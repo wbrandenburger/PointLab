@@ -142,10 +142,9 @@ Filereader::readParametersDLR(std::string filename, Eigen::Matrix3d& cam, Eigen:
 	}
 	Eigen::Matrix3d cameraR_ = cameraR.transpose();
 	Eigen::Vector3d cameraT_ = -cameraR_*cameraT;
+
 	cameraT = cameraT_;
 	cameraR = cameraR_;
-	std::cout << cameraR << std::endl;
-	std::cout << cameraT << std::endl;
 }
 
 
