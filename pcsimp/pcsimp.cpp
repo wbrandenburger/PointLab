@@ -9,30 +9,11 @@
 //#include "flann/flann.hpp"
 
 #include "pcsimp.hpp"
-#include "util/any.h"
 
 #include "tools/utils.h"
 #include "tools/io.h"
 
-typedef std::map<std::string, pcsimp::any> IndexParams;
-
-template<typename T>
-T get_params(const IndexParams& params, std::string name, const T& default_value)
-{
-	IndexParams::const_iterator it = params.find(name);
-	if (it != params.end()) {
-		return it->second.cast<T>();
-	}
-	else {
-		return default_value;
-	}
-}
-
 int main(int argc, char* argv[]) {
-
-	IndexParams versuch;
-	versuch["Was"] = 15;
-	std::cout << get_params(versuch, "Was", 1) << std::endl;
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
 
