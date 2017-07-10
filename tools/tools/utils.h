@@ -36,5 +36,6 @@
 #include "utils/pointcloud.h"
 #include "utils/randomize.h"
 #include "utils/timer.h"
+#include "utils/threadpool.h"
 
 #endif /* INCLUDE_PROJECT_H_ */

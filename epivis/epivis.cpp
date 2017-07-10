@@ -191,8 +191,8 @@ int main(int argc, char** argv) {
 	//std::string img2N = argv[3];
 	//std::string conf2N = argv[4];
 
-	std::string data1 = "700";
-	std::string data2 = "701";
+	std::string data1 = "688";
+	std::string data2 = "689";
 	std::string img1N = "C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Bilder/52" + data1 + ".jpg";
 	std::string conf1N = "C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Daten/OrientierungIII/DLR/52" + data1 + "_param.txt";
 	std::string img2N = "C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Bilder/52" + data2 + ".jpg";

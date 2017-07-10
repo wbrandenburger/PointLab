@@ -12,7 +12,7 @@
 
 void
 Filereader::readGCP(std::string filename, std::vector<Eigen::Vector3d>& gcps) {
-	std::cerr << "Reading in file: " << filename << "..." << std::endl;
+	//std::cerr << "Reading in file: " << filename << "..." << std::endl;
 	std::ifstream inStream(filename.c_str());
 	if (!inStream.good()) {
 		std::cout << "error in readCamConfig: file " << filename << " not found" << std::endl;
@@ -29,8 +29,8 @@ Filereader::readGCP(std::string filename, std::vector<Eigen::Vector3d>& gcps) {
 			continue;
 		Eigen::Vector3d temp;
 		std::cout.precision(20);
-		temp[1] = -std::stod(strs[1]);
-		temp[0] = std::stod(strs[2]);
+		temp[0] = std::stod(strs[1]);
+		temp[1] = std::stod(strs[2]);
 		temp[2] = std::stod(strs[3]);
 		gcps.push_back(temp);
 		std::cout << temp.transpose() << std::endl;
@@ -41,7 +41,7 @@ Filereader::readGCP(std::string filename, std::vector<Eigen::Vector3d>& gcps) {
 void
 Filereader::readParametersDLR(std::string filename, Eigen::Matrix3d& cam, Eigen::Matrix3d& cameraR, Eigen::Vector3d& cameraT){
 
-	std::cerr << "Reading in file: " << filename << "..." << std::endl;
+	//std::cerr << "Reading in file: " << filename << "..." << std::endl;
 	std::ifstream inStream(filename.c_str());
 	if(!inStream.good()){
 		std::cout << "error in readCamConfig: file " << filename << " not found" << std::endl;

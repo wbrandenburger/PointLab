@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 	std::string conf1N = "C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Daten/OrientierungIII/DLR/52800_param.txt";
 	std::string img2N = "C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Bilder/52801.jpg";
 	std::string conf2N = "C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Daten/OrientierungIII/DLR/52801_param.txt";
-
+	
 	std::cout << "Going to read: " << img1N << std::endl;
 	img1 = cv::imread(img1N);
 	filereader.readParametersDLR(conf1N, cameraA1, cameraR1, cameraT1);
