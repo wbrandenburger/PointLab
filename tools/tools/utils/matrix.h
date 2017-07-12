@@ -53,13 +53,43 @@ namespace utils
 		/**
 			Constructor
 			
-			@param data row-array of a specific Type
-			@param rows
-			@param cols
+			@param data_ row-array of a specific Type
+			@param rows_
+			@param cols_
 		*/
 		Matrix(ElementType* data_, size_t rows_, size_t cols_) :
 			rows(rows_), cols(cols_), data(data_)
 		{
+		}
+
+		/**
+			Copy Constructor
+
+			@param matrix_
+		*/
+		Matrix(const Matrix<ElementType>& matrix_)
+		{
+			data = new ElementType[matrix_.rows*matrix_.cols];
+			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++){
+				data[i] = matrix_[std::ceil(i/3)][i%3];
+			}
+			rows = matrix_.rows;
+			cols = matrix_.cols;
+		}
+		
+		/**
+			Copy assignment operator
+
+			@param matrix_
+		*/
+		void operator=(const Matrix<ElementType>& matrix_)
+		{
+			data = new ElementType[matrix_.rows*matrix_.cols];
+			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++) {
+				data[i] = matrix_[std::ceil(i / 3)][i % 3];
+			}
+			rows = matrix_.rows;
+			cols = matrix_.cols;
 		}
 
 		/**
@@ -80,7 +110,7 @@ namespace utils
 		/**
 			Returns the pointer of the data array
 			
-			@return pointer of data array
+			@return Return pointer of data array
 		*/
 		ElementType* getPtr() const
 		{
@@ -89,8 +119,9 @@ namespace utils
 
 		/**
 			Return the pointer of the indexth row
-			
-			@return pointer of the indexth row
+
+			@param index Index of the row
+			@return Return pointer of the indexth row
 		*/
 		inline ElementType* operator[](size_t index) const
 		{
@@ -101,4 +132,4 @@ namespace utils
 
 }
 
-#endif UTILS_MATRIX_H_
+#endif /* UTILS_MATRIX_H_ */

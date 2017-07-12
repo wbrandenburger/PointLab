@@ -27,23 +27,169 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_ALLOCATOR_H_
+#ifndef UTILS_ALLOCATOR_H_ 
 #define UTILS_ALLOCATOR_H_
 
-#ifdef _DEBUG
-	#ifndef DEBUG_NEW
-		#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-		#define new DEBUG_NEW
-	#endif
-#endif
-
 namespace utils
-
 {
-	class Allocator {
-	
+	/**
+	* Allocates (using C's malloc) a generic type T.
+	*
+	* Params:
+	*     count = number of instances to allocate.
+	 * Returns: pointer (of type T*) to memory buffer
+	 */
+	template <typename T>
+	T* allocate(size_t count = 1)
+	{
+   		T* mem = (T*) ::malloc(sizeof(T)*count);
+    	return mem;
+	}
+
+
+
+	/**
+ 	* Pooled storage allocator
+	*
+ 	* The following routines allow for the efficient allocation of storage in
+ 	* small chunks from a specified pool.  Rather than allowing each structure
+ 	* to be freed individually, an entire pool of storage is freed at once.
+ 	* This method has two advantages over just using malloc() and free().  First,
+ 	* it is far more efficient for allocating small objects, as there is
+ 	* no overhead for remembering all the information needed to free each
+ 	* object or consolidating fragmented memory.  Second, the decision about
+ 	* how long to keep an object is made at the time of allocation, and there
+ 	* is no need to track down all the objects to free them.
+ 	*
+ 	*/
+
+	const size_t     WORDSIZE=16;
+	const  size_t     BLOCKSIZE=8192;
+
+	class PooledAllocator
+	{
+    	/* We maintain memory alignment to word boundaries by requiring that all
+        	allocations be in multiples of the machine wordsize.  */
+    	/* Size of machine word in bytes.  Must be power of 2. */
+    	/* Minimum number of bytes requested at a time from	the system.  Must be multiple of WORDSIZE. */
+
+
+    	int     remaining;  /* Number of bytes left in current block of storage. */
+    	void*   base;     /* Pointer to base of current block of storage. */
+    	void*   loc;      /* Current location in block to next allocate memory. */
+    	int     blocksize;
+
+
 	public:
+    	int     usedMemory;
+    	int     wastedMemory;
+
+    	/**
+        	Default constructor. Initializes a new pool.
+     	*/
+    	PooledAllocator(int blocksize = BLOCKSIZE)
+    	{
+        	this->blocksize = blocksize;
+        	remaining = 0;
+        	base = NULL;
+
+        	usedMemory = 0;
+        	wastedMemory = 0;
+    	}
+
+    	/**
+     	* Destructor. Frees all the memory allocated in this pool.
+     	*/
+    	~PooledAllocator()
+    	{
+        	free();
+    	}
+    
+		void free()
+		{
+			void* prev;
+			while (base != NULL) {
+				prev = *((void**) base); /* Get pointer to prev block. */
+				::free(base);
+				base = prev;
+			}
+			base = NULL;
+			remaining = 0;
+			usedMemory = 0;
+			wastedMemory = 0;
+		}
 	
+		/**
+		* Returns a pointer to a piece of new memory of the given size in bytes
+		* allocated from the pool.
+		*/
+		void* allocateMemory(int size)
+		{
+			int blocksize;
+	
+			/* Round size up to a multiple of wordsize.  The following expression
+				only works for WORDSIZE that is a power of 2, by masking last bits of
+				incremented size to zero.
+			*/
+			size = (size + (WORDSIZE - 1)) & ~(WORDSIZE - 1);
+	
+			/* Check whether a new block must be allocated.  Note that the first word
+				of a block is reserved for a pointer to the previous block.
+			*/
+			if (size > remaining) {
+	
+				wastedMemory += remaining;
+	
+				/* Allocate new storage. */
+				blocksize = (size + sizeof(void*) + (WORDSIZE-1) > BLOCKSIZE) ?
+							size + sizeof(void*) + (WORDSIZE-1) : BLOCKSIZE;
+	
+				// use the standard C malloc to allocate memory
+				void* m = ::malloc(blocksize);
+				if (!m) {
+					fprintf(stderr,"Failed to allocate memory.\n");
+					return NULL;
+				}
+	
+				/* Fill first word of new block with pointer to previous block. */
+				((void**) m)[0] = base;
+				base = m;
+	
+				int shift = 0;
+				//int shift = (WORDSIZE - ( (((size_t)m) + sizeof(void*)) & (WORDSIZE-1))) & (WORDSIZE-1);
+	
+				remaining = blocksize - sizeof(void*) - shift;
+				loc = ((char*)m + sizeof(void*) + shift);
+			}
+			void* rloc = loc;
+			loc = (char*)loc + size;
+			remaining -= size;
+	
+			usedMemory += size;
+	
+			return rloc;
+		}
+	
+		/**
+		* Allocates (using this pool) a generic type T.
+		*
+		* Params:
+		*     count = number of instances to allocate.
+		* Returns: pointer (of type T*) to memory buffer
+		*/
+		template <typename T>
+		T* allocate(size_t count = 1)
+		{
+			T* mem = (T*) this->allocateMemory((int)(sizeof(T)*count));
+			return mem;
+		}
+	
+	};
+	
+	class Allocator {
+
+	public:
+
 		size_t size;
 		size_t chunk;
 		int number;
@@ -53,7 +199,7 @@ namespace utils
 		void* current;
 
 		/**
-			Constructor
+		Constructor
 		*/
 		Allocator()
 		{
@@ -66,12 +212,12 @@ namespace utils
 		}
 
 		/**
-			Constructor
+		Constructor
 
-			@param size_ number of elements
-			@param chunk_ size of the elements in Bytes
+		@param size_ number of elements
+		@param chunk_ size of the elements in Bytes
 		*/
-		Allocator(size_t size_, size_t chunk_) 
+		Allocator(size_t size_, size_t chunk_)
 		{
 			size = size_;
 			chunk = chunk_;
@@ -81,16 +227,16 @@ namespace utils
 			current = base;
 		}
 
-		 /**
-			Deconstructor
-		 */
-		~Allocator() {}
-		
 		/**
-			Return a pointer to a memory area that can be used
+		Deconstructor
+		*/
+		~Allocator() {}
 
-			@param chunk_ size of the element which is required in Bytes
-			@return pointer to the memory area
+		/**
+		Return a pointer to a memory area that can be used
+
+		@param chunk_ size of the element which is required in Bytes
+		@return pointer to the memory area
 		*/
 		void* allocate()
 		{
@@ -107,14 +253,14 @@ namespace utils
 		}
 
 		/**
-			Return a pointer to a memory area that can be used
+		Return a pointer to a memory area that can be used
 
-			@param chunk_ size of the element which is required in Bytes
-			@param number_ integer which specifies the location of the pointer
-			@return pointer to the memory area
-			@return number_ integer which specifies the location of the pointer
+		@param chunk_ size of the element which is required in Bytes
+		@param number_ integer which specifies the location of the pointer
+		@return pointer to the memory area
+		@return number_ integer which specifies the location of the pointer
 		*/
-		void* allocate(int& number_) 
+		void* allocate(int& number_)
 		{
 
 			if (number == size) {
@@ -131,33 +277,33 @@ namespace utils
 		}
 
 		/**
-			Free memory
+		Free memory
 		*/
 		void clear()
 		{
 			size = 0;
 			chunk = 0;
 			number = 0;
-			
+
 			delete[] base;
 			base = nullptr;
 			current = nullptr;
 		}
 
 		/**
-			Shows how much memory is used
+		Shows how much memory is used
 
-			@return number of Bytes that are used by this object
+		@return number of Bytes that are used by this object
 		*/
-		size_t usedMemory() 
+		size_t usedMemory()
 		{
 			return number*chunk;
 		}
 
 		/**
-			Shows how much memory is remaining
+		Shows how much memory is remaining
 
-			@return number of Bytes that could be used
+		@return number of Bytes that could be used
 		*/
 		size_t remainedMemory()
 		{
@@ -174,31 +320,15 @@ namespace utils
 			return base;
 		}
 	};
-
 }
 
-/////////**
-////////	Overloading of the operator new - this operator offers a pointer to the allocated memory
-////////
-////////	@param allocator_ object which offers the allocated memory
-////////	@return pointer to the respective memory
-////////*/
-////////inline void* operator new(size_t size_, utils::Allocator& allocator_) 
-////////{
-////////	return allocator_.allocate();
-////////}
-////////
-/////////**
-////////	Overloading of the operator new - this operator offers a pointer to the allocated memory
-////////
-////////	@param allocator_ object which offers the allocated memory
-////////	@param number_ integer which specifies the location of the pointer
-////////	@return pointer to the respective memory
-////////	@return number_ integer which specifies the location of the pointer
-////////*/
-////////inline void* operator new(size_t size_, utils::Allocator& allocator_, int& number_)
-////////{
-////////	return allocator_.allocate(number_);
-////////}
+inline void* operator new (std::size_t size, utils::PooledAllocator& allocator)
+{
+    return allocator.allocateMemory(size) ;
+}
+
+inline void operator delete(void* p, utils::PooledAllocator& allocator)
+{
+}
 
 #endif /* UTILS_ALLOCATOR_H_ */

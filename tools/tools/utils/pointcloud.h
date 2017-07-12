@@ -30,7 +30,7 @@
 #ifndef UTILS_POINTCLOUD_H_
 #define UTILS_POINTCLOUD_H_
 
-#include "utils/matrix.h"
+#include "tools/utils/matrix.h"
 
 namespace utils
 {
