@@ -2,8 +2,6 @@
 #include <string>
 #include <thread>
 
-#include <map>
-
 //#define FLANN_USE_CUDA
 //#include "flann/flann.h"
 //#include "flann/flann.hpp"
@@ -48,12 +46,11 @@ int main(int argc, char* argv[]) {
 
 	std::cout << "Simplification-index has been built in " << time.stop() << " s" << std::endl;
 
-	///**
-	//Destroy the structures
-	//*/
-	//pointcloud.clear();
-	//delete[] indices.ptr();
-	//delete[] dists.ptr();
+	/**
+	Destroy the structures
+	*/
+	pointcloud.clear();
+
 
 
 	return(0);

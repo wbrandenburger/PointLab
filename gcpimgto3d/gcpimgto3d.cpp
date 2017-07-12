@@ -12,11 +12,11 @@
 
 #include "tools/io.h"
 #include "tools/utils.h"
-#include "tools/opencv/utils.h"
+#include "tools/image/utils.h"
 
 boost::mutex mutex;
 
-void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<Eigen::Vector3d>& gcps_, std::string aditional_) {	
+void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<Eigen::Vector3d>& gcps_, std::string additional_) {	
 	Eigen::Matrix3d cameraA;
 	Eigen::Matrix3d cameraR;
 	Eigen::Vector3d cameraT;
@@ -44,7 +44,7 @@ void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<
 
 	for (size_t j = 1; j < labels; j++) {
 		std::vector<std::vector<size_t>> coordinates;
-		utils::find<int>(imgLabel, coordinates, j);
+		image::find<int>(imgLabel, coordinates, j);
 
 		Eigen::Vector3d mean(0.0, 0.0, 1.0);
 		float meanx, meany = 0;
@@ -80,7 +80,7 @@ void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<
 		cv::threshold(patch, patchThresh, 245, 255, cv::THRESH_BINARY);
 
 		std::vector<std::vector<size_t>> patchCoordinates;
-		utils::find<uchar>(patchThresh, patchCoordinates, 255);
+		image::find<uchar>(patchThresh, patchCoordinates, 255);
 
 		Eigen::Vector3d patchMean(0.0, 0.0, 1.0);
 		for (size_t i = 0; i < patchCoordinates.size(); i++) {
@@ -146,7 +146,7 @@ void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<
 				mutex.lock();
 				std::ofstream outStream("C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Daten/gcps.txt", std::ofstream::app);
 				outStream.precision(15);
-				outStream << aditional_ << ";" << index << ";" << patchMean(0) << ";" << patchMean(1) << std::endl;
+				outStream << additional_ << ";" << index << ";" << patchMean(0) << ";" << patchMean(1) << std::endl;
 				outStream.close();
 				mutex.unlock();
 			}
@@ -166,7 +166,7 @@ int main(){
 	filereader.readGCP(gcpN, gcps);
 
 	std::ofstream outStream("C:/Users/Wolfgang Brandenburg/Documents/Schnoeggersburg/Daten/gcps.txt", std::ofstream::out);
-	outStream.precision(15);
+	outStream << "image gcp row column" << std::endl;
 	outStream.close();
 	
 	utils::Timer timer;
