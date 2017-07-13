@@ -78,9 +78,8 @@ namespace trees
 			@param dists_ Distances to the nearest neighbors found
 			@param knn_ Number of nearest neighbors to return
 			@param params_ Search parameters
-			@return Return number of all neighbors found
 		*/
-		int knnSearch(const Matrix<ElementType>& queries_,
+		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<size_t>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
@@ -104,26 +103,9 @@ namespace trees
 					boost::ref(params_), 
 					i)));
 			}
-			pool.shutdown();
-			int count = 0;
-//
-//#pragma omp parallel num_threads(params_.cores)
-//			{
-//				KNNResultSet2<ElementType> result_set(knn_);
-//
-//#pragma omp for schedule(static) reduction(+:count)
-//				for (int i = 0; i < (int)queries_.rows; i++) {
-//					result_set.clear();
-//					findNeighbors(result_set, queries_[i], params_);
-//					size_t n = std::min(result_set.size(), knn_);
-//					result_set.copy(indices_[i], dists_[i], n);
-//					count += n;
-//				}
-//			}
-			return count;
-		}
 
-		//boost::atomic<int> count{ 0 };
+			pool.shutdown();
+		}
 
 		/**
 			Perform k-nearest neighbor search
@@ -147,7 +129,6 @@ namespace trees
 			findNeighbors(result_set, queries_[index_], params_);
 			size_t n = std::min(result_set.size(), knn_);
 			result_set.copy(indices_[index_], dists_[index_], n);
-			//count += n;
 		}
 
 		/**
@@ -158,16 +139,15 @@ namespace trees
 			@param dists_ Distances to the nearest neighbors found
 			@param knn_ Number of nearest neighbors to return
 			@param params_ Search parameters
-			@return Return number of all neighbors found
 		*/
-		int knnSearch(const Matrix<ElementType>& queries_,
+		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<int>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_)
 		{
 			flann::Matrix<size_t> indices(new size_t[indices_.rows*indices_.cols], indices_.rows, indices_.cols);
-			int result = knnSearch(queries_, indices, dists_, knn_, params_);
+			knnSearch(queries_, indices, dists_, knn_, params_);
 
 			for (size_t i = 0; i < indices_.rows; ++i) {
 				for (size_t j = 0; j < indices_.cols; ++j) {
@@ -175,7 +155,6 @@ namespace trees
 				}
 			}
 			delete[] indices.ptr();
-			return result;
 		}
 
 	protected:

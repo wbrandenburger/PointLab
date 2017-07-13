@@ -71,15 +71,14 @@ namespace trees
 			@param dists_ Distances to the nearest neighbors found
 			@param knn_ Number of nearest neighbors to return
 			@param params_ Search parameters
-			@return Return number of all neighbors found
 		*/
-		int knnSearch(const Matrix<ElementType>& queries_,
+		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<size_t>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_) const
 		{
-			return nnIndex->knnSearch(queries_, indices_, dists_, knn_, params_);
+			nnIndex->knnSearch(queries_, indices_, dists_, knn_, params_);
 		}
 
 		/**
@@ -90,15 +89,14 @@ namespace trees
 			@param dists_ Distances to the nearest neighbors found
 			@param knn_ Number of nearest neighbors to return
 			@param params_ Search parameters
-			@return Return number of all neighbors found
 		*/
-		int knnSearch(const Matrix<ElementType>& queries_,
+		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<int>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_) const
 		{
-			return nnIndex->knnSearch(queries_, indices_, dists_, knn_, params_);
+			nnIndex->knnSearch(queries_, indices_, dists_, knn_, params_);
 		}
 
 
@@ -110,15 +108,14 @@ namespace trees
 			@param dists_ Distances to the nearest neighbors found
 			@param radius_ The radius used for search
 			@param params_ Search parameters
-			@return Return number of all neighbors found
 		*/
-		int radiusSearch(const Matrix<ElementType>& queries_,
+		void radiusSearch(const Matrix<ElementType>& queries_,
 			Matrix<size_t>& indices_,
 			Matrix<ElementType>& dists_,
 			float radius_,
 			const TreeParams& params_) const
 		{
-			return nnIndex_->radiusSearch(queries_, indices_, dists_, radius_, params_);
+			nnIndex_->radiusSearch(queries_, indices_, dists_, radius_, params_);
 		}
 
 		/**
@@ -129,15 +126,14 @@ namespace trees
 			@param dists_ Distances to the nearest neighbors found
 			@param radius_ The radius used for search
 			@param params_ Search parameters
-			@return Return number of all neighbors found
 		*/
-		int radiusSearch(const Matrix<ElementType>& queries_,
+		void radiusSearch(const Matrix<ElementType>& queries_,
 			Matrix<int>& indices_,
 			Matrix<ElementType>& dists_,
 			float radius_,
 			const TreeParams& params_) const
 		{
-			return nnIndex_->radiusSearch(queries_, indices_, dists_, radius_, params_);
+			nnIndex_->radiusSearch(queries_, indices_, dists_, radius_, params_);
 		}
 
 	private:
