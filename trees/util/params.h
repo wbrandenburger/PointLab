@@ -49,8 +49,8 @@ namespace trees
 		/**
 			Constructor
 
-			@param cores_ Number of cores
-			@oaram eps_  Machine epsilon
+			@param[in] cores_ Number of cores
+			@param[in] eps_  Machine epsilon
 		*/
 		TreeParams(int cores_ = 1, float eps_ = std::numeric_limits<float>::epsilon()) 
 		{
@@ -58,19 +58,23 @@ namespace trees
 			eps = eps_;
 		}
 
-		//Number of cores
+		/**
+			Number of cores
+		*/
 		int cores;
 
-		//Machine epsilon
+		/**
+			Machine epsilon
+		*/
 		float eps;
 	};
 
 	/**
-		Figure out whether the map has certain field
+		Figure out whether the map has a certain field
 
-		@param params_ Map with fields
-		@params name_ Field which will be searched in the map
-		@return Return True if the field is found in the map
+		@param[in] params_ Map with fields
+		@params[in] name_ Field which will be searched in the map
+		@return Returns true if the field is found in the map
 	*/
 	inline bool has_param(const IndexParams& params_, std::string name_)
 	{
@@ -80,9 +84,9 @@ namespace trees
 	/**
 		Returns the value of a certain field in a map
 
-		@param params_ Map with fields
-		@param name_ Field which will be searched in the map
-		@return Return the value of the found field 
+		@param[in] params_ Map with fields
+		@param[in] name_ Field which will be searched in the map
+		@return Returns the value of the found field 
 	*/
 	template<typename T>
 	T get_param(const IndexParams& params_, std::string name_)
@@ -99,10 +103,10 @@ namespace trees
 	/**
 		Returns the value of a certain field in a map
 
-		@param params_ Map with fields
-		@param name_ Field which will be searched in the map
-		@param default_value_ Returns a default value if there is no field in the map
-		@return Return the value of the found field or the default value
+		@param[in] params_ Map with fields
+		@param[in] name_ Field which will be searched in the map
+		@param[in] default_value_ Returns a default value if there is no field in the map
+		@return Returns the value of the found field or the default value
 	*/
 	template<typename T>
 	T get_param(const IndexParams& params_, std::string name_, const T& default_value_)

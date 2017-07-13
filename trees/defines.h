@@ -32,6 +32,9 @@
 
 namespace trees
 {
+	/**
+		Indices of the project trees
+	*/
 	enum treeIndex
 	{
 		TREE_INDEX_KDTREE = 1

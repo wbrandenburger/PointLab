@@ -43,21 +43,21 @@ namespace utils
 		clock_t time;
 
 		/**
-		* Constructor
+			Constructor
 		*/
 		Timer()
 		{
 		}
 
 		/**
-		* Deconstructor
+			Deconstructor
 		*/
 		~Timer()
 		{
 		}
 
 		/**
-		* Starts the timer
+			Starts the timer
 		*/
 		void start()
 		{
@@ -65,7 +65,9 @@ namespace utils
 		}
 
 		/**
-		* Stops the timer
+			Stops the timer
+			
+			@return duration of time betwenn invoking start and stop
 		*/
 		double stop()
 		{

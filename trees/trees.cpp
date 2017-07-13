@@ -77,8 +77,8 @@ int main(int argc, char* argv[]) {
 	/**
 		Search in pointcloud
 	*/
-	int nn = 20;
-	int querynumber = pointcloudkdtree.rows;
+	int nn = 2000;
+	int querynumber = 12;// pointcloudkdtree.rows;
 
 	trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
 	trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 	/**
 		Generates a pointcloud with points whose neighbors shall searched for
 	*/
-	utils::rand_seed();
+	utils::randSeed();
 	trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
 	for (int i = 0; i < querynumber; i++) {
 		int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
 	/**
 		Colorize the pointcloud
 	*/
-	utils::rand_seed();
+	utils::randSeed();
 	for (int i = 0; i < indices.rows; i++) {
 		int r = utils::rand<int>(255, 0);
 		int g = utils::rand<int>(255, 0);

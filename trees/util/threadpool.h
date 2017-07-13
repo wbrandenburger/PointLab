@@ -27,7 +27,6 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-
 #ifndef TREES_THREADPOOL_H_
 #define TREES_THREADPOOL_H_
 
@@ -49,6 +48,11 @@ namespace trees
 
 	public:
 
+		/**
+			Constructor
+			
+			@param[in] pool_ Number of active threads
+		*/
 		Threadpool(std::size_t pool_) : work(io_service), available(pool_)
 		{
 			for (std::size_t i = 0; i < pool_; ++i)
@@ -57,10 +61,16 @@ namespace trees
 			}
 		}
 
+		/**
+			Destructor
+		*/
 		~Threadpool()
 		{
 		}
 
+		/**
+			Terminates io_service and threads
+		*/
 		void shutdown()
 		{
 			// Force all threads to return from io_service::run().
@@ -74,6 +84,12 @@ namespace trees
 			catch (const std::exception&) {}
 		}
 
+		/**
+			Start a thread with a specific task
+			
+			@param[in] task_ Function which will be invoked
+			@return True if the function could be invoked
+		*/
 		template <typename Task> bool runTask(Task task_)
 		{
 			boost::unique_lock< boost::mutex > lock(mutex);
@@ -92,6 +108,11 @@ namespace trees
 
 	private:
 	
+		/**
+			Invoke the function task_
+			
+			@param[in] task_ Function which will be invoked
+		*/
 		void wrapTask(boost::function<void()> task_)
 		{
 			// Run the user supplied task.

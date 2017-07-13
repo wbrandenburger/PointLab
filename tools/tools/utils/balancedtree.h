@@ -39,28 +39,9 @@ namespace utils
 	public:
 
 		/**
-			Every node stores a value. When the node stores a value which is different from NAN
-			occupied becomes true
-		*/
-		ElementType value;
-		bool occupied;
-
-		/**
-			Depth is the maximal depth that a child from this node has
-		*/
-		int depth;
-
-		/**
-			Every node has a pointer to each child and a pointer to the parent
-		*/
-		BalancedTree<ElementType>* parent;
-		BalancedTree<ElementType>* nodel;
-		BalancedTree<ElementType>* noder;
-
-		/**
 			Constructor
 
-			@param pointer to the parent of this node
+			@param[in] pointer to the parent of this node
 		*/
 		BalancedTree(BalancedTree<ElementType>* parent_) : parent(parent_)
 		{
@@ -85,8 +66,8 @@ namespace utils
 		/**
 			Adds a value to the tree
 			
-			@param root_, pointer to root
-			@param value_, the value which should be added
+			@param[in] root_ Pointer to root
+			@param[in] value_ The value which should be added
 		*/
 		void addNode(void** root_, ElementType value_)
 		{
@@ -153,8 +134,8 @@ namespace utils
 		/**
 			Rotates the node to the right
 
-			@param root_, pointer to root
-			@param rootparent_, determines whether the node is involved which points to root
+			@param[in] root_ Pointer to root
+			@param[in] rootparent_ Determines whether the node is involved which points to root
 		*/
 		void turnRight(void** root_, bool rootparent_) {
 			/**
@@ -200,8 +181,8 @@ namespace utils
 		/**
 			Rotates the node to the left
 
-			@param root_, pointer to root
-			@param rootparent_, determines whether the node is involved which points to root
+			@param[in] root_ Pointer to root
+			@param[in] rootparent_ Determines whether the node is involved which points to root
 		*/
 		void turnLeft(void** root_, bool rootparent_) {
 			/**
@@ -248,7 +229,7 @@ namespace utils
 		/**
 			Computes the balance factor
 
-			@return balancefactor which lies between [-2,2]
+			@return Balancefactor which lies between [-2,2]
 		*/
 		int getBalanceFactor() {
 			if (!nodel && !noder) {
@@ -270,7 +251,7 @@ public:
 		/**
 			Computes the number of elements in the tree
 
-			@return count number of elements in the tree
+			@return Count number of elements in the tree
 		*/
 		void getNumber(int& count)
 		{
@@ -314,7 +295,7 @@ public:
 		/**
 			Checks whether the specification of the depth in every node of the tree is correct
 
-			@return true when the specifications are correct
+			@return True when the specifications are correct
 		*/
 		bool checkDepth()
 		{
@@ -356,7 +337,7 @@ public:
 		/**
 			Checks whether the left and right node have this as parent
 
-			@return true when the the left and right node have this as parent
+			@return True when the the left and right node have this as parent
 		*/
 		bool checkParent()
 		{
@@ -383,7 +364,7 @@ public:
 		/**
 			Checks whether the value of the left node is smaller and the value of the right value is bigger than the value of the parent
 
-			@return true when the values are co
+			@return True when the values are in the expected order
 		*/
 		bool checkRelations()
 		{
@@ -450,13 +431,13 @@ private:
 			}
 		}
 
-public:
+	public:
 
 		/**
 			Searches for a node with the same value as value_
 
-			@param value_ value which should be searched for in the tree
-			@return true when the tree contains a node with the given value
+			@param[in] value_ Value which should be searched for in the tree
+			@return True when the tree contains a node with the given value
 		*/
 		bool search(ElementType value_)
 		{
@@ -468,6 +449,27 @@ public:
 
 			return 0;
 		}
+	
+	public:
+
+		/**
+			Every node stores a value. When the node stores a value which is different from NAN
+			occupied becomes true
+		*/
+		ElementType value;
+		bool occupied;
+
+		/**
+			Depth is the maximal depth that a child from this node has
+		*/
+		int depth;
+
+		/**
+			Every node has a pointer to each child and a pointer to the parent
+		*/
+		BalancedTree<ElementType>* parent;
+		BalancedTree<ElementType>* nodel;
+		BalancedTree<ElementType>* noder;
 	};
 }
 

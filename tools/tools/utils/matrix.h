@@ -38,10 +38,6 @@ namespace utils
 	{
 	public:
 
-		size_t rows;
-		size_t cols;
-		ElementType* data;
-
 		/**
 			Constructor
 		*/
@@ -53,9 +49,9 @@ namespace utils
 		/**
 			Constructor
 			
-			@param data_ row-array of a specific Type
-			@param rows_
-			@param cols_
+			@param[in] data_ Row-array of a specific Type
+			@param[in] rows_
+			@param[in] cols_
 		*/
 		Matrix(ElementType* data_, size_t rows_, size_t cols_) :
 			rows(rows_), cols(cols_), data(data_)
@@ -65,7 +61,7 @@ namespace utils
 		/**
 			Copy Constructor
 
-			@param matrix_
+			@param[in] matrix_
 		*/
 		Matrix(const Matrix<ElementType>& matrix_)
 		{
@@ -80,7 +76,7 @@ namespace utils
 		/**
 			Copy assignment operator
 
-			@param matrix_
+			@param[in] matrix_
 		*/
 		void operator=(const Matrix<ElementType>& matrix_)
 		{
@@ -120,13 +116,20 @@ namespace utils
 		/**
 			Return the pointer of the indexth row
 
-			@param index Index of the row
+			@param[in] index Index of the row
 			@return Return pointer of the indexth row
 		*/
 		inline ElementType* operator[](size_t index) const
 		{
 			return data + index*cols;
 		}
+		
+	public:
+
+		size_t rows;
+		size_t cols;
+		ElementType* data;
+
 
 	};
 

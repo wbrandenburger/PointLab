@@ -46,10 +46,18 @@ namespace trees
 	
 	public:
 
+		/**
+			Constructor
+		*/
 		NNIndex() : size(0), veclen(0)
 		{
 		}
 
+		/**
+			Set parameters based on the input pointcloud
+			
+			@param[in] dataset_ Pointcloud
+		*/
 		void setDataset(const Matrix<ElementType>& dataset_)
 		{
 			size = dataset_.rows;
@@ -58,26 +66,42 @@ namespace trees
 			dataset = dataset_;
 		}
 
+		/**
+			Build the tree of the specified index
+		*/
 		virtual void buildIndex() {
 			freeIndex();
 
 			buildIndexImpl();
 		}
 
+		/**
+			Free allocated memory
+		*/
 		virtual void freeIndex() = 0;
 
+		/**
+			Build the tree of the specified index
+		*/
 		virtual void buildIndexImpl() = 0;
 
+		/**
+			Prepares the search process, computes initial distances and calls the search function
+			
+			@param[in,out] result_set_ Container which contains the found neighbors
+			@param[in] vec_ Point which neighbors shall be found
+			@param[in] params_ Input parameters for the search
+		*/
 		virtual void findNeighbors(ResultSet<ElementType>& result_set_, const ElementType* vec_, const TreeParams& params_) const = 0;
 
 		/**
 			Perform k-nearest neighbor search
 
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param knn_ Number of nearest neighbors to return
-			@param params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] knn_ Number of nearest neighbors to return
+			@param[in] params_ Search parameters
 		*/
 		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<size_t>& indices_,
@@ -110,12 +134,12 @@ namespace trees
 		/**
 			Perform k-nearest neighbor search
 
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param knn_ Number of nearest neighbors to return
-			@param params_ Search parameters
-			@param index_ Number of the row of the queries
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] knn_ Number of nearest neighbors to return
+			@param[in] params_ Search parameters
+			@param[in] index_ Number of the row of the queries
 		*/
 		void knnSearchThreadpool(const Matrix<ElementType>& queries_,
 								 Matrix<size_t>& indices_,
@@ -134,11 +158,11 @@ namespace trees
 		/**
 			Perform k-nearest neighbor search
 
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param knn_ Number of nearest neighbors to return
-			@param params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] knn_ Number of nearest neighbors to return
+			@param[in] params_ Search parameters
 		*/
 		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<int>& indices_,
@@ -173,8 +197,6 @@ namespace trees
 			Pointcloud
 		*/
 		Matrix<ElementType> dataset;
-	
-
 	};
 
 }

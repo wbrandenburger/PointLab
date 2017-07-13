@@ -42,24 +42,18 @@ namespace utils
 
 	public:
 
-		utils::Matrix<ElementType> points;
-		utils::Matrix<uchar> colors;
-
-		size_t rows;
-		size_t cols;
-
 		/**
-		* Constructor
+			Constructor
 		*/
 		Pointcloud(void)
 		{
 		}
 
 		/**
-		* Constructor
-		*
-		* @param rows
-		* @param cols
+			Constructor
+		
+			@param[in] rows_ Number of points
+			@param[in] cols_ Number of dimension
 		*/
 		Pointcloud(size_t rows_, size_t cols_)
 		{
@@ -70,14 +64,14 @@ namespace utils
 		}
 
 		/**
-		* Deconstructor
+			Deconstructor
 		*/
 		~Pointcloud(void)
 		{
 		}
 
 		/**
-		* Deletes the point and color array
+			Deletes the point and color array
 		*/
 		void clear() const
 		{
@@ -86,9 +80,9 @@ namespace utils
 		}
 
 		/**
-		* Returns the pointer of the data array
-		*
-		* @return pointer of data array
+			Returns the pointer of the data array
+		
+			@return Pointer of pointcloud matrix
 		*/
 		ElementType* getPointsPtr() const
 		{
@@ -96,10 +90,10 @@ namespace utils
 		}
 
 		/**
-		* Sets the data array for the points of the pointcloud
-		*
-		* @param rows
-		* @param cols
+			Sets the data array for the points of the pointcloud
+		
+			@param[in] rows_ Number of points
+			@param[in] cols_ Number of dimensions
 		*/
 		void setPoints(size_t rows_, size_t cols_)
 		{
@@ -110,18 +104,39 @@ namespace utils
 		}
 
 		/**
-		* Sets the data array for the colorinformation
-		*
-		* @param rows
-		* @param cols
+			Sets the data array for the colorinformation
+			
+			@param[in] rows_ Number of points
+			@param[in] cols_ Number of colorchannels
 		*/
 		void setColors(size_t rows_, size_t cols_)
 		{
 			colors = utils::Matrix<uchar>(new uchar[rows_*cols_], rows_, cols_);
 		}
+		
+	public:
+
+		/**
+			Pointcloud
+		*/
+		utils::Matrix<ElementType> points;
+		
+		/**
+			Color of points
+		*/
+		utils::Matrix<uchar> colors;
+
+		/**
+			Number of points
+		*/
+		size_t rows;
+		
+		/**
+			Number of dimensions
+		*/
+		size_t cols;
 
 	};
-
 }
 
 #endif /* UTILS_POINTCLOUD_H_ */

@@ -46,8 +46,8 @@ namespace trees
 		/**
 			Constructor
 
-			@param dataset_ Pointcloud
-			@param params_ Input parameters
+			@param[in] dataset_ Pointcloud
+			@param[in] params_ Input parameters
 		*/
 		Index(const Matrix<ElementType>& dataset_, const IndexParams& params_) : params(params_)
 		{
@@ -66,11 +66,11 @@ namespace trees
 		/**
 			Perform k-nearest neighbor search
 			
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param knn_ Number of nearest neighbors to return
-			@param params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] knn_ Number of nearest neighbors to return
+			@param[in] params_ Search parameters
 		*/
 		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<size_t>& indices_,
@@ -84,11 +84,11 @@ namespace trees
 		/**
 			Perform k-nearest neighbor search
 
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param knn_ Number of nearest neighbors to return
-			@param params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] knn_ Number of nearest neighbors to return
+			@param[in] params_ Search parameters
 		*/
 		void knnSearch(const Matrix<ElementType>& queries_,
 			Matrix<int>& indices_,
@@ -103,11 +103,11 @@ namespace trees
 		/**
 			Perform radius search
 
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param radius_ The radius used for search
-			@param params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] radius_ The radius used for search
+			@param[in] params_ Search parameters
 		*/
 		void radiusSearch(const Matrix<ElementType>& queries_,
 			Matrix<size_t>& indices_,
@@ -121,11 +121,11 @@ namespace trees
 		/**
 			Perform radius search
 
-			@param queries_ The query points for which to find the nearest neighbors
-			@param indices_ The indices of the nearest neighbors found
-			@param dists_ Distances to the nearest neighbors found
-			@param radius_ The radius used for search
-			@param params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] radius_ The radius used for search
+			@param[in] params_ Search parameters
 		*/
 		void radiusSearch(const Matrix<ElementType>& queries_,
 			Matrix<int>& indices_,

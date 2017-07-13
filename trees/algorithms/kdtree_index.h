@@ -44,12 +44,16 @@
 namespace trees
 {
 
+	/**
+		Input parameters for the tree
+	*/
 	struct KDTreeIndexParams : public IndexParams
 	{
 		/**
 			Constructor
 
-			@param neighbor_ Number of used neighbors for computing surface
+			@param[in] neighbor_ Maximal number  of neighbors in one node
+			@param[in] ordered_ Flag whether th epointcloud shall be sorted
 		*/
 		KDTreeIndexParams(int neighbor_ = 30, bool ordered_ = true)
 		{
@@ -69,8 +73,8 @@ namespace trees
 		/**
 			Constructor
 
-			@param data_ Pointcloud
-			@param params_ Input parameters for the tree
+			@param[in] dataset_ Pointcloud
+			@param[in] params_ Input parameters for the tree
 		*/
 		KDTreeIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_ = KDTreeIndexParams())
 		{
@@ -80,6 +84,9 @@ namespace trees
 			setDataset(dataset_);
 		}
 
+		/**
+			Structures for the bounding box
+		*/
 		struct Interval
 		{
 			ElementType low, high;
@@ -87,6 +94,9 @@ namespace trees
 
 		typedef std::vector<Interval> BoundingBox;
 		
+		/**
+			Structure for a node in the tree
+		*/
 		struct Node
 		{
 			/**
@@ -117,6 +127,9 @@ namespace trees
 
 	private:
 
+		/**
+			Prepares the building processs of the tree and calls the initial divide function
+		*/
 		void buildIndexImpl()
 		{
 			// Create a permutable array of indices to the input vectors.
@@ -136,39 +149,46 @@ namespace trees
 			}
 		}
 
+		/**
+			Free allocated memory
+		*/
 		void freeIndex() 
 		{
 			if (ordered){ 
 				dataset_ordered.clear();
 			}
-			//if (root_node) root_node->~Node();
 			pool.free();
 		}
 
-		void computeBoundingBox(BoundingBox& bbox)
+		/**
+			Computes the bounding box of the entire pointcloud
+
+			@param[in,out] bbox_ Structure which contain the bounds of the bounding box
+		*/
+		void computeBoundingBox(BoundingBox& bbox_)
 		{
-			bbox.resize(veclen);
+			bbox_.resize(veclen);
 			for (size_t i = 0; i<veclen; ++i) {
-				bbox[i].low = (ElementType)dataset[0][i];
-				bbox[i].high = (ElementType)dataset[0][i];
+				bbox_[i].low = (ElementType)dataset[0][i];
+				bbox_[i].high = (ElementType)dataset[0][i];
 			}
 			for (size_t k = 1; k<size; ++k) {
 				for (size_t i = 0; i<veclen; ++i) {
-					if (dataset[k][i]<bbox[i].low) bbox[i].low = (ElementType)dataset[k][i];
-					if (dataset[k][i]>bbox[i].high) bbox[i].high = (ElementType)dataset[k][i];
+					if (dataset[k][i]<bbox_[i].low) bbox_[i].low = (ElementType)dataset[k][i];
+					if (dataset[k][i]>bbox_[i].high) bbox_[i].high = (ElementType)dataset[k][i];
 				}
 			}
 		}
 
 
 		/**
-		* Create a tree node that subdivides the list of vecs from vind[first]
-		* to vind[last].  The routine is called recursively on each sublist.
-		* Place a pointer to this new tree node in the location pTree.
-		*
-		* Params: pTree = the new node to create
-		*                  first = index of the first vector
-		*                  last = index of the last vector
+			Divides the points  between left_ and right_ and calls revursively divideTree or
+			creates the leaf node with the respective points
+
+			@param[in] left_ Left bound of the list which shall be split
+			@param[in] right_ Right bound of the list which shall be split
+			@param[in] bbox_ Bounding Box of the entire pointcloud
+			@return Pointer to a node of the tree
 		*/
 		NodePtr divideTree(int left_, int right_, BoundingBox& bbox_)
 		{
@@ -220,17 +240,37 @@ namespace trees
 			return node;
 		}
 
-		void computeMinMax(int* ind, int count, int dim, ElementType& min_elem, ElementType& max_elem)
+		/**
+			Computes the minimal and maximal value of one dimension in a list of the pointcloud
+
+			@param[in] ind_ Pointer to the list
+			@param[in] count_ Number of elements in the list which shall be included
+			@param[in] dim_ Dimension of pointcloud which shall be examined
+			@param[in,out] min_elem_ Minimal value
+			@param[in,out] max_elem_ Maximal value
+
+		*/
+		void computeMinMax(int* ind_, int count_, int dim_, ElementType& min_elem_, ElementType& max_elem_)
 		{
-			min_elem = dataset[ind[0]][dim];
-			max_elem = dataset[ind[0]][dim];
-			for (int i = 1; i<count; ++i) {
-				ElementType val = dataset[ind[i]][dim];
-				if (val<min_elem) min_elem = val;
-				if (val>max_elem) max_elem = val;
+			min_elem_ = dataset[ind_[0]][dim_];
+			max_elem_ = dataset[ind_[0]][dim_];
+			for (int i = 1; i<count_; ++i) {
+				ElementType val = dataset[ind_[i]][dim_];
+				if (val<min_elem_) min_elem_ = val;
+				if (val>max_elem_) max_elem_ = val;
 			}
 		}
 
+		/**
+			Computes the index, dimension and value of the point where the list will be split
+			
+			@param[in] ind_ Pointer to the list
+			@param[in] count_ Number of elements in the list which shall be included
+			@param[in,out] index_ Index of the point where the list will be split
+			@param[in,out] cutfeat_ Dimension of the point where the list will be split
+			@param[in,out] cutval_ Value of the point where the list will be split
+			@param[in] bbox_ Bounding Box of the entire pointcloud
+		*/
 		void middleSplit(int* ind_, int count_, int& index_, int& cutfeat_, ElementType& cutval_, const BoundingBox& bbox_)
 		{
 			// find the largest span from the approximate bounding box
@@ -277,58 +317,14 @@ namespace trees
 			assert(index > 0 && index < count_);
 		}
 
-		void middleSplit_(int* ind_, int count_, int& index_, int& cutfeat_, ElementType& cutval_, const BoundingBox& bbox_)
-		{
-			const float eps_val = 0.00001f;
-			DistanceType max_span = bbox_[0].high - bbox_[0].low;
-			for (size_t i = 1; i<veclen; ++i) {
-				DistanceType span = bbox_[i].high - bbox_[i].low;
-				if (span>max_span) {
-					max_span = span;
-				}
-			}
-			DistanceType max_spread = -1;
-			cutfeat_ = 0;
-			for (size_t i = 0; i<veclen; ++i) {
-				DistanceType span = bbox_[i].high - bbox_[i].low;
-				if (span>(DistanceType)((1 - eps_val)*max_span)) {
-					ElementType min_elem, max_elem;
-					computeMinMax(ind_, count_, cutfeat_, min_elem, max_elem);
-					DistanceType spread = (DistanceType)(max_elem - min_elem);
-					if (spread>max_spread) {
-						cutfeat_ = i;
-						max_spread = spread;
-					}
-				}
-			}
-			// split in the middle
-			DistanceType split_val = (bbox_[cutfeat].low + bbox_[cutfeat].high) / 2;
-			ElementType min_elem, max_elem;
-			computeMinMax(ind_, count_, cutfeat_, min_elem, max_elem);
-
-			if (split_val<min_elem) cutval_ = (DistanceType)min_elem;
-			else if (split_val>max_elem) cutval_ = (DistanceType)max_elem;
-			else cutval_ = split_val;
-
-			int lim1, lim2;
-			planeSplit(ind_, count_, cutfeat_, cutval_, lim1, lim2);
-
-			if (lim1>count_ / 2) index_ = lim1;
-			else if (lim2<count_ / 2) index_ = lim2;
-			else index_ = count_ / 2;
-
-			assert(index > 0 && index < count_);
-		}
-
-
 		/**
-		*  Subdivide the list of points by a plane perpendicular on axe corresponding
-		*  to the 'cutfeat' dimension at 'cutval' position.
-		*
-		*  On return:
-		*  dataset[ind[0..lim1-1]][cutfeat]<cutval
-		*  dataset[ind[lim1..lim2-1]][cutfeat]==cutval
-		*  dataset[ind[lim2..count]][cutfeat]>cutval
+			Sorts the list in elements which are smaller than cutval_ and greater than cutval_
+
+			@param[in] ind_ Pointer to the list
+			@param[in] count_ Number of elements in the list which shall be included
+			@param[in] cutfeat_ Dimension of the point where the list will be split
+			@param[in,out] lim1_ Left index which is the split index
+			@param[in,out] lim2_ Right index which is the plit index
 		*/
 		void planeSplit(int* ind_, int count_, int cutfeat_, ElementType cutval_, int& lim1_, int& lim2_)
 		{
@@ -351,6 +347,36 @@ namespace trees
 			}
 			lim2_ = left;
 		}
+
+	public:
+		
+		/**
+			Prepares the search process, computes initial distances and calls the search function
+
+			@param[in,out] result_set_ Container which contains the found neighbors
+			@param[in] vec_ Point which neighbors shall be found
+			@param[in] params_ Input parameters for the search
+		*/
+		void findNeighbors(ResultSet<ElementType>& result_set_, const ElementType* vec_, const TreeParams& params_) const
+		{
+			float epsError = 1 + params_.eps;
+
+			std::vector<ElementType> dists(veclen, 0);
+			ElementType distsq = computeInitialDistances(vec_, dists);
+
+			searchLevel(result_set_, vec_, root_node, distsq, dists, epsError);
+
+		}
+		
+	private:
+
+		/**
+			Computes an initial value for mindistsq_
+
+			@param[in] vec_ Point which neighbors shall be found
+			@param[in,out] dists
+			@return Initial value for mindistsq_
+		*/
 		ElementType computeInitialDistances(const ElementType* vec_, std::vector<ElementType>& dists_) const
 		{
 			ElementType distsq = 0.0;
@@ -369,23 +395,16 @@ namespace trees
 			return distsq;
 		}
 
-	public:
-		
-		void findNeighbors(ResultSet<ElementType>& result_set_, const ElementType* vec_, const TreeParams& params_) const
-		{
-			float epsError = 1 + params_.eps;
-
-			std::vector<ElementType> dists(veclen, 0);
-			ElementType distsq = computeInitialDistances(vec_, dists);
-
-			searchLevel(result_set_, vec_, root_node, distsq, dists, epsError);
-
-		}
-		
-	private:
-
 		/**
-		* Performs an exact search in the tree starting from a node.
+			Performs an exact search in the tree starting from a node.
+
+			@param[in,out] result_set_ Container which contains the found neighbors
+			@param[in] vec_ Point which neighbors shall be found
+			@param[in] node_ Node which will be examined
+			@param[in] mindistsq_ The distance of a node to vec_
+			@param[in,out] dists_ The distances of a node in the certain dimensions to vec_
+			@param[in] epsError_ Error value
+
 		*/
 		void searchLevel(ResultSet<ElementType>& result_set_, const ElementType* vec_, const NodePtr node_, ElementType mindistsq_,
 			std::vector<ElementType>& dists_, const float epsError_) const
@@ -442,7 +461,7 @@ namespace trees
 	private:
 
 		/**
-			Number of used neigbors in a node
+			Maximal number of neighbors in a node
 		*/
 		int neighbor;
 

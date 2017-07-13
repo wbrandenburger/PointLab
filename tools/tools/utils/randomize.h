@@ -36,7 +36,7 @@ namespace utils
 	/**
 		Seeds the random number generator
 	*/
-	inline void rand_seed()
+	inline void randSeed()
 	{
 		srand(time(NULL));
 	}
@@ -44,61 +44,68 @@ namespace utils
 	/**
 		Computes a random double value between a higher and a lower bound
 	 
-		@param high upper bound
-		@param lowlLower bound
-		@return random double value
+		@param[in] high_ Upper bound
+		@param[in] low_ Lower bound
+		@return Random double value
 	*/
-	inline double rand_double(double high = 1.0, double low = 0)
+	inline double randDouble(double high_ = 1.0, double low_ = 0)
 	{
-		return low + (double)((high-low) * (std::rand() / (RAND_MAX + 1.0)));
+		return low_ + (double)((high_-low_) * (std::rand() / (RAND_MAX + 1.0)));
 	}
 
 	/**
 		Computes a random float value between a higher and a lower bound
 
-		@param high upper bound
-		@param lowlLower bound
-		@return random double value
+		@param[in] high_ Upper bound
+		@param[in] lowl_ Lower bound
+		@return Random double value
 	*/
-	inline double rand_float(float high = 1.0, float low = 0)
+	inline double randFloat(float high_ = 1.0, float low_ = 0)
 	{
-		return low + (float)((high - low) * (std::rand() / (RAND_MAX + 1.0)));
+		return low_ + (float)((high_ - low_) * (std::rand() / (RAND_MAX + 1.0)));
 	}
 
 	/**
 		Computes a random integer value between a higher and a lower bound
 		
-		@param high upper bound
-		@param low lower bound
-		@return random integer value
+		@param[in] high_ Upper bound
+		@param[in] low_ Lower bound
+		@return Random integer value
 	*/
-	inline int rand_int(int high = RAND_MAX, int low = 0)
+	inline int randInt(int high_ = RAND_MAX, int low_ = 0)
 	{
-		return low + (int)((high - low) * (std::rand() / (RAND_MAX + 1.0)));
+		return low_ + (int)((high_ - low_) * (std::rand() / (RAND_MAX + 1.0)));
 	}
 
+	/**
+		Computes a random value of a specific type between a higher and a lower bound
+		
+		@param[in] high_ Upper bound
+		@param[in] low_ Lower bound
+		@return Random value
+	*/
 	template <typename ElementType>
-	inline ElementType rand(ElementType high = 0, ElementType low = 0)
+	inline ElementType rand(ElementType high_ = 0, ElementType low_ = 0)
 	{
-		if (high == 0) {
+		if (high_ == 0) {
 			if (std::is_same<ElementType, char>::value) {
-				high = 127;
+				high_ = 127;
 			}
 			else if (std::is_same<ElementType, unsigned char>::value) {
-				high = 255;
+				high_ = 255;
 			}
 			else if (std::is_same<ElementType, float>::value) {
-				high = 1;
+				high_ = 1;
 			}
 			else if (std::is_same<ElementType, double>::value) {
-				high = 1;
+				high_ = 1;
 			}
 			else {
-				high = 32767;
+				high_ = 32767;
 			}
 		}
 
-		return low + (ElementType)((high - low) * (std::rand() / (RAND_MAX + 1.0)));
+		return low_ + (ElementType)((high_ - low_) * (std::rand() / (RAND_MAX + 1.0)));
 	}
 }
 

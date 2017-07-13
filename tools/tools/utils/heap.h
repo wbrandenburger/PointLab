@@ -37,11 +37,6 @@ namespace utils
 
 	public:
 
-		ElementType* array;
-		/* size in {2^n-1}*/
-		size_t size;
-		size_t count;
-
 		/**
 			Constructor
 		*/
@@ -50,7 +45,7 @@ namespace utils
 		/**
 			Constructor
 
-			@param size_ size of the array which has to be built
+			@param[in] size_ size of the array which has to be built
 		*/
 		Heap(size_t size_) {
 			array = new ElementType[size_];
@@ -66,8 +61,8 @@ namespace utils
 		/**
 			Sets the pointer array and size 
 		
-			@param array_ pointer of an array
-			@param size_ size of the array
+			@param[in] array_ Pointer of an array
+			@param[in] size_ Size of the array
 		*/
 		void setHeap(size_t size_) {
 			array = new ElementType[size_];
@@ -78,7 +73,7 @@ namespace utils
 		/**
 			Resizes the array
 
-			@param size_ of the array
+			@param[in] size_ of the array
 		*/
 		void resize(size_t size_) {
 			ElementType* new_array = new ElementType[size_];
@@ -108,7 +103,7 @@ namespace utils
 		/**
 			Get the number of elements in the array
 
-			@return number of elements
+			@return Number of elements
 		*/
 		size_t getElements() {
 			return count;
@@ -125,11 +120,12 @@ namespace utils
 		}
 
 	private:
+	
 		/**
 			Swap two array elements
 
-			@param x first array element
-			@param y second array element
+			@param[in] x first array element
+			@param[in] y second array element
 		*/
 		void swap(ElementType& x, ElementType& y) {
 			ElementType swap = x;
@@ -140,7 +136,7 @@ namespace utils
 		/**
 			Push up a element in the array
 
-			@param index_ index of the element which has to push up
+			@param[in] index_ index of the element which has to push up
 		*/
 		void pushup(size_t index_) {
 			
@@ -172,7 +168,7 @@ namespace utils
 		/**
 			Pull down a element in the array
 
-			@param index_ index of the element which has to pull down
+			@param[in] index_ index of the element which has to pull down
 		*/
 		void pulldown(size_t index_) {
 			while (index_ < (size + 1) / 2 - 1) {
@@ -226,7 +222,7 @@ namespace utils
 		/**
 			Adds a new element
 
-			@param value_ element which will be added
+			@param[in] value_ element which will be added
 		*/
 		void add(ElementType value_) {
 			if (count > size) {
@@ -259,7 +255,7 @@ namespace utils
 		/**
 			Checks whether the elements in the array are ordered
 
-			@return true when the array is ordered
+			@return True when the array is ordered
 		*/
 		bool checkHeap() {
 			size_t begin = 0;
@@ -289,6 +285,24 @@ namespace utils
 			}
 			return 1;
 		}
+		
+	public:
+
+		/** 
+			Array with the size of 2^n-1
+		*/
+		ElementType* array;
+		
+		/**
+			Size of Array
+		*/
+		size_t size;
+		
+		/**
+			Number of elements in heap
+		*/
+		size_t count;
+
 	};	
 }
 

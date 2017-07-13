@@ -40,9 +40,9 @@ namespace trees
 	/**
 		Create a pointer of a specified indextype
 
-		@param dataset_ Pointcloud
-		@param params_ Input parameters for the tree
-		@return Return a pointer of the created index
+		@param[in] dataset_ Pointcloud
+		@param[in] params_ Input parameters for the tree
+		@return Returns a pointer of the created index
 	*/
 	template<template<typename> typename Index, typename ElementType>
 	inline NNIndex<ElementType>* createIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_)
@@ -53,10 +53,10 @@ namespace trees
 	/**
 		Create a pointer of a specified indextype
 
-		@param indexType_ Type of the index which should be build
-		@param dataset_ Pointcloud
-		@param params_ Input parameters for the tree
-		@return Return a pointer of the created index
+		@param[in] indexType_ Type of the index which should be build
+		@param[in] dataset_ Pointcloud
+		@param[in] params_ Input parameters for the tree
+		@return Returns a pointer of the created index
 	*/
 	template<typename ElementType>
 	inline NNIndex<ElementType>* createIndexByType(const treeIndex indexType_,
