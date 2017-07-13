@@ -138,11 +138,11 @@ namespace trees
 
 		void freeIndex() 
 		{
-			//if (ordered){ 
-			//	dataset_ordered.clear();
-			//}
+			if (ordered){ 
+				dataset_ordered.clear();
+			}
 			//if (root_node) root_node->~Node();
-			//pool.free();
+			pool.free();
 		}
 
 		void computeBoundingBox(BoundingBox& bbox)
@@ -231,94 +231,93 @@ namespace trees
 			}
 		}
 
-		void middleSplit(int* ind, int count, int& index, int& cutfeat, ElementType& cutval, const BoundingBox& bbox)
+		void middleSplit(int* ind_, int count_, int& index_, int& cutfeat_, ElementType& cutval_, const BoundingBox& bbox_)
 		{
 			// find the largest span from the approximate bounding box
-			ElementType max_span = bbox[0].high - bbox[0].low;
-			cutfeat = 0;
-			cutval = (bbox[0].high + bbox[0].low) / 2;
+			ElementType max_span = bbox_[0].high - bbox_[0].low;
+			cutfeat_ = 0;
+			cutval_ = (bbox_[0].high + bbox_[0].low) / 2;
 			for (size_t i = 1; i<veclen; ++i) {
-				ElementType span = bbox[i].high - bbox[i].low;
+				ElementType span = bbox_[i].high - bbox_[i].low;
 				if (span>max_span) {
 					max_span = span;
-					cutfeat = i;
-					cutval = (bbox[i].high + bbox[i].low) / 2;
+					cutfeat_ = i;
+					cutval_ = (bbox_[i].high + bbox_[i].low) / 2;
 				}
 			}
 
 			// compute exact span on the found dimension
 			ElementType min_elem, max_elem;
-			computeMinMax(ind, count, cutfeat, min_elem, max_elem);
-			cutval = (min_elem + max_elem) / 2;
+			computeMinMax(ind_, count_, cutfeat_, min_elem, max_elem);
+			cutval_ = (min_elem + max_elem) / 2;
 			max_span = max_elem - min_elem;
 
 			// check if a dimension of a largest span exists
-			size_t k = cutfeat;
+			size_t k = cutfeat_;
 			for (size_t i = 0; i<veclen; ++i) {
 				if (i == k) continue;
-				ElementType span = bbox[i].high - bbox[i].low;
+				ElementType span = bbox_[i].high - bbox_[i].low;
 				if (span>max_span) {
-					computeMinMax(ind, count, i, min_elem, max_elem);
+					computeMinMax(ind_, count_, i, min_elem, max_elem);
 					span = max_elem - min_elem;
 					if (span>max_span) {
 						max_span = span;
-						cutfeat = i;
-						cutval = (min_elem + max_elem) / 2;
+						cutfeat_ = i;
+						cutval_ = (min_elem + max_elem) / 2;
 					}
 				}
 			}
 			int lim1, lim2;
-			planeSplit(ind, count, cutfeat, cutval, lim1, lim2);
+			planeSplit(ind_, count_, cutfeat_, cutval_, lim1, lim2);
 
-			if (lim1>count / 2) index = lim1;
-			else if (lim2<count / 2) index = lim2;
-			else index = count / 2;
+			if (lim1>count_ / 2) index_ = lim1;
+			else if (lim2<count_ / 2) index_ = lim2;
+			else index_ = count_ / 2;
 
-			assert(index > 0 && index < count);
+			assert(index > 0 && index < count_);
 		}
 
-
-		void middleSplit_(int* ind, int count, int& index, int& cutfeat, ElementType& cutval, const BoundingBox& bbox)
+		void middleSplit_(int* ind_, int count_, int& index_, int& cutfeat_, ElementType& cutval_, const BoundingBox& bbox_)
 		{
 			const float eps_val = 0.00001f;
-			DistanceType max_span = bbox[0].high - bbox[0].low;
+			DistanceType max_span = bbox_[0].high - bbox_[0].low;
 			for (size_t i = 1; i<veclen; ++i) {
-				DistanceType span = bbox[i].high - bbox[i].low;
+				DistanceType span = bbox_[i].high - bbox_[i].low;
 				if (span>max_span) {
 					max_span = span;
 				}
 			}
 			DistanceType max_spread = -1;
-			cutfeat = 0;
+			cutfeat_ = 0;
 			for (size_t i = 0; i<veclen; ++i) {
-				DistanceType span = bbox[i].high - bbox[i].low;
+				DistanceType span = bbox_[i].high - bbox_[i].low;
 				if (span>(DistanceType)((1 - eps_val)*max_span)) {
 					ElementType min_elem, max_elem;
-					computeMinMax(ind, count, cutfeat, min_elem, max_elem);
+					computeMinMax(ind_, count_, cutfeat_, min_elem, max_elem);
 					DistanceType spread = (DistanceType)(max_elem - min_elem);
 					if (spread>max_spread) {
-						cutfeat = i;
+						cutfeat_ = i;
 						max_spread = spread;
 					}
 				}
 			}
 			// split in the middle
-			DistanceType split_val = (bbox[cutfeat].low + bbox[cutfeat].high) / 2;
+			DistanceType split_val = (bbox_[cutfeat].low + bbox_[cutfeat].high) / 2;
 			ElementType min_elem, max_elem;
-			computeMinMax(ind, count, cutfeat, min_elem, max_elem);
+			computeMinMax(ind_, count_, cutfeat_, min_elem, max_elem);
 
-			if (split_val<min_elem) cutval = (DistanceType)min_elem;
-			else if (split_val>max_elem) cutval = (DistanceType)max_elem;
-			else cutval = split_val;
+			if (split_val<min_elem) cutval_ = (DistanceType)min_elem;
+			else if (split_val>max_elem) cutval_ = (DistanceType)max_elem;
+			else cutval_ = split_val;
 
 			int lim1, lim2;
-			planeSplit(ind, count, cutfeat, cutval, lim1, lim2);
+			planeSplit(ind_, count_, cutfeat_, cutval_, lim1, lim2);
 
-			if (lim1>count / 2) index = lim1;
-			else if (lim2<count / 2) index = lim2;
-			else index = count / 2;
+			if (lim1>count_ / 2) index_ = lim1;
+			else if (lim2<count_ / 2) index_ = lim2;
+			else index_ = count_ / 2;
 
-			assert(index > 0 && index < count);
+			assert(index > 0 && index < count_);
 		}
 
 
@@ -331,26 +330,26 @@ namespace trees
 		*  dataset[ind[lim1..lim2-1]][cutfeat]==cutval
 		*  dataset[ind[lim2..count]][cutfeat]>cutval
 		*/
-		void planeSplit(int* ind, int count, int cutfeat, ElementType cutval, int& lim1, int& lim2)
+		void planeSplit(int* ind_, int count_, int cutfeat_, ElementType cutval_, int& lim1_, int& lim2_)
 		{
 			int left = 0;
-			int right = count - 1;
+			int right = count_ - 1;
 			for (;; ) {
-				while (left <= right && dataset[ind[left]][cutfeat]<cutval) ++left;
-				while (left <= right && dataset[ind[right]][cutfeat] >= cutval) --right;
+				while (left <= right && dataset[ind_[left]][cutfeat_]<cutval_) ++left;
+				while (left <= right && dataset[ind_[right]][cutfeat_] >= cutval_) --right;
 				if (left>right) break;
-				std::swap(ind[left], ind[right]); ++left; --right;
+				std::swap(ind_[left], ind_[right]); ++left; --right;
 			}
 
-			lim1 = left;
-			right = count - 1;
+			lim1_ = left;
+			right = count_ - 1;
 			for (;; ) {
-				while (left <= right && dataset[ind[left]][cutfeat] <= cutval) ++left;
-				while (left <= right && dataset[ind[right]][cutfeat]>cutval) --right;
+				while (left <= right && dataset[ind_[left]][cutfeat_] <= cutval_) ++left;
+				while (left <= right && dataset[ind_[right]][cutfeat_]>cutval_) --right;
 				if (left>right) break;
-				std::swap(ind[left], ind[right]); ++left; --right;
+				std::swap(ind_[left], ind_[right]); ++left; --right;
 			}
-			lim2 = left;
+			lim2_ = left;
 		}
 		ElementType computeInitialDistances(const ElementType* vec_, std::vector<ElementType>& dists_) const
 		{
