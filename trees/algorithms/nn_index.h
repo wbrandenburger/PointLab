@@ -35,6 +35,7 @@
 #include "util/matrix.h"
 #include "util/params.h"
 #include "util/result_set.h"
+#include "util/threadpool.h"
 
 namespace trees
 {
@@ -83,30 +84,70 @@ namespace trees
 			Matrix<size_t>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
-			const TreeParams& params_) const
+			const TreeParams& params_)
 		{
 			assert(queries_.cols == veclen());
 			assert(indices_.rows >= queries_.rows);
 			assert(dists_.rows >= queries_.rows);
 			assert(indices_.cols >= knn_);
 			assert(dists_.cols >= knn_);
+			
+			Threadpool pool(params_.cores);
 
-			int count = 0;
-
-#pragma omp parallel num_threads(params_.cores)
-			{
-				KNNResultSet2<ElementType> result_set(knn_);
-
-#pragma omp for schedule(static) reduction(+:count)
-				for (int i = 0; i < (int)queries_.rows; i++) {
-					result_set.clear();
-					findNeighbors(result_set, queries_[i], params_);
-					size_t n = std::min(result_set.size(), knn_);
-					result_set.copy(indices_[i], dists_[i], n);
-					count += n;
-				}
+			for (int i = 0; i < queries_.rows; i++) {
+				while (!pool.runTask(boost::bind(&NNIndex<ElementType>::knnSearchThreadpool,
+					this, 
+					boost::ref(queries_), 
+					boost::ref(indices_), 
+					boost::ref(dists_), 
+					knn_,
+					boost::ref(params_), 
+					i)));
 			}
+			pool.shutdown();
+			int count = 0;
+//
+//#pragma omp parallel num_threads(params_.cores)
+//			{
+//				KNNResultSet2<ElementType> result_set(knn_);
+//
+//#pragma omp for schedule(static) reduction(+:count)
+//				for (int i = 0; i < (int)queries_.rows; i++) {
+//					result_set.clear();
+//					findNeighbors(result_set, queries_[i], params_);
+//					size_t n = std::min(result_set.size(), knn_);
+//					result_set.copy(indices_[i], dists_[i], n);
+//					count += n;
+//				}
+//			}
 			return count;
+		}
+
+		//boost::atomic<int> count{ 0 };
+
+		/**
+			Perform k-nearest neighbor search
+
+			@param queries_ The query points for which to find the nearest neighbors
+			@param indices_ The indices of the nearest neighbors found
+			@param dists_ Distances to the nearest neighbors found
+			@param knn_ Number of nearest neighbors to return
+			@param params_ Search parameters
+			@param index_ Number of the row of the queries
+		*/
+		void knnSearchThreadpool(const Matrix<ElementType>& queries_,
+								 Matrix<size_t>& indices_,
+								 Matrix<ElementType>& dists_,
+								size_t knn_,
+								const TreeParams& params_,
+								size_t index_)
+		{
+			KNNResultSet2<ElementType> result_set(knn_);
+			result_set.clear();
+			findNeighbors(result_set, queries_[index_], params_);
+			size_t n = std::min(result_set.size(), knn_);
+			result_set.copy(indices_[index_], dists_[index_], n);
+			//count += n;
 		}
 
 		/**
@@ -123,7 +164,7 @@ namespace trees
 			Matrix<int>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
-			const TreeParams& params_) const
+			const TreeParams& params_)
 		{
 			flann::Matrix<size_t> indices(new size_t[indices_.rows*indices_.cols], indices_.rows, indices_.cols);
 			int result = knnSearch(queries_, indices, dists_, knn_, params_);

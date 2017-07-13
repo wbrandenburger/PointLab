@@ -174,7 +174,7 @@ int main(){
 
 	boost::filesystem::directory_iterator end_iter;
 	
-	utils::threadpool pool(24);
+	utils::Threadpool pool(24);
 
 	if (boost::filesystem::exists(img1N) && boost::filesystem::is_directory(img1N)) {
 		for (boost::filesystem::directory_iterator dir_iter(img1N); dir_iter != end_iter; ++dir_iter) {

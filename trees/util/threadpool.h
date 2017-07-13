@@ -28,15 +28,14 @@
 *************************************************************************/
 
 
-#ifndef UTILS_THREADPOOL_H_
-#define UTILS_THREADPOOL_H_
+#ifndef TREES_THREADPOOL_H_
+#define TREES_THREADPOOL_H_
 
 #include <boost/asio.hpp>
 #include <boost/atomic.hpp>
 #include <boost/thread.hpp>
 
-
-namespace utils
+namespace trees
 {
 	class Threadpool
 	{
@@ -110,4 +109,4 @@ namespace utils
 	};
 }
 
-#endif /* UTILS_THREADPOOL_H_ */
+#endif /* TREES_THREADPOOL_H_ */

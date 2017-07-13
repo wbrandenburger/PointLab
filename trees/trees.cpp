@@ -77,8 +77,8 @@ int main(int argc, char* argv[]) {
 	/**
 		Search in pointcloud
 	*/
-	int nn = 5000;
-	int querynumber = 12;//pointcloudkdtree.rows;
+	int nn = 20;
+	int querynumber = pointcloudkdtree.rows;
 
 	trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
 	trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
@@ -117,8 +117,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/planeOut.ply", pointcloud);
-
+	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	/**
 		Destroy the structures
