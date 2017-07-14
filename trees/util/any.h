@@ -163,74 +163,117 @@ namespace trees
 	{
 
 	public:
-		/// Initializing constructor.
-		template <typename T>
-		any(const T& x) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+		/**
+			Constructor
+
+			@param[in] x_ Pointer or instance of any abitrary type
+		*/
+		template <typename T> any(const T& x_) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
 		{
-			assign(x);
+			assign(x_);
 		}
 
-		/// Empty constructor.
+		/**
+			Constructor
+		*/
 		any() : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL) {}
+		
+		/**
+			Special initializing constructor for string literals
 
-		/// Special initializing constructor for string literals.
-		any(const char* x) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+			@param[in] x_ Pointer to a string literal
+		*/
+		any(const char* x_) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
 		{
-			assign(x);
+			assign(x_);
 		}
 
-		/// Copy constructor.
-		any(const any& x) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+		/**
+			Copy Constructor
+
+			@param[in]	x_ Instance of class any
+		*/
+		any(const any& x_) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
 		{
-			assign(x);
+			assign(x_);
 		}
 
-		/// Destructor.
+		/**
+			Destructor
+		*/
 		~any()
 		{
 			policy->static_delete(&object);
 		}
+		
+		/**
+			Assignment function from another instance of class any
 
-		/// Assignment function from another any.
-		any& assign(const any& x)
+			@param[in]	x_ Instance of class any
+			@return Dereference of this
+		*/
+		any& assign(const any& x_)
 		{
 			reset();
-			policy = x.policy;
-			policy->clone(&x.object, &object);
+			policy = x_.policy;
+			policy->clone(&x_.object, &object);
 			return *this;
 	    }
 
-	    /// Assignment function.
-	    template <typename T> any& assign(const T& x)
+		/**
+			Assignment function
+
+			@param[in]	x_ Pointer or instance of any abitrary type
+			@return Dereference of this
+		*/
+	    template <typename T> any& assign(const T& x_)
 	    {
 			reset();
 			policy = anyimpl::get_policy<T>();
-			policy->copy_from_value(&x, &object);
+			policy->copy_from_value(&x_, &object);
 			return *this;
 		}
 	
-	    /// Assignment operator.
-	    template<typename T> any& operator=(const T& x)
+		/**
+			Operator = assignment from  a pointer or instance of any abitrary type
+
+			@param[in]	x_ Pointer or instance of any abitrary type
+			@return Dereference of this
+		*/
+	    template<typename T> any& operator=(const T& x_)
 		{
-			return assign(x);
+			return assign(x_);
 		}
 
-		/// Assignment operator, specialed for literal strings.
-		/// They have types like const char [6] which don't work as expected.
-		any& operator=(const char* x)
+		/**
+			Operator = specialized for literal strings
+
+			@param[in] x_ Pointer to a string literal
+			@return Dereference of this
+		*/
+		any& operator=(const char* x_)
 		{
-			return assign(x);
+			return assign(x_);
 		}
 
-    /// Utility functions
-		any& swap(any& x)
+		/**
+			Swap function
+
+			@param[in]	x_ Instance of class any
+			@return Dereference of this
+		*/
+		any& swap(any& x_)
 		{
-			std::swap(policy, x.policy);
-			std::swap(object, x.object);
+			std::swap(policy, x_.policy);
+			std::swap(object, x_.object);
 			return *this;
 		}
 
-		/// Cast operator. You can only cast to the original type.
+		/**
+			Cast operator
+
+			@return Pointer or instance which is stored in any
+		*/
 		template<typename T> T& cast()
 		{
 			if (policy->type() != typeid(T)) throw anyimpl::bad_any_cast();
@@ -238,7 +281,11 @@ namespace trees
 			return *r;
 		}
 
-		/// Cast operator. You can only cast to the original type.
+		/** 
+			Cast operator
+
+			@return Pointer or instance which is stored in any
+		*/
 		template<typename T> const T& cast() const
 		{
 			if (policy->type() != typeid(T)) throw anyimpl::bad_any_cast();
@@ -246,32 +293,52 @@ namespace trees
 			return *r;
 		}
 
-		/// Returns true if the any contains no value.
+		/**
+			Returns true if the any contains no value
+
+			@return True if the any contains no value
+		*/
 		bool empty() const
 		{
 			return policy->type() == typeid(anyimpl::empty_any);
 		}
 
-		/// Frees any allocated memory, and sets the value to NULL.
+		/**
+			Frees any allocated memory, and sets the value to NULL.
+		*/
 		void reset()
 		{
 			policy->static_delete(&object);
 			policy = anyimpl::get_policy<anyimpl::empty_any>();
 		}
 
-		/// Returns true if the two types are the same.
-		bool compatible(const any& x) const
+		/**
+			Returns true if the two types are the same
+		
+			@param[in]	x_ Instance of class any
+			@return True if the two types are the same
+		*/
+		bool compatible(const any& x_) const
 		{
-			return policy->type() == x.policy->type();
+			return policy->type() == x_.policy->type();
 		}
 
-		/// Returns if the type is compatible with the policy
+		/**
+			Returns if the type is compatible with the policy
+
+			@return True if the type is compatible with the policy
+		*/
 		template<typename T>
 		bool has_type()
 		{
 			return policy->type() == typeid(T);
 		}
+		
+		/**
+			Returns the type of the pointer or instance stored in object
 
+			@return  Type of the pointer or instance stored in object
+		*/
 		const std::type_info& type() const
 		{
 			return policy->type();
@@ -282,15 +349,27 @@ namespace trees
 
 	private:
 
+		/**
+			Differentiation whether object contains a pointer or an instance
+		*/
 		anyimpl::base_any_policy* policy;
 		
+		/**
+			Pointer which is targeted on a pointer or an instance
+		*/
 		void* object;
 	};
 
-	inline std::ostream& operator <<(std::ostream& out, const any& any_val)
+	/**
+		Operator << Prints the instance which is stored in any_val
+
+		@param[in,out] out_ Outstream in which the instance will be printed
+		@param[in] any_val_ Instance of any which object shall be printed
+	*/
+	inline std::ostream& operator <<(std::ostream& out_, const any& any_val_)
 	{
-		any_val.policy->print(out,&any_val.object);
-		return out;
+		any_val_.policy->print(out_,&any_val_.object);
+		return out_;
 	}
 }
 
