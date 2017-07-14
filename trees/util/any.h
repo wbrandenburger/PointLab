@@ -161,7 +161,6 @@ namespace trees
 
 	class any
 	{
-		typedef any any_t; // workaround for the NVCC compiler under windows
 
 	public:
 		/// Initializing constructor.
@@ -202,7 +201,7 @@ namespace trees
 	    }
 
 	    /// Assignment function.
-	    template <typename T> any_t& assign(const T& x)
+	    template <typename T> any& assign(const T& x)
 	    {
 			reset();
 			policy = anyimpl::get_policy<T>();
@@ -211,7 +210,7 @@ namespace trees
 		}
 	
 	    /// Assignment operator.
-	    template<typename T> any_t& operator=(const T& x)
+	    template<typename T> any& operator=(const T& x)
 		{
 			return assign(x);
 		}
