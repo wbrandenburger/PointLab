@@ -1,0 +1,205 @@
+\hypertarget{classtrees_1_1_n_n_index}{}\section{trees\+:\+:N\+N\+Index$<$ Element\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_n_n_index}\index{trees\+::\+N\+N\+Index$<$ Element\+Type $>$@{trees\+::\+N\+N\+Index$<$ Element\+Type $>$}}
+Inheritance diagram for trees\+:\+:N\+N\+Index$<$ Element\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classtrees_1_1_n_n_index}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_n_n_index_ae314d8a7c8c0db0eaf22b667b4b4a14e}{N\+N\+Index} ()
+\item 
+void \hyperlink{classtrees_1_1_n_n_index_a0f02fa0888a3c93b38465ccd37517ba1}{set\+Dataset} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dataset\+\_\+)
+\item 
+virtual void \hyperlink{classtrees_1_1_n_n_index_ad8db1182322eba8c1f68ce250e45a36c}{build\+Index} ()
+\item 
+virtual void \hyperlink{classtrees_1_1_n_n_index_afc6b99a8f2693e8b446fc6697dac9f0d}{free\+Index} ()=0
+\item 
+virtual void \hyperlink{classtrees_1_1_n_n_index_a3a280e25b04449f34c4ed0fcc419e7b1}{build\+Index\+Impl} ()=0
+\item 
+virtual void \hyperlink{classtrees_1_1_n_n_index_af48da46453e78744d8874c529e06b5ff}{find\+Neighbors} (\hyperlink{classtrees_1_1_result_set}{Result\+Set}$<$ Element\+Type $>$ \&result\+\_\+set\+\_\+, const Element\+Type $\ast$vec\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+) const =0
+\item 
+void \hyperlink{classtrees_1_1_n_n_index_abf4572754ebd83300ab7c7747be10752}{knn\+Search} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, size\+\_\+t knn\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+)
+\item 
+void \hyperlink{classtrees_1_1_n_n_index_a059a92d41b77db12a7803e8348ae1c11}{knn\+Search\+Threadpool} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, size\+\_\+t knn\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+, size\+\_\+t index\+\_\+)
+\item 
+void \hyperlink{classtrees_1_1_n_n_index_a4f489d7dd35c009a8e1e246dc569f8a0}{knn\+Search} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ int $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, size\+\_\+t knn\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_n_n_index_a2c14aa447b5461fb839213f092881b23}{size}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_n_n_index_a3da4f85f9618451a8f7d27301fb6ac8c}{veclen}
+\item 
+\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \hyperlink{classtrees_1_1_n_n_index_a895867d67826166ea69def3488847cc6}{dataset}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_ae314d8a7c8c0db0eaf22b667b4b4a14e}\label{classtrees_1_1_n_n_index_ae314d8a7c8c0db0eaf22b667b4b4a14e}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!N\+N\+Index@{N\+N\+Index}}
+\index{N\+N\+Index@{N\+N\+Index}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{N\+N\+Index()}{NNIndex()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+\hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::\hyperlink{classtrees_1_1_n_n_index}{N\+N\+Index} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_ad8db1182322eba8c1f68ce250e45a36c}\label{classtrees_1_1_n_n_index_ad8db1182322eba8c1f68ce250e45a36c}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!build\+Index@{build\+Index}}
+\index{build\+Index@{build\+Index}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{build\+Index()}{buildIndex()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+virtual void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::build\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Build the tree of the specified index \mbox{\Hypertarget{classtrees_1_1_n_n_index_a3a280e25b04449f34c4ed0fcc419e7b1}\label{classtrees_1_1_n_n_index_a3a280e25b04449f34c4ed0fcc419e7b1}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!build\+Index\+Impl@{build\+Index\+Impl}}
+\index{build\+Index\+Impl@{build\+Index\+Impl}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{build\+Index\+Impl()}{buildIndexImpl()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+virtual void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::build\+Index\+Impl (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Build the tree of the specified index \mbox{\Hypertarget{classtrees_1_1_n_n_index_af48da46453e78744d8874c529e06b5ff}\label{classtrees_1_1_n_n_index_af48da46453e78744d8874c529e06b5ff}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!find\+Neighbors@{find\+Neighbors}}
+\index{find\+Neighbors@{find\+Neighbors}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{find\+Neighbors()}{findNeighbors()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+virtual void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::find\+Neighbors (\begin{DoxyParamCaption}\item[{\hyperlink{classtrees_1_1_result_set}{Result\+Set}$<$ Element\+Type $>$ \&}]{result\+\_\+set\+\_\+,  }\item[{const Element\+Type $\ast$}]{vec\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Prepares the search process, computes initial distances and calls the search function
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em result\+\_\+set\+\_\+} & Container which contains the found neighbors \\
+\hline
+\mbox{\tt in}  & {\em vec\+\_\+} & Point which neighbors shall be found \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Input parameters for the search \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classtrees_1_1_k_d_tree_index_a37e551977e3c3f772846040819a12e8f}{trees\+::\+K\+D\+Tree\+Index$<$ Element\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_afc6b99a8f2693e8b446fc6697dac9f0d}\label{classtrees_1_1_n_n_index_afc6b99a8f2693e8b446fc6697dac9f0d}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!free\+Index@{free\+Index}}
+\index{free\+Index@{free\+Index}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{free\+Index()}{freeIndex()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+virtual void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::free\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Free allocated memory \mbox{\Hypertarget{classtrees_1_1_n_n_index_abf4572754ebd83300ab7c7747be10752}\label{classtrees_1_1_n_n_index_abf4572754ebd83300ab7c7747be10752}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!knn\+Search@{knn\+Search}}
+\index{knn\+Search@{knn\+Search}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{knn\+Search()}{knnSearch()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::knn\+Search (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{size\+\_\+t}]{knn\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform k-\/nearest neighbor search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em knn\+\_\+} & Number of nearest neighbors to return \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_a4f489d7dd35c009a8e1e246dc569f8a0}\label{classtrees_1_1_n_n_index_a4f489d7dd35c009a8e1e246dc569f8a0}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!knn\+Search@{knn\+Search}}
+\index{knn\+Search@{knn\+Search}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{knn\+Search()}{knnSearch()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::knn\+Search (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ int $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{size\+\_\+t}]{knn\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform k-\/nearest neighbor search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em knn\+\_\+} & Number of nearest neighbors to return \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_a059a92d41b77db12a7803e8348ae1c11}\label{classtrees_1_1_n_n_index_a059a92d41b77db12a7803e8348ae1c11}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!knn\+Search\+Threadpool@{knn\+Search\+Threadpool}}
+\index{knn\+Search\+Threadpool@{knn\+Search\+Threadpool}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{knn\+Search\+Threadpool()}{knnSearchThreadpool()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::knn\+Search\+Threadpool (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{size\+\_\+t}]{knn\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+,  }\item[{size\+\_\+t}]{index\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform k-\/nearest neighbor search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em knn\+\_\+} & Number of nearest neighbors to return \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\mbox{\tt in}  & {\em index\+\_\+} & Number of the row of the queries \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_a0f02fa0888a3c93b38465ccd37517ba1}\label{classtrees_1_1_n_n_index_a0f02fa0888a3c93b38465ccd37517ba1}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!set\+Dataset@{set\+Dataset}}
+\index{set\+Dataset@{set\+Dataset}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{set\+Dataset()}{setDataset()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+void \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::set\+Dataset (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dataset\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set parameters based on the input pointcloud
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dataset\+\_\+} & Pointcloud \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtrees_1_1_n_n_index_a895867d67826166ea69def3488847cc6}\label{classtrees_1_1_n_n_index_a895867d67826166ea69def3488847cc6}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!dataset@{dataset}}
+\index{dataset@{dataset}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{dataset}{dataset}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+\hyperlink{classtrees_1_1_matrix}{Matrix}$<$Element\+Type$>$ \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::dataset\hspace{0.3cm}{\ttfamily [protected]}}
+
+Pointcloud \mbox{\Hypertarget{classtrees_1_1_n_n_index_a2c14aa447b5461fb839213f092881b23}\label{classtrees_1_1_n_n_index_a2c14aa447b5461fb839213f092881b23}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!size@{size}}
+\index{size@{size}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::size\hspace{0.3cm}{\ttfamily [protected]}}
+
+Numbers of points in pointcloud \mbox{\Hypertarget{classtrees_1_1_n_n_index_a3da4f85f9618451a8f7d27301fb6ac8c}\label{classtrees_1_1_n_n_index_a3da4f85f9618451a8f7d27301fb6ac8c}} 
+\index{trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}!veclen@{veclen}}
+\index{veclen@{veclen}!trees\+::\+N\+N\+Index@{trees\+::\+N\+N\+Index}}
+\subsubsection{\texorpdfstring{veclen}{veclen}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_n_n_index}{trees\+::\+N\+N\+Index}$<$ Element\+Type $>$\+::veclen\hspace{0.3cm}{\ttfamily [protected]}}
+
+Number of dimensions of data 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+algorithms/nn\+\_\+index.\+h\end{DoxyCompactItemize}

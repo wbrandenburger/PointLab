@@ -1,0 +1,80 @@
+\hypertarget{classtrees_1_1_k_n_n_result_set}{}\section{trees\+:\+:K\+N\+N\+Result\+Set$<$ Distance\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_k_n_n_result_set}\index{trees\+::\+K\+N\+N\+Result\+Set$<$ Distance\+Type $>$@{trees\+::\+K\+N\+N\+Result\+Set$<$ Distance\+Type $>$}}
+
+
+{\ttfamily \#include $<$result\+\_\+set.\+h$>$}
+
+Inheritance diagram for trees\+:\+:K\+N\+N\+Result\+Set$<$ Distance\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classtrees_1_1_k_n_n_result_set}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_ae243d4e2be3ff92c714898b7fb3b607e}\label{classtrees_1_1_k_n_n_result_set_ae243d4e2be3ff92c714898b7fb3b607e}} 
+typedef \hyperlink{structtrees_1_1_distance_index}{Distance\+Index}$<$ Distance\+Type $>$ {\bfseries Dist\+Index}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_af84c8771413e6594b2d63b54797f1ce6}\label{classtrees_1_1_k_n_n_result_set_af84c8771413e6594b2d63b54797f1ce6}} 
+{\bfseries K\+N\+N\+Result\+Set} (size\+\_\+t capacity\+\_\+)
+\item 
+void \hyperlink{classtrees_1_1_k_n_n_result_set_a6faafd1ae6f7dbe5a9fdcf03c244141c}{clear} ()
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_a3fdf3248d81cfdb9e68b5fc94a46ca38}\label{classtrees_1_1_k_n_n_result_set_a3fdf3248d81cfdb9e68b5fc94a46ca38}} 
+size\+\_\+t {\bfseries size} () const
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_a88d22190d5d32bea60224b55959e336b}\label{classtrees_1_1_k_n_n_result_set_a88d22190d5d32bea60224b55959e336b}} 
+bool {\bfseries full} () const
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_a41aa290d7219ec1e8eca98c04364ba09}\label{classtrees_1_1_k_n_n_result_set_a41aa290d7219ec1e8eca98c04364ba09}} 
+void {\bfseries add\+Point} (Distance\+Type dist, size\+\_\+t index)
+\item 
+void \hyperlink{classtrees_1_1_k_n_n_result_set_a3e1b80d0f5c564f74d840c9838653a39}{copy} (size\+\_\+t $\ast$indices, Distance\+Type $\ast$dists, size\+\_\+t num\+\_\+elements, bool sorted=true)
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_a684b5be0f09a8ede3cc18e028d4f0e48}\label{classtrees_1_1_k_n_n_result_set_a684b5be0f09a8ede3cc18e028d4f0e48}} 
+Distance\+Type {\bfseries worst\+Dist} () const
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Distance\+Type$>$\newline
+class trees\+::\+K\+N\+N\+Result\+Set$<$ Distance\+Type $>$}
+
+K-\/\+Nearest neighbour result set. Ensures that the elements inserted are unique 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_a6faafd1ae6f7dbe5a9fdcf03c244141c}\label{classtrees_1_1_k_n_n_result_set_a6faafd1ae6f7dbe5a9fdcf03c244141c}} 
+\index{trees\+::\+K\+N\+N\+Result\+Set@{trees\+::\+K\+N\+N\+Result\+Set}!clear@{clear}}
+\index{clear@{clear}!trees\+::\+K\+N\+N\+Result\+Set@{trees\+::\+K\+N\+N\+Result\+Set}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_k_n_n_result_set}{trees\+::\+K\+N\+N\+Result\+Set}$<$ Distance\+Type $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Clears the result set \mbox{\Hypertarget{classtrees_1_1_k_n_n_result_set_a3e1b80d0f5c564f74d840c9838653a39}\label{classtrees_1_1_k_n_n_result_set_a3e1b80d0f5c564f74d840c9838653a39}} 
+\index{trees\+::\+K\+N\+N\+Result\+Set@{trees\+::\+K\+N\+N\+Result\+Set}!copy@{copy}}
+\index{copy@{copy}!trees\+::\+K\+N\+N\+Result\+Set@{trees\+::\+K\+N\+N\+Result\+Set}}
+\subsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_k_n_n_result_set}{trees\+::\+K\+N\+N\+Result\+Set}$<$ Distance\+Type $>$\+::copy (\begin{DoxyParamCaption}\item[{size\+\_\+t $\ast$}]{indices,  }\item[{Distance\+Type $\ast$}]{dists,  }\item[{size\+\_\+t}]{num\+\_\+elements,  }\item[{bool}]{sorted = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Copy indices and distances to output buffers 
+\begin{DoxyParams}{Parameters}
+{\em indices} & \\
+\hline
+{\em dists} & \\
+\hline
+{\em num\+\_\+elements} & Number of elements to copy \\
+\hline
+{\em sorted} & Indicates if results should be sorted \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/result\+\_\+set.\+h\end{DoxyCompactItemize}

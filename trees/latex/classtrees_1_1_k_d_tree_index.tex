@@ -1,0 +1,81 @@
+\hypertarget{classtrees_1_1_k_d_tree_index}{}\section{trees\+:\+:K\+D\+Tree\+Index$<$ Element\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_k_d_tree_index}\index{trees\+::\+K\+D\+Tree\+Index$<$ Element\+Type $>$@{trees\+::\+K\+D\+Tree\+Index$<$ Element\+Type $>$}}
+Inheritance diagram for trees\+:\+:K\+D\+Tree\+Index$<$ Element\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classtrees_1_1_k_d_tree_index}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtrees_1_1_k_d_tree_index_1_1_interval}{Interval}
+\item 
+struct \hyperlink{structtrees_1_1_k_d_tree_index_1_1_node}{Node}
+\end{DoxyCompactItemize}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_d_tree_index_a18fc026725b0201b5086e03dd1904035}\label{classtrees_1_1_k_d_tree_index_a18fc026725b0201b5086e03dd1904035}} 
+typedef std\+::vector$<$ \hyperlink{structtrees_1_1_k_d_tree_index_1_1_interval}{Interval} $>$ {\bfseries Bounding\+Box}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_d_tree_index_a2354de5f76b2a9325a991f5c3017b05c}\label{classtrees_1_1_k_d_tree_index_a2354de5f76b2a9325a991f5c3017b05c}} 
+typedef \hyperlink{structtrees_1_1_k_d_tree_index_1_1_node}{Node} $\ast$ {\bfseries Node\+Ptr}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_k_d_tree_index_abfde9fe47fe77c9fdde1af8d500b85e5}{K\+D\+Tree\+Index} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dataset\+\_\+, const Index\+Params \&params\+\_\+=\hyperlink{structtrees_1_1_k_d_tree_index_params}{K\+D\+Tree\+Index\+Params}())
+\item 
+void \hyperlink{classtrees_1_1_k_d_tree_index_a37e551977e3c3f772846040819a12e8f}{find\+Neighbors} (\hyperlink{classtrees_1_1_result_set}{Result\+Set}$<$ Element\+Type $>$ \&result\+\_\+set\+\_\+, const Element\+Type $\ast$vec\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+) const
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_k_d_tree_index_abfde9fe47fe77c9fdde1af8d500b85e5}\label{classtrees_1_1_k_d_tree_index_abfde9fe47fe77c9fdde1af8d500b85e5}} 
+\index{trees\+::\+K\+D\+Tree\+Index@{trees\+::\+K\+D\+Tree\+Index}!K\+D\+Tree\+Index@{K\+D\+Tree\+Index}}
+\index{K\+D\+Tree\+Index@{K\+D\+Tree\+Index}!trees\+::\+K\+D\+Tree\+Index@{trees\+::\+K\+D\+Tree\+Index}}
+\subsubsection{\texorpdfstring{K\+D\+Tree\+Index()}{KDTreeIndex()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+\hyperlink{classtrees_1_1_k_d_tree_index}{trees\+::\+K\+D\+Tree\+Index}$<$ Element\+Type $>$\+::\hyperlink{classtrees_1_1_k_d_tree_index}{K\+D\+Tree\+Index} (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dataset\+\_\+,  }\item[{const Index\+Params \&}]{params\+\_\+ = {\ttfamily \hyperlink{structtrees_1_1_k_d_tree_index_params}{K\+D\+Tree\+Index\+Params}()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dataset\+\_\+} & Pointcloud \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Input parameters for the tree \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_k_d_tree_index_a37e551977e3c3f772846040819a12e8f}\label{classtrees_1_1_k_d_tree_index_a37e551977e3c3f772846040819a12e8f}} 
+\index{trees\+::\+K\+D\+Tree\+Index@{trees\+::\+K\+D\+Tree\+Index}!find\+Neighbors@{find\+Neighbors}}
+\index{find\+Neighbors@{find\+Neighbors}!trees\+::\+K\+D\+Tree\+Index@{trees\+::\+K\+D\+Tree\+Index}}
+\subsubsection{\texorpdfstring{find\+Neighbors()}{findNeighbors()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+void \hyperlink{classtrees_1_1_k_d_tree_index}{trees\+::\+K\+D\+Tree\+Index}$<$ Element\+Type $>$\+::find\+Neighbors (\begin{DoxyParamCaption}\item[{\hyperlink{classtrees_1_1_result_set}{Result\+Set}$<$ Element\+Type $>$ \&}]{result\+\_\+set\+\_\+,  }\item[{const Element\+Type $\ast$}]{vec\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Prepares the search process, computes initial distances and calls the search function
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em result\+\_\+set\+\_\+} & Container which contains the found neighbors \\
+\hline
+\mbox{\tt in}  & {\em vec\+\_\+} & Point which neighbors shall be found \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Input parameters for the search \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtrees_1_1_n_n_index_af48da46453e78744d8874c529e06b5ff}{trees\+::\+N\+N\+Index$<$ Element\+Type $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+algorithms/kdtree\+\_\+index.\+h\end{DoxyCompactItemize}

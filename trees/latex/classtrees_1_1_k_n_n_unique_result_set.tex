@@ -1,0 +1,97 @@
+\hypertarget{classtrees_1_1_k_n_n_unique_result_set}{}\section{trees\+:\+:K\+N\+N\+Unique\+Result\+Set$<$ Distance\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_k_n_n_unique_result_set}\index{trees\+::\+K\+N\+N\+Unique\+Result\+Set$<$ Distance\+Type $>$@{trees\+::\+K\+N\+N\+Unique\+Result\+Set$<$ Distance\+Type $>$}}
+
+
+{\ttfamily \#include $<$result\+\_\+set.\+h$>$}
+
+Inheritance diagram for trees\+:\+:K\+N\+N\+Unique\+Result\+Set$<$ Distance\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classtrees_1_1_k_n_n_unique_result_set}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_k_n_n_unique_result_set_a97620bc6b7febbe8c1885e7191fadf86}{K\+N\+N\+Unique\+Result\+Set} (unsigned int capacity)
+\item 
+void \hyperlink{classtrees_1_1_k_n_n_unique_result_set_af5525c7d03d3c2f37031b46207aec3a2}{add\+Point} (Distance\+Type dist, size\+\_\+t index)
+\item 
+void \hyperlink{classtrees_1_1_k_n_n_unique_result_set_aaa6184d20236d8ebe5facb2560751e88}{clear} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_unique_result_set_a37696fa83b61266a10aae88a74e534b4}\label{classtrees_1_1_k_n_n_unique_result_set_a37696fa83b61266a10aae88a74e534b4}} 
+typedef \hyperlink{classtrees_1_1_unique_result_set}{Unique\+Result\+Set}$<$ Distance\+Type $>$\+::\hyperlink{structtrees_1_1_unique_result_set_1_1_dist_index}{Dist\+Index} {\bfseries Dist\+Index}
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_k_n_n_unique_result_set_a52a3e1ea392eeace263f540865a55250}{capacity\+\_\+}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Distance\+Type$>$\newline
+class trees\+::\+K\+N\+N\+Unique\+Result\+Set$<$ Distance\+Type $>$}
+
+Class that holds the k NN neighbors Faster than \hyperlink{classtrees_1_1_k_n_n_result_set}{K\+N\+N\+Result\+Set} as it uses a binary heap and does not maintain two arrays 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_unique_result_set_a97620bc6b7febbe8c1885e7191fadf86}\label{classtrees_1_1_k_n_n_unique_result_set_a97620bc6b7febbe8c1885e7191fadf86}} 
+\index{trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}!K\+N\+N\+Unique\+Result\+Set@{K\+N\+N\+Unique\+Result\+Set}}
+\index{K\+N\+N\+Unique\+Result\+Set@{K\+N\+N\+Unique\+Result\+Set}!trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{K\+N\+N\+Unique\+Result\+Set()}{KNNUniqueResultSet()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+\hyperlink{classtrees_1_1_k_n_n_unique_result_set}{trees\+::\+K\+N\+N\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::\hyperlink{classtrees_1_1_k_n_n_unique_result_set}{K\+N\+N\+Unique\+Result\+Set} (\begin{DoxyParamCaption}\item[{unsigned int}]{capacity }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor 
+\begin{DoxyParams}{Parameters}
+{\em capacity} & the number of neighbors to store at max \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_unique_result_set_af5525c7d03d3c2f37031b46207aec3a2}\label{classtrees_1_1_k_n_n_unique_result_set_af5525c7d03d3c2f37031b46207aec3a2}} 
+\index{trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}!add\+Point@{add\+Point}}
+\index{add\+Point@{add\+Point}!trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{add\+Point()}{addPoint()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_k_n_n_unique_result_set}{trees\+::\+K\+N\+N\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::add\+Point (\begin{DoxyParamCaption}\item[{Distance\+Type}]{dist,  }\item[{size\+\_\+t}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Add a possible candidate to the best neighbors 
+\begin{DoxyParams}{Parameters}
+{\em dist} & distance for that neighbor \\
+\hline
+{\em index} & index of that neighbor \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtrees_1_1_result_set}{trees\+::\+Result\+Set$<$ Distance\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_unique_result_set_aaa6184d20236d8ebe5facb2560751e88}\label{classtrees_1_1_k_n_n_unique_result_set_aaa6184d20236d8ebe5facb2560751e88}} 
+\index{trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}!clear@{clear}}
+\index{clear@{clear}!trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_k_n_n_unique_result_set}{trees\+::\+K\+N\+N\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Remove all elements in the set 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtrees_1_1_k_n_n_unique_result_set_a52a3e1ea392eeace263f540865a55250}\label{classtrees_1_1_k_n_n_unique_result_set_a52a3e1ea392eeace263f540865a55250}} 
+\index{trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}!capacity\+\_\+@{capacity\+\_\+}}
+\index{capacity\+\_\+@{capacity\+\_\+}!trees\+::\+K\+N\+N\+Unique\+Result\+Set@{trees\+::\+K\+N\+N\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{capacity\+\_\+}{capacity\_}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_k_n_n_unique_result_set}{trees\+::\+K\+N\+N\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::capacity\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+The number of neighbors to keep 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/result\+\_\+set.\+h\end{DoxyCompactItemize}

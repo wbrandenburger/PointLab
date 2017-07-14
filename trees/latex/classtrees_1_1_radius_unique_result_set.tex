@@ -1,0 +1,108 @@
+\hypertarget{classtrees_1_1_radius_unique_result_set}{}\section{trees\+:\+:Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_radius_unique_result_set}\index{trees\+::\+Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$@{trees\+::\+Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$}}
+
+
+{\ttfamily \#include $<$result\+\_\+set.\+h$>$}
+
+Inheritance diagram for trees\+:\+:Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classtrees_1_1_radius_unique_result_set}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_radius_unique_result_set_a257fdf0c924ab9077613c2dc1a3b18ea}{Radius\+Unique\+Result\+Set} (Distance\+Type radius)
+\item 
+void \hyperlink{classtrees_1_1_radius_unique_result_set_ad354a9cee46aa287bb6f9d6bfde50e94}{add\+Point} (Distance\+Type dist, size\+\_\+t index)
+\item 
+void \hyperlink{classtrees_1_1_radius_unique_result_set_a1931c3241af134573cb3021f735c469c}{clear} ()
+\item 
+bool \hyperlink{classtrees_1_1_radius_unique_result_set_a0a402d8fb16cfaa233d43bdcb5b3ab97}{full} () const
+\item 
+Distance\+Type \hyperlink{classtrees_1_1_radius_unique_result_set_af0f7ec26a6515cb085df64a43afe433c}{worst\+Dist} () const
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Distance\+Type$>$\newline
+class trees\+::\+Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$}
+
+Class that holds the radius nearest neighbors It is more accurate than Radius\+Result as it is not limited in the number of neighbors 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_radius_unique_result_set_a257fdf0c924ab9077613c2dc1a3b18ea}\label{classtrees_1_1_radius_unique_result_set_a257fdf0c924ab9077613c2dc1a3b18ea}} 
+\index{trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}!Radius\+Unique\+Result\+Set@{Radius\+Unique\+Result\+Set}}
+\index{Radius\+Unique\+Result\+Set@{Radius\+Unique\+Result\+Set}!trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{Radius\+Unique\+Result\+Set()}{RadiusUniqueResultSet()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+\hyperlink{classtrees_1_1_radius_unique_result_set}{trees\+::\+Radius\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::\hyperlink{classtrees_1_1_radius_unique_result_set}{Radius\+Unique\+Result\+Set} (\begin{DoxyParamCaption}\item[{Distance\+Type}]{radius }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor 
+\begin{DoxyParams}{Parameters}
+{\em capacity} & the number of neighbors to store at max \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_radius_unique_result_set_ad354a9cee46aa287bb6f9d6bfde50e94}\label{classtrees_1_1_radius_unique_result_set_ad354a9cee46aa287bb6f9d6bfde50e94}} 
+\index{trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}!add\+Point@{add\+Point}}
+\index{add\+Point@{add\+Point}!trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{add\+Point()}{addPoint()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_radius_unique_result_set}{trees\+::\+Radius\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::add\+Point (\begin{DoxyParamCaption}\item[{Distance\+Type}]{dist,  }\item[{size\+\_\+t}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Add a possible candidate to the best neighbors 
+\begin{DoxyParams}{Parameters}
+{\em dist} & distance for that neighbor \\
+\hline
+{\em index} & index of that neighbor \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtrees_1_1_result_set}{trees\+::\+Result\+Set$<$ Distance\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_radius_unique_result_set_a1931c3241af134573cb3021f735c469c}\label{classtrees_1_1_radius_unique_result_set_a1931c3241af134573cb3021f735c469c}} 
+\index{trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}!clear@{clear}}
+\index{clear@{clear}!trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_radius_unique_result_set}{trees\+::\+Radius\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Remove all elements in the set \mbox{\Hypertarget{classtrees_1_1_radius_unique_result_set_a0a402d8fb16cfaa233d43bdcb5b3ab97}\label{classtrees_1_1_radius_unique_result_set_a0a402d8fb16cfaa233d43bdcb5b3ab97}} 
+\index{trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}!full@{full}}
+\index{full@{full}!trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{full()}{full()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+bool \hyperlink{classtrees_1_1_radius_unique_result_set}{trees\+::\+Radius\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::full (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Check the status of the set \begin{DoxyReturn}{Returns}
+alwys false 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classtrees_1_1_unique_result_set_a6c10f8635c22eaecaa7e6fda3afea132}{trees\+::\+Unique\+Result\+Set$<$ Distance\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_radius_unique_result_set_af0f7ec26a6515cb085df64a43afe433c}\label{classtrees_1_1_radius_unique_result_set_af0f7ec26a6515cb085df64a43afe433c}} 
+\index{trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}!worst\+Dist@{worst\+Dist}}
+\index{worst\+Dist@{worst\+Dist}!trees\+::\+Radius\+Unique\+Result\+Set@{trees\+::\+Radius\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{worst\+Dist()}{worstDist()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+Distance\+Type \hyperlink{classtrees_1_1_radius_unique_result_set}{trees\+::\+Radius\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::worst\+Dist (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+The distance of the furthest neighbor If we don\textquotesingle{}t have enough neighbors, it returns the max possible value \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classtrees_1_1_unique_result_set_a2301eba6dae87959cc50668dd2307d4d}{trees\+::\+Unique\+Result\+Set$<$ Distance\+Type $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/result\+\_\+set.\+h\end{DoxyCompactItemize}

@@ -1,0 +1,99 @@
+\hypertarget{classtrees_1_1_pooled_allocator}{}\section{trees\+:\+:Pooled\+Allocator Class Reference}
+\label{classtrees_1_1_pooled_allocator}\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_pooled_allocator_ae03eae7a2d5ccfffc2263976538a325a}{Pooled\+Allocator} (int blocksize\+\_\+=8192, int wordsize\+\_\+=16)
+\item 
+\hyperlink{classtrees_1_1_pooled_allocator_a02a16650ef941629896065e047542c9b}{$\sim$\+Pooled\+Allocator} ()
+\item 
+void \hyperlink{classtrees_1_1_pooled_allocator_a64a9e64fba5590513fa11ed5ff74e067}{free} ()
+\item 
+void $\ast$ \hyperlink{classtrees_1_1_pooled_allocator_a33b64cd726208d57d982d42a7e00e7a0}{allocate\+Memory} (int size\+\_\+)
+\item 
+{\footnotesize template$<$typename T $>$ }\\T $\ast$ \hyperlink{classtrees_1_1_pooled_allocator_af5bd259585b270d0c43a48c147835699}{allocate} (size\+\_\+t count\+\_\+=1)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classtrees_1_1_pooled_allocator_a1c1fcdab76bfdd6c99e91ede846b36c4}{used\+Memory}
+\item 
+int \hyperlink{classtrees_1_1_pooled_allocator_a39f18ea897fadf1f81d006a853a4c0c0}{wasted\+Memory}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_pooled_allocator_ae03eae7a2d5ccfffc2263976538a325a}\label{classtrees_1_1_pooled_allocator_ae03eae7a2d5ccfffc2263976538a325a}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!Pooled\+Allocator@{Pooled\+Allocator}}
+\index{Pooled\+Allocator@{Pooled\+Allocator}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{Pooled\+Allocator()}{PooledAllocator()}}
+{\footnotesize\ttfamily trees\+::\+Pooled\+Allocator\+::\+Pooled\+Allocator (\begin{DoxyParamCaption}\item[{int}]{blocksize\+\_\+ = {\ttfamily 8192},  }\item[{int}]{wordsize\+\_\+ = {\ttfamily 16} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor \mbox{\Hypertarget{classtrees_1_1_pooled_allocator_a02a16650ef941629896065e047542c9b}\label{classtrees_1_1_pooled_allocator_a02a16650ef941629896065e047542c9b}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!````~Pooled\+Allocator@{$\sim$\+Pooled\+Allocator}}
+\index{````~Pooled\+Allocator@{$\sim$\+Pooled\+Allocator}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{$\sim$\+Pooled\+Allocator()}{~PooledAllocator()}}
+{\footnotesize\ttfamily trees\+::\+Pooled\+Allocator\+::$\sim$\+Pooled\+Allocator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Destructor 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_pooled_allocator_af5bd259585b270d0c43a48c147835699}\label{classtrees_1_1_pooled_allocator_af5bd259585b270d0c43a48c147835699}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!allocate@{allocate}}
+\index{allocate@{allocate}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T$\ast$ trees\+::\+Pooled\+Allocator\+::allocate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count\+\_\+ = {\ttfamily 1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Allocates (using this pool) a generic type T.
+
+
+\begin{DoxyParams}{Parameters}
+{\em count\+\_\+} & Number of instances to allocate. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer of type T$\ast$ to memory buffer 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classtrees_1_1_pooled_allocator_a33b64cd726208d57d982d42a7e00e7a0}\label{classtrees_1_1_pooled_allocator_a33b64cd726208d57d982d42a7e00e7a0}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!allocate\+Memory@{allocate\+Memory}}
+\index{allocate\+Memory@{allocate\+Memory}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{allocate\+Memory()}{allocateMemory()}}
+{\footnotesize\ttfamily void$\ast$ trees\+::\+Pooled\+Allocator\+::allocate\+Memory (\begin{DoxyParamCaption}\item[{int}]{size\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns a pointer to a piece of new memory of the given size in bytes
+
+
+\begin{DoxyParams}{Parameters}
+{\em size\+\_\+} & Number of bytes which shall be allocated \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a pointer to a piece of new memory of the given size in bytes 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classtrees_1_1_pooled_allocator_a64a9e64fba5590513fa11ed5ff74e067}\label{classtrees_1_1_pooled_allocator_a64a9e64fba5590513fa11ed5ff74e067}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!free@{free}}
+\index{free@{free}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{free()}{free()}}
+{\footnotesize\ttfamily void trees\+::\+Pooled\+Allocator\+::free (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Frees meory 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtrees_1_1_pooled_allocator_a1c1fcdab76bfdd6c99e91ede846b36c4}\label{classtrees_1_1_pooled_allocator_a1c1fcdab76bfdd6c99e91ede846b36c4}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!used\+Memory@{used\+Memory}}
+\index{used\+Memory@{used\+Memory}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{used\+Memory}{usedMemory}}
+{\footnotesize\ttfamily int trees\+::\+Pooled\+Allocator\+::used\+Memory}
+
+Number of bytes which has been already used \mbox{\Hypertarget{classtrees_1_1_pooled_allocator_a39f18ea897fadf1f81d006a853a4c0c0}\label{classtrees_1_1_pooled_allocator_a39f18ea897fadf1f81d006a853a4c0c0}} 
+\index{trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}!wasted\+Memory@{wasted\+Memory}}
+\index{wasted\+Memory@{wasted\+Memory}!trees\+::\+Pooled\+Allocator@{trees\+::\+Pooled\+Allocator}}
+\subsubsection{\texorpdfstring{wasted\+Memory}{wastedMemory}}
+{\footnotesize\ttfamily int trees\+::\+Pooled\+Allocator\+::wasted\+Memory}
+
+Number of bytes which are unused 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/allocator.\+h\end{DoxyCompactItemize}

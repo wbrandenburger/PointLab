@@ -37,7 +37,7 @@ namespace utils
 	class Matrix
 	{
 	public:
-
+	
 		/**
 			Constructor
 		*/
@@ -50,8 +50,8 @@ namespace utils
 			Constructor
 			
 			@param[in] data_ Row-array of a specific Type
-			@param[in] rows_
-			@param[in] cols_
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
 		*/
 		Matrix(ElementType* data_, size_t rows_, size_t cols_) :
 			rows(rows_), cols(cols_), data(data_)
@@ -61,7 +61,7 @@ namespace utils
 		/**
 			Copy Constructor
 
-			@param[in] matrix_
+			@param[in] matrix_ Matrix which shall be copied
 		*/
 		Matrix(const Matrix<ElementType>& matrix_)
 		{
@@ -76,7 +76,7 @@ namespace utils
 		/**
 			Copy assignment operator
 
-			@param[in] matrix_
+			@param[in] matrix_ Matrix which shall be copied
 		*/
 		void operator=(const Matrix<ElementType>& matrix_)
 		{
@@ -116,21 +116,27 @@ namespace utils
 		/**
 			Return the pointer of the indexth row
 
-			@param[in] index Index of the row
-			@return Return pointer of the indexth row
+			@param[in] index_ Index of the row
+			@return Returns the pointer of the indexth row
 		*/
-		inline ElementType* operator[](size_t index) const
+		inline ElementType* operator[](size_t index_) const
 		{
-			return data + index*cols;
+			return data + index_*cols;
 		}
 		
 	public:
-
-		size_t rows;
-		size_t cols;
-		ElementType* data;
-
-
+		/** 
+			Rows of matrix 
+		*/
+		size_t rows; 
+		/** 
+			Columns of matrix 
+		*/
+		size_t cols;  
+		/** 
+			Pointer to data 
+		*/ 
+		ElementType* data; 
 	};
 
 }

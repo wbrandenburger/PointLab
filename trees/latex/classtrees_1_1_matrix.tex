@@ -1,0 +1,161 @@
+\hypertarget{classtrees_1_1_matrix}{}\section{trees\+:\+:Matrix$<$ Element\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_matrix}\index{trees\+::\+Matrix$<$ Element\+Type $>$@{trees\+::\+Matrix$<$ Element\+Type $>$}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_matrix_a363bff5b1ded7ead42eeb72cfee359f3}{Matrix} (void)
+\item 
+\hyperlink{classtrees_1_1_matrix_a476f805286aeea991d815402c2ff703a}{Matrix} (Element\+Type $\ast$data\+\_\+, size\+\_\+t rows\+\_\+, size\+\_\+t cols\+\_\+)
+\item 
+\hyperlink{classtrees_1_1_matrix_aaa1772283d722e34a9a914f1d493a754}{Matrix} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&matrix\+\_\+)
+\item 
+void \hyperlink{classtrees_1_1_matrix_a1467c63bceec8a38771c845fad759784}{operator=} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&matrix\+\_\+)
+\item 
+\hyperlink{classtrees_1_1_matrix_a4eac26e6570ad219af70aa36eeadc2f7}{$\sim$\+Matrix} ()
+\item 
+void \hyperlink{classtrees_1_1_matrix_a2ed5574e99debc9db90ccc50afe6aa7a}{clear} () const
+\item 
+Element\+Type $\ast$ \hyperlink{classtrees_1_1_matrix_ae4c759a614daf9f1f019566eca92edab}{get\+Ptr} () const
+\item 
+Element\+Type $\ast$ \hyperlink{classtrees_1_1_matrix_a8ef252012ddf2ca4ebfd096ff0a1122b}{operator\mbox{[}$\,$\mbox{]}} (size\+\_\+t index\+\_\+) const
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_matrix_a88dfff3f217f59caec11e519b23153f6}{rows}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_matrix_a612011a0ae81b3e9d0a7e44a7e827f5c}{cols}
+\item 
+Element\+Type $\ast$ \hyperlink{classtrees_1_1_matrix_ac7cf0dc5123d2df5cfbac43c5b3c3ee6}{data}
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_matrix_a363bff5b1ded7ead42eeb72cfee359f3}\label{classtrees_1_1_matrix_a363bff5b1ded7ead42eeb72cfee359f3}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!Matrix@{Matrix}}
+\index{Matrix@{Matrix}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{Matrix()}{Matrix()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+\hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::\hyperlink{classtrees_1_1_matrix}{Matrix} (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor \mbox{\Hypertarget{classtrees_1_1_matrix_a476f805286aeea991d815402c2ff703a}\label{classtrees_1_1_matrix_a476f805286aeea991d815402c2ff703a}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!Matrix@{Matrix}}
+\index{Matrix@{Matrix}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{Matrix()}{Matrix()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+\hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::\hyperlink{classtrees_1_1_matrix}{Matrix} (\begin{DoxyParamCaption}\item[{Element\+Type $\ast$}]{data\+\_\+,  }\item[{size\+\_\+t}]{rows\+\_\+,  }\item[{size\+\_\+t}]{cols\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em data\+\_\+} & Row-\/array of a specific Type \\
+\hline
+\mbox{\tt in}  & {\em rows\+\_\+} & Rows of the matrix \\
+\hline
+\mbox{\tt in}  & {\em cols\+\_\+} & Columns of the matrix \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_matrix_aaa1772283d722e34a9a914f1d493a754}\label{classtrees_1_1_matrix_aaa1772283d722e34a9a914f1d493a754}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!Matrix@{Matrix}}
+\index{Matrix@{Matrix}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{Matrix()}{Matrix()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+\hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::\hyperlink{classtrees_1_1_matrix}{Matrix} (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{matrix\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Copy Constructor
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em matrix\+\_\+} & \hyperlink{classtrees_1_1_matrix}{Matrix} which shall be copied \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_matrix_a4eac26e6570ad219af70aa36eeadc2f7}\label{classtrees_1_1_matrix_a4eac26e6570ad219af70aa36eeadc2f7}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!````~Matrix@{$\sim$\+Matrix}}
+\index{````~Matrix@{$\sim$\+Matrix}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{$\sim$\+Matrix()}{~Matrix()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+\hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::$\sim$\hyperlink{classtrees_1_1_matrix}{Matrix} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Deconstructor 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_matrix_a2ed5574e99debc9db90ccc50afe6aa7a}\label{classtrees_1_1_matrix_a2ed5574e99debc9db90ccc50afe6aa7a}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!clear@{clear}}
+\index{clear@{clear}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+void \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Deletes the data array \mbox{\Hypertarget{classtrees_1_1_matrix_ae4c759a614daf9f1f019566eca92edab}\label{classtrees_1_1_matrix_ae4c759a614daf9f1f019566eca92edab}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!get\+Ptr@{get\+Ptr}}
+\index{get\+Ptr@{get\+Ptr}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{get\+Ptr()}{getPtr()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+Element\+Type$\ast$ \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::get\+Ptr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the pointer of the data array
+
+\begin{DoxyReturn}{Returns}
+Return pointer of data array 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classtrees_1_1_matrix_a1467c63bceec8a38771c845fad759784}\label{classtrees_1_1_matrix_a1467c63bceec8a38771c845fad759784}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!operator=@{operator=}}
+\index{operator=@{operator=}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+void \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{matrix\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Copy assignment operator
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em matrix\+\_\+} & \hyperlink{classtrees_1_1_matrix}{Matrix} which shall be copied \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_matrix_a8ef252012ddf2ca4ebfd096ff0a1122b}\label{classtrees_1_1_matrix_a8ef252012ddf2ca4ebfd096ff0a1122b}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{operator[]()}{operator[]()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+Element\+Type$\ast$ \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Return the pointer of the indexth row
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em index\+\_\+} & \hyperlink{classtrees_1_1_index}{Index} of the row \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns the pointer of the indexth row 
+\end{DoxyReturn}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtrees_1_1_matrix_a612011a0ae81b3e9d0a7e44a7e827f5c}\label{classtrees_1_1_matrix_a612011a0ae81b3e9d0a7e44a7e827f5c}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!cols@{cols}}
+\index{cols@{cols}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{cols}{cols}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::cols}
+
+Columns of matrix \mbox{\Hypertarget{classtrees_1_1_matrix_ac7cf0dc5123d2df5cfbac43c5b3c3ee6}\label{classtrees_1_1_matrix_ac7cf0dc5123d2df5cfbac43c5b3c3ee6}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!data@{data}}
+\index{data@{data}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+Element\+Type$\ast$ \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::data}
+
+Pointer to data \mbox{\Hypertarget{classtrees_1_1_matrix_a88dfff3f217f59caec11e519b23153f6}\label{classtrees_1_1_matrix_a88dfff3f217f59caec11e519b23153f6}} 
+\index{trees\+::\+Matrix@{trees\+::\+Matrix}!rows@{rows}}
+\index{rows@{rows}!trees\+::\+Matrix@{trees\+::\+Matrix}}
+\subsubsection{\texorpdfstring{rows}{rows}}
+{\footnotesize\ttfamily template$<$typename Element\+Type$>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_matrix}{trees\+::\+Matrix}$<$ Element\+Type $>$\+::rows}
+
+Rows of matrix 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/matrix.\+h\end{DoxyCompactItemize}

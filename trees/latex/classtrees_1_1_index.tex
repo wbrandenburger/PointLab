@@ -1,0 +1,139 @@
+\hypertarget{classtrees_1_1_index}{}\section{trees\+:\+:Index$<$ Element\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_index}\index{trees\+::\+Index$<$ Element\+Type $>$@{trees\+::\+Index$<$ Element\+Type $>$}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_index_a8ac9a102556cdf044f3384305b713d6d}{Index} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dataset\+\_\+, const Index\+Params \&params\+\_\+)
+\item 
+void \hyperlink{classtrees_1_1_index_a893641c30781d8d75b4e22135f0cbd3e}{build\+Index} ()
+\item 
+void \hyperlink{classtrees_1_1_index_aee16af4d46ebb7d1697286fcccb50fb5}{knn\+Search} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, size\+\_\+t knn\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+) const
+\item 
+void \hyperlink{classtrees_1_1_index_a62a5492569573064eb3043a4d623b4db}{knn\+Search} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ int $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, size\+\_\+t knn\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+) const
+\item 
+void \hyperlink{classtrees_1_1_index_ace6a01fd40aa0d7f1ff6c8389b883e2e}{radius\+Search} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, float radius\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+) const
+\item 
+void \hyperlink{classtrees_1_1_index_a16c5f2b07bc57fe6fee53218c9d01bd3}{radius\+Search} (const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&queries\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ int $>$ \&indices\+\_\+, \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&dists\+\_\+, float radius\+\_\+, const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&params\+\_\+) const
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_index_a8ac9a102556cdf044f3384305b713d6d}\label{classtrees_1_1_index_a8ac9a102556cdf044f3384305b713d6d}} 
+\index{trees\+::\+Index@{trees\+::\+Index}!Index@{Index}}
+\index{Index@{Index}!trees\+::\+Index@{trees\+::\+Index}}
+\subsubsection{\texorpdfstring{Index()}{Index()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+\hyperlink{classtrees_1_1_index}{trees\+::\+Index}$<$ Element\+Type $>$\+::\hyperlink{classtrees_1_1_index}{Index} (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dataset\+\_\+,  }\item[{const Index\+Params \&}]{params\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dataset\+\_\+} & Pointcloud \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Input parameters \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_index_a893641c30781d8d75b4e22135f0cbd3e}\label{classtrees_1_1_index_a893641c30781d8d75b4e22135f0cbd3e}} 
+\index{trees\+::\+Index@{trees\+::\+Index}!build\+Index@{build\+Index}}
+\index{build\+Index@{build\+Index}!trees\+::\+Index@{trees\+::\+Index}}
+\subsubsection{\texorpdfstring{build\+Index()}{buildIndex()}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+void \hyperlink{classtrees_1_1_index}{trees\+::\+Index}$<$ Element\+Type $>$\+::build\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Build the tree \mbox{\Hypertarget{classtrees_1_1_index_aee16af4d46ebb7d1697286fcccb50fb5}\label{classtrees_1_1_index_aee16af4d46ebb7d1697286fcccb50fb5}} 
+\index{trees\+::\+Index@{trees\+::\+Index}!knn\+Search@{knn\+Search}}
+\index{knn\+Search@{knn\+Search}!trees\+::\+Index@{trees\+::\+Index}}
+\subsubsection{\texorpdfstring{knn\+Search()}{knnSearch()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+void \hyperlink{classtrees_1_1_index}{trees\+::\+Index}$<$ Element\+Type $>$\+::knn\+Search (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{size\+\_\+t}]{knn\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform k-\/nearest neighbor search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em knn\+\_\+} & Number of nearest neighbors to return \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_index_a62a5492569573064eb3043a4d623b4db}\label{classtrees_1_1_index_a62a5492569573064eb3043a4d623b4db}} 
+\index{trees\+::\+Index@{trees\+::\+Index}!knn\+Search@{knn\+Search}}
+\index{knn\+Search@{knn\+Search}!trees\+::\+Index@{trees\+::\+Index}}
+\subsubsection{\texorpdfstring{knn\+Search()}{knnSearch()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+void \hyperlink{classtrees_1_1_index}{trees\+::\+Index}$<$ Element\+Type $>$\+::knn\+Search (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ int $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{size\+\_\+t}]{knn\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform k-\/nearest neighbor search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em knn\+\_\+} & Number of nearest neighbors to return \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_index_ace6a01fd40aa0d7f1ff6c8389b883e2e}\label{classtrees_1_1_index_ace6a01fd40aa0d7f1ff6c8389b883e2e}} 
+\index{trees\+::\+Index@{trees\+::\+Index}!radius\+Search@{radius\+Search}}
+\index{radius\+Search@{radius\+Search}!trees\+::\+Index@{trees\+::\+Index}}
+\subsubsection{\texorpdfstring{radius\+Search()}{radiusSearch()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+void \hyperlink{classtrees_1_1_index}{trees\+::\+Index}$<$ Element\+Type $>$\+::radius\+Search (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ size\+\_\+t $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{float}]{radius\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform radius search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em radius\+\_\+} & The radius used for search \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_index_a16c5f2b07bc57fe6fee53218c9d01bd3}\label{classtrees_1_1_index_a16c5f2b07bc57fe6fee53218c9d01bd3}} 
+\index{trees\+::\+Index@{trees\+::\+Index}!radius\+Search@{radius\+Search}}
+\index{radius\+Search@{radius\+Search}!trees\+::\+Index@{trees\+::\+Index}}
+\subsubsection{\texorpdfstring{radius\+Search()}{radiusSearch()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename Element\+Type $>$ \\
+void \hyperlink{classtrees_1_1_index}{trees\+::\+Index}$<$ Element\+Type $>$\+::radius\+Search (\begin{DoxyParamCaption}\item[{const \hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{queries\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ int $>$ \&}]{indices\+\_\+,  }\item[{\hyperlink{classtrees_1_1_matrix}{Matrix}$<$ Element\+Type $>$ \&}]{dists\+\_\+,  }\item[{float}]{radius\+\_\+,  }\item[{const \hyperlink{structtrees_1_1_tree_params}{Tree\+Params} \&}]{params\+\_\+ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Perform radius search
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em queries\+\_\+} & The query points for which to find the nearest neighbors \\
+\hline
+\mbox{\tt in,out}  & {\em indices\+\_\+} & The indices of the nearest neighbors found \\
+\hline
+\mbox{\tt in,out}  & {\em dists\+\_\+} & Distances to the nearest neighbors found \\
+\hline
+\mbox{\tt in}  & {\em radius\+\_\+} & The radius used for search \\
+\hline
+\mbox{\tt in}  & {\em params\+\_\+} & Search parameters \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+trees.\+hpp\end{DoxyCompactItemize}

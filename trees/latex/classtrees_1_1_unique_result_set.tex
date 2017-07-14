@@ -1,0 +1,150 @@
+\hypertarget{classtrees_1_1_unique_result_set}{}\section{trees\+:\+:Unique\+Result\+Set$<$ Distance\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_unique_result_set}\index{trees\+::\+Unique\+Result\+Set$<$ Distance\+Type $>$@{trees\+::\+Unique\+Result\+Set$<$ Distance\+Type $>$}}
+
+
+{\ttfamily \#include $<$result\+\_\+set.\+h$>$}
+
+Inheritance diagram for trees\+:\+:Unique\+Result\+Set$<$ Distance\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.624595cm]{classtrees_1_1_unique_result_set}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtrees_1_1_unique_result_set_1_1_dist_index}{Dist\+Index}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtrees_1_1_unique_result_set_ad1f538e2dcaa431612d537efefc6699e}{Unique\+Result\+Set} ()
+\item 
+bool \hyperlink{classtrees_1_1_unique_result_set_a6c10f8635c22eaecaa7e6fda3afea132}{full} () const
+\item 
+void \hyperlink{classtrees_1_1_unique_result_set_a81ab4a644430e524c37a1024628c6b02}{copy} (size\+\_\+t $\ast$indices, Distance\+Type $\ast$dist, int n\+\_\+neighbors, bool sorted=true)
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_unique_result_set_a3b0df0041064e4e255e8cc22d142eab8}{size} () const
+\item 
+Distance\+Type \hyperlink{classtrees_1_1_unique_result_set_a2301eba6dae87959cc50668dd2307d4d}{worst\+Dist} () const
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classtrees_1_1_unique_result_set_a4d9baa438af8d132f30676f25c5900b4}{is\+\_\+full\+\_\+}
+\item 
+Distance\+Type \hyperlink{classtrees_1_1_unique_result_set_acdfe562ad6f99ae5f68b7e8af3d68171}{worst\+\_\+distance\+\_\+}
+\item 
+std\+::set$<$ \hyperlink{structtrees_1_1_unique_result_set_1_1_dist_index}{Dist\+Index} $>$ \hyperlink{classtrees_1_1_unique_result_set_a3a3dd371f4861f0addcfabe8c68ec11c}{dist\+\_\+indices\+\_\+}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Distance\+Type$>$\newline
+class trees\+::\+Unique\+Result\+Set$<$ Distance\+Type $>$}
+
+Class that holds the k NN neighbors 
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classtrees_1_1_unique_result_set_ad1f538e2dcaa431612d537efefc6699e}\label{classtrees_1_1_unique_result_set_ad1f538e2dcaa431612d537efefc6699e}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!Unique\+Result\+Set@{Unique\+Result\+Set}}
+\index{Unique\+Result\+Set@{Unique\+Result\+Set}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{Unique\+Result\+Set()}{UniqueResultSet()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+\hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::\hyperlink{classtrees_1_1_unique_result_set}{Unique\+Result\+Set} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Default cosntructor 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_unique_result_set_a81ab4a644430e524c37a1024628c6b02}\label{classtrees_1_1_unique_result_set_a81ab4a644430e524c37a1024628c6b02}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!copy@{copy}}
+\index{copy@{copy}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::copy (\begin{DoxyParamCaption}\item[{size\+\_\+t $\ast$}]{indices,  }\item[{Distance\+Type $\ast$}]{dist,  }\item[{int}]{n\+\_\+neighbors,  }\item[{bool}]{sorted = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Copy the set to two C arrays 
+\begin{DoxyParams}{Parameters}
+{\em indices} & pointer to a C array of indices \\
+\hline
+{\em dist} & pointer to a C array of distances \\
+\hline
+{\em n\+\_\+neighbors} & the number of neighbors to copy \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_unique_result_set_a6c10f8635c22eaecaa7e6fda3afea132}\label{classtrees_1_1_unique_result_set_a6c10f8635c22eaecaa7e6fda3afea132}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!full@{full}}
+\index{full@{full}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{full()}{full()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+bool \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::full (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Check the status of the set \begin{DoxyReturn}{Returns}
+true if we have k NN 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classtrees_1_1_result_set}{trees\+::\+Result\+Set$<$ Distance\+Type $>$}.
+
+
+
+Reimplemented in \hyperlink{classtrees_1_1_radius_unique_result_set_a0a402d8fb16cfaa233d43bdcb5b3ab97}{trees\+::\+Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_unique_result_set_a3b0df0041064e4e255e8cc22d142eab8}\label{classtrees_1_1_unique_result_set_a3b0df0041064e4e255e8cc22d142eab8}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!size@{size}}
+\index{size@{size}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+The number of neighbors in the set \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{classtrees_1_1_unique_result_set_a2301eba6dae87959cc50668dd2307d4d}\label{classtrees_1_1_unique_result_set_a2301eba6dae87959cc50668dd2307d4d}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!worst\+Dist@{worst\+Dist}}
+\index{worst\+Dist@{worst\+Dist}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{worst\+Dist()}{worstDist()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+Distance\+Type \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::worst\+Dist (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+The distance of the furthest neighbor If we don\textquotesingle{}t have enough neighbors, it returns the max possible value \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classtrees_1_1_result_set}{trees\+::\+Result\+Set$<$ Distance\+Type $>$}.
+
+
+
+Reimplemented in \hyperlink{classtrees_1_1_radius_unique_result_set_af0f7ec26a6515cb085df64a43afe433c}{trees\+::\+Radius\+Unique\+Result\+Set$<$ Distance\+Type $>$}.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{classtrees_1_1_unique_result_set_a3a3dd371f4861f0addcfabe8c68ec11c}\label{classtrees_1_1_unique_result_set_a3a3dd371f4861f0addcfabe8c68ec11c}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!dist\+\_\+indices\+\_\+@{dist\+\_\+indices\+\_\+}}
+\index{dist\+\_\+indices\+\_\+@{dist\+\_\+indices\+\_\+}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{dist\+\_\+indices\+\_\+}{dist\_indices\_}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+std\+::set$<$\hyperlink{structtrees_1_1_unique_result_set_1_1_dist_index}{Dist\+Index}$>$ \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::dist\+\_\+indices\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+The best candidates so far \mbox{\Hypertarget{classtrees_1_1_unique_result_set_a4d9baa438af8d132f30676f25c5900b4}\label{classtrees_1_1_unique_result_set_a4d9baa438af8d132f30676f25c5900b4}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!is\+\_\+full\+\_\+@{is\+\_\+full\+\_\+}}
+\index{is\+\_\+full\+\_\+@{is\+\_\+full\+\_\+}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{is\+\_\+full\+\_\+}{is\_full\_}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+bool \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::is\+\_\+full\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+Flag to say if the set is full \mbox{\Hypertarget{classtrees_1_1_unique_result_set_acdfe562ad6f99ae5f68b7e8af3d68171}\label{classtrees_1_1_unique_result_set_acdfe562ad6f99ae5f68b7e8af3d68171}} 
+\index{trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}!worst\+\_\+distance\+\_\+@{worst\+\_\+distance\+\_\+}}
+\index{worst\+\_\+distance\+\_\+@{worst\+\_\+distance\+\_\+}!trees\+::\+Unique\+Result\+Set@{trees\+::\+Unique\+Result\+Set}}
+\subsubsection{\texorpdfstring{worst\+\_\+distance\+\_\+}{worst\_distance\_}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+Distance\+Type \hyperlink{classtrees_1_1_unique_result_set}{trees\+::\+Unique\+Result\+Set}$<$ Distance\+Type $>$\+::worst\+\_\+distance\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+The worst distance found so far 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/result\+\_\+set.\+h\end{DoxyCompactItemize}

@@ -1,0 +1,119 @@
+\hypertarget{classtrees_1_1_radius_result_set}{}\section{trees\+:\+:Radius\+Result\+Set$<$ Distance\+Type $>$ Class Template Reference}
+\label{classtrees_1_1_radius_result_set}\index{trees\+::\+Radius\+Result\+Set$<$ Distance\+Type $>$@{trees\+::\+Radius\+Result\+Set$<$ Distance\+Type $>$}}
+
+
+{\ttfamily \#include $<$result\+\_\+set.\+h$>$}
+
+Inheritance diagram for trees\+:\+:Radius\+Result\+Set$<$ Distance\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classtrees_1_1_radius_result_set}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a553d1b7b948e3647afce9e168b0cf5a4}\label{classtrees_1_1_radius_result_set_a553d1b7b948e3647afce9e168b0cf5a4}} 
+typedef \hyperlink{structtrees_1_1_distance_index}{Distance\+Index}$<$ Distance\+Type $>$ {\bfseries Dist\+Index}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a0db3556f2cbe54ef66ca8c3f1d753592}\label{classtrees_1_1_radius_result_set_a0db3556f2cbe54ef66ca8c3f1d753592}} 
+{\bfseries Radius\+Result\+Set} (Distance\+Type radius\+\_\+)
+\item 
+void \hyperlink{classtrees_1_1_radius_result_set_a4e41825c25577341937de798be4ab659}{clear} ()
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_radius_result_set_a4ac769fcfb64d84d46d0eb233d4681da}{size} () const
+\item 
+bool \hyperlink{classtrees_1_1_radius_result_set_a25ad92a894e2b78556bb3c781b2cc173}{full} () const
+\item 
+void \hyperlink{classtrees_1_1_radius_result_set_a65652623444c8beb35a1d27a86117b2a}{add\+Point} (Distance\+Type dist, size\+\_\+t index)
+\item 
+void \hyperlink{classtrees_1_1_radius_result_set_aad21bfbfd64e9e1a4fb5d5f80daf84b8}{copy} (size\+\_\+t $\ast$indices, Distance\+Type $\ast$dists, size\+\_\+t num\+\_\+elements, bool sorted=true)
+\item 
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a676e9763ca183b970e5cda2f39ffcbc5}\label{classtrees_1_1_radius_result_set_a676e9763ca183b970e5cda2f39ffcbc5}} 
+Distance\+Type {\bfseries worst\+Dist} () const
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Distance\+Type$>$\newline
+class trees\+::\+Radius\+Result\+Set$<$ Distance\+Type $>$}
+
+Unbounded radius result set. It will hold as many elements as are added to it. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a65652623444c8beb35a1d27a86117b2a}\label{classtrees_1_1_radius_result_set_a65652623444c8beb35a1d27a86117b2a}} 
+\index{trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}!add\+Point@{add\+Point}}
+\index{add\+Point@{add\+Point}!trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}}
+\subsubsection{\texorpdfstring{add\+Point()}{addPoint()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_radius_result_set}{trees\+::\+Radius\+Result\+Set}$<$ Distance\+Type $>$\+::add\+Point (\begin{DoxyParamCaption}\item[{Distance\+Type}]{dist,  }\item[{size\+\_\+t}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Add another point to result set 
+\begin{DoxyParams}{Parameters}
+{\em dist} & distance to point \\
+\hline
+{\em index} & index of point Pre-\/conditions\+: capacity\+\_\+$>$0 \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classtrees_1_1_result_set}{trees\+::\+Result\+Set$<$ Distance\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a4e41825c25577341937de798be4ab659}\label{classtrees_1_1_radius_result_set_a4e41825c25577341937de798be4ab659}} 
+\index{trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}!clear@{clear}}
+\index{clear@{clear}!trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_radius_result_set}{trees\+::\+Radius\+Result\+Set}$<$ Distance\+Type $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Clears the result set \mbox{\Hypertarget{classtrees_1_1_radius_result_set_aad21bfbfd64e9e1a4fb5d5f80daf84b8}\label{classtrees_1_1_radius_result_set_aad21bfbfd64e9e1a4fb5d5f80daf84b8}} 
+\index{trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}!copy@{copy}}
+\index{copy@{copy}!trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}}
+\subsubsection{\texorpdfstring{copy()}{copy()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+void \hyperlink{classtrees_1_1_radius_result_set}{trees\+::\+Radius\+Result\+Set}$<$ Distance\+Type $>$\+::copy (\begin{DoxyParamCaption}\item[{size\+\_\+t $\ast$}]{indices,  }\item[{Distance\+Type $\ast$}]{dists,  }\item[{size\+\_\+t}]{num\+\_\+elements,  }\item[{bool}]{sorted = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Copy indices and distances to output buffers 
+\begin{DoxyParams}{Parameters}
+{\em indices} & \\
+\hline
+{\em dists} & \\
+\hline
+{\em num\+\_\+elements} & Number of elements to copy \\
+\hline
+{\em sorted} & Indicates if results should be sorted \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a25ad92a894e2b78556bb3c781b2cc173}\label{classtrees_1_1_radius_result_set_a25ad92a894e2b78556bb3c781b2cc173}} 
+\index{trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}!full@{full}}
+\index{full@{full}!trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}}
+\subsubsection{\texorpdfstring{full()}{full()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+bool \hyperlink{classtrees_1_1_radius_result_set}{trees\+::\+Radius\+Result\+Set}$<$ Distance\+Type $>$\+::full (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Radius search result set always reports full \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classtrees_1_1_result_set}{trees\+::\+Result\+Set$<$ Distance\+Type $>$}.
+
+\mbox{\Hypertarget{classtrees_1_1_radius_result_set_a4ac769fcfb64d84d46d0eb233d4681da}\label{classtrees_1_1_radius_result_set_a4ac769fcfb64d84d46d0eb233d4681da}} 
+\index{trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}!size@{size}}
+\index{size@{size}!trees\+::\+Radius\+Result\+Set@{trees\+::\+Radius\+Result\+Set}}
+\subsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily template$<$typename Distance\+Type $>$ \\
+size\+\_\+t \hyperlink{classtrees_1_1_radius_result_set}{trees\+::\+Radius\+Result\+Set}$<$ Distance\+Type $>$\+::size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+Number of elements in the result set 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+util/result\+\_\+set.\+h\end{DoxyCompactItemize}
