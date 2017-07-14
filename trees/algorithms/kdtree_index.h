@@ -99,28 +99,36 @@ namespace trees
 		*/
 		struct Node
 		{
-			/**
-			* Indices of points in leaf node
-			*/
-			int left, right;
-			/**
-			* Dimension used for subdivision.
-			*/
-			int divfeat;
-			/**
-			* The values used for subdivision.
-			*/
-			ElementType divlow, divhigh;
-			/**
-			* The child nodes.
-			*/
-			Node* child1, *child2;
+			Node() : left(0), right(0), divfeat(0), divlow(0), divhigh(0),
+				child1(nullptr), child2(nullptr), parent(nullptr) {}
 
 			~Node()
 			{
 				if (child1) child1->~Node();
 				if (child2) child2->~Node();
 			}
+
+			/**
+				Indices of points in leaf node
+			*/
+			int left, right;
+			/**
+				Dimension used for subdivision
+			*/
+			int divfeat;
+			/**
+				The values used for subdivision
+			*/
+			ElementType divlow, divhigh;
+			/**
+				The child nodes
+			*/
+			Node* child1, *child2;
+			/**
+				Parent
+			*/
+			Node* parent;
+
 		};
 
 		typedef Node* NodePtr;
@@ -139,7 +147,7 @@ namespace trees
 			}
 
 			computeBoundingBox(root_bbox);
-			root_node = divideTree(0, size, root_bbox);
+			root_node = divideTree(nullptr, 0, size, root_bbox);
 
 			if (ordered) {
 				dataset_ordered = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
@@ -190,10 +198,10 @@ namespace trees
 			@param[in] bbox_ Bounding Box of the entire pointcloud
 			@return Pointer to a node of the tree
 		*/
-		NodePtr divideTree(int left_, int right_, BoundingBox& bbox_)
+		NodePtr divideTree(NodePtr parent_, int left_, int right_, BoundingBox& bbox_)
 		{
 			NodePtr node = new (pool) Node(); // allocate memory
-
+			node->parent = parent_;
 											   /* If too few exemplars remain, then make this a leaf node. */
 			if ((right_ - left_) <= neighbor) {
 				node->child1 = node->child2 = NULL;    /* Mark as leaf node. */
@@ -222,11 +230,11 @@ namespace trees
 
 				BoundingBox left_bbox(bbox_);
 				left_bbox[cutfeat].high = cutval;
-				node->child1 = divideTree(left_, left_ + idx, left_bbox);
+				node->child1 = divideTree(node, left_, left_ + idx, left_bbox);
 
 				BoundingBox right_bbox(bbox_);
 				right_bbox[cutfeat].low = cutval;
-				node->child2 = divideTree(left_ + idx, right_, right_bbox);
+				node->child2 = divideTree(node, left_ + idx, right_, right_bbox);
 
 				node->divlow = left_bbox[cutfeat].high;
 				node->divhigh = right_bbox[cutfeat].low;
