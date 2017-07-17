@@ -42,60 +42,60 @@ namespace utils
 	namespace anyimpl
 	{
 
-		struct bad_any_cast : public std::runtime_error
+		struct BadAnyCast : public std::runtime_error
 		{
-			bad_any_cast() : std::runtime_error("Cannot convert 'any' value") { }
+			BadAnyCast() : std::runtime_error("Cannot convert 'any' value") { }
 		};
 
-		struct empty_any {};
+		struct EmptyAny {};
 
-		inline std::ostream& operator <<(std::ostream& out, const empty_any&)
+		inline std::ostream& operator <<(std::ostream& out, const EmptyAny&)
 		{
 			out << "[empty_any]";
 			return out;
 		}
 
-		struct base_any_policy
+		struct BaseAnyPolicy
 		{
-			virtual void static_delete(void** x) = 0;
-			virtual void copy_from_value(void const* src, void** dest) = 0;
+			virtual void staticDelete(void** x) = 0;
+			virtual void copyFromValue(void const* src, void** dest) = 0;
 			virtual void clone(void* const* src, void** dest) = 0;
 			virtual void move(void* const* src, void** dest) = 0;
-			virtual void* get_value(void** src) = 0;
-			virtual const void* get_value(void* const * src) = 0;
-			virtual ::size_t get_size() = 0;
+			virtual void* getValue(void** src) = 0;
+			virtual const void* getValue(void* const * src) = 0;
+			virtual ::size_t getSize() = 0;
 			virtual const std::type_info& type() = 0;
 			virtual void print(std::ostream& out, void* const* src) = 0;
 		};
 
-		template<typename T> struct typed_base_any_policy : base_any_policy
+		template<typename T> struct TypedBaseAnyPolicy : BaseAnyPolicy
 		{
-			virtual ::size_t get_size() { return sizeof(T); }
+			virtual ::size_t getSize() { return sizeof(T); }
 			virtual const std::type_info& type() { return typeid(T); }
 
 		};
 
-		template<typename T> struct small_any_policy : typed_base_any_policy<T>
+		template<typename T> struct SmallAnyPolicy : TypedBaseAnyPolicy<T>
 		{
-			virtual void static_delete(void**) { }
-			virtual void copy_from_value(void const* src, void** dest)
+			virtual void staticDelete(void**) { }
+			virtual void copyFromValue(void const* src, void** dest)
 			{
 				new (dest) T(* reinterpret_cast<T const*>(src));
 			}
 			virtual void clone(void* const* src, void** dest) { *dest = *src; }
 			virtual void move(void* const* src, void** dest) { *dest = *src; }
-			virtual void* get_value(void** src) { return reinterpret_cast<void*>(src); }
-			virtual const void* get_value(void* const * src) { return reinterpret_cast<const void*>(src); }
+			virtual void* getValue(void** src) { return reinterpret_cast<void*>(src); }
+			virtual const void* getValue(void* const * src) { return reinterpret_cast<const void*>(src); }
 			virtual void print(std::ostream& out, void* const* src) { out << *reinterpret_cast<T const*>(src); }
 		};
 
-		template<typename T> struct big_any_policy : typed_base_any_policy<T>
+		template<typename T> struct BigAnyPolicy : TypedBaseAnyPolicy<T>
 		{
-			virtual void static_delete(void** x)
+			virtual void staticDelete(void** x)
 			{
 				if (* x) delete (* reinterpret_cast<T**>(x)); *x = NULL;
 			}
-			virtual void copy_from_value(void const* src, void** dest)
+			virtual void copyFromValue(void const* src, void** dest)
 			{
 				*dest = new T(*reinterpret_cast<T const*>(src));
 			}
@@ -108,36 +108,36 @@ namespace utils
 				(*reinterpret_cast<T**>(dest))->~T();
 				**reinterpret_cast<T**>(dest) = **reinterpret_cast<T* const*>(src);
 			}
-			virtual void* get_value(void** src) { return *src; }
-			virtual const void* get_value(void* const * src) { return *src; }
-			virtual void print(std::ostream& out, void* const* src) { /*out << *reinterpret_cast<T const*>(*src);*/ }
+			virtual void* getValue(void** src) { return *src; }
+			virtual const void* getValue(void* const * src) { return *src; }
+			virtual void print(std::ostream& out, void* const* src) { out << *reinterpret_cast<T const*>(*src); }
 		};
 
 		template<typename T>
-		struct choose_policy
+		struct ChoosePolicy
 		{
-			typedef big_any_policy<T> type;
+			typedef BigAnyPolicy<T> Type;
 		};
 
 		template<typename T>
-		struct choose_policy<T*>
+		struct ChoosePolicy<T*>
 		{
-			typedef small_any_policy<T*> type;
+			typedef SmallAnyPolicy<T*> Type;
 		};
 
 		struct any;
 
 		/// Choosing the policy for an any type is illegal, but should never happen.
 		/// This is designed to throw a compiler error.
-		template<> struct choose_policy<any>
+		template<> struct ChoosePolicy<any>
 		{
-			typedef void type;
+			typedef void Type;
 		};
 
 		/// Specializations for small types.
 		#define SMALL_POLICY(TYPE) \
 			template<> \
-			struct choose_policy<TYPE> { typedef small_any_policy<TYPE> type; \
+			struct ChoosePolicy<TYPE> { typedef SmallAnyPolicy<TYPE> Type; \
 			}
 
 		SMALL_POLICY(signed char);
@@ -152,14 +152,14 @@ namespace utils
 		SMALL_POLICY(bool);
 
 		/// This function will return a different policy for each type.
-		template<typename T> base_any_policy* get_policy()
+		template<typename T> BaseAnyPolicy* getPolicy()
 		{
-		    static typename choose_policy<T>::type policy;
+		    static typename ChoosePolicy<T>::Type policy;
 			return &policy;
 		}
 	} 
 
-	class any
+	class Any
 	{
 
 	public:
@@ -168,7 +168,7 @@ namespace utils
 
 			@param[in] x_ Pointer or instance of any abitrary type
 		*/
-		template <typename T> any(const T& x_) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+		template <typename T> Any(const T& x_) : policy(anyimpl::getPolicy<anyimpl::EmptyAny>()), object(NULL)
 		{
 			assign(x_);
 		}
@@ -176,14 +176,14 @@ namespace utils
 		/**
 			Constructor
 		*/
-		any() : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL) {}
+		Any() : policy(anyimpl::getPolicy<anyimpl::EmptyAny>()), object(NULL) {}
 		
 		/**
 			Special initializing constructor for string literals
 
 			@param[in] x_ Pointer to a string literal
 		*/
-		any(const char* x_) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+		Any(const char* x_) : policy(anyimpl::getPolicy<anyimpl::EmptyAny>()), object(NULL)
 		{
 			assign(x_);
 		}
@@ -193,7 +193,7 @@ namespace utils
 
 			@param[in]	x_ Instance of class any
 		*/
-		any(const any& x_) : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+		Any(const Any& x_) : policy(anyimpl::getPolicy<anyimpl::EmptyAny>()), object(NULL)
 		{
 			assign(x_);
 		}
@@ -201,9 +201,9 @@ namespace utils
 		/**
 			Destructor
 		*/
-		~any()
+		~Any()
 		{
-			policy->static_delete(&object);
+			policy->staticDelete(&object);
 		}
 		
 		/**
@@ -212,7 +212,7 @@ namespace utils
 			@param[in]	x_ Instance of class any
 			@return Dereference of this
 		*/
-		any& assign(const any& x_)
+		Any& assign(const Any& x_)
 		{
 			reset();
 			policy = x_.policy;
@@ -226,11 +226,11 @@ namespace utils
 			@param[in]	x_ Pointer or instance of any abitrary type
 			@return Dereference of this
 		*/
-	    template <typename T> any& assign(const T& x_)
+	    template <typename T> Any& assign(const T& x_)
 	    {
 			reset();
-			policy = anyimpl::get_policy<T>();
-			policy->copy_from_value(&x_, &object);
+			policy = anyimpl::getPolicy<T>();
+			policy->copyFromValue(&x_, &object);
 			return *this;
 		}
 	
@@ -240,7 +240,7 @@ namespace utils
 			@param[in]	x_ Pointer or instance of any abitrary type
 			@return Dereference of this
 		*/
-	    template<typename T> any& operator=(const T& x_)
+	    template<typename T> Any& operator=(const T& x_)
 		{
 			return assign(x_);
 		}
@@ -251,7 +251,7 @@ namespace utils
 			@param[in] x_ Pointer to a string literal
 			@return Dereference of this
 		*/
-		any& operator=(const char* x_)
+		Any& operator=(const char* x_)
 		{
 			return assign(x_);
 		}
@@ -262,7 +262,7 @@ namespace utils
 			@param[in]	x_ Instance of class any
 			@return Dereference of this
 		*/
-		any& swap(any& x_)
+		Any& swap(Any& x_)
 		{
 			std::swap(policy, x_.policy);
 			std::swap(object, x_.object);
@@ -276,8 +276,8 @@ namespace utils
 		*/
 		template<typename T> T& cast()
 		{
-			if (policy->type() != typeid(T)) throw anyimpl::bad_any_cast();
-			T* r = reinterpret_cast<T*>(policy->get_value(&object));
+			if (policy->type() != typeid(T)) throw anyimpl::BadAnyCast();
+			T* r = reinterpret_cast<T*>(policy->getValue(&object));
 			return *r;
 		}
 
@@ -288,8 +288,8 @@ namespace utils
 		*/
 		template<typename T> const T& cast() const
 		{
-			if (policy->type() != typeid(T)) throw anyimpl::bad_any_cast();
-			const T* r = reinterpret_cast<const T*>(policy->get_value(&object));
+			if (policy->type() != typeid(T)) throw anyimpl::BadAnyCast();
+			const T* r = reinterpret_cast<const T*>(policy->getValue(&object));
 			return *r;
 		}
 
@@ -300,7 +300,7 @@ namespace utils
 		*/
 		bool empty() const
 		{
-			return policy->type() == typeid(anyimpl::empty_any);
+			return policy->type() == typeid(anyimpl::EmptyAny);
 		}
 
 		/**
@@ -308,8 +308,8 @@ namespace utils
 		*/
 		void reset()
 		{
-			policy->static_delete(&object);
-			policy = anyimpl::get_policy<anyimpl::empty_any>();
+			policy->staticDelete(&object);
+			policy = anyimpl::getPolicy<anyimpl::EmptyAny>();
 		}
 
 		/**
@@ -318,7 +318,7 @@ namespace utils
 			@param[in]	x_ Instance of class any
 			@return True if the two types are the same
 		*/
-		bool compatible(const any& x_) const
+		bool compatible(const Any& x_) const
 		{
 			return policy->type() == x_.policy->type();
 		}
@@ -329,7 +329,7 @@ namespace utils
 			@return True if the type is compatible with the policy
 		*/
 		template<typename T>
-		bool has_type()
+		bool hasType()
 		{
 			return policy->type() == typeid(T);
 		}
@@ -344,7 +344,7 @@ namespace utils
 			return policy->type();
 		}
 
-		friend std::ostream& operator <<(std::ostream& out, const any& any_val);
+		friend std::ostream& operator <<(std::ostream& out, const Any& any_val);
 
 
 	private:
@@ -352,7 +352,7 @@ namespace utils
 		/**
 			Differentiation whether object contains a pointer or an instance
 		*/
-		anyimpl::base_any_policy* policy;
+		anyimpl::BaseAnyPolicy* policy;
 		
 		/**
 			Pointer which is targeted on a pointer or an instance
@@ -366,7 +366,7 @@ namespace utils
 		@param[in,out] out_ Outstream in which the instance will be printed
 		@param[in] any_val_ Instance of any which object shall be printed
 	*/
-	inline std::ostream& operator <<(std::ostream& out_, const any& any_val_)
+	inline std::ostream& operator <<(std::ostream& out_, const Any& any_val_)
 	{
 		any_val_.policy->print(out_,&any_val_.object);
 		return out_;

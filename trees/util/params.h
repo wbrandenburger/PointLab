@@ -39,7 +39,7 @@
 
 namespace trees
 {
-	typedef std::map<std::string, any> IndexParams;
+	typedef std::map<std::string, Any> IndexParams;
 
 	/**
 		Structure which holds tree parameters
