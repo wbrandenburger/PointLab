@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['empty',['empty',['../classtrees_1_1any.html#a2bc0c0f86ee6baefd7d9efebad0fdada',1,'trees::any']]]
+  ['empty',['empty',['../classtrees_1_1_any.html#a68aefb2ac59c48d2f900520d8a8680b6',1,'trees::Any']]]
 ];

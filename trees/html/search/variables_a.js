@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['veclen',['veclen',['../classtrees_1_1_n_n_index.html#a3da4f85f9618451a8f7d27301fb6ac8c',1,'trees::NNIndex']]]
+  ['usedmemory',['usedMemory',['../classtrees_1_1_pooled_allocator.html#a1c1fcdab76bfdd6c99e91ede846b36c4',1,'trees::PooledAllocator']]]
 ];
