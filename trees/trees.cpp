@@ -76,63 +76,14 @@ int main(int argc, char* argv[]) {
 	index.buildIndex();
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
-	/////**
-	////	Search in pointcloud
-	////*/
-	////int nn = 2000;
-	////int querynumber = 12;// pointcloudkdtree.rows;
-
-	////trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
-	////trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
-
-	/////**
-	////	Generates a pointcloud with points whose neighbors shall searched for
-	////*/
-	////utils::randSeed();
-	////trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
-	////for (int i = 0; i < querynumber; i++) {
-	////	int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
-	////	for (int j = 0; j < pointcloudkdtree.cols; j++) {
-	////		query[i][j] = pointcloudkdtree[random][j];
-	////	}
-	////}
-
-	////trees::TreeParams params;
-	////params.cores = cores;
-
-	////time.start();
-	////index.knnSearch(query, indices, dists, nn, params);
-	////std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
-	////
-	/////**
-	////	Colorize the pointcloud
-	////*/
-	////utils::randSeed();
-	////for (int i = 0; i < indices.rows; i++) {
-	////	int r = utils::rand<int>(255, 0);
-	////	int g = utils::rand<int>(255, 0);
-	////	int b = utils::rand<int>(255, 0);
-	////	for (int j = 0; j < indices.cols; j++) {
-	////		pointcloud.colors[indices[i][j]][0] = r;
-	////		pointcloud.colors[indices[i][j]][1] = g;
-	////		pointcloud.colors[indices[i][j]][2] = b;
-	////	}
-	////}
-
-	////io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
-
 	/**
 		Search in pointcloud
 	*/
-	float radius = 0.005;
+	int nn = 2000;
 	int querynumber = 12;// pointcloudkdtree.rows;
 
-	std::vector<std::vector<int>> indices(querynumber);
-	std::vector<std::vector<float>> dists(querynumber);
-
-	//for (size_t i = 0; i < 12; i++) {
-	//	indices.
-	//}
+	trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
+	trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
 
 	/**
 		Generates a pointcloud with points whose neighbors shall searched for
@@ -150,18 +101,18 @@ int main(int argc, char* argv[]) {
 	params.cores = cores;
 
 	time.start();
-	index.radiusSearch(query, indices, dists, radius, params);
+	index.knnSearch(query, indices, dists, nn, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
-
+	
 	/**
 		Colorize the pointcloud
 	*/
 	utils::randSeed();
-	for (int i = 0; i < indices.size(); i++) {
+	for (int i = 0; i < indices.rows; i++) {
 		int r = utils::rand<int>(255, 0);
 		int g = utils::rand<int>(255, 0);
 		int b = utils::rand<int>(255, 0);
-		for (int j = 0; j < indices[i].size(); j++) {
+		for (int j = 0; j < indices.cols; j++) {
 			pointcloud.colors[indices[i][j]][0] = r;
 			pointcloud.colors[indices[i][j]][1] = g;
 			pointcloud.colors[indices[i][j]][2] = b;
@@ -170,36 +121,62 @@ int main(int argc, char* argv[]) {
 
 	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
+	/////**
+	////	Search in pointcloud
+	////*/
+	////float radius = 0.005;
+	////int querynumber = 12;// pointcloudkdtree.rows;
+
+	////std::vector<std::vector<int>> indices(querynumber);
+	////std::vector<std::vector<float>> dists(querynumber);
+
+	/////**
+	////	Generates a pointcloud with points whose neighbors shall searched for
+	////*/
+	////utils::randSeed();
+	////trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
+	////for (int i = 0; i < querynumber; i++) {
+	////	int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
+	////	for (int j = 0; j < pointcloudkdtree.cols; j++) {
+	////		query[i][j] = pointcloudkdtree[random][j];
+	////	}
+	////}
+
+	////trees::TreeParams params;
+	////params.cores = cores;
+
+	////time.start();
+	////index.radiusSearch(query, indices, dists, radius, params);
+	////std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
+
+	/////**
+	////	Colorize the pointcloud
+	////*/
+	////utils::randSeed();
+	////for (int i = 0; i < indices.size(); i++) {
+	////	int r = utils::rand<int>(255, 0);
+	////	int g = utils::rand<int>(255, 0);
+	////	int b = utils::rand<int>(255, 0);
+	////	for (int j = 0; j < indices[i].size(); j++) {
+	////		pointcloud.colors[indices[i][j]][0] = r;
+	////		pointcloud.colors[indices[i][j]][1] = g;
+	////		pointcloud.colors[indices[i][j]][2] = b;
+	////	}
+	////}
+
+	////io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
+
 	/**
 		Destroy the structures
 	*/
 	pointcloud.clear();
 
 
-	int* heaplist = new int[15];
-
-	heaplist[0] = 35;
-	heaplist[1] = 99;
-	heaplist[2] = 12;
-	heaplist[3] = 56;
-	heaplist[4] = 85;
-	heaplist[5] = 23;
-	heaplist[6] = 96;
-	heaplist[7] = 43;
-	heaplist[8] = 75;
-	heaplist[9] = 24;
-	heaplist[10] = 59;
-	heaplist[11] = 83;
-	heaplist[12] = 37;
-	heaplist[13] = 72;
-	heaplist[14] = 4;
-	
-	utils::Heap<int, true> heap(15);
-	
-	for (int i = 0; i < 15; i++) {
-		heap.push(heaplist[i]);
-	}
-
+	utils::HeapNode<int>* heaplist = new utils::HeapNode<int>[15];
+	utils::HeapUpdate<utils::HeapNode<int>> heap(15);
+	//for (int i = 0; i < 15; i++) {
+	//	heaplist[i].setHeapNode(utils::rand<int>(100, 0), &heap);
+	//}
 
 	std::cout << heap << std::endl;
 

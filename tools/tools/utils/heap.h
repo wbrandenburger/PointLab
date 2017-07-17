@@ -32,7 +32,7 @@
 
 namespace utils
 {
-	template<typename ElementType,bool greater>
+	template<typename ElementType>
 	class Heap {
 
 	public:
@@ -40,50 +40,54 @@ namespace utils
 		/**
 			Constructor
 		*/
-		Heap() {};
+		Heap() : heaparray(nullptr), size(0), count(0) {}
 		
 		/**
 			Constructor
 
-			@param[in] size_ size of the array which has to be built
+			@param[in] size_ size of the heaparray which has to be built
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		Heap(size_t size_) {
-			array = new ElementType[size_];
-			size = size_;
+		Heap(size_t size_, bool greater_ = true) : size(size_), greater(greater_) { 
+			heaparray = new ElementType[size_];
 			count = 0;
 		}
 	
 		/**
 			Desconstructor
 		*/
-		~Heap() { delete[] array; }
+		~Heap() { delete[] heaparray; }
 
 		/**
-			Sets the pointer array and size 
-		
-			@param[in] array_ Pointer of an array
-			@param[in] size_ Size of the array
+			Sets the pointer heaparray and size 
+
+			@param[in] size_ Size of the heaparray
 		*/
 		void setHeap(size_t size_) {
-			array = new ElementType[size_];
+
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			heaparray = new ElementType[size_];
 			size = size_;
 			count = 0;
 		}
 
 		/**
-			Resizes the array
+			Resizes the heaparray
 
-			@param[in] size_ of the array
+			@param[in] size_ of the heaparray
 		*/
 		void resize(size_t size_) {
-			ElementType* new_array = new ElementType[size_];
+			ElementType* new_heaparray = new ElementType[size_];
 
 			for (int i = 0; i<size+1; i++) {
-				new_array[i] = array[i];
+				new_heaparray[i] = heaparray[i];
 			}
 
-			delete[] array;
-			array = new_array;
+			delete[] heaparray;
+			heaparray = new_heaparray;
 			size = size_;
 		}
 		
@@ -94,14 +98,14 @@ namespace utils
 			size_t index = lastEntry();
 				
 			for (int i = 0; i < index + 1; i++) {
-				array[i] = 0;
+				heaparray[i] = 0;
 			}
 
 			count = 0;
 		}
 
 		/**
-			Get the number of elements in the array
+			Get the number of elements in the heaparray
 
 			@return Number of elements
 		*/
@@ -109,23 +113,13 @@ namespace utils
 			return count;
 		}
 
-
-		/**
-			Get information about the array
-		*/
-		void getInfos() {
-			for (size_t i = 0; i < count; i++) {
-				printf("Index %i, Value %i\n", i, array[i]);
-			}
-		}
-
 	private:
 	
 		/**
-			Swap two array elements
+			Swap two heaparray elements
 
-			@param[in] x first array element
-			@param[in] y second array element
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
 		*/
 		void swap(ElementType& x, ElementType& y) {
 			ElementType swap = x;
@@ -134,7 +128,7 @@ namespace utils
 		}
 
 		/**
-			Push up a element in the array
+			Push up a element in the heaparray
 
 			@param[in] index_ index of the element which has to push up
 		*/
@@ -150,14 +144,14 @@ namespace utils
 				}
 				
 				if (greater) {
-					if (array[new_index] < array[index_]) {
-							swap(array[new_index], array[index_]);
+					if (heaparray[new_index] < heaparray[index_]) {
+							swap(heaparray[new_index], heaparray[index_]);
 					}
 					else { return; }
 				}
 				else {
-					if (array[new_index] > array[index_]) {
-						swap(array[new_index], array[index_]);
+					if (heaparray[new_index] > heaparray[index_]) {
+						swap(heaparray[new_index], heaparray[index_]);
 					}
 					else { return; }
 				}
@@ -166,7 +160,7 @@ namespace utils
 		}
 
 		/**
-			Pull down a element in the array
+			Pull down a element in the heaparray
 
 			@param[in] index_ index of the element which has to pull down
 		*/
@@ -174,20 +168,20 @@ namespace utils
 			while (index_ < (size + 1) / 2 - 1) {
 				if (greater) {
 					size_t new_index;
-					if (array[2 * index_ + 1] && array[2 * index_ + 2]) {
-						new_index = array[2 * index_ + 1] > array[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
+					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
 					}
-					else if (array[2 * index_ + 1] && !array[2 * index_ + 2]) {
+					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
 						new_index = 2 * index_ + 1;
 					}
-					else if (!array[2 * index_ + 1] && array[2 * index_ + 2]) {
+					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
 						new_index = 2 * index_ + 2;
 						}
 					else {
 						return;
 					}
-					if (array[index_] < array[new_index]) {
-						swap(array[index_], array[new_index]);
+					if (heaparray[index_] < heaparray[new_index]) {
+						swap(heaparray[index_], heaparray[new_index]);
 						index_ = new_index;
 					}
 					else {
@@ -196,20 +190,20 @@ namespace utils
 				}
 				else {
 					size_t new_index;
-					if (array[2 * index_ + 1] && array[2 * index_ + 2]) {
-						new_index = array[2 * index_ + 1] < array[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
+					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
 					}
-					else if (array[2 * index_ + 1] && !array[2 * index_ + 2]) {
+					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
 						new_index = 2 * index_ + 1;
 					}
-					else if (!array[2 * index_ + 1] && array[2 * index_ + 2]) {
+					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
 						new_index = 2 * index_ + 2;
 					}
 					else {
 						return;
 					}
-					if (array[index_] > array[new_index]) {
-						swap(array[index_], array[new_index]);
+					if (heaparray[index_] > heaparray[new_index]) {
+						swap(heaparray[index_], heaparray[new_index]);
 						index_ = new_index;
 					}
 					else {
@@ -229,7 +223,7 @@ namespace utils
 				resize(size * 2 + 1);
 			}
 
-			array[count] = value_;
+			heaparray[count] = value_;
 			pushup(count);
 
 			count = count + 1;
@@ -241,10 +235,10 @@ namespace utils
 			@return minimal/maximal value of the heap
 		*/
 		ElementType pop() {
-			ElementType value = array[0];
+			ElementType value = heaparray[0];
 
-			array[0] = array[count-1];
-			array[count-1] = 0;
+			heaparray[0] = heaparray[count-1];
+			heaparray[count-1] = 0;
 			count = count - 1;
 			
 			pulldown(0);
@@ -253,9 +247,9 @@ namespace utils
 		}
 
 		/**
-			Checks whether the elements in the array are ordered
+			Checks whether the elements in the heaparray are ordered
 
-			@return True when the array is ordered
+			@return True when the heaparray is ordered
 		*/
 		bool checkHeap() {
 			size_t begin = 0;
@@ -263,20 +257,20 @@ namespace utils
 			while (begin < (size + 1) / 2 - 1) {
 				size_t elements = (size_t)pow((float)2, (float)depth);
 				for (size_t i = 0; i < elements; i++) {
-					if (array[2 * begin + 1]) {
+					if (heaparray[2 * begin + 1]) {
 						if (greater) {
-							if (array[begin] < array[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
 						}
 						else {
-							if (array[begin] > array[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
 						}
 					}
-					if (array[2 * begin + 2]) {
+					if (heaparray[2 * begin + 2]) {
 						if (greater) {
-							if (array[begin] < array[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
 						}
 						else {
-							if (array[begin] > array[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
 						}
 					}
 					begin = begin + 1;
@@ -290,12 +284,12 @@ namespace utils
 	public:
 
 		/** 
-			Array with the size of 2^n-1
+			heaparray with the size of 2^n-1
 		*/
-		ElementType* array;
+		ElementType* heaparray;
 		
 		/**
-			Size of Array
+			Size of heaparray
 		*/
 		size_t size;
 		
@@ -304,7 +298,374 @@ namespace utils
 		*/
 		size_t count;
 
+		/**
+			Flag which specifies wheter the set will be descendendly ordered
+		*/
+		bool greater;
 	};	
+
+	template<typename ElementType> struct HeapNode {
+
+		ElementType value;
+
+		size_t index;
+
+
+		//HeapNode* heap_node;
+
+		//HeapUpdate<HeapNode<ElementType>, greater>* heap;
+
+		//HeapNode() : value(0), index(0), heap_node(nullptr), heap(nullptr) {}
+
+		//HeapNode(ElementType value_, HeapUpdate<HeapNode<ElementType>, greater>* heap_) : value(value_), heap(heap_)
+		//{
+		//	index = heap_->count;
+		//	heap_node = &heap_->heaparray[heap->count];
+
+		//	heap_->push(*this);
+		//}
+
+		//void setHeapNode(ElementType value_, HeapUpdate<HeapNode<ElementType> greater>* heap_)
+		//{
+		//	value = value_;
+		//	heap = heap_)
+		//	index = heap_->count;
+		//	heap_node = &heap_->heaparray[heap->count];
+
+		//	heap_->push(*this);
+		//}
+
+		bool operator < (const HeapNode& node_)
+		{
+			return value < node_.value ? true : false;
+		}
+		
+		bool operator > (const HeapNode& node_)
+		{
+			return value > node_.value ? true : false;
+		}
+
+	};
+
+	template<typename ElementType>
+	class HeapUpdate {
+
+	public:
+
+		/**
+			Constructor
+		*/
+		HeapUpdate() : heaparray(nullptr), size(0), count(0) {}
+
+		/**
+			Constructor
+
+			@param[in] size_ size of the heaparray which has to be built
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
+		*/
+		HeapUpdate(size_t size_, bool greater_ = true) : size(size_), greater(greater_) {
+			heaparray = new ElementType[size_];
+			count = 0;
+		}
+
+		/**
+			Desconstructor
+		*/
+		~HeapUpdate() { delete[] heaparray; }
+
+		/**
+		Sets the pointer heaparray and size
+
+		@param[in] size_ Size of the heaparray
+		*/
+		void setHeap(size_t size_) {
+
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			heaparray = new ElementType[size_];
+			size = size_;
+			count = 0;
+		}
+
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		void resize(size_t size_) {
+			ElementType* new_heaparray = new ElementType[size_];
+
+			for (int i = 0; i<size + 1; i++) {
+				new_heaparray[i] = heaparray[i];
+			}
+
+			delete[] heaparray;
+			heaparray = new_heaparray;
+			size = size_;
+		}
+
+		/**
+			Sets the elements to zero
+		*/
+		void clear() {
+			size_t index = lastEntry();
+
+			for (int i = 0; i < index + 1; i++) {
+				heaparray[i] = 0;
+			}
+
+			count = 0;
+		}
+
+		/**
+			Get the number of elements in the heaparray
+
+			@return Number of elements
+		*/
+		size_t getElements() {
+			return count;
+		}
+
+	private:
+
+		/**
+			Swap two heaparray elements
+
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
+		*/
+		void swap(ElementType& x, ElementType& y) 
+		{
+			ElementType swap = x;
+			x = y;
+			y = swap;
+		}
+
+		/**
+			Swap two heaparray elements
+
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
+		*/
+		void swap(size_t index_, size_t new_index)
+		{
+			swap(heaparray[new_index], heaparray[index_]);
+			
+			heaparray[new_index].heap_node->heap_node = &heaparray[new_index];
+			heaparray[new_index].index = new_index;
+			
+			heaparray[index_].heap_node->heap_node = &heaparray[index_];
+			heaparray[index_].index = index_;
+		}
+
+		/**
+			Push up a element in the heaparray
+
+			@param[in] index_ index of the element which has to push up
+		*/
+		void pushup(size_t index_) {
+
+			while (index_ != 0) {
+				size_t new_index;
+				if (index_ % 2 == 0) {
+					new_index = (index_ / 2) - 1;
+				}
+				else {
+					new_index = (index_ - 1) / 2;
+				}
+
+				if (greater) {
+					if (heaparray[new_index] < heaparray[index_]) {
+						swap(new_index, index_);
+					}
+					else { return; }
+				}
+				else {
+					if (heaparray[new_index] > heaparray[index_]) {
+						swap(new_index, index_);
+					}
+					else { return; }
+				}
+				index_ = new_index;
+			}
+		}
+
+		/**
+			Pull down a element in the heaparray
+
+			@param[in] index_ index of the element which has to pull down
+		*/
+		void pulldown(size_t index_) {
+			while (index_ < (size + 1) / 2 - 1) {
+				if (greater) {
+					size_t new_index;
+					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
+					}
+					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
+						new_index = 2 * index_ + 1;
+					}
+					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+						new_index = 2 * index_ + 2;
+					}
+					else {
+						return;
+					}
+					if (heaparray[index_] < heaparray[new_index]) {
+						swap(index_, new_index);
+						index_ = new_index;
+					}
+					else {
+						return;
+					}
+				}
+				else {
+					size_t new_index;
+					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
+					}
+					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
+						new_index = 2 * index_ + 1;
+					}
+					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+						new_index = 2 * index_ + 2;
+					}
+					else {
+						return;
+					}
+					if (heaparray[index_] > heaparray[new_index]) {
+						swap(index_, new_index);
+						index_ = new_index;
+					}
+					else {
+						return;
+					}
+				}
+			}
+		}
+	public:
+		/**
+			Adds a new element
+
+			@param[in] value_ element which will be added
+		*/
+		void push(ElementType& value_) {
+			if (count > size) {
+				resize(size * 2 + 1);
+			}
+
+			heaparray[count] = value_;
+			pushup(count);
+
+			count = count + 1;
+		}
+
+		/**
+			Pops the minimal/maximal element;
+
+			@return minimal/maximal value of the heap
+		*/
+		ElementType pop() {
+			ElementType value = heaparray[0];
+
+			heaparray[0] = heaparray[count - 1];
+			heaparray[count - 1] = 0;
+			count = count - 1;
+
+			pulldown(0);
+
+			return value;
+		}
+
+		/**
+			Checks whether the elements in the heaparray are ordered
+
+			@return True when the heaparray is ordered
+		*/
+		bool checkHeap() {
+			size_t begin = 0;
+			size_t depth = 0;
+			while (begin < (size + 1) / 2 - 1) {
+				size_t elements = (size_t)pow((float)2, (float)depth);
+				for (size_t i = 0; i < elements; i++) {
+					if (heaparray[2 * begin + 1]) {
+						if (greater) {
+							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
+						}
+						else {
+							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
+						}
+					}
+					if (heaparray[2 * begin + 2]) {
+						if (greater) {
+							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
+						}
+						else {
+							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
+						}
+					}
+					begin = begin + 1;
+				}
+				depth = depth + 1;
+			}
+			return 1;
+		}
+
+
+	public:
+
+		/**
+			heaparray with the size of 2^n-1
+		*/
+		ElementType* heaparray;
+
+		/**
+			Size of heaparray
+		*/
+		size_t size;
+
+		/**
+			Number of elements in heap
+		*/
+		size_t count;
+
+		/**
+			Flag which specifies wheter the set will be descendendly ordered
+		*/
+		bool greater;
+	};
+	/**
+	
+		Operator << Prints the values of the heap
+
+		@param[in,out] out_ Outstream in which the node will be printed
+		@param[in] heap_ Node which values shall be printed
+	*/
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const HeapNode<ElementType>& heap_node_)
+	{
+		out_ << heap_node_.value;
+
+		return out_;
+	}
+	
+	/**
+		Operator << Prints the values of the heap
+
+		@param[in,out] out_ Outstream in which the heap will be printed
+		@param[in] heap_ Heap which values shall be printed
+	*/
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const HeapUpdate<ElementType>& heap_)
+	{
+		for (size_t i = 0; i < heap_.count; i++) {
+			out_ << heap_.heaparray[i] << " ";
+		}
+
+		return out_;
+	}
 
 	/**
 		Operator << Prints the values of the heap
@@ -312,11 +673,11 @@ namespace utils
 		@param[in,out] out_ Outstream in which the heap will be printed
 		@param[in] heap_ Heap which values shall be printed
 	*/
-	template<typename ElementType, bool greater>
-	std::ostream& operator<<(std::ostream& out_, const Heap<ElementType,greater>& heap_)
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const Heap<ElementType>& heap_)
 	{
 		for (size_t i = 0; i < heap_.count; i++) {
-			out_ << heap_.array[i] << " ";
+			out_ << heap_.heaparray[i] << " ";
 		}
 
 		return out_;
