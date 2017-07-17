@@ -148,6 +148,8 @@ namespace trees
 				diff1 = (a_[1] - b_[1]);
 				diff2 = (a_[2] - b_[2]);
 
+				std::cout << diff0 << " " << diff1 << " " << diff2 << std::endl;
+
 				result += diff0*diff0 + diff1*diff1 + diff2*diff2;
 
 				a_ += 3;
@@ -155,6 +157,7 @@ namespace trees
 			}
 
 			while (a_ < last) {
+				
 				diff0 = (*a_++ - *b_++);
 				result += diff0*diff0;
 			}

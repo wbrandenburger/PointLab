@@ -124,11 +124,12 @@ int main(int argc, char* argv[]) {
 	/**
 		Search in pointcloud
 	*/
-	int radius = 0.05;
+	float radius = 0.005;
 	int querynumber = 12;// pointcloudkdtree.rows;
 
 	std::vector<std::vector<int>> indices(querynumber);
 	std::vector<std::vector<float>> dists(querynumber);
+
 	/**
 		Generates a pointcloud with points whose neighbors shall searched for
 	*/
@@ -149,7 +150,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 
 	/**
-	Colorize the pointcloud
+		Colorize the pointcloud
 	*/
 	utils::randSeed();
 	for (int i = 0; i < indices.size(); i++) {
@@ -163,7 +164,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
+	//io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	/**
 		Destroy the structures

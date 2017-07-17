@@ -425,7 +425,6 @@ namespace trees
 					ElementType* point = ordered ? dataset_ordered[i] : dataset[vind[i]];
 					
 					ElementType dist = distance(const_cast<ElementType*>(vec_), point, veclen);
-
 					if (dist<worst_dist) {
 						result_set_.addPoint(dist, vind[i]);
 					}

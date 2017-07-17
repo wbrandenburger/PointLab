@@ -483,7 +483,7 @@ public:
     void addPoint(DistanceType dist, size_t index)
     {
     	if (dist<radius_) {
-    		// add new element
+			// add new element
     		dist_index_.push_back(DistIndex(dist,index));
     	}
     }

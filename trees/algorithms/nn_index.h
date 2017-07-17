@@ -148,11 +148,11 @@ namespace trees
 								const TreeParams& params_,
 								size_t index_)
 		{
-			KNNResultSet2<ElementType> result_set(knn_);
-			result_set.clear();
-			findNeighbors(result_set, queries_[index_], params_);
-			size_t n = std::min(result_set.size(), knn_);
-			result_set.copy(indices_[index_], dists_[index_], n);
+			KNNResultSet2<ElementType> resultSet(knn_);
+			resultSet.clear();
+			findNeighbors(resultSet, queries_[index_], params_);
+			size_t n = std::min(resultSet.size(), knn_);
+			resultSet.copy(indices_[index_], dists_[index_], n);
 		}
 
 		/**
@@ -179,6 +179,92 @@ namespace trees
 				}
 			}
 			delete[] indices.ptr();
+		}
+
+		/**
+		Perform radius search
+
+		@param[in] queries_ The query points for which to find the nearest neighbors
+		@param[in,out] indices_ The indices of the nearest neighbors found
+		@param[in,out] dists_ Distances to the nearest neighbors found
+		@param[in] radius_ The radius used for search
+		@param[in] params_ Search parameters
+		*/
+		void radiusSearch(const Matrix<ElementType>& queries_,
+			std::vector< std::vector<size_t> >& indices_,
+			std::vector<std::vector<ElementType>>& dists_,
+			float radius_,
+			const TreeParams& params_)
+		{
+			assert(queries.cols == veclen());
+
+			Threadpool pool(params_.cores);
+
+			for (int i = 0; i < queries_.rows; i++) {
+				while (!pool.runTask(boost::bind(&NNIndex<ElementType>::radiusSearchThread,
+					this,
+					boost::ref(queries_),
+					boost::ref(indices_),
+					boost::ref(dists_),
+					radius_,
+					boost::ref(params_),
+					i)));
+			}
+			
+			pool.shutdown();
+		}
+
+		/**
+			Perform radius search
+
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] radius_ The radius used for search
+			@param[in] params_ Search parameters
+			@param[in] index_ Number of the row of the queries
+		*/
+		void radiusSearchThread(const Matrix<ElementType>& queries_,
+			std::vector< std::vector<size_t>>& indices_,
+			std::vector<std::vector<ElementType>>& dists_,
+			float radius_,
+			const TreeParams& params_,
+			size_t index_)
+		{
+			RadiusResultSet<ElementType> resultSet(radius_);
+			resultSet.clear();
+			findNeighbors(resultSet, queries_[index_], params_);
+			size_t n = resultSet.size();
+
+			if (n > 0) {
+				indices_[index_].resize(n);
+				dists_[index_].resize(n);
+				resultSet.copy(&indices_[index_][0], &dists_[index_][0], n);
+			}
+		}
+
+		/**
+			Perform radius search
+
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] radius_ The radius used for search
+			@param[in] params_ Search parameters
+		*/
+		void radiusSearch(const Matrix<ElementType>& queries_,
+			std::vector<std::vector<int>>& indices_,
+			std::vector<std::vector<ElementType>>& dists_,
+			float radius_,
+			const TreeParams& params_)
+		{
+			std::vector<std::vector<size_t> > indices(indices_.size());
+			radiusSearch(queries_, indices, dists_, radius_, params_);
+
+			for (size_t i = 0; i<indices_.size(); ++i) {
+				indices_.resize(indices[i].size());
+				indices_[i].assign(indices[i].begin(), indices[i].end());
+			}
 		}
 
 	protected:

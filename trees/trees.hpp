@@ -110,8 +110,8 @@ namespace trees
 			@param[in] params_ Search parameters
 		*/
 		void radiusSearch(const Matrix<ElementType>& queries_,
-			std::vector< std::vector<size_t>>& indices_,
-			std::vector<std::vector<ElementType>>& dists_,
+			std::vector< std::vector<size_t>> indices_,
+			std::vector<std::vector<ElementType>> dists_,
 			float radius_,
 			const TreeParams& params_) const
 		{
@@ -128,8 +128,8 @@ namespace trees
 			@param[in] params_ Search parameters
 		*/
 		void radiusSearch(const Matrix<ElementType>& queries_,
-			std::vector< std::vector<int>>& indices_,
-			std::vector<std::vector<ElementType>>& dists_,
+			std::vector< std::vector<int>> indices_,
+			std::vector<std::vector<ElementType>> dists_,
 			float radius_,
 			const TreeParams& params_) const
 		{
