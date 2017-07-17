@@ -210,8 +210,14 @@ namespace trees
 					boost::ref(params_),
 					i)));
 			}
-			
+
 			pool.shutdown();
+			std::cout << "Hier" << std::endl;
+			std::cout << indices_.size() << std::endl;
+			for (int i = 0; i < queries_.rows; i++) {
+				std::cout << indices_[i].size() << std::endl;
+			}
+
 		}
 
 		/**

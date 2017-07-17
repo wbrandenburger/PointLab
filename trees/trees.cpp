@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	//io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
+	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	/**
 		Destroy the structures

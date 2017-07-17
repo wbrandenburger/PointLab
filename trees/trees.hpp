@@ -76,7 +76,7 @@ namespace trees
 			Matrix<size_t>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
-			const TreeParams& params_) const
+			const TreeParams& params_) 
 		{
 			nnIndex->knnSearch(queries_, indices_, dists_, knn_, params_);
 		}
@@ -94,7 +94,7 @@ namespace trees
 			Matrix<int>& indices_,
 			Matrix<ElementType>& dists_,
 			size_t knn_,
-			const TreeParams& params_) const
+			const TreeParams& params_)
 		{
 			nnIndex->knnSearch(queries_, indices_, dists_, knn_, params_);
 		}
@@ -110,12 +110,18 @@ namespace trees
 			@param[in] params_ Search parameters
 		*/
 		void radiusSearch(const Matrix<ElementType>& queries_,
-			std::vector< std::vector<size_t>> indices_,
-			std::vector<std::vector<ElementType>> dists_,
+			std::vector< std::vector<size_t>>& indices_,
+			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,
-			const TreeParams& params_) const
+			const TreeParams& params_)
 		{
 			nnIndex->radiusSearch(queries_, indices_, dists_, radius_, params_);
+
+			std::cout << "Hier" << std::endl;
+			//std::cout << indices_.size() << std::endl;
+			//for (int i = 0; i < queries_.rows; i++) {
+			//	std::cout << indices_[i].size() << std::endl;
+			//}
 		}
 
 		/**
@@ -128,10 +134,10 @@ namespace trees
 			@param[in] params_ Search parameters
 		*/
 		void radiusSearch(const Matrix<ElementType>& queries_,
-			std::vector< std::vector<int>> indices_,
-			std::vector<std::vector<ElementType>> dists_,
+			std::vector< std::vector<int>>& indices_,
+			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,
-			const TreeParams& params_) const
+			const TreeParams& params_)
 		{
 			nnIndex->radiusSearch(queries_, indices_, dists_, radius_, params_);
 		}
