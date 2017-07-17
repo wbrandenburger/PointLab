@@ -423,10 +423,8 @@ namespace trees
 				ElementType worst_dist = result_set_.worstDist();
 				for (int i = node_->left; i<node_->right; ++i) {	
 					ElementType* point = ordered ? dataset_ordered[i] : dataset[vind[i]];
-					ElementType dist = 0;
-					for (int j = 0; j < veclen; j++) {
-						dist += (vec_[j] - point[j])*(vec_[j] - point[j]);
-					}
+					
+					ElementType dist = distance(const_cast<ElementType*>(vec_), point, veclen);
 
 					if (dist<worst_dist) {
 						result_set_.addPoint(dist, vind[i]);
@@ -447,12 +445,12 @@ namespace trees
 			if ((diff1 + diff2)<0) {
 				bestChild = node_->child1;
 				otherChild = node_->child2;
-				cut_dist = (val-node_->divhigh)*(val-node_->divhigh);
+				cut_dist = distance(val, node_->divhigh); //(val-node_->divhigh)*(val-node_->divhigh);
 			}
 			else {
 				bestChild = node_->child2;
 				otherChild = node_->child1;
-				cut_dist = (val - node_->divlow)*(val - node_->divlow);
+				cut_dist = distance(val, node_->divlow); // (val - node_->divlow)*(val - node_->divlow);
 			}
 
 			/* Call recursively to search next level down. */
@@ -507,7 +505,6 @@ namespace trees
 		/**
 			Distance structure
 		*/
-
 		L2<ElementType> distance;
 	};
 
