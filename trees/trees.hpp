@@ -116,12 +116,6 @@ namespace trees
 			const TreeParams& params_)
 		{
 			nnIndex->radiusSearch(queries_, indices_, dists_, radius_, params_);
-
-			std::cout << "Hier" << std::endl;
-			//std::cout << indices_.size() << std::endl;
-			//for (int i = 0; i < queries_.rows; i++) {
-			//	std::cout << indices_[i].size() << std::endl;
-			//}
 		}
 
 		/**

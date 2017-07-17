@@ -212,12 +212,6 @@ namespace trees
 			}
 
 			pool.shutdown();
-			std::cout << "Hier" << std::endl;
-			std::cout << indices_.size() << std::endl;
-			for (int i = 0; i < queries_.rows; i++) {
-				std::cout << indices_[i].size() << std::endl;
-			}
-
 		}
 
 		/**
@@ -266,9 +260,8 @@ namespace trees
 		{
 			std::vector<std::vector<size_t> > indices(indices_.size());
 			radiusSearch(queries_, indices, dists_, radius_, params_);
-
+			
 			for (size_t i = 0; i<indices_.size(); ++i) {
-				indices_.resize(indices[i].size());
 				indices_[i].assign(indices[i].begin(), indices[i].end());
 			}
 		}

@@ -130,6 +130,10 @@ int main(int argc, char* argv[]) {
 	std::vector<std::vector<int>> indices(querynumber);
 	std::vector<std::vector<float>> dists(querynumber);
 
+	//for (size_t i = 0; i < 12; i++) {
+	//	indices.
+	//}
+
 	/**
 		Generates a pointcloud with points whose neighbors shall searched for
 	*/
