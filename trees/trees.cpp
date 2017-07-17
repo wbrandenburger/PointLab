@@ -76,15 +76,59 @@ int main(int argc, char* argv[]) {
 	index.buildIndex();
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
+	/////**
+	////	Search in pointcloud
+	////*/
+	////int nn = 2000;
+	////int querynumber = 12;// pointcloudkdtree.rows;
+
+	////trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
+	////trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
+
+	/////**
+	////	Generates a pointcloud with points whose neighbors shall searched for
+	////*/
+	////utils::randSeed();
+	////trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
+	////for (int i = 0; i < querynumber; i++) {
+	////	int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
+	////	for (int j = 0; j < pointcloudkdtree.cols; j++) {
+	////		query[i][j] = pointcloudkdtree[random][j];
+	////	}
+	////}
+
+	////trees::TreeParams params;
+	////params.cores = cores;
+
+	////time.start();
+	////index.knnSearch(query, indices, dists, nn, params);
+	////std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
+	////
+	/////**
+	////	Colorize the pointcloud
+	////*/
+	////utils::randSeed();
+	////for (int i = 0; i < indices.rows; i++) {
+	////	int r = utils::rand<int>(255, 0);
+	////	int g = utils::rand<int>(255, 0);
+	////	int b = utils::rand<int>(255, 0);
+	////	for (int j = 0; j < indices.cols; j++) {
+	////		pointcloud.colors[indices[i][j]][0] = r;
+	////		pointcloud.colors[indices[i][j]][1] = g;
+	////		pointcloud.colors[indices[i][j]][2] = b;
+	////	}
+	////}
+
+	////io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
+
 	/**
 		Search in pointcloud
 	*/
-	int nn = 2000;
+	int radius = 0.05;
 	int querynumber = 12;// pointcloudkdtree.rows;
 
-	trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
-	trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
-
+	std::vector<std::vector<int>> indices(querynumber);
+	std::vector<std::vector<float>> dists(querynumber);
 	/**
 		Generates a pointcloud with points whose neighbors shall searched for
 	*/
@@ -101,18 +145,18 @@ int main(int argc, char* argv[]) {
 	params.cores = cores;
 
 	time.start();
-	index.knnSearch(query, indices, dists, nn, params);
+	index.radiusSearch(query, indices, dists, radius, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
-	
+
 	/**
-		Colorize the pointcloud
+	Colorize the pointcloud
 	*/
 	utils::randSeed();
-	for (int i = 0; i < indices.rows; i++) {
+	for (int i = 0; i < indices.size(); i++) {
 		int r = utils::rand<int>(255, 0);
 		int g = utils::rand<int>(255, 0);
 		int b = utils::rand<int>(255, 0);
-		for (int j = 0; j < indices.cols; j++) {
+		for (int j = 0; j < indices[i].size(); j++) {
 			pointcloud.colors[indices[i][j]][0] = r;
 			pointcloud.colors[indices[i][j]][1] = g;
 			pointcloud.colors[indices[i][j]][2] = b;
