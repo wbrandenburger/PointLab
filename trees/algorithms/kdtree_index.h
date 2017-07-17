@@ -37,6 +37,7 @@
 #include "algorithms/nn_index.h"
 
 #include "util/allocator.h"
+#include "util/dist.h"
 #include "util/matrix.h"
 #include "util/result_set.h"
 #include "util/params.h"
@@ -503,6 +504,11 @@ namespace trees
 		*/
 		Matrix<ElementType> dataset_ordered;
 
+		/**
+			Distance structure
+		*/
+
+		L2<ElementType> distance;
 	};
 
 }
