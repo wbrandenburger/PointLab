@@ -36,6 +36,8 @@
 #include "tools/utils.h"
 #include "tools/io.h"
 
+#include "tools/utils/heap.h"
+
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
@@ -125,6 +127,32 @@ int main(int argc, char* argv[]) {
 	pointcloud.clear();
 
 
+	int* heaplist = new int[15];
+
+	heaplist[0] = 35;
+	heaplist[1] = 99;
+	heaplist[2] = 12;
+	heaplist[3] = 56;
+	heaplist[4] = 85;
+	heaplist[5] = 23;
+	heaplist[6] = 96;
+	heaplist[7] = 43;
+	heaplist[8] = 75;
+	heaplist[9] = 24;
+	heaplist[10] = 59;
+	heaplist[11] = 83;
+	heaplist[12] = 37;
+	heaplist[13] = 72;
+	heaplist[14] = 4;
+	
+	utils::Heap<int, true> heap(15);
+	
+	for (int i = 0; i < 15; i++) {
+		heap.push(heaplist[i]);
+	}
+
+
+	std::cout << heap << std::endl;
 
 	return(0);
 }

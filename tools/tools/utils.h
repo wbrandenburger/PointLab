@@ -32,6 +32,7 @@
 
 #include "utils/allocator.h"
 #include "utils/balancedtree.h"
+#include "utils/heap.h"
 #include "utils/matrix.h"
 #include "utils/pointcloud.h"
 #include "utils/randomize.h"

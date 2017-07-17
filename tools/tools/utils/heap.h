@@ -224,7 +224,7 @@ namespace utils
 
 			@param[in] value_ element which will be added
 		*/
-		void add(ElementType value_) {
+		void push(ElementType value_) {
 			if (count > size) {
 				resize(size * 2 + 1);
 			}
@@ -285,7 +285,8 @@ namespace utils
 			}
 			return 1;
 		}
-		
+
+
 	public:
 
 		/** 
@@ -304,6 +305,22 @@ namespace utils
 		size_t count;
 
 	};	
+
+	/**
+		Operator << Prints the values of the heap
+
+		@param[in,out] out_ Outstream in which the heap will be printed
+		@param[in] heap_ Heap which values shall be printed
+	*/
+	template<typename ElementType, bool greater>
+	std::ostream& operator<<(std::ostream& out_, const Heap<ElementType,greater>& heap_)
+	{
+		for (size_t i = 0; i < heap_.count; i++) {
+			out_ << heap_.array[i] << " ";
+		}
+
+		return out_;
+	}
 }
 
 #endif /* UTILS_HEAP_H_ */
