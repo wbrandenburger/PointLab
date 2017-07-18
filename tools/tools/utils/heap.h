@@ -78,6 +78,21 @@ namespace utils
 			return value > heap_node_.value ? true : false;
 		}
 
+		/**
+			Clears the structure
+		*/
+		void clear()
+		{
+			value = NULL;
+			index = NULL;
+			heap_node = nullptr;
+		}
+
+		/** 
+			Return True if the structure is empty
+
+			@return True if tje structure is empty
+		*/
 		bool isEmpty()
 		{
 			if (value == NULL && index == NULL && heap_node == nullptr) {
@@ -171,7 +186,7 @@ namespace utils
 				delete[] heaparray;
 			}
 
-			heaparray = new ElementType[size_];
+			heaparray = new HeapNode<ElementType>[size_];
 			size = size_;
 			count = 0;
 		}
@@ -182,7 +197,7 @@ namespace utils
 			@param[in] size_ of the heaparray
 		*/
 		void resize(size_t size_) {
-			ElementType* new_heaparray = new ElementType[size_];
+			ElementType* new_heaparray = new HeapNode<ElementType>[size_];
 
 			for (int i = 0; i<size+1; i++) {
 				new_heaparray[i] = heaparray[i];
@@ -223,10 +238,22 @@ namespace utils
 			@param[in] x first heaparray element
 			@param[in] y second heaparray element
 		*/
-		void swap(ElementType& x, ElementType& y) {
-			ElementType swap = x;
+		void swap(HeapNode<ElementType>& x, HeapNode<ElementType>& y)
+		{
+			HeapNode<ElementType> swap = x;
 			x = y;
 			y = swap;
+		}
+
+		/**
+			Swap two heaparray elements
+
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
+		*/
+		void swap(size_t index_, size_t new_index)
+		{
+			swap(heaparray[new_index], heaparray[index_]);
 		}
 
 		/**
@@ -236,7 +263,7 @@ namespace utils
 			@return True when pushing the element up was successful
 		*/
 		bool pushup(size_t index_) {
-			
+
 			bool flag = false;
 
 			while (index_ != 0) {
@@ -247,17 +274,17 @@ namespace utils
 				else {
 					new_index = (index_ - 1) / 2;
 				}
-				
+
 				if (greater) {
 					if (heaparray[new_index] < heaparray[index_]) {
-						swap(heaparray[new_index], heaparray[index_]);
+						swap(new_index, index_);
 						flag = true;
 					}
 					else { return flag; }
 				}
 				else {
 					if (heaparray[new_index] > heaparray[index_]) {
-						swap(heaparray[new_index], heaparray[index_]);
+						swap(new_index, index_);
 						flag = true;
 					}
 					else { return flag; }
@@ -275,28 +302,28 @@ namespace utils
 			@return True when pulling the element down was successful
 		*/
 		bool pulldown(size_t index_) {
-			
+
 			bool flag = false;
-			
+
 			while (index_ < (size + 1) / 2 - 1) {
 				if (greater) {
 					size_t new_index;
-					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
 					}
-					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
+					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 1;
 					}
-					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 2;
-						}
+					}
 					else {
 						return flag;
 					}
 					if (heaparray[index_] < heaparray[new_index]) {
-						swap(heaparray[index_], heaparray[new_index]);
+						swap(index_, new_index);
 						index_ = new_index;
-						flag = true
+						flag = true;
 					}
 					else {
 						return flag;
@@ -304,20 +331,20 @@ namespace utils
 				}
 				else {
 					size_t new_index;
-					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
 					}
-					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
+					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 1;
 					}
-					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 2;
 					}
 					else {
 						return flag;
 					}
 					if (heaparray[index_] > heaparray[new_index]) {
-						swap(heaparray[index_], heaparray[new_index]);
+						swap(index_, new_index);
 						index_ = new_index;
 						flag = true;
 					}
@@ -327,7 +354,7 @@ namespace utils
 				}
 			}
 
-			return flag
+			return flag;
 		}
 	public:
 		/**
@@ -340,7 +367,7 @@ namespace utils
 				resize(size * 2 + 1);
 			}
 
-			heaparray[count] = value_;
+			heaparray[count].value = value_;
 			pushup(count);
 
 			count = count + 1;
@@ -352,10 +379,10 @@ namespace utils
 			@return minimal/maximal value of the heap
 		*/
 		ElementType pop() {
-			ElementType value = heaparray[0];
+			ElementType value = heaparray[0].value;
 
 			heaparray[0] = heaparray[count-1];
-			heaparray[count-1] = 0;
+			heaparray[count-1].clear();
 			count = count - 1;
 			
 			pulldown(0);
@@ -374,7 +401,7 @@ namespace utils
 			while (begin < (size + 1) / 2 - 1) {
 				size_t elements = (size_t)pow((float)2, (float)depth);
 				for (size_t i = 0; i < elements; i++) {
-					if (heaparray[2 * begin + 1]) {
+					if (!heaparray[2 * begin + 1].isEmpty()) {
 						if (greater) {
 							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
 						}
@@ -382,7 +409,7 @@ namespace utils
 							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
 						}
 					}
-					if (heaparray[2 * begin + 2]) {
+					if (!heaparray[2 * begin + 2].isEmpty) {
 						if (greater) {
 							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
 						}
@@ -681,11 +708,10 @@ namespace utils
 		*/
 		ElementType pop() {
 			ElementType value = heaparray[0].value;
-			heaparray[0].heap_node->heap_node = nullptr;
-			heaparray[0].heap_node->index = NULL;
+			heaparray[0].heap_node->clear();
 
 			heaparray[0] = heaparray[count - 1];
-			heaparray[count - 1] = 0;
+			heaparray[count - 1].clear();
 			count = count - 1;
 
 			pulldown(0);
@@ -723,7 +749,7 @@ namespace utils
 			while (begin < (size + 1) / 2 - 1) {
 				size_t elements = (size_t)pow((float)2, (float)depth);
 				for (size_t i = 0; i < elements; i++) {
-					if (heaparray[2 * begin + 1]) {
+					if (!heaparray[2 * begin + 1].isEmpty()) {
 						if (greater) {
 							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
 						}
@@ -731,7 +757,7 @@ namespace utils
 							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
 						}
 					}
-					if (heaparray[2 * begin + 2]) {
+					if (!heaparray[2 * begin + 2].isEmpty()) {
 						if (greater) {
 							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
 						}
