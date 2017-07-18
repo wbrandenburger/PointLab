@@ -35,6 +35,60 @@
 
 namespace utils
 {
+
+	template<typename ElementType> struct HeapNode {
+
+		ElementType value;
+
+		size_t index;
+
+		HeapNode* heap_node;
+
+		/**
+			Constructor
+		*/
+		HeapNode() : value(NULL), index(NULL), heap_node(nullptr) {}
+
+		/**
+			Constructor
+
+			@param[in] value_ Element
+			@param[in] index_ Index in array
+			@param[in] heap_node_ Pointer to a instance of HeapNode
+		*/
+		HeapNode(ElementType value_, size_t index_, HeapNode* heap_node_) : value(value_), index(index_), heap_node(heap_node_) {}
+
+		/**
+			Operator < Compares two HeapNodes
+
+			@param[in] heap_node_ Instance of HeapNode
+		*/
+		bool operator < (const HeapNode& heap_node_)
+		{
+			return value < heap_node_.value ? true : false;
+		}
+
+		/**
+			Operator < Compares two HeapNodes
+
+			@param[in] heap_node_ Instance of HeapNode
+		*/
+		bool operator > (const HeapNode& heap_node_)
+		{
+			return value > heap_node_.value ? true : false;
+		}
+
+		bool isEmpty()
+		{
+			if (value == NULL && index == NULL && heap_node == nullptr) {
+				return true;
+			}
+
+			return false;
+		}
+
+	};
+
 	template<typename ElementType>
 	class BaseHeap 
 	{
@@ -43,18 +97,26 @@ namespace utils
 		/**
 			Constructor
 		*/
-		BaseHeap () : size(0), count(0), greater(true) {}
+		BaseHeap () : heaparray(nullptr), size(0), count(0), greater(true) {}
 		/**
 			Constructor
 
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		BaseHeap(size_t size_, bool greater_ = true) : size(size_), greater(greater_), count(0) {}
+		BaseHeap(size_t size_, bool greater_ = true) : size(size_), greater(greater_), count(0) {
+			heaparray = new HeapNode<ElementType>[size_];
+		}
 
-		virtual ~BaseHeap() {}
+		virtual ~BaseHeap() = 0 {}
 
 	public:
+
+
+		/**
+			heaparray with the size of 2^n-1
+		*/
+		HeapNode<ElementType>* heaparray;
 
 		/**
 			Size of heaparray
@@ -80,7 +142,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		Heap() : BaseHeap(), heaparray(nullptr) {}
+		Heap() : BaseHeap(){}
 		
 		/**
 			Constructor
@@ -89,7 +151,6 @@ namespace utils
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
 		Heap(size_t size_, bool greater_ = true) : BaseHeap(size_) {
-			heaparray = new ElementType[size_];
 		}
 	
 		/**
@@ -338,64 +399,7 @@ namespace utils
 
 	public:
 
-		/**
-			heaparray with the size of 2^n-1
-		*/
-		ElementType* heaparray;
 	};	
-
-	template<typename ElementType> struct HeapNode {
-
-		ElementType value;
-
-		size_t index;
-
-		HeapNode* heap_node;
-
-		/**
-			Constructor
-		*/
-		HeapNode() : value(NULL), index(NULL), heap_node(nullptr) {}
-
-		/**
-			Constructor
-
-			@param[in] value_ Element
-			@param[in] index_ Index in array
-			@param[in] heap_node_ Pointer to a instance of HeapNode
-		*/
-		HeapNode(ElementType value_,size_t index_, HeapNode* heap_node_) : value(value_), index(index_), heap_node(heap_node_) {}
-
-		/**
-			Operator < Compares two HeapNodes
-
-			@param[in] heap_node_ Instance of HeapNode
-		*/
-		bool operator < (const HeapNode& heap_node_)
-		{
-			return value < heap_node_.value ? true : false;
-		}
-
-		/**
-			Operator < Compares two HeapNodes
-
-			@param[in] heap_node_ Instance of HeapNode
-		*/
-		bool operator > (const HeapNode& heap_node_)
-		{
-			return value > heap_node_.value ? true : false;
-		}
-
-		bool isEmpty()
-		{
-			if (value == NULL && index == NULL && heap_node == nullptr) {
-				return true;
-			}
-
-			return false;
-		}
-
-	};
 
 	template<typename ElementType>
 	class HeapWrapper : public BaseHeap<ElementType> 
@@ -405,7 +409,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		HeapWrapper() : BaseHeap(), heaparray(nullptr) {}
+		HeapWrapper() : BaseHeap() {}
 
 		/**
 			Constructor
@@ -414,7 +418,6 @@ namespace utils
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
 		HeapWrapper(size_t size_, bool greater_ = true) : BaseHeap(size_) {
-			heaparray = new HeapNode<ElementType>[size_];
 			heapvector.resize(size_);
 		}
 
@@ -747,29 +750,9 @@ namespace utils
 	public:
 
 		/**
-			heaparray with the size of 2^n-1
-		*/
-		HeapNode<ElementType>* heaparray;
-
-		/**
 			Vector indexing the heaparray
 		*/
 		std::vector<HeapNode<ElementType>> heapvector;
-
-		///**
-		//	Size of heaparray
-		//*/
-		//size_t size;
-
-		///**
-		//	Number of elements in heap
-		//*/
-		//size_t count;
-
-		///**
-		//	Flag which specifies wheter the set will be descendendly ordered
-		//*/
-		//bool greater;
 	};
 
 	/**
