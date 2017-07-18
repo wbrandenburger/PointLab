@@ -171,14 +171,16 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-
-	utils::HeapNode<int>* heaplist = new utils::HeapNode<int>[15];
-	utils::HeapUpdate<utils::HeapNode<int>> heap(15);
-	//for (int i = 0; i < 15; i++) {
-	//	heaplist[i].setHeapNode(utils::rand<int>(100, 0), &heap);
-	//}
-
+	utils::HeapWrapper<int> heap(15);
+	for (int i = 0; i < 15; i++) {
+		int a = utils::rand<int>(100, 0);
+		std::cout << a << " ";
+		heap.push(a,i);
+	}
+	std::cout << std::endl;
+	
 	std::cout << heap << std::endl;
-
+	heap.update(100, 4);
+	std::cout << heap << std::endl;
 	return(0);
 }

@@ -30,6 +30,9 @@
 #ifndef UTILS_HEAP_H_
 #define UTILS_HEAP_H_
 
+#include <vector>
+#include <assert.h>
+
 namespace utils
 {
 	template<typename ElementType>
@@ -40,7 +43,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		Heap() : heaparray(nullptr), size(0), count(0) {}
+		Heap() : heaparray(nullptr), size(0), count(0), greater(true) {}
 		
 		/**
 			Constructor
@@ -131,9 +134,12 @@ namespace utils
 			Push up a element in the heaparray
 
 			@param[in] index_ index of the element which has to push up
+			@return True when pushing the element up was successful
 		*/
-		void pushup(size_t index_) {
+		bool pushup(size_t index_) {
 			
+			bool flag = false;
+
 			while (index_ != 0) {
 				size_t new_index;
 				if (index_ % 2 == 0) {
@@ -145,26 +151,34 @@ namespace utils
 				
 				if (greater) {
 					if (heaparray[new_index] < heaparray[index_]) {
-							swap(heaparray[new_index], heaparray[index_]);
+						swap(heaparray[new_index], heaparray[index_]);
+						flag = true;
 					}
-					else { return; }
+					else { return flag; }
 				}
 				else {
 					if (heaparray[new_index] > heaparray[index_]) {
 						swap(heaparray[new_index], heaparray[index_]);
+						flag = true;
 					}
-					else { return; }
+					else { return flag; }
 				}
 				index_ = new_index;
 			}
+
+			return flag;
 		}
 
 		/**
 			Pull down a element in the heaparray
 
 			@param[in] index_ index of the element which has to pull down
+			@return True when pulling the element down was successful
 		*/
-		void pulldown(size_t index_) {
+		bool pulldown(size_t index_) {
+			
+			bool flag = false;
+			
 			while (index_ < (size + 1) / 2 - 1) {
 				if (greater) {
 					size_t new_index;
@@ -178,14 +192,15 @@ namespace utils
 						new_index = 2 * index_ + 2;
 						}
 					else {
-						return;
+						return flag;
 					}
 					if (heaparray[index_] < heaparray[new_index]) {
 						swap(heaparray[index_], heaparray[new_index]);
 						index_ = new_index;
+						flag = true
 					}
 					else {
-						return;
+						return flag;
 					}
 				}
 				else {
@@ -200,17 +215,20 @@ namespace utils
 						new_index = 2 * index_ + 2;
 					}
 					else {
-						return;
+						return flag;
 					}
 					if (heaparray[index_] > heaparray[new_index]) {
 						swap(heaparray[index_], heaparray[new_index]);
 						index_ = new_index;
+						flag = true;
 					}
 					else {
-						return;
+						return flag;
 					}
 				}
 			}
+
+			return flag
 		}
 	public:
 		/**
@@ -310,52 +328,62 @@ namespace utils
 
 		size_t index;
 
+		HeapNode* heap_node;
 
-		//HeapNode* heap_node;
+		/**
+			Constructor
+		*/
+		HeapNode() : value(NULL), index(NULL), heap_node(nullptr) {}
 
-		//HeapUpdate<HeapNode<ElementType>, greater>* heap;
+		/**
+			Constructor
 
-		//HeapNode() : value(0), index(0), heap_node(nullptr), heap(nullptr) {}
+			@param[in] value_ Element
+			@param[in] index_ Index in array
+			@param[in] heap_node_ Pointer to a instance of HeapNode
+		*/
+		HeapNode(ElementType value_,size_t index_, HeapNode* heap_node_) : value(value_), index(index_), heap_node(heap_node_) {}
 
-		//HeapNode(ElementType value_, HeapUpdate<HeapNode<ElementType>, greater>* heap_) : value(value_), heap(heap_)
-		//{
-		//	index = heap_->count;
-		//	heap_node = &heap_->heaparray[heap->count];
+		/**
+			Operator < Compares two HeapNodes
 
-		//	heap_->push(*this);
-		//}
-
-		//void setHeapNode(ElementType value_, HeapUpdate<HeapNode<ElementType> greater>* heap_)
-		//{
-		//	value = value_;
-		//	heap = heap_)
-		//	index = heap_->count;
-		//	heap_node = &heap_->heaparray[heap->count];
-
-		//	heap_->push(*this);
-		//}
-
-		bool operator < (const HeapNode& node_)
+			@param[in] heap_node_ Instance of HeapNode
+		*/
+		bool operator < (const HeapNode& heap_node_)
 		{
-			return value < node_.value ? true : false;
+			return value < heap_node_.value ? true : false;
 		}
-		
-		bool operator > (const HeapNode& node_)
+
+		/**
+			Operator < Compares two HeapNodes
+
+			@param[in] heap_node_ Instance of HeapNode
+		*/
+		bool operator > (const HeapNode& heap_node_)
 		{
-			return value > node_.value ? true : false;
+			return value > heap_node_.value ? true : false;
+		}
+
+		bool isEmpty()
+		{
+			if (value == NULL && index == NULL && heap_node == nullptr) {
+				return true;
+			}
+
+			return false;
 		}
 
 	};
 
 	template<typename ElementType>
-	class HeapUpdate {
+	class HeapWrapper {
 
 	public:
 
 		/**
 			Constructor
 		*/
-		HeapUpdate() : heaparray(nullptr), size(0), count(0) {}
+		HeapWrapper() : heaparray(nullptr), size(0), count(0), greater(true) {}
 
 		/**
 			Constructor
@@ -363,28 +391,36 @@ namespace utils
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		HeapUpdate(size_t size_, bool greater_ = true) : size(size_), greater(greater_) {
-			heaparray = new ElementType[size_];
+		HeapWrapper(size_t size_, bool greater_ = true) : size(size_), greater(greater_) {
+			heaparray = new HeapNode<ElementType>[size_];
+			heapvector.resize(size_);
 			count = 0;
 		}
 
 		/**
 			Desconstructor
 		*/
-		~HeapUpdate() { delete[] heaparray; }
+		~HeapWrapper() 
+		{ 
+			delete[] heaparray; 
+			heapvector.clear();
+		}
 
 		/**
-		Sets the pointer heaparray and size
+			Sets the pointer heaparray and size
 
-		@param[in] size_ Size of the heaparray
+			@param[in] size_ Size of the heaparray
 		*/
 		void setHeap(size_t size_) {
 
 			if (heaparray) {
 				delete[] heaparray;
 			}
+			heapvector.clear();
 
-			heaparray = new ElementType[size_];
+			heaparray = new HeapNode<ElementType>[size_];
+			heapvector.resize(size_);
+
 			size = size_;
 			count = 0;
 		}
@@ -395,7 +431,7 @@ namespace utils
 			@param[in] size_ of the heaparray
 		*/
 		void resize(size_t size_) {
-			ElementType* new_heaparray = new ElementType[size_];
+			HeapNode<ElementType>* new_heaparray = new HeapNode<ElementType>[size_];
 
 			for (int i = 0; i<size + 1; i++) {
 				new_heaparray[i] = heaparray[i];
@@ -403,6 +439,9 @@ namespace utils
 
 			delete[] heaparray;
 			heaparray = new_heaparray;
+
+			heapvector.resize(size_);
+
 			size = size_;
 		}
 
@@ -416,6 +455,8 @@ namespace utils
 				heaparray[i] = 0;
 			}
 
+			heapvector.clear();
+
 			count = 0;
 		}
 
@@ -428,6 +469,33 @@ namespace utils
 			return count;
 		}
 
+		/**
+			Get the element of the specified index
+
+			@param[in] index_ Index of the element
+			@return Value of the element
+		*/
+		ElementType getElement(size_t index_)
+		{
+			assert(heapvector[index_].heap_node != nullptr);
+
+			return heapvector[index_].heap_node->value;
+		}
+
+		/**
+			Get the index in the array of the specified index
+
+			@param[in] index_ Index of the element
+			@return Index in the array
+		*/
+		size_t getIndex(size_t index_)
+		{
+			assert(heapvector[index_].heap_node != nullptr);
+
+			return heapvector[index_].heap_node->index;
+		}
+
+
 	private:
 
 		/**
@@ -436,9 +504,9 @@ namespace utils
 			@param[in] x first heaparray element
 			@param[in] y second heaparray element
 		*/
-		void swap(ElementType& x, ElementType& y) 
+		void swap(HeapNode<ElementType>& x, HeapNode<ElementType>& y) 
 		{
-			ElementType swap = x;
+			HeapNode<ElementType> swap = x;
 			x = y;
 			y = swap;
 		}
@@ -454,18 +522,21 @@ namespace utils
 			swap(heaparray[new_index], heaparray[index_]);
 			
 			heaparray[new_index].heap_node->heap_node = &heaparray[new_index];
-			heaparray[new_index].index = new_index;
+			heaparray[new_index].heap_node->index = new_index;
 			
 			heaparray[index_].heap_node->heap_node = &heaparray[index_];
-			heaparray[index_].index = index_;
+			heaparray[index_].heap_node->index = index_;
 		}
 
 		/**
 			Push up a element in the heaparray
 
 			@param[in] index_ index of the element which has to push up
+			@return True when pushing the element up was successful 
 		*/
-		void pushup(size_t index_) {
+		bool pushup(size_t index_) {
+
+			bool flag = false;
 
 			while (index_ != 0) {
 				size_t new_index;
@@ -479,71 +550,83 @@ namespace utils
 				if (greater) {
 					if (heaparray[new_index] < heaparray[index_]) {
 						swap(new_index, index_);
+						flag = true;
 					}
-					else { return; }
+					else { return flag; }
 				}
 				else {
 					if (heaparray[new_index] > heaparray[index_]) {
 						swap(new_index, index_);
+						flag = true;
 					}
-					else { return; }
+					else { return flag; }
 				}
 				index_ = new_index;
 			}
+
+			return flag;
 		}
 
 		/**
 			Pull down a element in the heaparray
 
 			@param[in] index_ index of the element which has to pull down
+			@return True when pulling the element down was successful
 		*/
-		void pulldown(size_t index_) {
+		bool pulldown(size_t index_) {
+
+			bool flag = false;
+
 			while (index_ < (size + 1) / 2 - 1) {
 				if (greater) {
 					size_t new_index;
-					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
 					}
-					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
+					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 1;
 					}
-					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 2;
 					}
 					else {
-						return;
+						return flag;
 					}
 					if (heaparray[index_] < heaparray[new_index]) {
 						swap(index_, new_index);
 						index_ = new_index;
+						flag = true;
 					}
 					else {
-						return;
+						return flag;
 					}
 				}
 				else {
 					size_t new_index;
-					if (heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
 					}
-					else if (heaparray[2 * index_ + 1] && !heaparray[2 * index_ + 2]) {
+					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 1;
 					}
-					else if (!heaparray[2 * index_ + 1] && heaparray[2 * index_ + 2]) {
+					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
 						new_index = 2 * index_ + 2;
 					}
 					else {
-						return;
+						return flag;
 					}
 					if (heaparray[index_] > heaparray[new_index]) {
 						swap(index_, new_index);
 						index_ = new_index;
+						flag = true;
 					}
 					else {
-						return;
+						return flag;
 					}
 				}
 			}
+
+			return flag;
 		}
 	public:
 		/**
@@ -551,12 +634,17 @@ namespace utils
 
 			@param[in] value_ element which will be added
 		*/
-		void push(ElementType& value_) {
+		void push(ElementType value_, size_t index_) {
 			if (count > size) {
 				resize(size * 2 + 1);
 			}
 
-			heaparray[count] = value_;
+			HeapNode<ElementType> heap_node(value_, index_, &heapvector[index_]);
+			heaparray[count] = heap_node;
+			
+			heapvector[index_].heap_node = &heaparray[count];
+			heapvector[index_].index = count;
+
 			pushup(count);
 
 			count = count + 1;
@@ -568,7 +656,9 @@ namespace utils
 			@return minimal/maximal value of the heap
 		*/
 		ElementType pop() {
-			ElementType value = heaparray[0];
+			ElementType value = heaparray[0].value;
+			heaparray[0].heap_node->heap_node = nullptr;
+			heaparray[0].heap_node->index = NULL;
 
 			heaparray[0] = heaparray[count - 1];
 			heaparray[count - 1] = 0;
@@ -577,6 +667,25 @@ namespace utils
 			pulldown(0);
 
 			return value;
+		}
+
+		/**
+			Update a value
+
+			@param[in] index_ Index of the element
+		*/
+		void update(ElementType value_, size_t index_)
+		{
+			assert(heapvector[index_].heap_node != nullptr);
+
+			heapvector[index_].heap_node->value = value_;
+			
+			//std::cout << heapvector[index_].index << std::endl;
+			if (!pushup(heapvector[index_].index))
+			{
+				pulldown(heapvector[index_].index);
+			}
+			
 		}
 
 		/**
@@ -619,7 +728,12 @@ namespace utils
 		/**
 			heaparray with the size of 2^n-1
 		*/
-		ElementType* heaparray;
+		HeapNode<ElementType>* heaparray;
+
+		/**
+			Vector indexing the heaparray
+		*/
+		std::vector<HeapNode<ElementType>> heapvector;
 
 		/**
 			Size of heaparray
@@ -636,6 +750,7 @@ namespace utils
 		*/
 		bool greater;
 	};
+
 	/**
 	
 		Operator << Prints the values of the heap
@@ -658,7 +773,7 @@ namespace utils
 		@param[in] heap_ Heap which values shall be printed
 	*/
 	template<typename ElementType>
-	std::ostream& operator<<(std::ostream& out_, const HeapUpdate<ElementType>& heap_)
+	std::ostream& operator<<(std::ostream& out_, const HeapWrapper<ElementType>& heap_)
 	{
 		for (size_t i = 0; i < heap_.count; i++) {
 			out_ << heap_.heaparray[i] << " ";
