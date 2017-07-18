@@ -124,103 +124,7 @@ namespace utils
 		}
 
 		virtual ~BaseHeap() = 0 {}
-
-	public:
-
-
-		/**
-			heaparray with the size of 2^n-1
-		*/
-		HeapNode<ElementType>* heaparray;
-
-		/**
-			Size of heaparray
-		*/
-		size_t size;
-
-		/**
-			Number of elements in heap
-		*/
-		size_t count;
-
-		/**
-			Flag which specifies wheter the set will be descendendly ordered
-		*/
-		bool greater;
-	};
-
-	template<typename ElementType>
-	class Heap : public BaseHeap<ElementType> {
-
-	public:
-
-		/**
-			Constructor
-		*/
-		Heap() : BaseHeap(){}
 		
-		/**
-			Constructor
-
-			@param[in] size_ size of the heaparray which has to be built
-			@param[in] greater Flag which specifies whether the set will be descendendly ordered
-		*/
-		Heap(size_t size_, bool greater_ = true) : BaseHeap(size_) {
-		}
-	
-		/**
-			Desconstructor
-		*/
-		~Heap() { 
-			delete[] heaparray; 
-		}
-
-		/**
-			Sets the pointer heaparray and size 
-
-			@param[in] size_ Size of the heaparray
-		*/
-		void setHeap(size_t size_) {
-
-			if (heaparray) {
-				delete[] heaparray;
-			}
-
-			heaparray = new HeapNode<ElementType>[size_];
-			size = size_;
-			count = 0;
-		}
-
-		/**
-			Resizes the heaparray
-
-			@param[in] size_ of the heaparray
-		*/
-		void resize(size_t size_) {
-			ElementType* new_heaparray = new HeapNode<ElementType>[size_];
-
-			for (int i = 0; i<size+1; i++) {
-				new_heaparray[i] = heaparray[i];
-			}
-
-			delete[] heaparray;
-			heaparray = new_heaparray;
-			size = size_;
-		}
-		
-		/**
-			Sets the elements to zero
-		*/
-		void clear() {
-			size_t index = lastEntry();
-				
-			for (int i = 0; i < index + 1; i++) {
-				heaparray[i] = 0;
-			}
-
-			count = 0;
-		}
-
 		/**
 			Get the number of elements in the heaparray
 
@@ -230,30 +134,60 @@ namespace utils
 			return count;
 		}
 
-	private:
+		/**
+			Checks whether the elements in the heaparray are ordered
+
+			@return True when the heaparray is ordered
+		*/
+		bool checkHeap() {
+			size_t begin = 0;
+			size_t depth = 0;
+			while (begin < (size + 1) / 2 - 1) {
+				size_t elements = (size_t)pow((float)2, (float)depth);
+				for (size_t i = 0; i < elements; i++) {
+					if (!heaparray[2 * begin + 1].isEmpty()) {
+						if (greater) {
+							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
+						}
+						else {
+							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
+						}
+					}
+					if (!heaparray[2 * begin + 2].isEmpty()) {
+						if (greater) {
+							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
+						}
+						else {
+							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
+						}
+					}
+					begin = begin + 1;
+				}
+				depth = depth + 1;
+			}
+			return 1;
+		}
 	
+	protected:
 		/**
 			Swap two heaparray elements
 
 			@param[in] x first heaparray element
 			@param[in] y second heaparray element
 		*/
-		void swap(HeapNode<ElementType>& x, HeapNode<ElementType>& y)
+		virtual void swap(size_t index_, size_t new_index) = 0 {}
+
+		/**
+			Swap two heaparray elements
+
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
+		*/
+		void swapElements(HeapNode<ElementType>& x, HeapNode<ElementType>& y)
 		{
 			HeapNode<ElementType> swap = x;
 			x = y;
 			y = swap;
-		}
-
-		/**
-			Swap two heaparray elements
-
-			@param[in] x first heaparray element
-			@param[in] y second heaparray element
-		*/
-		void swap(size_t index_, size_t new_index)
-		{
-			swap(heaparray[new_index], heaparray[index_]);
 		}
 
 		/**
@@ -356,13 +290,140 @@ namespace utils
 
 			return flag;
 		}
+
 	public:
+
+		/**
+			Adds a new element
+
+			@param[in] value_ Element which will be added
+			@param[in] index_ Index ind the list of elements
+		*/
+		virtual void push(ElementType value_, size_t index_ = NULL) = 0 {}
+
+		/**
+			Pops the minimal/maximal element;
+
+			@return minimal/maximal value of the heap
+		*/
+		virtual ElementType pop()  = 0 {}
+
+	public:
+
+		/**
+			heaparray with the size of 2^n-1
+		*/
+		HeapNode<ElementType>* heaparray;
+
+		/**
+			Size of heaparray
+		*/
+		size_t size;
+
+		/**
+			Number of elements in heap
+		*/
+		size_t count;
+
+		/**
+			Flag which specifies wheter the set will be descendendly ordered
+		*/
+		bool greater;
+	};
+
+	template<typename ElementType>
+	class Heap : public BaseHeap<ElementType> {
+
+	public:
+
+		/**
+			Constructor
+		*/
+		Heap() : BaseHeap(){}
+		
+		/**
+			Constructor
+
+			@param[in] size_ size of the heaparray which has to be built
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
+		*/
+		Heap(size_t size_, bool greater_ = true) : BaseHeap(size_) {
+		}
+	
+		/**
+			Desconstructor
+		*/
+		~Heap() { 
+			delete[] heaparray; 
+		}
+
+		/**
+			Sets the pointer heaparray and size 
+
+			@param[in] size_ Size of the heaparray
+		*/
+		void setHeap(size_t size_) {
+
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			heaparray = new HeapNode<ElementType>[size_];
+			size = size_;
+			count = 0;
+		}
+
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		void resize(size_t size_) {
+			ElementType* new_heaparray = new HeapNode<ElementType>[size_];
+
+			for (int i = 0; i<size+1; i++) {
+				new_heaparray[i] = heaparray[i];
+			}
+
+			delete[] heaparray;
+			heaparray = new_heaparray;
+			size = size_;
+		}
+		
+		/**
+			Sets the elements to zero
+		*/
+		void clear() {
+			size_t index = lastEntry();
+				
+			for (int i = 0; i < index + 1; i++) {
+				heaparray[i] = 0;
+			}
+
+			count = 0;
+		}
+
+	private:
+
+		/**
+			Swap two heaparray elements
+
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
+		*/
+		void swap(size_t index_, size_t new_index)
+		{
+			swapElements(heaparray[new_index], heaparray[index_]);
+		}
+
+	public:
+
 		/**
 			Adds a new element
 
 			@param[in] value_ element which will be added
 		*/
-		void push(ElementType value_) {
+		void push(ElementType value_, size_t index_ = NULL) {
 			if (count > size) {
 				resize(size * 2 + 1);
 			}
@@ -388,40 +449,6 @@ namespace utils
 			pulldown(0);
 
 			return value;
-		}
-
-		/**
-			Checks whether the elements in the heaparray are ordered
-
-			@return True when the heaparray is ordered
-		*/
-		bool checkHeap() {
-			size_t begin = 0;
-			size_t depth = 0;
-			while (begin < (size + 1) / 2 - 1) {
-				size_t elements = (size_t)pow((float)2, (float)depth);
-				for (size_t i = 0; i < elements; i++) {
-					if (!heaparray[2 * begin + 1].isEmpty()) {
-						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
-						}
-						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
-						}
-					}
-					if (!heaparray[2 * begin + 2].isEmpty) {
-						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
-						}
-						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
-						}
-					}
-					begin = begin + 1;
-				}
-				depth = depth + 1;
-			}
-			return 1;
 		}
 
 	public:
@@ -512,15 +539,6 @@ namespace utils
 		}
 
 		/**
-			Get the number of elements in the heaparray
-
-			@return Number of elements
-		*/
-		size_t getElements() {
-			return count;
-		}
-
-		/**
 			Get the element of the specified index
 
 			@param[in] index_ Index of the element
@@ -546,21 +564,7 @@ namespace utils
 			return heapvector[index_].heap_node->index;
 		}
 
-
 	private:
-
-		/**
-			Swap two heaparray elements
-
-			@param[in] x first heaparray element
-			@param[in] y second heaparray element
-		*/
-		void swap(HeapNode<ElementType>& x, HeapNode<ElementType>& y) 
-		{
-			HeapNode<ElementType> swap = x;
-			x = y;
-			y = swap;
-		}
 
 		/**
 			Swap two heaparray elements
@@ -570,7 +574,7 @@ namespace utils
 		*/
 		void swap(size_t index_, size_t new_index)
 		{
-			swap(heaparray[new_index], heaparray[index_]);
+			swapElements(heaparray[new_index], heaparray[index_]);
 			
 			heaparray[new_index].heap_node->heap_node = &heaparray[new_index];
 			heaparray[new_index].heap_node->index = new_index;
@@ -579,113 +583,15 @@ namespace utils
 			heaparray[index_].heap_node->index = index_;
 		}
 
-		/**
-			Push up a element in the heaparray
-
-			@param[in] index_ index of the element which has to push up
-			@return True when pushing the element up was successful 
-		*/
-		bool pushup(size_t index_) {
-
-			bool flag = false;
-
-			while (index_ != 0) {
-				size_t new_index;
-				if (index_ % 2 == 0) {
-					new_index = (index_ / 2) - 1;
-				}
-				else {
-					new_index = (index_ - 1) / 2;
-				}
-
-				if (greater) {
-					if (heaparray[new_index] < heaparray[index_]) {
-						swap(new_index, index_);
-						flag = true;
-					}
-					else { return flag; }
-				}
-				else {
-					if (heaparray[new_index] > heaparray[index_]) {
-						swap(new_index, index_);
-						flag = true;
-					}
-					else { return flag; }
-				}
-				index_ = new_index;
-			}
-
-			return flag;
-		}
-
-		/**
-			Pull down a element in the heaparray
-
-			@param[in] index_ index of the element which has to pull down
-			@return True when pulling the element down was successful
-		*/
-		bool pulldown(size_t index_) {
-
-			bool flag = false;
-
-			while (index_ < (size + 1) / 2 - 1) {
-				if (greater) {
-					size_t new_index;
-					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
-					}
-					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 1;
-					}
-					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 2;
-					}
-					else {
-						return flag;
-					}
-					if (heaparray[index_] < heaparray[new_index]) {
-						swap(index_, new_index);
-						index_ = new_index;
-						flag = true;
-					}
-					else {
-						return flag;
-					}
-				}
-				else {
-					size_t new_index;
-					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
-					}
-					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 1;
-					}
-					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 2;
-					}
-					else {
-						return flag;
-					}
-					if (heaparray[index_] > heaparray[new_index]) {
-						swap(index_, new_index);
-						index_ = new_index;
-						flag = true;
-					}
-					else {
-						return flag;
-					}
-				}
-			}
-
-			return flag;
-		}
 	public:
+
 		/**
 			Adds a new element
 
 			@param[in] value_ element which will be added
+			@param[in] index_ Index ind the list of elements
 		*/
-		void push(ElementType value_, size_t index_) {
+		void push(ElementType value_, size_t index_ = NULL) {
 			if (count > size) {
 				resize(size * 2 + 1);
 			}
@@ -737,41 +643,6 @@ namespace utils
 			}
 			
 		}
-
-		/**
-			Checks whether the elements in the heaparray are ordered
-
-			@return True when the heaparray is ordered
-		*/
-		bool checkHeap() {
-			size_t begin = 0;
-			size_t depth = 0;
-			while (begin < (size + 1) / 2 - 1) {
-				size_t elements = (size_t)pow((float)2, (float)depth);
-				for (size_t i = 0; i < elements; i++) {
-					if (!heaparray[2 * begin + 1].isEmpty()) {
-						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
-						}
-						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
-						}
-					}
-					if (!heaparray[2 * begin + 2].isEmpty()) {
-						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
-						}
-						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
-						}
-					}
-					begin = begin + 1;
-				}
-				depth = depth + 1;
-			}
-			return 1;
-		}
-
 
 	public:
 
