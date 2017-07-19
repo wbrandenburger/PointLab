@@ -171,16 +171,42 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-	utils::HeapWrapper<int> heap(15);
+	utils::HeapWrapper<int> heap1(15);
 	for (int i = 0; i < 15; i++) {
 		int a = utils::rand<int>(100, 0);
 		std::cout << a << " ";
-		heap.push(a,i);
+		heap1.push(a,i);
 	}
 	std::cout << std::endl;
+	std::cout << heap1 << std::endl;
 	
-	std::cout << heap << std::endl;
-	heap.update(100, 4);
-	std::cout << heap << std::endl;
+	heap1.update(100, 4);
+	std::cout << heap1 << std::endl;
+
+	if (heap1.checkHeap()) {
+		std::cout << "SuperDuper" << std::endl;
+	}
+
+	heap1.update(5, 4);
+	std::cout << heap1 << std::endl;
+
+	if (heap1.checkHeap()) {
+		std::cout << "SuperDuper" << std::endl;
+	}
+
+	utils::Heap<int> heap2(15);
+	for (int i = 0; i < 15; i++) {
+		int a = utils::rand<int>(100, 0);
+		std::cout << a << " ";
+		heap2.push(a, i);
+	}
+
+	std::cout << std::endl;
+	std::cout << heap2 << std::endl;
+
+
+	if (heap2.checkHeap()) {
+		std::cout << "SuperDuper" << std::endl;
+	}
 	return(0);
 }

@@ -109,6 +109,7 @@ namespace utils
 	{
 
 	public:
+
 		/**
 			Constructor
 		*/
@@ -133,6 +134,25 @@ namespace utils
 		size_t getElements() {
 			return count;
 		}
+
+		/**
+			Sets the pointer heaparray and size
+
+			@param[in] size_ Size of the heaparray
+		*/
+		virtual void setHeap(size_t size_) = 0 {}
+
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		virtual void resize(size_t size_) = 0 {}
+
+		/**
+			Sets the elements to zero
+		*/
+		virtual void clear() = 0 {}
 
 		/**
 			Checks whether the elements in the heaparray are ordered
@@ -379,7 +399,7 @@ namespace utils
 			@param[in] size_ of the heaparray
 		*/
 		void resize(size_t size_) {
-			ElementType* new_heaparray = new HeapNode<ElementType>[size_];
+			HeapNode<ElementType>* new_heaparray = new HeapNode<ElementType>[size_];
 
 			for (int i = 0; i<size+1; i++) {
 				new_heaparray[i] = heaparray[i];
@@ -394,10 +414,8 @@ namespace utils
 			Sets the elements to zero
 		*/
 		void clear() {
-			size_t index = lastEntry();
-				
-			for (int i = 0; i < index + 1; i++) {
-				heaparray[i] = 0;
+			for (int i = 0; i < count; i++) {
+				heaparray[i].clear();
 			}
 
 			count = 0;
@@ -527,10 +545,8 @@ namespace utils
 			Sets the elements to zero
 		*/
 		void clear() {
-			size_t index = lastEntry();
-
-			for (int i = 0; i < index + 1; i++) {
-				heaparray[i] = 0;
+			for (int i = 0; i < count; i++) {
+				heaparray[i].clear();
 			}
 
 			heapvector.clear();
@@ -666,22 +682,6 @@ namespace utils
 
 		return out_;
 	}
-	
-	/**
-		Operator << Prints the values of the heap
-
-		@param[in,out] out_ Outstream in which the heap will be printed
-		@param[in] heap_ Heap which values shall be printed
-	*/
-	template<typename ElementType>
-	std::ostream& operator<<(std::ostream& out_, const HeapWrapper<ElementType>& heap_)
-	{
-		for (size_t i = 0; i < heap_.count; i++) {
-			out_ << heap_.heaparray[i] << " ";
-		}
-
-		return out_;
-	}
 
 	/**
 		Operator << Prints the values of the heap
@@ -690,7 +690,7 @@ namespace utils
 		@param[in] heap_ Heap which values shall be printed
 	*/
 	template<typename ElementType>
-	std::ostream& operator<<(std::ostream& out_, const Heap<ElementType>& heap_)
+	std::ostream& operator<<(std::ostream& out_, const BaseHeap<ElementType>& heap_)
 	{
 		for (size_t i = 0; i < heap_.count; i++) {
 			out_ << heap_.heaparray[i] << " ";
