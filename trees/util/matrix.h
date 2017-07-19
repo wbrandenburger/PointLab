@@ -42,7 +42,7 @@ namespace trees
 			Constructor
 		*/
 		Matrix(void) :
-			rows(0), cols(0), data(NULL)
+			rows(0), cols(0), data(nullptr)
 		{
 		}
 
@@ -65,10 +65,14 @@ namespace trees
 		*/
 		Matrix(const Matrix<ElementType>& matrix_)
 		{
+			if (data) {
+				clear();
+			}
 			data = new ElementType[matrix_.rows*matrix_.cols];
 			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++){
 				data[i] = matrix_[std::ceil(i/3)][i%3];
 			}
+			//std::copy(matrix_.data[0], matrix_.data[0] + matrix_.rows*matrix_.cols, data[0]);
 			rows = matrix_.rows;
 			cols = matrix_.cols;
 		}
@@ -80,10 +84,14 @@ namespace trees
 		*/
 		void operator=(const Matrix<ElementType>& matrix_)
 		{
+			if (data) {
+				clear();
+			}
 			data = new ElementType[matrix_.rows*matrix_.cols];
 			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++) {
 				data[i] = matrix_[std::ceil(i / 3)][i % 3];
 			}
+			//std::copy(matrix_.data[0], matrix_.data[0] + matrix_.rows*matrix_.cols, data[0]);
 			rows = matrix_.rows;
 			cols = matrix_.cols;
 		}
@@ -98,9 +106,14 @@ namespace trees
 		/**
 			Deletes the data array
 		*/
-		void clear() const
+		void clear()
 		{
-			delete[] data;
+			if (data){
+				delete[] data;
+			}
+			data = nullptr;
+			rows = 0;
+			cols = 0;
 		}
 
 		/**

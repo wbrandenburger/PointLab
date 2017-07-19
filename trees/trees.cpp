@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
 	/**
-		Search in pointcloud
+		Search in pointcloud knn search
 	*/
 	int nn = 2000;
 	int querynumber = 12;// pointcloudkdtree.rows;
@@ -104,6 +104,8 @@ int main(int argc, char* argv[]) {
 	index.knnSearch(query, indices, dists, nn, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 	
+	index.freeIndex();
+
 	/**
 		Colorize the pointcloud
 	*/
@@ -122,7 +124,7 @@ int main(int argc, char* argv[]) {
 	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	/////**
-	////	Search in pointcloud
+	////	Search in pointcloud radius search
 	////*/
 	////float radius = 0.005;
 	////int querynumber = 12;// pointcloudkdtree.rows;

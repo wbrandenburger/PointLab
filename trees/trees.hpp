@@ -55,6 +55,10 @@ namespace trees
 			nnIndex = createIndexByType<ElementType>(indexType, dataset_, params);
 		}
 
+		void freeIndex() {
+			nnIndex->freeIndex();
+		}
+
 		/**
 			Build the tree
 		*/
