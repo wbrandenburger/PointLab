@@ -114,7 +114,7 @@ namespace trees
 		*/
 		struct Node
 		{
-			Node() : divfeat(0), divlow(0), divhigh(0),
+			Node() : points(0), divfeat(0), divlow(0), divhigh(0),
 				child1(nullptr), child2(nullptr), parent(nullptr) {}
 
 			~Node()
@@ -127,6 +127,11 @@ namespace trees
 				Indices of points in leaf node
 			*/
 			std::vector<int> indices;
+
+			/**
+				Number of points
+			*/
+			size_t points;
 			/**
 				Dimension used for subdivision
 			*/
@@ -219,7 +224,8 @@ namespace trees
 			if ((right_ - left_) <= neighbor) {
 				node->child1 = node->child2 = NULL;    /* Mark as leaf node. */
 				
-				node->indices.resize(right_ - left_);
+				node->points = right_ - left_;
+				node->indices.resize(node->points);
 				for (size_t i = left_; i < right_; i++) {
 					node->indices[i - left_] = i;
 				}
