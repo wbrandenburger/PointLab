@@ -54,6 +54,11 @@ namespace trees
 		}
 
 		/**
+			Free allocated memory
+		*/
+		virtual void freeIndex() = 0;
+
+		/**
 			Set parameters based on the input pointcloud
 			
 			@param[in] dataset_ Pointcloud
@@ -70,15 +75,15 @@ namespace trees
 			Build the tree of the specified index
 		*/
 		virtual void buildIndex() {
-			freeIndex();
+			freeBuild();
 
 			buildIndexImpl();
 		}
 
 		/**
-			Free allocated memory
+			Free allocated memory for build process
 		*/
-		virtual void freeIndex() = 0;
+		virtual void freeBuild() = 0;
 
 		/**
 			Build the tree of the specified index

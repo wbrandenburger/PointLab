@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
 	/**
-		Search in pointcloud
+		Search in pointcloud knn search
 	*/
 	int nn = 2000;
 	int querynumber = 12;// pointcloudkdtree.rows;
@@ -104,6 +104,8 @@ int main(int argc, char* argv[]) {
 	index.knnSearch(query, indices, dists, nn, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 	
+	index.freeIndex();
+
 	/**
 		Colorize the pointcloud
 	*/
@@ -122,7 +124,7 @@ int main(int argc, char* argv[]) {
 	io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	/////**
-	////	Search in pointcloud
+	////	Search in pointcloud radius search
 	////*/
 	////float radius = 0.005;
 	////int querynumber = 12;// pointcloudkdtree.rows;
@@ -171,42 +173,5 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-	utils::HeapWrapper<int> heap1(15);
-	for (int i = 0; i < 15; i++) {
-		int a = utils::rand<int>(100, 0);
-		std::cout << a << " ";
-		heap1.push(a,i);
-	}
-	std::cout << std::endl;
-	std::cout << heap1 << std::endl;
-	
-	heap1.update(100, 4);
-	std::cout << heap1 << std::endl;
-
-	if (heap1.checkHeap()) {
-		std::cout << "SuperDuper" << std::endl;
-	}
-
-	heap1.update(5, 4);
-	std::cout << heap1 << std::endl;
-
-	if (heap1.checkHeap()) {
-		std::cout << "SuperDuper" << std::endl;
-	}
-
-	utils::Heap<int> heap2(15);
-	for (int i = 0; i < 15; i++) {
-		int a = utils::rand<int>(100, 0);
-		std::cout << a << " ";
-		heap2.push(a, i);
-	}
-
-	std::cout << std::endl;
-	std::cout << heap2 << std::endl;
-
-
-	if (heap2.checkHeap()) {
-		std::cout << "SuperDuper" << std::endl;
-	}
 	return(0);
 }
