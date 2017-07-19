@@ -116,7 +116,7 @@ namespace trees
 		*/
 		struct Node
 		{
-			Node() : points(0), divfeat(0), divlow(0), divhigh(0),
+			Node() : points(NULL), divfeat(NULL), divlow(NULL), divhigh(NULL),
 				child1(nullptr), child2(nullptr), parent(nullptr) {}
 
 			~Node()
@@ -124,11 +124,23 @@ namespace trees
 				if (child1) child1->~Node();
 				if (child2) child2->~Node();
 			}
+			/**
+				Removes child
+			*/
+			void removeChild(Node* node)
+			{
+				if (child1 == node) { child1 = nullptr; }
+				if (child2 == node) { child2 = nullptr; }
+
+				if (!child1 && !child2) {
+					parent->removeChild(this);
+				}
+			}
 
 			/**
 				Indices of points in leaf node
 			*/
-			std::vector<int> indices;
+			size_t* indices;
 
 			/**
 				Number of points
@@ -255,10 +267,10 @@ namespace trees
 			node->parent = parent_;
 											   /* If too few exemplars remain, then make this a leaf node. */
 			if ((right_ - left_) <= neighbor) {
-				node->child1 = node->child2 = NULL;    /* Mark as leaf node. */
+				node->child1 = node->child2 = nullptr;    /* Mark as leaf node. */
 				
 				node->points = right_ - left_;
-				node->indices.resize(node->points);
+				node->indices= new size_t[node->points];
 				for (size_t i = left_; i < right_; i++) {
 					node->indices[i - left_] = i;
 
@@ -315,7 +327,7 @@ namespace trees
 			@param[in,out] max_elem_ Maximal value
 
 		*/
-		void computeMinMax(int* ind_, int count_, int dim_, ElementType& min_elem_, ElementType& max_elem_)
+		void computeMinMax(size_t* ind_, int count_, int dim_, ElementType& min_elem_, ElementType& max_elem_)
 		{
 			min_elem_ = dataset_points[ind_[0]][dim_];
 			max_elem_ = dataset_points[ind_[0]][dim_];
@@ -336,7 +348,7 @@ namespace trees
 			@param[in,out] cutval_ Value of the point where the list will be split
 			@param[in] bbox_ Bounding Box of the entire pointcloud
 		*/
-		void middleSplit(int* ind_, int count_, int& index_, int& cutfeat_, ElementType& cutval_, const BoundingBox& bbox_)
+		void middleSplit(size_t* ind_, int count_, int& index_, int& cutfeat_, ElementType& cutval_, const BoundingBox& bbox_)
 		{
 			// find the largest span from the approximate bounding box
 			ElementType max_span = bbox_[0].high - bbox_[0].low;
@@ -391,7 +403,7 @@ namespace trees
 			@param[in,out] lim1_ Left index which is the split index
 			@param[in,out] lim2_ Right index which is the plit index
 		*/
-		void planeSplit(int* ind_, int count_, int cutfeat_, ElementType cutval_, int& lim1_, int& lim2_)
+		void planeSplit(size_t* ind_, int count_, int cutfeat_, ElementType cutval_, int& lim1_, int& lim2_)
 		{
 			int left = 0;
 			int right = count_ - 1;
@@ -411,6 +423,43 @@ namespace trees
 				std::swap(ind_[left], ind_[right]); ++left; --right;
 			}
 			lim2_ = left;
+		}
+
+		/**
+			Removes point from kdtree
+
+			@param[in] index_ Index of the point in the pointcloud
+		*/
+		void remove(size_t index_)
+		{
+			//size_t index = ordered ? vind[index_] : index_;
+			//NodePtr node = dataset_nodes[index];
+
+			//std::cout << index << std::endl;
+
+			//if (node)
+			//{
+			//	std::vector<size_t>::iterator it = node->indices.begin();
+			//	while (it != node->indices.end()) {
+			//		if (*it == index) {
+			//			node->indices.erase(it, it + 1);
+			//	//		node->points--;
+			//		}
+			//		it++;
+			//	}
+			//	
+			//	//for (size_t i = 0; i < node->points; i++) {
+			//	//	std::cout << node->indices[i] << " ";
+			//	//}
+			//	//std::cout << std::endl;
+
+			//	//if (!node->points) {
+			//	//	node->parent->removeChild(node);
+			//	//	dataset_nodes[index] = nullptr;
+			//	//}
+
+
+			//}
 		}
 
 	public:
@@ -477,7 +526,7 @@ namespace trees
 			/* If this is a leaf node, then do check and return. */
 			if ((node_->child1 == NULL) && (node_->child2 == NULL)) {
 				ElementType worst_dist = result_set_.worstDist();
-				for (int i = 0; i<node_->indices.size(); ++i) {	
+				for (int i = 0; i<node_->points; ++i) {	
 					ElementType* point = ordered ? dataset_points[node_->indices[i]] : dataset_points[vind[node_->indices[i]]];
 					
 					ElementType dist = distance(const_cast<ElementType*>(vec_), point, veclen);
@@ -540,7 +589,7 @@ namespace trees
 		/**
 			Array of indices to vectors in the dataset.
 		*/
-		std::vector<int> vind;
+		std::vector<size_t> vind;
 		
 		/**
 			Pooled memory allocator.

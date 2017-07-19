@@ -99,6 +99,13 @@ namespace trees
 		virtual void buildIndexImpl() = 0;
 
 		/**
+			Removes point from kdtree
+
+			@param[in] index_ Index of the point in the pointcloud
+		*/
+		virtual void remove(size_t index_) = 0;
+
+		/**
 			Prepares the search process, computes initial distances and calls the search function
 			
 			@param[in,out] result_set_ Container which contains the found neighbors

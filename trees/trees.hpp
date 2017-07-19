@@ -81,6 +81,16 @@ namespace trees
 		}
 
 		/**
+			Removes point from kdtree
+
+			@param[in] index_ Index of the point in the pointcloud
+		*/
+		void remove(size_t index_)
+		{
+			nnIndex->remove(index_);
+		}
+
+		/**
 			Perform k-nearest neighbor search
 			
 			@param[in] queries_ The query points for which to find the nearest neighbors

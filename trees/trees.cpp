@@ -76,9 +76,6 @@ int main(int argc, char* argv[]) {
 	index.buildIndex();
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
-	index.rebuild(pointcloudkdtree);
-
-
 	/**
 		Search in pointcloud knn search
 	*/
@@ -107,6 +104,10 @@ int main(int argc, char* argv[]) {
 	index.knnSearch(query, indices, dists, nn, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 	
+	for (size_t i = 0; i < pointcloudkdtree.rows; i++) {
+		index.remove(i);
+	}
+
 	index.freeIndex();
 
 	/**
