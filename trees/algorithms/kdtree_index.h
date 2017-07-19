@@ -114,7 +114,7 @@ namespace trees
 		*/
 		struct Node
 		{
-			Node() : left(0), right(0), divfeat(0), divlow(0), divhigh(0),
+			Node() : divfeat(0), divlow(0), divhigh(0),
 				child1(nullptr), child2(nullptr), parent(nullptr) {}
 
 			~Node()
@@ -126,7 +126,7 @@ namespace trees
 			/**
 				Indices of points in leaf node
 			*/
-			int left, right;
+			std::vector<int> indices;
 			/**
 				Dimension used for subdivision
 			*/
@@ -218,8 +218,11 @@ namespace trees
 											   /* If too few exemplars remain, then make this a leaf node. */
 			if ((right_ - left_) <= neighbor) {
 				node->child1 = node->child2 = NULL;    /* Mark as leaf node. */
-				node->left = left_;
-				node->right = right_;
+				
+				node->indices.resize(right_ - left_);
+				for (size_t i = left_; i < right_; i++) {
+					node->indices[i - left_] = i;
+				}
 
 				// compute bounding-box of leaf points
 				for (size_t i = 0; i<veclen; ++i) {
@@ -433,12 +436,12 @@ namespace trees
 			/* If this is a leaf node, then do check and return. */
 			if ((node_->child1 == NULL) && (node_->child2 == NULL)) {
 				ElementType worst_dist = result_set_.worstDist();
-				for (int i = node_->left; i<node_->right; ++i) {	
-					ElementType* point = ordered ? dataset_kdtree[i] : dataset_kdtree[vind[i]];
+				for (int i = 0; i<node_->indices.size(); ++i) {	
+					ElementType* point = ordered ? dataset_kdtree[node_->indices[i]] : dataset_kdtree[vind[node_->indices[i]]];
 					
 					ElementType dist = distance(const_cast<ElementType*>(vec_), point, veclen);
 					if (dist<worst_dist) {
-						result_set_.addPoint(dist, vind[i]);
+						result_set_.addPoint(dist, vind[node_->indices[i]]);
 					}
 				}
 				return;
