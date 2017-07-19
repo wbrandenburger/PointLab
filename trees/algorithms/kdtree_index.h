@@ -77,15 +77,15 @@ namespace trees
 			@param[in] dataset_ Pointcloud
 			@param[in] params_ Input parameters for the tree
 		*/
-		KDTreeIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_ = KDTreeIndexParams())
+		KDTreeIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_ = KDTreeIndexParams()) : root_node(nullptr), dataset_nodes(nullptr)
 		{
 			neighbor = get_param(params_, "neighbor", 30);
 			ordered = get_param(params_, "ordered", true);
 
 			setDataset(dataset_);
 
-			dataset_kdtree = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
-			std::copy(dataset[0], dataset[0] + size*veclen, dataset_kdtree[0]);
+			dataset_points = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
+			std::copy(dataset[0], dataset[0] + size*veclen, dataset_points[0]);
 		}
 		
 		/**	
@@ -93,9 +93,11 @@ namespace trees
 		*/
 		void freeIndex()
 		{
-			if (dataset_kdtree.getPtr()) {
-				dataset_kdtree.clear();
+			if (dataset_nodes) {
+				delete[] dataset_nodes;
+				dataset_nodes = nullptr;
 			}
+			dataset_points.clear();
 			pool.free();
 		}
 
@@ -166,25 +168,56 @@ namespace trees
 				vind[i] = i;
 			}
 
+			dataset_nodes = new NodePtr[size];
+
 			computeBoundingBox(root_bbox);
 			root_node = divideTree(nullptr, 0, size, root_bbox);
-			Matrix<ElementType> dataset_temp = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
+			
 			if (ordered) {
+				Matrix<ElementType> dataset_points_temp = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
 				for (size_t i = 0; i < size; ++i) {
-					std::copy(dataset_kdtree[vind[i]], dataset_kdtree[vind[i]] + veclen, dataset_temp[i]);
+					std::copy(dataset_points[vind[i]], dataset_points[vind[i]] + veclen, dataset_points_temp[i]);
 				}
-				dataset_kdtree = dataset_temp;
-				dataset_temp.clear();
+				dataset_points = dataset_points_temp;
+				dataset_points_temp.clear();
+
+				NodePtr* dataset_nodes_temp = new NodePtr[size];
+				for (size_t i = 0; i < size; ++i) {
+					dataset_nodes_temp[i] = dataset_nodes[vind[i]];
+				}
+				delete[] dataset_nodes;
+				dataset_nodes = dataset_nodes_temp;
 			}
 		}
 
 		/**
-			Free allocated memory
+			Free allocated memory for build process
 		*/
 		void freeBuild() 
 		{
+			if (dataset_nodes) {
+				delete[] dataset_nodes;
+				dataset_nodes = nullptr;
+			}
 			pool.free();
 		}
+
+		/**
+			Rebuilds the index
+
+			@param[in] dataset_ Pointcloud
+		*/
+		void rebuild(const Matrix<ElementType>& dataset_)
+		{
+			setDataset(dataset_);
+
+			dataset_points.clear();
+			dataset_points = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
+			std::copy(dataset[0], dataset[0] + size*veclen, dataset_points[0]);
+
+			buildIndex();
+		}
+
 
 		/**
 			Computes the bounding box of the entire pointcloud
@@ -195,13 +228,13 @@ namespace trees
 		{
 			bbox_.resize(veclen);
 			for (size_t i = 0; i<veclen; ++i) {
-				bbox_[i].low = (ElementType)dataset_kdtree[0][i];
-				bbox_[i].high = (ElementType)dataset_kdtree[0][i];
+				bbox_[i].low = (ElementType)dataset_points[0][i];
+				bbox_[i].high = (ElementType)dataset_points[0][i];
 			}
 			for (size_t k = 1; k<size; ++k) {
 				for (size_t i = 0; i<veclen; ++i) {
-					if (dataset_kdtree[k][i]<bbox_[i].low) bbox_[i].low = (ElementType)dataset_kdtree[k][i];
-					if (dataset_kdtree[k][i]>bbox_[i].high) bbox_[i].high = (ElementType)dataset_kdtree[k][i];
+					if (dataset_points[k][i]<bbox_[i].low) bbox_[i].low = (ElementType)dataset_points[k][i];
+					if (dataset_points[k][i]>bbox_[i].high) bbox_[i].high = (ElementType)dataset_points[k][i];
 				}
 			}
 		}
@@ -228,17 +261,19 @@ namespace trees
 				node->indices.resize(node->points);
 				for (size_t i = left_; i < right_; i++) {
 					node->indices[i - left_] = i;
+
+					dataset_nodes[vind[i]] = node;
 				}
 
 				// compute bounding-box of leaf points
 				for (size_t i = 0; i<veclen; ++i) {
-					bbox_[i].low = (ElementType)dataset_kdtree[vind[left_]][i];
-					bbox_[i].high = (ElementType)dataset_kdtree[vind[left_]][i];
+					bbox_[i].low = (ElementType)dataset_points[vind[left_]][i];
+					bbox_[i].high = (ElementType)dataset_points[vind[left_]][i];
 				}
 				for (int k = left_ + 1; k<right_; ++k) {
 					for (size_t i = 0; i<veclen; ++i) {
-						if (bbox_[i].low>dataset_kdtree[vind[k]][i]) bbox_[i].low = (ElementType)dataset_kdtree[vind[k]][i];
-						if (bbox_[i].high<dataset_kdtree[vind[k]][i]) bbox_[i].high = (ElementType)dataset_kdtree[vind[k]][i];
+						if (bbox_[i].low>dataset_points[vind[k]][i]) bbox_[i].low = (ElementType)dataset_points[vind[k]][i];
+						if (bbox_[i].high<dataset_points[vind[k]][i]) bbox_[i].high = (ElementType)dataset_points[vind[k]][i];
 					}
 				}
 			}
@@ -282,10 +317,10 @@ namespace trees
 		*/
 		void computeMinMax(int* ind_, int count_, int dim_, ElementType& min_elem_, ElementType& max_elem_)
 		{
-			min_elem_ = dataset_kdtree[ind_[0]][dim_];
-			max_elem_ = dataset_kdtree[ind_[0]][dim_];
+			min_elem_ = dataset_points[ind_[0]][dim_];
+			max_elem_ = dataset_points[ind_[0]][dim_];
 			for (int i = 1; i<count_; ++i) {
-				ElementType val = dataset_kdtree[ind_[i]][dim_];
+				ElementType val = dataset_points[ind_[i]][dim_];
 				if (val<min_elem_) min_elem_ = val;
 				if (val>max_elem_) max_elem_ = val;
 			}
@@ -361,8 +396,8 @@ namespace trees
 			int left = 0;
 			int right = count_ - 1;
 			for (;; ) {
-				while (left <= right && dataset_kdtree[ind_[left]][cutfeat_]<cutval_) ++left;
-				while (left <= right && dataset_kdtree[ind_[right]][cutfeat_] >= cutval_) --right;
+				while (left <= right && dataset_points[ind_[left]][cutfeat_]<cutval_) ++left;
+				while (left <= right && dataset_points[ind_[right]][cutfeat_] >= cutval_) --right;
 				if (left>right) break;
 				std::swap(ind_[left], ind_[right]); ++left; --right;
 			}
@@ -370,8 +405,8 @@ namespace trees
 			lim1_ = left;
 			right = count_ - 1;
 			for (;; ) {
-				while (left <= right && dataset_kdtree[ind_[left]][cutfeat_] <= cutval_) ++left;
-				while (left <= right && dataset_kdtree[ind_[right]][cutfeat_]>cutval_) --right;
+				while (left <= right && dataset_points[ind_[left]][cutfeat_] <= cutval_) ++left;
+				while (left <= right && dataset_points[ind_[right]][cutfeat_]>cutval_) --right;
 				if (left>right) break;
 				std::swap(ind_[left], ind_[right]); ++left; --right;
 			}
@@ -443,7 +478,7 @@ namespace trees
 			if ((node_->child1 == NULL) && (node_->child2 == NULL)) {
 				ElementType worst_dist = result_set_.worstDist();
 				for (int i = 0; i<node_->indices.size(); ++i) {	
-					ElementType* point = ordered ? dataset_kdtree[node_->indices[i]] : dataset_kdtree[vind[node_->indices[i]]];
+					ElementType* point = ordered ? dataset_points[node_->indices[i]] : dataset_points[vind[node_->indices[i]]];
 					
 					ElementType dist = distance(const_cast<ElementType*>(vec_), point, veclen);
 					if (dist<worst_dist) {
@@ -518,9 +553,14 @@ namespace trees
 		bool ordered;
 
 		/**
-			Ordered pointcloud
+			Pointcloud
 		*/
-		Matrix<ElementType> dataset_kdtree;
+		Matrix<ElementType> dataset_points;
+
+		/**
+			List with the indices to nodes
+		*/
+		NodePtr* dataset_nodes;
 
 		/**
 			Distance structure

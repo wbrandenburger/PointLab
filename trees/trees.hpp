@@ -55,6 +55,9 @@ namespace trees
 			nnIndex = createIndexByType<ElementType>(indexType, dataset_, params);
 		}
 
+		/**
+			Frees allocated memory
+		*/
 		void freeIndex() {
 			nnIndex->freeIndex();
 		}
@@ -65,6 +68,16 @@ namespace trees
 		void buildIndex()
 		{
 			nnIndex->buildIndex();
+		}
+
+		/** 
+			Rebuilds the index
+
+			@param[in] dataset_ Pointcloud
+		*/
+		void rebuild(const Matrix<ElementType>& dataset_)
+		{
+			nnIndex->rebuild(dataset_);
 		}
 
 		/**

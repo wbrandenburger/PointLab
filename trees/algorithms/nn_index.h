@@ -81,6 +81,14 @@ namespace trees
 		}
 
 		/**
+			Rebuilds the index
+
+			@param[in] dataset_ Pointcloud
+		*/
+		virtual void rebuild(const Matrix<ElementType>& dataset_) = 0;
+
+
+		/**
 			Free allocated memory for build process
 		*/
 		virtual void freeBuild() = 0;

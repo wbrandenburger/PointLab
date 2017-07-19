@@ -70,11 +70,14 @@ int main(int argc, char* argv[]) {
 		Build index
 	*/
 	
-	trees::Index<float> index(pointcloudkdtree, trees::KDTreeIndexParams(1));
+	trees::Index<float> index(pointcloudkdtree, trees::KDTreeIndexParams(20));
 
 	time.start();
 	index.buildIndex();
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
+
+	index.rebuild(pointcloudkdtree);
+
 
 	/**
 		Search in pointcloud knn search
