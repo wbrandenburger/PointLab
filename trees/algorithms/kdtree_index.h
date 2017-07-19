@@ -98,6 +98,7 @@ namespace trees
 				dataset_nodes = nullptr;
 			}
 			dataset_points.clear();
+			if (root_node) { root_node->~Node(); }
 			pool.free();
 		}
 
@@ -117,12 +118,14 @@ namespace trees
 		struct Node
 		{
 			Node() : points(NULL), divfeat(NULL), divlow(NULL), divhigh(NULL),
-				child1(nullptr), child2(nullptr), parent(nullptr) {}
+				indices(nullptr), child1(nullptr), child2(nullptr), parent(nullptr) {}
 
 			~Node()
 			{
 				if (child1) child1->~Node();
 				if (child2) child2->~Node();
+
+				if (indices) { delete[] indices; }
 			}
 			/**
 				Removes child
@@ -133,7 +136,7 @@ namespace trees
 				if (child2 == node) { child2 = nullptr; }
 
 				if (!child1 && !child2) {
-					parent->removeChild(this);
+					if (parent) { parent->removeChild(this); }
 				}
 			}
 
@@ -211,6 +214,7 @@ namespace trees
 				delete[] dataset_nodes;
 				dataset_nodes = nullptr;
 			}
+			if (root_node) { root_node->~Node(); }
 			pool.free();
 		}
 
@@ -432,34 +436,26 @@ namespace trees
 		*/
 		void remove(size_t index_)
 		{
-			//size_t index = ordered ? vind[index_] : index_;
-			//NodePtr node = dataset_nodes[index];
+			size_t index = ordered ? vind[index_] : index_;
+			NodePtr node = dataset_nodes[index];
 
-			//std::cout << index << std::endl;
+			if (node)
+			{
+				for (size_t i = 0; i < node->points; i++){
+					if (node->indices[i] == index) {
+						if (i != node->points - 1) {
+							std::copy(node->indices + i + 1, node->indices + node->points, node->indices + i);
+						}
+						node->points--;
+					}
+				}
+			
+				if (!node->points) {
+					node->parent->removeChild(node);
+				}
 
-			//if (node)
-			//{
-			//	std::vector<size_t>::iterator it = node->indices.begin();
-			//	while (it != node->indices.end()) {
-			//		if (*it == index) {
-			//			node->indices.erase(it, it + 1);
-			//	//		node->points--;
-			//		}
-			//		it++;
-			//	}
-			//	
-			//	//for (size_t i = 0; i < node->points; i++) {
-			//	//	std::cout << node->indices[i] << " ";
-			//	//}
-			//	//std::cout << std::endl;
-
-			//	//if (!node->points) {
-			//	//	node->parent->removeChild(node);
-			//	//	dataset_nodes[index] = nullptr;
-			//	//}
-
-
-			//}
+				dataset_nodes[index] = nullptr;
+			}
 		}
 
 	public:
