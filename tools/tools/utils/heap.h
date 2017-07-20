@@ -607,7 +607,7 @@ namespace utils
 			@param[in] value_ element which will be added
 			@param[in] index_ Index ind the list of elements
 		*/
-		void push(ElementType value_, size_t index_ = NULL) {
+		void push(ElementType value_, size_t index_) {
 			if (count > size) {
 				resize(size * 2 + 1);
 			}
