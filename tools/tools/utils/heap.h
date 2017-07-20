@@ -546,9 +546,7 @@ namespace utils
 		*/
 		ElementType getElement(size_t index_)
 		{
-			assert(heapvector[index_].heap_node != nullptr);
-
-			return heapvector[index_].heap_node->value;
+			return heaparray[heapvector[index_]].value;
 		}
 
 		/**
@@ -559,9 +557,7 @@ namespace utils
 		*/
 		size_t getIndex(size_t index_)
 		{
-			assert(heapvector[index_].heap_node != nullptr);
-
-			return heapvector[index_].heap_node->index;
+			return heaparray[heapvector[index_]].index;
 		}
 
 	private:
@@ -596,8 +592,8 @@ namespace utils
 		{
 			swapElements(heaparray[new_index], heaparray[index_]);
 			
-			heapvector[heaparray[new_index].index].index = new_index;
-			heapvector[heaparray[index_].index].index = index_;
+			heapvector[heaparray[new_index].index] = new_index;
+			heapvector[heaparray[index_].index] = index_;
 		}
 
 	public:
@@ -616,7 +612,7 @@ namespace utils
 			HeapNode<ElementType> heap_node(value_, index_);
 			heaparray[count] = heap_node;
 			
-			heapvector[index_].index = count;
+			heapvector[index_] = count;
 
 			pushup(count);
 
@@ -630,7 +626,7 @@ namespace utils
 		*/
 		ElementType pop() {
 			ElementType value = heaparray[0].value;
-			heapvector[heaparray[0].index].clear();
+			heapvector[heaparray[0].index] = NULL;
 
 			heaparray[0] = heaparray[count - 1];
 			heaparray[count - 1].clear();
@@ -648,11 +644,11 @@ namespace utils
 		*/
 		void update(ElementType value_, size_t index_)
 		{
-			heaparray[heapvector[index_].index].value = value_;
+			heaparray[heapvector[index_]].value = value_;
 
-			if (!pushup(heapvector[index_].index))
+			if (!pushup(heapvector[index_]))
 			{
-				pulldown(heapvector[index_].index);
+				pulldown(heapvector[index_]);
 			}
 			
 		}
@@ -662,7 +658,7 @@ namespace utils
 		/**
 			Vector indexing the heaparray
 		*/
-		std::vector<HeapNode<ElementType>> heapvector;
+		std::vector<size_t> heapvector;
 	};
 
 	/**
