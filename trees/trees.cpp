@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 		Search in pointcloud knn search
 	*/
 	int nn = 2000;
-	int querynumber = 12;// pointcloudkdtree.rows;
+	int querynumber = 3;// pointcloudkdtree.rows;
 
 	trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
 	trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
@@ -100,13 +100,13 @@ int main(int argc, char* argv[]) {
 	trees::TreeParams params;
 	params.cores = cores;
 
+	for (size_t i = 0; i < 98000;/*pointcloudkdtree.rows;*/ i++) {
+		index.remove(i);
+	}
+
 	time.start();
 	index.knnSearch(query, indices, dists, nn, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
-	
-	for (size_t i = 0; i < pointcloudkdtree.rows; i++) {
-		index.remove(i);
-	}
 
 	index.freeIndex();
 

@@ -31,7 +31,6 @@
 #define TREES_KDTREE_INDEX_H_
 
 #include <vector>
-#include <assert.h>
 
 #include "defines.h"
 #include "algorithms/nn_index.h"
@@ -87,20 +86,8 @@ namespace trees
 			dataset_points = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
 			std::copy(dataset[0], dataset[0] + size*veclen, dataset_points[0]);
 		}
-		
-		/**	
-			Free allocated memory
-		*/
-		void freeIndex()
-		{
-			if (dataset_nodes) {
-				delete[] dataset_nodes;
-				dataset_nodes = nullptr;
-			}
-			dataset_points.clear();
-			if (root_node) { root_node->~Node(); }
-			pool.free();
-		}
+	
+	private:
 
 		/**
 			Structures for the bounding box
@@ -117,9 +104,15 @@ namespace trees
 		*/
 		struct Node
 		{
+			/**
+				Constructor
+			*/
 			Node() : points(NULL), divfeat(NULL), divlow(NULL), divhigh(NULL),
 				indices(nullptr), child1(nullptr), child2(nullptr), parent(nullptr) {}
 
+			/**
+				Destructor
+			*/
 			~Node()
 			{
 				if (child1) child1->~Node();
@@ -129,14 +122,32 @@ namespace trees
 			}
 			/**
 				Removes child
+
+				@param[in] node_ The node which call the removing process
 			*/
-			void removeChild(Node* node)
+			void removeChild(Node* node_)
 			{
-				if (child1 == node) { child1 = nullptr; }
-				if (child2 == node) { child2 = nullptr; }
+				if (child1 == node_) { child1 = nullptr; }
+				if (child2 == node_) { child2 = nullptr; }
 
 				if (!child1 && !child2) {
 					if (parent) { parent->removeChild(this); }
+				}
+			}
+
+
+			/**
+				Figure out the number of points
+
+				@param[in,out] count_ Number of points
+			*/
+			void count(size_t& count_)
+			{
+				if (child1) { child1->count(count_); }
+				if (child2) { child2->count(count_); }
+
+				if (points) {
+					count_ += points;
 				}
 			}
 
@@ -170,7 +181,27 @@ namespace trees
 
 		typedef Node* NodePtr;
 
-	private:
+		/**
+			Free allocated memory
+		*/
+		void freeIndex()
+		{
+			if (dataset_nodes) {
+				delete[] dataset_nodes;
+				dataset_nodes = nullptr;
+			}
+			dataset_points.clear();
+			if (root_node) { root_node->~Node(); }
+			pool.clear();
+		}
+
+		/**
+			Get the dataset
+		*/
+		void getDataset(Matrix<ElementType>& dataset_) 
+		{
+			dataset_ = dataset_points;
+		}
 
 		/**
 			Prepares the building processs of the tree and calls the initial divide function
@@ -203,6 +234,8 @@ namespace trees
 				delete[] dataset_nodes;
 				dataset_nodes = dataset_nodes_temp;
 			}
+
+			pool.join();
 		}
 
 		/**
@@ -215,7 +248,7 @@ namespace trees
 				dataset_nodes = nullptr;
 			}
 			if (root_node) { root_node->~Node(); }
-			pool.free();
+			pool.clear();
 		}
 
 		/**
@@ -267,7 +300,7 @@ namespace trees
 		*/
 		NodePtr divideTree(NodePtr parent_, int left_, int right_, BoundingBox& bbox_)
 		{
-			NodePtr node = new (pool) Node(); // allocate memory
+			NodePtr node = new (pool) Node; // allocate memory
 			node->parent = parent_;
 											   /* If too few exemplars remain, then make this a leaf node. */
 			if ((right_ - left_) <= neighbor) {
@@ -394,8 +427,11 @@ namespace trees
 			if (lim1>count_ / 2) index_ = lim1;
 			else if (lim2<count_ / 2) index_ = lim2;
 			else index_ = count_ / 2;
-
-			assert(index > 0 && index < count_);
+			
+			if (index_ < 0 && index_ > count_) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
 		}
 
 		/**
@@ -433,9 +469,17 @@ namespace trees
 			Removes point from kdtree
 
 			@param[in] index_ Index of the point in the pointcloud
+			@return True when removing of point was successful
 		*/
-		void remove(size_t index_)
+		bool remove(size_t index_)
 		{
+			if (index_ >= size) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			bool flag = false;
+
 			size_t index = ordered ? vind[index_] : index_;
 			NodePtr node = dataset_nodes[index];
 
@@ -447,6 +491,8 @@ namespace trees
 							std::copy(node->indices + i + 1, node->indices + node->points, node->indices + i);
 						}
 						node->points--;
+
+						flag = true;
 					}
 				}
 			
@@ -456,6 +502,8 @@ namespace trees
 
 				dataset_nodes[index] = nullptr;
 			}
+
+			return flag;
 		}
 
 	public:
@@ -520,7 +568,7 @@ namespace trees
 			std::vector<ElementType>& dists_, const float epsError_) const
 		{
 			/* If this is a leaf node, then do check and return. */
-			if ((node_->child1 == NULL) && (node_->child2 == NULL)) {
+			if ((node_->child1 == nullptr) && (node_->child2 == nullptr)) {
 				ElementType worst_dist = result_set_.worstDist();
 				for (int i = 0; i<node_->points; ++i) {	
 					ElementType* point = ordered ? dataset_points[node_->indices[i]] : dataset_points[vind[node_->indices[i]]];
@@ -539,30 +587,34 @@ namespace trees
 			ElementType diff1 = val - node_->divlow;
 			ElementType diff2 = val - node_->divhigh;
 
-			NodePtr bestChild;
-			NodePtr otherChild;
+			NodePtr best_child;
+			NodePtr other_child;
 			ElementType cut_dist;
 			if ((diff1 + diff2)<0) {
-				bestChild = node_->child1;
-				otherChild = node_->child2;
-				cut_dist = distance(val, node_->divhigh); //(val-node_->divhigh)*(val-node_->divhigh);
+				best_child = node_->child1;
+				other_child = node_->child2;
+				cut_dist = distance(val, node_->divhigh);
 			}
 			else {
-				bestChild = node_->child2;
-				otherChild = node_->child1;
-				cut_dist = distance(val, node_->divlow); // (val - node_->divlow)*(val - node_->divlow);
+				best_child = node_->child2;
+				other_child = node_->child1;
+				cut_dist = distance(val, node_->divlow); 
 			}
 
 			/* Call recursively to search next level down. */
-			searchLevel(result_set_, vec_, bestChild, mindistsq_, dists_, epsError_);
-
-			ElementType dst = dists_[idx];
-			mindistsq_ = mindistsq_ + cut_dist - dst;
-			dists_[idx] = cut_dist;
-			if (mindistsq_*epsError_ <= result_set_.worstDist()) {
-				searchLevel(result_set_, vec_, otherChild, mindistsq_, dists_, epsError_);
+			if (best_child) {
+				searchLevel(result_set_, vec_, best_child, mindistsq_, dists_, epsError_);
 			}
-			dists_[idx] = dst;
+
+			if (other_child) {
+				ElementType dst = dists_[idx];
+				mindistsq_ = mindistsq_ + cut_dist - dst;
+				dists_[idx] = cut_dist;
+				if (mindistsq_*epsError_ <= result_set_.worstDist()) {
+					searchLevel(result_set_, vec_, other_child, mindistsq_, dists_, epsError_);
+				}
+				dists_[idx] = dst;
+			}
 		}
 
 	private:

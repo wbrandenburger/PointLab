@@ -62,6 +62,15 @@ namespace trees
 			nnIndex->freeIndex();
 		}
 
+
+		/**
+			Get the dataset
+		*/
+		void getDataset(Matrix<ElementType>& dataset_)
+		{
+			nnIndex->getDataset(dataset_);
+		}
+
 		/**
 			Build the tree
 		*/
@@ -85,9 +94,9 @@ namespace trees
 
 			@param[in] index_ Index of the point in the pointcloud
 		*/
-		void remove(size_t index_)
+		bool remove(size_t index_)
 		{
-			nnIndex->remove(index_);
+			return nnIndex->remove(index_);
 		}
 
 		/**

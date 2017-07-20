@@ -58,6 +58,12 @@ namespace trees
 		*/
 		virtual void freeIndex() = 0;
 
+
+		/**
+			Get the dataset
+		*/
+		virtual void getDataset(Matrix<ElementType>& dataset_) = 0;
+
 		/**
 			Set parameters based on the input pointcloud
 			
@@ -103,7 +109,7 @@ namespace trees
 
 			@param[in] index_ Index of the point in the pointcloud
 		*/
-		virtual void remove(size_t index_) = 0;
+		virtual bool remove(size_t index_) = 0;
 
 		/**
 			Prepares the search process, computes initial distances and calls the search function
