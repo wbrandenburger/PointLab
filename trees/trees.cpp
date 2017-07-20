@@ -177,5 +177,16 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
+	utils::HeapWrapper<int> heap(15, true);
+	for (int i = 0; i < 15; i++) {
+		heap.push(utils::randInt(100, 0),i);
+	}
+
+	std::cout << heap << std::endl;
+
+	heap.update(94, 13);
+
+	std::cout << heap << std::endl;
+
 	return(0);
 }
