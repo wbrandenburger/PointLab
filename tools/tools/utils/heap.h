@@ -36,6 +36,11 @@
 namespace utils
 {
 
+	inline size_t computeInitialSize(size_t size_) 
+	{
+		return std::pow(2, std::ceil(std::log2(size_)));
+	}
+
 	template<typename ElementType> struct HeapNode {
 
 		ElementType value;
@@ -116,8 +121,9 @@ namespace utils
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		BaseHeap(size_t size_, bool greater_ = true) : size(size_), greater(greater_), count(0) {
-			heaparray = new HeapNode<ElementType>[size_];
+		BaseHeap(size_t size_, bool greater_ = true) : greater(greater_), count(0) {
+			size = computeInitialSize(size_);
+			heaparray = new HeapNode<ElementType>[size];
 		}
 
 		virtual ~BaseHeap() = 0 {}
@@ -137,13 +143,6 @@ namespace utils
 			@param[in] size_ Size of the heaparray
 		*/
 		virtual void setHeap(size_t size_) = 0 {}
-
-		/**
-			Resizes the heaparray
-
-			@param[in] size_ of the heaparray
-		*/
-		virtual void resize(size_t size_) = 0 {}
 
 		/**
 			Sets the elements to zero
@@ -185,6 +184,15 @@ namespace utils
 		}
 	
 	protected:
+
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		virtual void resize(size_t size_) = 0 {}
+
+
 		/**
 			Swap two heaparray elements
 
@@ -384,28 +392,11 @@ namespace utils
 				delete[] heaparray;
 			}
 
-			heaparray = new HeapNode<ElementType>[size_];
-			size = size_;
+			size = computeInitialSize(size_);
+			heaparray = new HeapNode<ElementType>[size];
 			count = 0;
 		}
 
-		/**
-			Resizes the heaparray
-
-			@param[in] size_ of the heaparray
-		*/
-		void resize(size_t size_) {
-			HeapNode<ElementType>* new_heaparray = new HeapNode<ElementType>[size_];
-
-			for (int i = 0; i<size+1; i++) {
-				new_heaparray[i] = heaparray[i];
-			}
-
-			delete[] heaparray;
-			heaparray = new_heaparray;
-			size = size_;
-		}
-		
 		/**
 			Sets the elements to zero
 		*/
@@ -418,6 +409,23 @@ namespace utils
 		}
 
 	private:
+		
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		void resize(size_t size_) {
+			HeapNode<ElementType>* new_heaparray = new HeapNode<ElementType>[size_];
+
+			for (int i = 0; i<size + 1; i++) {
+				new_heaparray[i] = heaparray[i];
+			}
+
+			delete[] heaparray;
+			heaparray = new_heaparray;
+			size = size_;
+		}
 
 		/**
 			Swap two heaparray elements
@@ -510,31 +518,11 @@ namespace utils
 			}
 			heapvector.clear();
 
-			heaparray = new HeapNode<ElementType>[size_];
-			heapvector.resize(size_);
+			size = computeInitialSize(size_);
+			heaparray = new HeapNode<ElementType>[size];
+			heapvector.resize(size);
 
-			size = size_;
 			count = 0;
-		}
-
-		/**
-			Resizes the heaparray
-
-			@param[in] size_ of the heaparray
-		*/
-		void resize(size_t size_) {
-			HeapNode<ElementType>* new_heaparray = new HeapNode<ElementType>[size_];
-
-			for (int i = 0; i<size + 1; i++) {
-				new_heaparray[i] = heaparray[i];
-			}
-
-			delete[] heaparray;
-			heaparray = new_heaparray;
-
-			heapvector.resize(size_);
-
-			size = size_;
 		}
 
 		/**
@@ -577,6 +565,26 @@ namespace utils
 		}
 
 	private:
+
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		void resize(size_t size_) {
+			HeapNode<ElementType>* new_heaparray = new HeapNode<ElementType>[size_];
+
+			for (int i = 0; i<size + 1; i++) {
+				new_heaparray[i] = heaparray[i];
+			}
+
+			delete[] heaparray;
+			heaparray = new_heaparray;
+
+			heapvector.resize(size_);
+
+			size = size_;
+		}
 
 		/**
 			Swap two heaparray elements
