@@ -42,21 +42,18 @@ namespace utils
 
 		size_t index;
 
-		HeapNode* heap_node;
-
 		/**
 			Constructor
 		*/
-		HeapNode() : value(NULL), index(NULL), heap_node(nullptr) {}
+		HeapNode() : value(NULL), index(NULL) {}
 
 		/**
 			Constructor
 
 			@param[in] value_ Element
 			@param[in] index_ Index in array
-			@param[in] heap_node_ Pointer to a instance of HeapNode
 		*/
-		HeapNode(ElementType value_, size_t index_, HeapNode* heap_node_) : value(value_), index(index_), heap_node(heap_node_) {}
+		HeapNode(ElementType value_, size_t index_) : value(value_), index(index_) {}
 
 		/**
 			Operator < Compares two HeapNodes
@@ -85,7 +82,6 @@ namespace utils
 		{
 			value = NULL;
 			index = NULL;
-			heap_node = nullptr;
 		}
 
 		/** 
@@ -95,7 +91,7 @@ namespace utils
 		*/
 		bool isEmpty()
 		{
-			if (value == NULL && index == NULL && heap_node == nullptr) {
+			if (value == NULL && index == NULL ) {
 				return true;
 			}
 
@@ -592,11 +588,8 @@ namespace utils
 		{
 			swapElements(heaparray[new_index], heaparray[index_]);
 			
-			heaparray[new_index].heap_node->heap_node = &heaparray[new_index];
-			heaparray[new_index].heap_node->index = new_index;
-			
-			heaparray[index_].heap_node->heap_node = &heaparray[index_];
-			heaparray[index_].heap_node->index = index_;
+			heapvector[heaparray[new_index].index].index = new_index;
+			heapvector[heaparray[index_].index].index = index_;
 		}
 
 	public:
@@ -612,10 +605,9 @@ namespace utils
 				resize(size * 2 + 1);
 			}
 
-			HeapNode<ElementType> heap_node(value_, index_, &heapvector[index_]);
+			HeapNode<ElementType> heap_node(value_, index_);
 			heaparray[count] = heap_node;
 			
-			heapvector[index_].heap_node = &heaparray[count];
 			heapvector[index_].index = count;
 
 			pushup(count);
@@ -630,7 +622,7 @@ namespace utils
 		*/
 		ElementType pop() {
 			ElementType value = heaparray[0].value;
-			heaparray[0].heap_node->clear();
+			heapvector[heaparray[0].index].clear();
 
 			heaparray[0] = heaparray[count - 1];
 			heaparray[count - 1].clear();
@@ -648,9 +640,7 @@ namespace utils
 		*/
 		void update(ElementType value_, size_t index_)
 		{
-			assert(heapvector[index_].heap_node != nullptr);
-
-			heapvector[index_].heap_node->value = value_;
+			heaparray[heapvector[index_].index].value = value_;
 
 			if (!pushup(heapvector[index_].index))
 			{

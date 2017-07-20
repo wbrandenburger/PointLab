@@ -177,8 +177,8 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-	utils::HeapWrapper<int> heap(15, true);
-	for (int i = 0; i < 15; i++) {
+	utils::HeapWrapper<int> heap(31, true);
+	for (int i = 0; i < 31; i++) {
 		heap.push(utils::randInt(100, 0),i);
 	}
 
