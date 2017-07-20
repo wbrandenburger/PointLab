@@ -79,8 +79,8 @@ int main(int argc, char* argv[]) {
 	/**
 		Search in pointcloud knn search
 	*/
-	int nn = 2000;
-	int querynumber = 3;// pointcloudkdtree.rows;
+	int nn = 20;
+	int querynumber = pointcloudkdtree.rows;
 
 	trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
 	trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
@@ -100,9 +100,9 @@ int main(int argc, char* argv[]) {
 	trees::TreeParams params;
 	params.cores = cores;
 
-	for (size_t i = 0; i < 98000;/*pointcloudkdtree.rows;*/ i++) {
-		index.remove(i);
-	}
+	//for (size_t i = 0; i < 98000;/*pointcloudkdtree.rows;*/ i++) {
+	//	index.remove(i);
+	//}
 
 	time.start();
 	index.knnSearch(query, indices, dists, nn, params);

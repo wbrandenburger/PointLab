@@ -234,8 +234,6 @@ namespace trees
 				delete[] dataset_nodes;
 				dataset_nodes = dataset_nodes_temp;
 			}
-
-			pool.join();
 		}
 
 		/**
