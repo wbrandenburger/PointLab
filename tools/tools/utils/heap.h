@@ -651,8 +651,7 @@ namespace utils
 			assert(heapvector[index_].heap_node != nullptr);
 
 			heapvector[index_].heap_node->value = value_;
-			
-			std::cout << heapvector[index_].index << std::endl;
+
 			if (!pushup(heapvector[index_].index))
 			{
 				pulldown(heapvector[index_].index);
