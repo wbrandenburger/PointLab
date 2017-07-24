@@ -106,6 +106,17 @@ namespace trees
 			return true;
 		}
 
+		/**
+			Waits until all threads has been finished
+
+			@return Return true if all tasks are completed
+		*/
+		bool waitTasks()
+		{
+			while (available != threads.size());
+
+			return true;
+		}
 	private:
 	
 		/**
