@@ -1301,7 +1301,7 @@ namespace utils
 			count++;
 			while (!unlockCount());
 			heaparray[countlockvalue].value = value_;
-			heapvector[countlockvalue] = countlockvalue;
+			heapvector[index_] = countlockvalue;
 			pushup(countlockvalue);
 		}
 
@@ -1336,15 +1336,13 @@ namespace utils
 		*/
 		void update(ElementType value_, size_t index_)
 		{
-			heaparray[heapvector[index_]].value = value_;
-
 			while (!heaparray[heapvector[index_]].lockIndex());
+			heaparray[heapvector[index_]].value = value_;
 			bool flag = pushup(heapvector[index_]);
-			if (!flag){
+			if (!flag) {
 				while (!heaparray[heapvector[index_]].lockIndex());
 				pulldown(heapvector[index_]);
 			}
-			
 		}
 
 	private:

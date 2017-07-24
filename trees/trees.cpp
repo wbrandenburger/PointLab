@@ -179,15 +179,15 @@ int main(int argc, char* argv[]) {
 
 	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 1000000000;
+	size_t n = 31;
 
-	utils::Threadpool pool(24);
+	utils::Threadpool pool(8);
 	Heap heapConcurrent(n, true);
 
 	time.start();
 
 	for (size_t i = 0; i < heapConcurrent.size; i++) {
-		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(1000000, 0), i)));
+		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
 	}
 	pool.waitTasks();
 
@@ -197,47 +197,22 @@ int main(int argc, char* argv[]) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
 
-	utils::Heap<int> heap(n, true);
+	std::cout << heapConcurrent << std::endl;
 
 	time.start();
 
-	for (size_t i = 0; i < heap.size; i++) {
-		heap.push(utils::randInt(1000000, 0), i);
+	for (size_t i = 0; i < heapConcurrent.size; i++) {
+		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
 	}
+	pool.waitTasks();
 
-	std::cout << time.stop() << " " << heap.size << " " << heap.count << " ";
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	if (heap.checkHeap()) {
+	if (heapConcurrent.checkHeap()) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
 
-
-	//for (size_t i = 0; i < n / 4; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::pop,&heap)));
-	//}
-	//pool.waitTasks();
-
-	//std::cout << heap.size << " " << heap.count << std::endl;
-	//
-	//if (heap.checkHeap()) {
-	//	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//}
-
-	//for (size_t i = 0; i < n / 2; i++) {
-	//	while (pool.runTask(boost::bind(&Heap::update,&heap,utils::randInt(100,0),utils::randInt(std::floor(n-n/4),0))));
-	//}
-	//pool.waitTasks();
-
-	//std::cout << heap.size << " " << heap.count << std::endl;
-
-	//if (heap.checkHeap()) {
-	//	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//}
-
-	//for (int i = 0; i < heap.count; i++) {
-	//	std::cout << heap.heapvector[i].getLock() << " ";
-	//}
-	//std::cout << std::endl;
+	std::cout << heapConcurrent << std::endl;
 
 	pool.shutdown();
 
