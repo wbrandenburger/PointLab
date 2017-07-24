@@ -177,22 +177,21 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-	utils::HeapConcurrent<int> heap(31, true);
-	for (int i = 0; i < 31; i++) {
-		heap.push(utils::randInt(100, 0),i);
+	utils::Threadpool pool(4);
+	utils::HeapConcurrent<int> heap(1000, true);
+
+	for (int i = 0; i < heap.size; i++) {
+		while (!pool.runTask(boost::bind(&utils::HeapConcurrent<int>::push, &heap, utils::randInt(100, 0), i)));
 	}
 
+	std::cout << heap.size << " " << heap.count << std::endl;
 	//std::cout << heap << std::endl;
 
 	//heap.update(94, 13);
 
 	std::cout << heap << std::endl;
 
-	heap.pop();
-	heap.pop();
-	heap.pop();
-
-	std::cout << heap << std::endl;
+	pool.shutdown();
 
 	if (heap.checkHeap()) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
