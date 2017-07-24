@@ -538,13 +538,24 @@ namespace utils
 			@return minimal/maximal value of the heap
 		*/
 		ElementType pop() {
+			if (count == 0) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
 			ElementType value = heaparray[0].value;
 
-			heaparray[0] = heaparray[count-1];
-			heaparray[count-1].clear();
-			count = count - 1;
-			
-			pulldown(0);
+			if (count == 1) {
+				heaparray[0].clear();
+				count--;
+			}
+			else {
+				heaparray[0] = heaparray[count - 1];
+				heaparray[count - 1].clear();
+				count--;
+				pulldown(0);
+			}
+
 
 			return value;
 		}
@@ -678,7 +689,8 @@ namespace utils
 			@param[in] value_ element which will be added
 			@param[in] index_ Index ind the list of elements
 		*/
-		void push(ElementType value_, size_t index_) {
+		void push(ElementType value_, size_t index_) 
+		{
 			if (count > size) {
 				resize(size * 2 + 1);
 			}
@@ -698,16 +710,27 @@ namespace utils
 
 			@return minimal/maximal value of the heap
 		*/
-		ElementType pop() {
+		ElementType pop() 
+		{
+			if (count == 0) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
 			ElementType value = heaparray[0].value;
 			heapvector[heaparray[0].index] = NULL;
 
-			heaparray[0] = heaparray[count - 1];
-			heapvector[heaparray[0].index] = 0;
-			heaparray[count - 1].clear();
-			count = count - 1;
-
-			pulldown(0);
+			if (count == 1) {
+				heaparray[0].clear();
+				count = 0;
+			}
+			else {
+				heaparray[0] = heaparray[count - 1];
+				heapvector[heaparray[0].index] = 0;
+				heaparray[count - 1].clear();
+				count-- ;
+				pulldown(0);
+			}
 
 			return value;
 		}
@@ -1136,6 +1159,7 @@ namespace utils
 			count++;
 			while (!unlockCount());
 			heaparray[countlockvalue].value = value_;
+			
 			pushup(countlockvalue);
 		}
 
@@ -1146,15 +1170,28 @@ namespace utils
 		*/
 		ElementType pop() 
 		{
+			if (count == 0) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
 			while (!heaparray[0].lockIndex());
 			ElementType value = heaparray[0].value;
 
-			while (!lockCount());
-			count--;
-			while (!heaparray[count].lockIndex());
-			heaparray[0] = heaparray[count];
-			heaparray[count].clear();
-			while (!unlockCount());
+			if (count == 1) {
+				while (!lockCount());
+				count--;
+				heaparray[count].clear();
+				while (!unlockCount());
+			}
+			else {
+				while (!lockCount());
+				count--;
+				while (!heaparray[count].lockIndex());
+				heaparray[0] = heaparray[count];
+				heaparray[count].clear();
+				while (!unlockCount());
+			}
 
 			pulldown(0);
 
@@ -1302,6 +1339,7 @@ namespace utils
 			while (!unlockCount());
 			heaparray[countlockvalue].value = value_;
 			heapvector[index_] = countlockvalue;
+			
 			pushup(countlockvalue);
 		}
 
@@ -1312,19 +1350,34 @@ namespace utils
 		*/
 		ElementType pop()
 		{
+
+			if (count == 0) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
 			while (!heaparray[0].lockIndex());
 			ElementType value = heaparray[0].value;
-			heapvector[heaparray[0].index] = NULL;
+			
+			if (count == 1) {
+				while (!lockCount());
+				count--;
+				heapvector[heaparray[0].index] = 0;
+				heaparray[count].clear();
+				while (!unlockCount());
+			}
+			else {
 
-			while (!lockCount());
-			count--;
-			while (!heaparray[count].lockIndex());
-			heaparray[0] = heaparray[count];
-			heapvector[heaparray[0].index] = 0;
-			heaparray[count].clear();
-			while (!unlockCount());
-
-			pulldown(0);
+				while (!lockCount());
+				count--;
+				while (!heaparray[count].lockIndex());
+				heaparray[0] = heaparray[count];
+				heapvector[heaparray[0].index] = 0;
+				heaparray[count].clear();
+				while (!unlockCount());
+				
+				pulldown(0);
+			}
 
 			return value;
 		}
