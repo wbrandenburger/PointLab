@@ -177,28 +177,69 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-	utils::Threadpool pool(4);
-	utils::HeapConcurrent<int> heap(1023, true);
+	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	for (int i = 0; i < heap.size; i++) {
-		while (!pool.runTask(boost::bind(&utils::HeapConcurrent<int>::push, &heap, i/*utils::randInt(100, 0)*/, i)));
+	size_t n = 1000000000;
+
+	utils::Threadpool pool(24);
+	Heap heapConcurrent(n, true);
+
+	time.start();
+
+	for (size_t i = 0; i < heapConcurrent.size; i++) {
+		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(1000000, 0), i)));
 	}
 	pool.waitTasks();
 
-	std::cout << heap.size << " " << heap.count <<  std::endl;
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	//heap.update(94, 13);
+	if (heapConcurrent.checkHeap()) {
+		std::cout << "Heapbedingung erfüllt" << std::endl;
+	}
 
-	std::cout << heap << std::endl;
+	utils::Heap<int> heap(n, true);
 
-	
+	time.start();
+
+	for (size_t i = 0; i < heap.size; i++) {
+		heap.push(utils::randInt(1000000, 0), i);
+	}
+
+	std::cout << time.stop() << " " << heap.size << " " << heap.count << " ";
+
 	if (heap.checkHeap()) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
+
+
+	//for (size_t i = 0; i < n / 4; i++) {
+	//	while (!pool.runTask(boost::bind(&Heap::pop,&heap)));
+	//}
+	//pool.waitTasks();
+
+	//std::cout << heap.size << " " << heap.count << std::endl;
+	//
+	//if (heap.checkHeap()) {
+	//	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//}
+
+	//for (size_t i = 0; i < n / 2; i++) {
+	//	while (pool.runTask(boost::bind(&Heap::update,&heap,utils::randInt(100,0),utils::randInt(std::floor(n-n/4),0))));
+	//}
+	//pool.waitTasks();
+
+	//std::cout << heap.size << " " << heap.count << std::endl;
+
+	//if (heap.checkHeap()) {
+	//	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//}
 
 	//for (int i = 0; i < heap.count; i++) {
 	//	std::cout << heap.heapvector[i].getLock() << " ";
 	//}
 	//std::cout << std::endl;
+
+	pool.shutdown();
+
 	return(0);
 }

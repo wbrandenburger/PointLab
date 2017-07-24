@@ -246,10 +246,10 @@ namespace utils
 					}
 					if (!heaparray[2 * begin + 2].isEmpty()) {
 						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] < heaparray[2 * begin + 2]) { return 0; }
 						}
 						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] > heaparray[2 * begin + 2]) { return 0; }
 						}
 					}
 					begin = begin + 1;
@@ -831,13 +831,13 @@ namespace utils
 		*/
 		void swapElements(HeapNodeConcurrent<ElementType>& x, HeapNodeConcurrent<ElementType>& y)
 		{
-			size_t swap = x.index;
+			size_t swap_index = x.index;
 			x.index = y.index;
-			y.index = swap;
+			y.index = swap_index;
 			
-			swap = x.value;
+			ElementType swap_element = x.value;
 			x.value = y.value;
-			y.value = swap;
+			y.value = swap_element;
 		}
 
 		/**
@@ -920,12 +920,13 @@ namespace utils
 						new_index = 2 * index_ + 2;
 					}
 					else {
+						while (!heaparray[index_].unlockIndex());
 						return flag;
 					}
 
 					while (!heaparray[new_index].lockIndex());
 					if (heaparray[index_] < heaparray[new_index]) {
-						swap(index_, new_index);
+						swap(new_index, index_);
 						
 						while (!heaparray[index_].unlockIndex());
 						
@@ -951,12 +952,13 @@ namespace utils
 						new_index = 2 * index_ + 2;
 					}
 					else {
+						while (!heaparray[index_].unlockIndex());
 						return flag;
 					}
 
 					while (!heaparray[new_index].lockIndex());
 					if (heaparray[index_] > heaparray[new_index]) {
-						swap(index_, new_index);
+						swap(new_index, index_);
 
 						while (!heaparray[index_].unlockIndex());
 
@@ -1128,8 +1130,6 @@ namespace utils
 				std::exit(EXIT_FAILURE);
 			}
 
-			
-
 			while (!lockCount());
 			size_t countlockvalue = count;
 			while (!heaparray[count].lockIndex());
@@ -1160,6 +1160,196 @@ namespace utils
 
 			return value;
 		}
+	};
+
+	template<typename ElementType>
+	class HeapWrapperConcurrent : public BaseHeapConcurrent<ElementType> 
+	{
+	public:
+
+		/**
+			Constructor
+		*/
+		HeapWrapperConcurrent() : BaseHeapConcurrent() {}
+
+		/**
+			Constructor
+
+			@param[in] size_ size of the heaparray which has to be built
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
+		*/
+		HeapWrapperConcurrent(size_t size_, bool greater_ = true) : BaseHeapConcurrent(size_) {
+			heapvector.resize(size_);
+		}
+
+		/**
+			Desconstructor
+		*/
+		~HeapWrapperConcurrent() 
+		{ 
+			delete[] heaparray; 
+			heapvector.clear();
+		}
+
+		/**
+			Sets the pointer heaparray and size
+
+			@param[in] size_ Size of the heaparray
+		*/
+		void setHeap(size_t size_) {
+
+			if (heaparray) {
+				delete[] heaparray;
+			}
+			heapvector.clear();
+
+			size = computeInitialSize(size_);
+			heaparray = new HeapNodeConcurrent<ElementType>[size];
+			heapvector.resize(size);
+
+			count = 0;
+		}
+
+		/**
+			Sets the elements to zero
+		*/
+		void clear() {
+			for (int i = 0; i < count; i++) {
+				heaparray[i].clear();
+			}
+
+			heapvector.clear();
+
+			count = 0;
+		}
+
+		/**
+			Get the element of the specified index
+
+			@param[in] index_ Index of the element
+			@return Value of the element
+		*/
+		ElementType getElement(size_t index_)
+		{
+			return heaparray[heapvector[index_]].value;
+		}
+
+		/**
+			Get the index in the array of the specified index
+
+			@param[in] index_ Index of the element
+			@return Index in the array
+		*/
+		size_t getIndex(size_t index_)
+		{
+			return heaparray[heapvector[index_]].index;
+		}
+
+	private:
+
+		/**
+			Resizes the heaparray
+
+			@param[in] size_ of the heaparray
+		*/
+		void resize(size_t size_) {
+			HeapNodeConcurrent<ElementType>* new_heaparray = new HeapNodeConcurrent<ElementType>[size_];
+
+			for (int i = 0; i<size + 1; i++) {
+				new_heaparray[i] = heaparray[i];
+			}
+
+			delete[] heaparray;
+			heaparray = new_heaparray;
+
+			heapvector.resize(size_);
+
+			size = size_;
+		}
+
+		/**
+			Swap two heaparray elements
+
+			@param[in] x first heaparray element
+			@param[in] y second heaparray element
+		*/
+		void swap(size_t index_, size_t new_index)
+		{
+			swapElements(heaparray[new_index], heaparray[index_]);
+			
+			heapvector[heaparray[new_index].index] = new_index;
+			heapvector[heaparray[index_].index] = index_;
+		}
+
+	public:
+
+		/**
+			Adds a new element
+
+			@param[in] value_ element which will be added
+		*/
+		void push(ElementType value_, size_t index_ = NULL)
+		{
+			if (count >= size) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			while (!lockCount());
+			size_t countlockvalue = count;
+			while (!heaparray[count].lockIndex());
+			count++;
+			while (!unlockCount());
+			heaparray[countlockvalue].value = value_;
+			pushup(countlockvalue);
+		}
+
+		/**
+			Pops the minimal/maximal element;
+
+			@return minimal/maximal value of the heap
+		*/
+		ElementType pop()
+		{
+			while (!heaparray[0].lockIndex());
+			ElementType value = heaparray[0].value;
+
+			while (!lockCount());
+			count--;
+			while (!heaparray[count].lockIndex());
+			heaparray[0] = heaparray[count];
+			heaparray[count].clear();
+			while (!unlockCount());
+
+			pulldown(0);
+
+			return value;
+		}
+
+		/**
+			Update a value
+
+			@param[in] index_ Index of the element
+		*/
+		void update(ElementType value_, size_t index_)
+		{
+			heaparray[heapvector[index_]].value = value_;
+
+			while (!heaparray[heapvector[index_]].lockIndex());
+			bool flag = pushup(heapvector[index_]);
+			if (!flag){
+				while (!heaparray[heapvector[index_]].lockIndex());
+				pulldown(heapvector[index_]);
+			}
+			
+		}
+
+	private:
+
+		/**
+			Vector indexing the heaparray
+		*/
+		std::vector<size_t> heapvector;
 	};
 
 	/**
