@@ -36,8 +36,6 @@
 #include "tools/utils.h"
 #include "tools/io.h"
 
-#include "tools/utils/heap.h"
-
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
