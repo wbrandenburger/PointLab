@@ -153,9 +153,7 @@ namespace utils
 		{
 			size_t lock_value = 0;
 
-			lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
-
-			return lock_value ? true : false;
+			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -167,9 +165,7 @@ namespace utils
 		{
 			size_t unlock_value = 1;
 
-			lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
-
-			return !unlock_value ? true : false;
+			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
 		void operator=(const HeapNodeConcurrent<ElementType>& heapnode)
@@ -749,14 +745,14 @@ namespace utils
 		/**
 			Constructor
 		*/
-		BaseHeapConcurrent() : heaparray(nullptr), size(0), count(0), countlock(0), counter(0), greater(true) {}
+		BaseHeapConcurrent() : heaparray(nullptr), size(0), count(0), countlock(0), greater(true) {}
 		/**
 			Constructor
 
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		BaseHeapConcurrent(size_t size_, bool greater_ = true) : greater(greater_), count(0), countlock(0), counter(0) {
+		BaseHeapConcurrent(size_t size_, bool greater_ = true) : greater(greater_), count(0), countlock(0) {
 			size = computeInitialSize(size_);
 			heaparray = new HeapNodeConcurrent<ElementType>[size];
 		}
@@ -805,10 +801,10 @@ namespace utils
 					}
 					if (!heaparray[2 * begin + 2].isEmpty()) {
 						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] < heaparray[2 * begin + 2]) { return 0; }
 						}
 						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
+							if (heaparray[begin] > heaparray[2 * begin + 2]) { return 0; }
 						}
 					}
 					begin = begin + 1;
@@ -991,8 +987,6 @@ namespace utils
 			size_t lock_value = 0;
 
 			return countlock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
-
-			/*return lock_value != 0 ? true : false;*/
 		}
 
 		/**
@@ -1005,8 +999,6 @@ namespace utils
 			size_t unlock_value = 1;
 
 			return countlock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
-
-			/*return unlock_value != 0? true : false;*/
 		}
 
 
@@ -1049,8 +1041,6 @@ namespace utils
 			Lock for count
 		*/
 		boost::atomic<size_t> countlock;
-
-		boost::atomic<size_t> counter;
 
 		/**
 			Flag which specifies wheter the set will be descendendly ordered
@@ -1143,7 +1133,6 @@ namespace utils
 			while (!lockCount());
 			size_t countlockvalue = count;
 			while (!heaparray[count].lockIndex());
-			counter.fetch_add(1, boost::memory_order_relaxed);
 			count++;
 			while (!unlockCount());
 			heaparray[countlockvalue].value = value_;

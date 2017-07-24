@@ -114,7 +114,7 @@ namespace utils
 		bool waitTasks()
 		{
 			while (available != threads.size());
-			std::cout << available << " "<< threads.size() << std::endl;
+			
 			return true;
 		}
 		

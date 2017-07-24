@@ -183,12 +183,9 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < heap.size; i++) {
 		while (!pool.runTask(boost::bind(&utils::HeapConcurrent<int>::push, &heap, i/*utils::randInt(100, 0)*/, i)));
 	}
-	pool.shutdown();
+	pool.waitTasks();
 
-	
-
-	std::cout << heap.size << " " << heap.count << " " << heap.counter.load(boost::memory_order_relaxed) << std::endl;
-	//std::cout << heap << std::endl;
+	std::cout << heap.size << " " << heap.count <<  std::endl;
 
 	//heap.update(94, 13);
 
