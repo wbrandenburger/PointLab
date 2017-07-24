@@ -568,7 +568,7 @@ namespace utils
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
 		HeapWrapper(size_t size_, bool greater_ = true) : BaseHeap(size_) {
-			heapvector.resize(size_);
+			heapvector.resize(computeInitialSize(size_));
 		}
 
 		/**
@@ -1179,7 +1179,7 @@ namespace utils
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
 		HeapWrapperConcurrent(size_t size_, bool greater_ = true) : BaseHeapConcurrent(size_) {
-			heapvector.resize(size_);
+			heapvector.resize(computeInitialSize(size_));
 		}
 
 		/**
@@ -1301,6 +1301,7 @@ namespace utils
 			count++;
 			while (!unlockCount());
 			heaparray[countlockvalue].value = value_;
+			heapvector[countlockvalue] = countlockvalue;
 			pushup(countlockvalue);
 		}
 
@@ -1313,11 +1314,13 @@ namespace utils
 		{
 			while (!heaparray[0].lockIndex());
 			ElementType value = heaparray[0].value;
+			heapvector[heaparray[0].index] = NULL;
 
 			while (!lockCount());
 			count--;
 			while (!heaparray[count].lockIndex());
 			heaparray[0] = heaparray[count];
+			heapvector[heaparray[0].index] = 0;
 			heaparray[count].clear();
 			while (!unlockCount());
 
