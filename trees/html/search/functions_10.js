@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['uniqueresultset',['UniqueResultSet',['../classtrees_1_1_unique_result_set.html#ad1f538e2dcaa431612d537efefc6699e',1,'trees::UniqueResultSet']]],
-  ['usedmemory',['usedMemory',['../classtrees_1_1_allocator.html#af3266a905a5482ac22c24f5c2b2349fd',1,'trees::Allocator']]]
+  ['threadpool',['Threadpool',['../classtrees_1_1_threadpool.html#a2ddeee4f43093bc52ff011213def07e4',1,'trees::Threadpool']]],
+  ['treeparams',['TreeParams',['../structtrees_1_1_tree_params.html#a0f5ed74837938da3ff41a8c95a6edfd8',1,'trees::TreeParams']]],
+  ['type',['type',['../classtrees_1_1_any.html#a22066497a63c8986424c9999482f2c3d',1,'trees::Any']]]
 ];

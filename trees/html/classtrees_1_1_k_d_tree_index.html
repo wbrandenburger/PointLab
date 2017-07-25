@@ -64,7 +64,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classtrees_1_1_k_d_tree_index-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -81,22 +80,6 @@ Inheritance diagram for trees::KDTreeIndex&lt; ElementType &gt;:</div>
 </map>
  </div></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrees_1_1_k_d_tree_index_1_1_interval.html">Interval</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtrees_1_1_k_d_tree_index_1_1_node.html">Node</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:a18fc026725b0201b5086e03dd1904035"><td class="memItemLeft" align="right" valign="top"><a id="a18fc026725b0201b5086e03dd1904035"></a>
-typedef std::vector&lt; <a class="el" href="structtrees_1_1_k_d_tree_index_1_1_interval.html">Interval</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>BoundingBox</b></td></tr>
-<tr class="separator:a18fc026725b0201b5086e03dd1904035"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2354de5f76b2a9325a991f5c3017b05c"><td class="memItemLeft" align="right" valign="top"><a id="a2354de5f76b2a9325a991f5c3017b05c"></a>
-typedef <a class="el" href="structtrees_1_1_k_d_tree_index_1_1_node.html">Node</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>NodePtr</b></td></tr>
-<tr class="separator:a2354de5f76b2a9325a991f5c3017b05c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:abfde9fe47fe77c9fdde1af8d500b85e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_k_d_tree_index.html#abfde9fe47fe77c9fdde1af8d500b85e5">KDTreeIndex</a> (const <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; ElementType &gt; &amp;dataset_, const IndexParams &amp;params_=<a class="el" href="structtrees_1_1_k_d_tree_index_params.html">KDTreeIndexParams</a>())</td></tr>
@@ -116,6 +99,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a059a92d41b77db12a7803e8348ae1c11 inherit pub_methods_classtrees_1_1_n_n_index"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f489d7dd35c009a8e1e246dc569f8a0 inherit pub_methods_classtrees_1_1_n_n_index"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_n_n_index.html#a4f489d7dd35c009a8e1e246dc569f8a0">knnSearch</a> (const <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; ElementType &gt; &amp;queries_, <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; int &gt; &amp;indices_, <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; ElementType &gt; &amp;dists_, size_t knn_, const <a class="el" href="structtrees_1_1_tree_params.html">TreeParams</a> &amp;params_)</td></tr>
 <tr class="separator:a4f489d7dd35c009a8e1e246dc569f8a0 inherit pub_methods_classtrees_1_1_n_n_index"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5227bd07d877a0afee6ac9b7a94177a inherit pub_methods_classtrees_1_1_n_n_index"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_n_n_index.html#ad5227bd07d877a0afee6ac9b7a94177a">radiusSearch</a> (const <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; ElementType &gt; &amp;queries_, std::vector&lt; std::vector&lt; size_t &gt; &gt; &amp;indices_, std::vector&lt; std::vector&lt; ElementType &gt;&gt; &amp;dists_, float radius_, const <a class="el" href="structtrees_1_1_tree_params.html">TreeParams</a> &amp;params_)</td></tr>
+<tr class="separator:ad5227bd07d877a0afee6ac9b7a94177a inherit pub_methods_classtrees_1_1_n_n_index"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af19f1243b64d78dece63fc526fe8307e inherit pub_methods_classtrees_1_1_n_n_index"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_n_n_index.html#af19f1243b64d78dece63fc526fe8307e">radiusSearchThread</a> (const <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; ElementType &gt; &amp;queries_, std::vector&lt; std::vector&lt; size_t &gt;&gt; &amp;indices_, std::vector&lt; std::vector&lt; ElementType &gt;&gt; &amp;dists_, float radius_, const <a class="el" href="structtrees_1_1_tree_params.html">TreeParams</a> &amp;params_, size_t index_)</td></tr>
+<tr class="separator:af19f1243b64d78dece63fc526fe8307e inherit pub_methods_classtrees_1_1_n_n_index"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2249f50af80e10630f8fb099ffd54acf inherit pub_methods_classtrees_1_1_n_n_index"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_n_n_index.html#a2249f50af80e10630f8fb099ffd54acf">radiusSearch</a> (const <a class="el" href="classtrees_1_1_matrix.html">Matrix</a>&lt; ElementType &gt; &amp;queries_, std::vector&lt; std::vector&lt; int &gt;&gt; &amp;indices_, std::vector&lt; std::vector&lt; ElementType &gt;&gt; &amp;dists_, float radius_, const <a class="el" href="structtrees_1_1_tree_params.html">TreeParams</a> &amp;params_)</td></tr>
+<tr class="separator:a2249f50af80e10630f8fb099ffd54acf inherit pub_methods_classtrees_1_1_n_n_index"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>

@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['matrix',['Matrix',['../classtrees_1_1_matrix.html',1,'trees::Matrix&lt; ElementType &gt;'],['../classtrees_1_1_matrix.html#a363bff5b1ded7ead42eeb72cfee359f3',1,'trees::Matrix::Matrix(void)'],['../classtrees_1_1_matrix.html#a476f805286aeea991d815402c2ff703a',1,'trees::Matrix::Matrix(ElementType *data_, size_t rows_, size_t cols_)'],['../classtrees_1_1_matrix.html#aaa1772283d722e34a9a914f1d493a754',1,'trees::Matrix::Matrix(const Matrix&lt; ElementType &gt; &amp;matrix_)']]]
+  ['l1',['L1',['../structtrees_1_1_l1.html',1,'trees']]],
+  ['l2',['L2',['../structtrees_1_1_l2.html',1,'trees']]],
+  ['l2simple',['L2Simple',['../structtrees_1_1_l2_simple.html',1,'trees']]],
+  ['loc',['loc',['../classtrees_1_1_allocator.html#a150ef8b53806d3cb02c97170aea46787',1,'trees::Allocator']]]
 ];

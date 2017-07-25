@@ -64,37 +64,58 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classtrees_1_1_pooled_allocator-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">trees::PooledAllocator Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="dynheader">
+Inheritance diagram for trees::PooledAllocator:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classtrees_1_1_pooled_allocator.png" usemap="#trees::PooledAllocator_map" alt=""/>
+  <map id="trees::PooledAllocator_map" name="trees::PooledAllocator_map">
+<area href="classtrees_1_1_allocator.html" alt="trees::Allocator" shape="rect" coords="0,0,136,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae03eae7a2d5ccfffc2263976538a325a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#ae03eae7a2d5ccfffc2263976538a325a">PooledAllocator</a> (int blocksize_=8192, int wordsize_=16)</td></tr>
-<tr class="separator:ae03eae7a2d5ccfffc2263976538a325a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac29cfd7073171cf67cf0e78a37f9edac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#ac29cfd7073171cf67cf0e78a37f9edac">PooledAllocator</a> (size_t blocksize_=8192)</td></tr>
+<tr class="separator:ac29cfd7073171cf67cf0e78a37f9edac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02a16650ef941629896065e047542c9b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a02a16650ef941629896065e047542c9b">~PooledAllocator</a> ()</td></tr>
 <tr class="separator:a02a16650ef941629896065e047542c9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64a9e64fba5590513fa11ed5ff74e067"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a64a9e64fba5590513fa11ed5ff74e067">free</a> ()</td></tr>
-<tr class="separator:a64a9e64fba5590513fa11ed5ff74e067"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33b64cd726208d57d982d42a7e00e7a0"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a33b64cd726208d57d982d42a7e00e7a0">allocateMemory</a> (int size_)</td></tr>
-<tr class="separator:a33b64cd726208d57d982d42a7e00e7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5bd259585b270d0c43a48c147835699"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:af5bd259585b270d0c43a48c147835699"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#af5bd259585b270d0c43a48c147835699">allocate</a> (size_t count_=1)</td></tr>
-<tr class="separator:af5bd259585b270d0c43a48c147835699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaf5da95ab275fed2865de00801e79b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#aeaf5da95ab275fed2865de00801e79b2">clear</a> ()</td></tr>
+<tr class="separator:aeaf5da95ab275fed2865de00801e79b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96e389f45a528f153f7518dbe807c1d6"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a96e389f45a528f153f7518dbe807c1d6">allocate</a> (int size_)</td></tr>
+<tr class="separator:a96e389f45a528f153f7518dbe807c1d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48598296a62c31931cbcd1d8fb61f43f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a48598296a62c31931cbcd1d8fb61f43f">join</a> ()</td></tr>
+<tr class="separator:a48598296a62c31931cbcd1d8fb61f43f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classtrees_1_1_allocator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classtrees_1_1_allocator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classtrees_1_1_allocator.html">trees::Allocator</a></td></tr>
+<tr class="memitem:a1b08d5c6bc8ac6f20f077730a1e72f0e inherit pub_methods_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a1b08d5c6bc8ac6f20f077730a1e72f0e">Allocator</a> (size_t blocksize_=8192, size_t wordsize_=16)</td></tr>
+<tr class="separator:a1b08d5c6bc8ac6f20f077730a1e72f0e inherit pub_methods_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ccbc0afff4f296570718372c5848430 inherit pub_methods_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a9ccbc0afff4f296570718372c5848430">~Allocator</a> ()</td></tr>
+<tr class="separator:a9ccbc0afff4f296570718372c5848430 inherit pub_methods_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a1c1fcdab76bfdd6c99e91ede846b36c4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a1c1fcdab76bfdd6c99e91ede846b36c4">usedMemory</a></td></tr>
-<tr class="separator:a1c1fcdab76bfdd6c99e91ede846b36c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39f18ea897fadf1f81d006a853a4c0c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_pooled_allocator.html#a39f18ea897fadf1f81d006a853a4c0c0">wastedMemory</a></td></tr>
-<tr class="separator:a39f18ea897fadf1f81d006a853a4c0c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_attribs_classtrees_1_1_allocator"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classtrees_1_1_allocator')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classtrees_1_1_allocator.html">trees::Allocator</a></td></tr>
+<tr class="memitem:a7bfdc724139d5c16e4a466f2f095688b inherit pro_attribs_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a7bfdc724139d5c16e4a466f2f095688b">blocksize</a></td></tr>
+<tr class="separator:a7bfdc724139d5c16e4a466f2f095688b inherit pro_attribs_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cd94b47f93ea913811291ce8a3071a1 inherit pro_attribs_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a9cd94b47f93ea913811291ce8a3071a1">base</a></td></tr>
+<tr class="separator:a9cd94b47f93ea913811291ce8a3071a1 inherit pro_attribs_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a150ef8b53806d3cb02c97170aea46787 inherit pro_attribs_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a150ef8b53806d3cb02c97170aea46787">loc</a></td></tr>
+<tr class="separator:a150ef8b53806d3cb02c97170aea46787 inherit pro_attribs_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af001a78f23465767f604441760ac9a69 inherit pro_attribs_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#af001a78f23465767f604441760ac9a69">blocks</a></td></tr>
+<tr class="separator:af001a78f23465767f604441760ac9a69 inherit pro_attribs_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4db6c8c7b9ee3674503b1fb62b7e6b40 inherit pro_attribs_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a4db6c8c7b9ee3674503b1fb62b7e6b40">remaining</a></td></tr>
+<tr class="separator:a4db6c8c7b9ee3674503b1fb62b7e6b40 inherit pro_attribs_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a6f444512dd3e66121a821e114207dd inherit pro_attribs_classtrees_1_1_allocator"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_allocator.html#a9a6f444512dd3e66121a821e114207dd">usedMemory</a></td></tr>
+<tr class="separator:a9a6f444512dd3e66121a821e114207dd inherit pro_attribs_classtrees_1_1_allocator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ae03eae7a2d5ccfffc2263976538a325a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae03eae7a2d5ccfffc2263976538a325a">&#9670;&nbsp;</a></span>PooledAllocator()</h2>
+<a id="ac29cfd7073171cf67cf0e78a37f9edac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac29cfd7073171cf67cf0e78a37f9edac">&#9670;&nbsp;</a></span>PooledAllocator()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -105,19 +126,9 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">trees::PooledAllocator::PooledAllocator </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>blocksize_</em> = <code>8192</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>blocksize_</em> = <code>8192</code></td><td>)</td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>wordsize_</em> = <code>16</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -126,7 +137,14 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Constructor </p>
+<p>Constructor</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">Number</td><td>of bytes of allocated memory buffer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">Number</td><td>of bytes of one element </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -157,44 +175,8 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="af5bd259585b270d0c43a48c147835699"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5bd259585b270d0c43a48c147835699">&#9670;&nbsp;</a></span>allocate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">T* trees::PooledAllocator::allocate </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>count_</em> = <code>1</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Allocates (using this pool) a generic type T.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">count_</td><td>Number of instances to allocate. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Pointer of type T* to memory buffer </dd></dl>
-
-</div>
-</div>
-<a id="a33b64cd726208d57d982d42a7e00e7a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33b64cd726208d57d982d42a7e00e7a0">&#9670;&nbsp;</a></span>allocateMemory()</h2>
+<a id="a96e389f45a528f153f7518dbe807c1d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96e389f45a528f153f7518dbe807c1d6">&#9670;&nbsp;</a></span>allocate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -203,7 +185,7 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void* trees::PooledAllocator::allocateMemory </td>
+          <td class="memname">void* trees::PooledAllocator::allocate </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>size_</em></td><td>)</td>
@@ -212,7 +194,7 @@ template&lt;typename T &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -224,11 +206,15 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a pointer to a piece of new memory of the given size in bytes </dd></dl>
+<p>Check whether a new block must be allocated. Note that the first word of a block is reserved for a pointer to the previous block.</p>
+<p>Return current location and sets remaining and used memory</p>
+
+<p>Implements <a class="el" href="classtrees_1_1_allocator.html#a3963a4c0384e3a83fd258a7d6b5303b9">trees::Allocator</a>.</p>
 
 </div>
 </div>
-<a id="a64a9e64fba5590513fa11ed5ff74e067"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64a9e64fba5590513fa11ed5ff74e067">&#9670;&nbsp;</a></span>free()</h2>
+<a id="aeaf5da95ab275fed2865de00801e79b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaf5da95ab275fed2865de00801e79b2">&#9670;&nbsp;</a></span>clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -237,7 +223,35 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void trees::PooledAllocator::free </td>
+          <td class="memname">void trees::PooledAllocator::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Frees memory </p>
+
+<p>Implements <a class="el" href="classtrees_1_1_allocator.html#aa1188b27061817113bc4a3e4523868e0">trees::Allocator</a>.</p>
+
+</div>
+</div>
+<a id="a48598296a62c31931cbcd1d8fb61f43f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48598296a62c31931cbcd1d8fb61f43f">&#9670;&nbsp;</a></span>join()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* trees::PooledAllocator::join </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -249,38 +263,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Frees meory </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="a1c1fcdab76bfdd6c99e91ede846b36c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c1fcdab76bfdd6c99e91ede846b36c4">&#9670;&nbsp;</a></span>usedMemory</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int trees::PooledAllocator::usedMemory</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Number of bytes which has been already used </p>
-
-</div>
-</div>
-<a id="a39f18ea897fadf1f81d006a853a4c0c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39f18ea897fadf1f81d006a853a4c0c0">&#9670;&nbsp;</a></span>wastedMemory</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int trees::PooledAllocator::wastedMemory</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Number of bytes which are unused </p>
+<p>Joins the different blocks and return the poiner of this memory buffer </p>
 
 </div>
 </div>

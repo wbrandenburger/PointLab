@@ -81,6 +81,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5aa569f51cc6095e8017500c7e6b074d"><td class="memTemplParams" colspan="2">template&lt;typename Task &gt; </td></tr>
 <tr class="memitem:a5aa569f51cc6095e8017500c7e6b074d"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classtrees_1_1_threadpool.html#a5aa569f51cc6095e8017500c7e6b074d">runTask</a> (Task task_)</td></tr>
 <tr class="separator:a5aa569f51cc6095e8017500c7e6b074d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5675fede770bf61c78cdd2d0250acc93"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtrees_1_1_threadpool.html#a5675fede770bf61c78cdd2d0250acc93">waitTasks</a> ()</td></tr>
+<tr class="separator:a5675fede770bf61c78cdd2d0250acc93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2ddeee4f43093bc52ff011213def07e4"></a>
@@ -202,6 +204,33 @@ template&lt;typename Task &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Terminates io_service and threads </p>
+
+</div>
+</div>
+<a id="a5675fede770bf61c78cdd2d0250acc93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5675fede770bf61c78cdd2d0250acc93">&#9670;&nbsp;</a></span>waitTasks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool trees::Threadpool::waitTasks </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Waits until all threads has been finished</p>
+<dl class="section return"><dt>Returns</dt><dd>Return true if all tasks are completed </dd></dl>
 
 </div>
 </div>

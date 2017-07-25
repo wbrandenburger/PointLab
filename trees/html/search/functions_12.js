@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['_7eallocator',['~Allocator',['../classtrees_1_1_allocator.html#a2a04e2aae952342f63846f91be214cb3',1,'trees::Allocator']]],
-  ['_7eany',['~Any',['../classtrees_1_1_any.html#a9c7b28ca5a1b9f26dd9dc7896405d74f',1,'trees::Any']]],
-  ['_7ematrix',['~Matrix',['../classtrees_1_1_matrix.html#a4eac26e6570ad219af70aa36eeadc2f7',1,'trees::Matrix']]],
-  ['_7epooledallocator',['~PooledAllocator',['../classtrees_1_1_pooled_allocator.html#a02a16650ef941629896065e047542c9b',1,'trees::PooledAllocator']]],
-  ['_7ethreadpool',['~Threadpool',['../classtrees_1_1_threadpool.html#afb783a8a8b881f2f0be9cae58550d345',1,'trees::Threadpool']]]
+  ['waittasks',['waitTasks',['../classtrees_1_1_threadpool.html#a5675fede770bf61c78cdd2d0250acc93',1,'trees::Threadpool']]],
+  ['worstdist',['worstDist',['../classtrees_1_1_unique_result_set.html#a2301eba6dae87959cc50668dd2307d4d',1,'trees::UniqueResultSet::worstDist()'],['../classtrees_1_1_radius_unique_result_set.html#af0f7ec26a6515cb085df64a43afe433c',1,'trees::RadiusUniqueResultSet::worstDist()']]]
 ];

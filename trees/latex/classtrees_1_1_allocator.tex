@@ -1,163 +1,94 @@
 \hypertarget{classtrees_1_1_allocator}{}\section{trees\+:\+:Allocator Class Reference}
 \label{classtrees_1_1_allocator}\index{trees\+::\+Allocator@{trees\+::\+Allocator}}
+Inheritance diagram for trees\+:\+:Allocator\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classtrees_1_1_allocator}
+\end{center}
+\end{figure}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{classtrees_1_1_allocator_a61b4f2e39ef2984f0cb57a0005e5a1b8}{Allocator} ()
+\hyperlink{classtrees_1_1_allocator_a1b08d5c6bc8ac6f20f077730a1e72f0e}{Allocator} (size\+\_\+t blocksize\+\_\+=8192, size\+\_\+t wordsize\+\_\+=16)
 \item 
-\hyperlink{classtrees_1_1_allocator_a539219cedd5fc9fae0d24be3212fbcea}{Allocator} (size\+\_\+t size\+\_\+, size\+\_\+t chunk\+\_\+)
+virtual \hyperlink{classtrees_1_1_allocator_a9ccbc0afff4f296570718372c5848430}{$\sim$\+Allocator} ()
 \item 
-\hyperlink{classtrees_1_1_allocator_a2a04e2aae952342f63846f91be214cb3}{$\sim$\+Allocator} ()
+virtual void \hyperlink{classtrees_1_1_allocator_aa1188b27061817113bc4a3e4523868e0}{clear} ()=0
 \item 
-void $\ast$ \hyperlink{classtrees_1_1_allocator_aa35a3d63a9a05ce16f01fcd290973990}{allocate} ()
-\item 
-void $\ast$ \hyperlink{classtrees_1_1_allocator_a03c0be0196af451bfd8c48dbe6fdb1f1}{allocate} (int \&number\+\_\+)
-\item 
-void \hyperlink{classtrees_1_1_allocator_ab604fe92fe429a8149dfbc3ab3d6fe5b}{clear} ()
-\item 
-size\+\_\+t \hyperlink{classtrees_1_1_allocator_af3266a905a5482ac22c24f5c2b2349fd}{used\+Memory} ()
-\item 
-size\+\_\+t \hyperlink{classtrees_1_1_allocator_ad9a9e6fb8eeca7d3f8cb89e24a2da54f}{remained\+Memory} ()
-\item 
-void $\ast$ \hyperlink{classtrees_1_1_allocator_adf38461ff66c1ea2a7aff5e178f30389}{operator\mbox{[}$\,$\mbox{]}} (int number\+\_\+)
-\item 
-void $\ast$ \hyperlink{classtrees_1_1_allocator_a04d8eebe7efde053e4c856767cf25656}{ptr} ()
+virtual void $\ast$ \hyperlink{classtrees_1_1_allocator_a3963a4c0384e3a83fd258a7d6b5303b9}{allocate} (int size\+\_\+)=0
 \end{DoxyCompactItemize}
-\subsection*{Public Attributes}
+\subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-size\+\_\+t \hyperlink{classtrees_1_1_allocator_a4e5438309246d70ff0c6d9a9f02883cc}{size}
-\item 
-size\+\_\+t \hyperlink{classtrees_1_1_allocator_a2b01b14ef276d4f876bbbb842e112b36}{chunk}
-\item 
-int \hyperlink{classtrees_1_1_allocator_a05591d52d447953dc864ca6052fb8954}{number}
+const size\+\_\+t \hyperlink{classtrees_1_1_allocator_a7bfdc724139d5c16e4a466f2f095688b}{blocksize}
 \item 
 void $\ast$ \hyperlink{classtrees_1_1_allocator_a9cd94b47f93ea913811291ce8a3071a1}{base}
 \item 
-void $\ast$ \hyperlink{classtrees_1_1_allocator_a2dd281e0ddcba5999da2e4233c405684}{current}
+void $\ast$ \hyperlink{classtrees_1_1_allocator_a150ef8b53806d3cb02c97170aea46787}{loc}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_allocator_af001a78f23465767f604441760ac9a69}{blocks}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_allocator_a4db6c8c7b9ee3674503b1fb62b7e6b40}{remaining}
+\item 
+size\+\_\+t \hyperlink{classtrees_1_1_allocator_a9a6f444512dd3e66121a821e114207dd}{used\+Memory}
 \end{DoxyCompactItemize}
 
 
 \subsection{Constructor \& Destructor Documentation}
-\mbox{\Hypertarget{classtrees_1_1_allocator_a61b4f2e39ef2984f0cb57a0005e5a1b8}\label{classtrees_1_1_allocator_a61b4f2e39ef2984f0cb57a0005e5a1b8}} 
+\mbox{\Hypertarget{classtrees_1_1_allocator_a1b08d5c6bc8ac6f20f077730a1e72f0e}\label{classtrees_1_1_allocator_a1b08d5c6bc8ac6f20f077730a1e72f0e}} 
 \index{trees\+::\+Allocator@{trees\+::\+Allocator}!Allocator@{Allocator}}
 \index{Allocator@{Allocator}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{Allocator()}{Allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
-{\footnotesize\ttfamily trees\+::\+Allocator\+::\+Allocator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
-
-Constructor \mbox{\Hypertarget{classtrees_1_1_allocator_a539219cedd5fc9fae0d24be3212fbcea}\label{classtrees_1_1_allocator_a539219cedd5fc9fae0d24be3212fbcea}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!Allocator@{Allocator}}
-\index{Allocator@{Allocator}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{Allocator()}{Allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
-{\footnotesize\ttfamily trees\+::\+Allocator\+::\+Allocator (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size\+\_\+,  }\item[{size\+\_\+t}]{chunk\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+\subsubsection{\texorpdfstring{Allocator()}{Allocator()}}
+{\footnotesize\ttfamily trees\+::\+Allocator\+::\+Allocator (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{blocksize\+\_\+ = {\ttfamily 8192},  }\item[{size\+\_\+t}]{wordsize\+\_\+ = {\ttfamily 16} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
 
 Constructor
 
 
 \begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em size\+\_\+} & Number of elements \\
+\mbox{\tt in}  & {\em Number} & of bytes of allocated memory buffer \\
 \hline
-\mbox{\tt in}  & {\em chunk\+\_\+} & Size of the elements in bytes \\
+\mbox{\tt in}  & {\em Number} & of bytes of one element \\
 \hline
 \end{DoxyParams}
-\mbox{\Hypertarget{classtrees_1_1_allocator_a2a04e2aae952342f63846f91be214cb3}\label{classtrees_1_1_allocator_a2a04e2aae952342f63846f91be214cb3}} 
+\mbox{\Hypertarget{classtrees_1_1_allocator_a9ccbc0afff4f296570718372c5848430}\label{classtrees_1_1_allocator_a9ccbc0afff4f296570718372c5848430}} 
 \index{trees\+::\+Allocator@{trees\+::\+Allocator}!````~Allocator@{$\sim$\+Allocator}}
 \index{````~Allocator@{$\sim$\+Allocator}!trees\+::\+Allocator@{trees\+::\+Allocator}}
 \subsubsection{\texorpdfstring{$\sim$\+Allocator()}{~Allocator()}}
-{\footnotesize\ttfamily trees\+::\+Allocator\+::$\sim$\+Allocator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+{\footnotesize\ttfamily virtual trees\+::\+Allocator\+::$\sim$\+Allocator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
 
 Deconstructor 
 
 \subsection{Member Function Documentation}
-\mbox{\Hypertarget{classtrees_1_1_allocator_aa35a3d63a9a05ce16f01fcd290973990}\label{classtrees_1_1_allocator_aa35a3d63a9a05ce16f01fcd290973990}} 
+\mbox{\Hypertarget{classtrees_1_1_allocator_a3963a4c0384e3a83fd258a7d6b5303b9}\label{classtrees_1_1_allocator_a3963a4c0384e3a83fd258a7d6b5303b9}} 
 \index{trees\+::\+Allocator@{trees\+::\+Allocator}!allocate@{allocate}}
 \index{allocate@{allocate}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{allocate()}{allocate()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
-{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::allocate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+\subsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily virtual void$\ast$ trees\+::\+Allocator\+::allocate (\begin{DoxyParamCaption}\item[{int}]{size\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
 
-Return a pointer to a memory area that can be used
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em chunk\+\_\+} & size of the element which is required in Bytes \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Pointer to the memory within buffer 
-\end{DoxyReturn}
-\mbox{\Hypertarget{classtrees_1_1_allocator_a03c0be0196af451bfd8c48dbe6fdb1f1}\label{classtrees_1_1_allocator_a03c0be0196af451bfd8c48dbe6fdb1f1}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!allocate@{allocate}}
-\index{allocate@{allocate}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{allocate()}{allocate()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
-{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::allocate (\begin{DoxyParamCaption}\item[{int \&}]{number\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
-
-Return a pointer to a memory buffer that can be used
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em chunk\+\_\+} & Size of the element which is required in bytes \\
-\hline
-\mbox{\tt in,out}  & {\em number\+\_\+} & Integer which specifies the location of the pointer \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Pointer to the memory buffer 
-\end{DoxyReturn}
-\mbox{\Hypertarget{classtrees_1_1_allocator_ab604fe92fe429a8149dfbc3ab3d6fe5b}\label{classtrees_1_1_allocator_ab604fe92fe429a8149dfbc3ab3d6fe5b}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!clear@{clear}}
-\index{clear@{clear}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{clear()}{clear()}}
-{\footnotesize\ttfamily void trees\+::\+Allocator\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
-
-Free memory \mbox{\Hypertarget{classtrees_1_1_allocator_adf38461ff66c1ea2a7aff5e178f30389}\label{classtrees_1_1_allocator_adf38461ff66c1ea2a7aff5e178f30389}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!operator\mbox{[}\mbox{]}@{operator[]}}
-\index{operator\mbox{[}\mbox{]}@{operator[]}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{operator[]()}{operator[]()}}
-{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{int}]{number\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
-
-Return a pointer from a specific position within the buffer
+Returns a pointer to a piece of new memory of the given size in bytes
 
 
 \begin{DoxyParams}{Parameters}
-{\em number\+\_\+} & Position within the buffer which is requested \\
+{\em size\+\_\+} & Number of bytes which shall be allocated \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-Pointer to a specific position within the buffer 
+Returns a pointer to a piece of new memory of the given size in bytes 
 \end{DoxyReturn}
-\mbox{\Hypertarget{classtrees_1_1_allocator_a04d8eebe7efde053e4c856767cf25656}\label{classtrees_1_1_allocator_a04d8eebe7efde053e4c856767cf25656}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!ptr@{ptr}}
-\index{ptr@{ptr}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{ptr()}{ptr()}}
-{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::ptr (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
 
-Return the pointer to the beginning of the memory buffer
 
-\begin{DoxyReturn}{Returns}
-Pointer to the beginning of the meory buffer 
-\end{DoxyReturn}
-\mbox{\Hypertarget{classtrees_1_1_allocator_ad9a9e6fb8eeca7d3f8cb89e24a2da54f}\label{classtrees_1_1_allocator_ad9a9e6fb8eeca7d3f8cb89e24a2da54f}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!remained\+Memory@{remained\+Memory}}
-\index{remained\+Memory@{remained\+Memory}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{remained\+Memory()}{remainedMemory()}}
-{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::remained\+Memory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+Implemented in \hyperlink{classtrees_1_1_pooled_allocator_a96e389f45a528f153f7518dbe807c1d6}{trees\+::\+Pooled\+Allocator}.
 
-Shows how much memory is remaining
+\mbox{\Hypertarget{classtrees_1_1_allocator_aa1188b27061817113bc4a3e4523868e0}\label{classtrees_1_1_allocator_aa1188b27061817113bc4a3e4523868e0}} 
+\index{trees\+::\+Allocator@{trees\+::\+Allocator}!clear@{clear}}
+\index{clear@{clear}!trees\+::\+Allocator@{trees\+::\+Allocator}}
+\subsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily virtual void trees\+::\+Allocator\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
 
-\begin{DoxyReturn}{Returns}
-Number of Bytes that could be used 
-\end{DoxyReturn}
-\mbox{\Hypertarget{classtrees_1_1_allocator_af3266a905a5482ac22c24f5c2b2349fd}\label{classtrees_1_1_allocator_af3266a905a5482ac22c24f5c2b2349fd}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!used\+Memory@{used\+Memory}}
-\index{used\+Memory@{used\+Memory}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{used\+Memory()}{usedMemory()}}
-{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::used\+Memory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+Frees memory 
 
-Shows how much memory is used
+Implemented in \hyperlink{classtrees_1_1_pooled_allocator_aeaf5da95ab275fed2865de00801e79b2}{trees\+::\+Pooled\+Allocator}.
 
-\begin{DoxyReturn}{Returns}
-Number of Bytes that are used by this object 
-\end{DoxyReturn}
 
 
 \subsection{Member Data Documentation}
@@ -165,33 +96,39 @@ Number of Bytes that are used by this object
 \index{trees\+::\+Allocator@{trees\+::\+Allocator}!base@{base}}
 \index{base@{base}!trees\+::\+Allocator@{trees\+::\+Allocator}}
 \subsubsection{\texorpdfstring{base}{base}}
-{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::base}
+{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::base\hspace{0.3cm}{\ttfamily [protected]}}
 
-Pointer to the allocated memory buffer \mbox{\Hypertarget{classtrees_1_1_allocator_a2b01b14ef276d4f876bbbb842e112b36}\label{classtrees_1_1_allocator_a2b01b14ef276d4f876bbbb842e112b36}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!chunk@{chunk}}
-\index{chunk@{chunk}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{chunk}{chunk}}
-{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::chunk}
+Pointer to the allocated memory buffer \mbox{\Hypertarget{classtrees_1_1_allocator_af001a78f23465767f604441760ac9a69}\label{classtrees_1_1_allocator_af001a78f23465767f604441760ac9a69}} 
+\index{trees\+::\+Allocator@{trees\+::\+Allocator}!blocks@{blocks}}
+\index{blocks@{blocks}!trees\+::\+Allocator@{trees\+::\+Allocator}}
+\subsubsection{\texorpdfstring{blocks}{blocks}}
+{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::blocks\hspace{0.3cm}{\ttfamily [protected]}}
 
-Number of bytes of allocated chunks \mbox{\Hypertarget{classtrees_1_1_allocator_a2dd281e0ddcba5999da2e4233c405684}\label{classtrees_1_1_allocator_a2dd281e0ddcba5999da2e4233c405684}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!current@{current}}
-\index{current@{current}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{current}{current}}
-{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::current}
+Number of blocks \mbox{\Hypertarget{classtrees_1_1_allocator_a7bfdc724139d5c16e4a466f2f095688b}\label{classtrees_1_1_allocator_a7bfdc724139d5c16e4a466f2f095688b}} 
+\index{trees\+::\+Allocator@{trees\+::\+Allocator}!blocksize@{blocksize}}
+\index{blocksize@{blocksize}!trees\+::\+Allocator@{trees\+::\+Allocator}}
+\subsubsection{\texorpdfstring{blocksize}{blocksize}}
+{\footnotesize\ttfamily const size\+\_\+t trees\+::\+Allocator\+::blocksize\hspace{0.3cm}{\ttfamily [protected]}}
 
-Pointer to the current position within the memory buffer \mbox{\Hypertarget{classtrees_1_1_allocator_a05591d52d447953dc864ca6052fb8954}\label{classtrees_1_1_allocator_a05591d52d447953dc864ca6052fb8954}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!number@{number}}
-\index{number@{number}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{number}{number}}
-{\footnotesize\ttfamily int trees\+::\+Allocator\+::number}
+Number of bytes of allocated memory buffer \mbox{\Hypertarget{classtrees_1_1_allocator_a150ef8b53806d3cb02c97170aea46787}\label{classtrees_1_1_allocator_a150ef8b53806d3cb02c97170aea46787}} 
+\index{trees\+::\+Allocator@{trees\+::\+Allocator}!loc@{loc}}
+\index{loc@{loc}!trees\+::\+Allocator@{trees\+::\+Allocator}}
+\subsubsection{\texorpdfstring{loc}{loc}}
+{\footnotesize\ttfamily void$\ast$ trees\+::\+Allocator\+::loc\hspace{0.3cm}{\ttfamily [protected]}}
 
-Number of bytes which has been already used \mbox{\Hypertarget{classtrees_1_1_allocator_a4e5438309246d70ff0c6d9a9f02883cc}\label{classtrees_1_1_allocator_a4e5438309246d70ff0c6d9a9f02883cc}} 
-\index{trees\+::\+Allocator@{trees\+::\+Allocator}!size@{size}}
-\index{size@{size}!trees\+::\+Allocator@{trees\+::\+Allocator}}
-\subsubsection{\texorpdfstring{size}{size}}
-{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::size}
+Current location in block to next allocate memory. \mbox{\Hypertarget{classtrees_1_1_allocator_a4db6c8c7b9ee3674503b1fb62b7e6b40}\label{classtrees_1_1_allocator_a4db6c8c7b9ee3674503b1fb62b7e6b40}} 
+\index{trees\+::\+Allocator@{trees\+::\+Allocator}!remaining@{remaining}}
+\index{remaining@{remaining}!trees\+::\+Allocator@{trees\+::\+Allocator}}
+\subsubsection{\texorpdfstring{remaining}{remaining}}
+{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::remaining\hspace{0.3cm}{\ttfamily [protected]}}
 
-Number of bytes of the allocated memory buffer 
+Number of bytes left in current block of storage. \mbox{\Hypertarget{classtrees_1_1_allocator_a9a6f444512dd3e66121a821e114207dd}\label{classtrees_1_1_allocator_a9a6f444512dd3e66121a821e114207dd}} 
+\index{trees\+::\+Allocator@{trees\+::\+Allocator}!used\+Memory@{used\+Memory}}
+\index{used\+Memory@{used\+Memory}!trees\+::\+Allocator@{trees\+::\+Allocator}}
+\subsubsection{\texorpdfstring{used\+Memory}{usedMemory}}
+{\footnotesize\ttfamily size\+\_\+t trees\+::\+Allocator\+::used\+Memory\hspace{0.3cm}{\ttfamily [protected]}}
+
+Number of bytes which has been already used 
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 

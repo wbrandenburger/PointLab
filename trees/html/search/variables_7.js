@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parent',['parent',['../structtrees_1_1_k_d_tree_index_1_1_node.html#a987f89ac48760137312cf2aca0ca8b14',1,'trees::KDTreeIndex::Node']]]
+  ['size',['size',['../classtrees_1_1_n_n_index.html#a2c14aa447b5461fb839213f092881b23',1,'trees::NNIndex']]]
 ];

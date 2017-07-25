@@ -10,6 +10,8 @@
 void \hyperlink{classtrees_1_1_threadpool_a3d6488b730cc53472239f9c74e384d64}{shutdown} ()
 \item 
 {\footnotesize template$<$typename Task $>$ }\\bool \hyperlink{classtrees_1_1_threadpool_a5aa569f51cc6095e8017500c7e6b074d}{run\+Task} (Task task\+\_\+)
+\item 
+bool \hyperlink{classtrees_1_1_threadpool_a5675fede770bf61c78cdd2d0250acc93}{wait\+Tasks} ()
 \end{DoxyCompactItemize}
 
 
@@ -59,7 +61,18 @@ True if the function could be invoked
 \subsubsection{\texorpdfstring{shutdown()}{shutdown()}}
 {\footnotesize\ttfamily void trees\+::\+Threadpool\+::shutdown (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
 
-Terminates io\+\_\+service and threads 
+Terminates io\+\_\+service and threads \mbox{\Hypertarget{classtrees_1_1_threadpool_a5675fede770bf61c78cdd2d0250acc93}\label{classtrees_1_1_threadpool_a5675fede770bf61c78cdd2d0250acc93}} 
+\index{trees\+::\+Threadpool@{trees\+::\+Threadpool}!wait\+Tasks@{wait\+Tasks}}
+\index{wait\+Tasks@{wait\+Tasks}!trees\+::\+Threadpool@{trees\+::\+Threadpool}}
+\subsubsection{\texorpdfstring{wait\+Tasks()}{waitTasks()}}
+{\footnotesize\ttfamily bool trees\+::\+Threadpool\+::wait\+Tasks (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Waits until all threads has been finished
+
+\begin{DoxyReturn}{Returns}
+Return true if all tasks are completed 
+\end{DoxyReturn}
+
 
 The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
 \item 
