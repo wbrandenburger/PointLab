@@ -77,8 +77,8 @@ int main(int argc, char* argv[]) {
 	trees::Matrix<float> pointcloudkdtree(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
 	
 
-	trees::PointcloudAoS<float> pointcloudAoS(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
-	std::cout << pointcloudAoS << std::endl;
+	trees::PointcloudSoA<float> pointcloudSoA(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
+	std::cout << pointcloudSoA << std::endl;
 
 	/**
 		Build index

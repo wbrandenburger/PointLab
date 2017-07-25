@@ -385,7 +385,10 @@ namespace trees
 		/**
 			Constructor
 		*/
-		PointcloudAoS () : Pointcloud() {}
+		PointcloudAoS () : Pointcloud() 
+		{
+			pointcloud = nullptr;
+		}
 
 		/**
 			Constructor
@@ -602,6 +605,273 @@ namespace trees
 		 */
 		 PointcloudNode<ElementType>* pointcloud;
 
+	};
+
+	template<typename ElementType> class PointcloudSoA : public Pointcloud<ElementType>
+	{
+	
+	public:
+
+		/**
+			Constructor
+		*/
+		PointcloudSoA () : Pointcloud() 
+		{
+			points = nullptr;
+			normals = nullptr;
+			colors = nullptr;
+		}
+
+		/**
+			Constructor
+
+			@param[in] points_ Points
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		PointcloudSoA(ElementType* points_, size_t rows_, size_t cols_) 
+			: Pointcloud(rows_, cols_)
+		{
+			setPoints(points_);
+			normals = nullptr;
+			colors = nullptr;
+		}
+
+		/**
+			Constructor
+
+			@param[in] points_ Points
+			@param[in] normals_ Normals
+			@param[in] colors_ Colors
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_)
+			: Pointcloud(rows_, cols_) 
+		{
+			setPoints(points_);
+			setNormals(normals_);
+			setColors(colors_);
+		}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			if (points) { delete[] points; }
+			if (normals) { delete[] normals; }
+			if (colors) { delete[] colors; }
+		}
+
+		/**
+			Prints the pointcloud
+
+			@param[in,out] out_ Outstream
+		*/
+		void print(std::ostream& out_) const
+		{
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					if (points) {
+						out_ << points[i*cols + j] << " ";
+					}
+				}
+				for (size_t j = 0; j < cols; j++) {
+					if (normals) {
+						out_ << normals[i*cols + j] << " ";
+					}
+				}
+				for (size_t j = 0; j < cols; j++) {
+					if (colors) {
+						out_ << colors[i*cols + j] << " ";
+					}
+				}
+				out_ << std::endl;
+			}
+		}
+
+		/**
+			Set points
+
+			@param[in] points_ Points
+		*/
+		void setPoints(ElementType* points_)
+		{
+			points = new ElementType[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					points[i*cols + j] = points_[i*cols + j];
+				}
+			}
+		}
+
+		/**
+			Set normals
+
+			@param[in] normals_ Normals
+		*/
+		void setNormals(ElementType* normals_)
+		{
+			normals = new ElementType[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					normals[i*cols + j] = normals_[i*cols + j];
+				}
+			}
+		}
+
+		/**
+			Set normals
+
+			@param[in] colors_ Colors
+		*/
+		void setColors(uchar* colors_)
+		{
+			colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					colors[i*cols + j] = colors_[i*cols + j];
+				}
+			}
+		}
+
+		/**
+			Set point
+
+			@param[in] point_ Point
+			@param[in] row_ Row
+		*/
+		void setPoint(ElementType* point_, size_t row_)
+		{
+			for (size_t i = 0; i < cols; i++) {
+				points[row_*cols + i] = point_[i];
+			}
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@param[in] row_ Row
+		*/
+		void setNormal(ElementType* normal_, size_t row_)
+		{
+			for (size_t i = 0; i < cols; i++) {
+				normals[row_*cols + i] = normal_[i];
+			}
+		}
+
+		/**
+			Set color information
+
+			@param[in] color_ Color information
+			@param[in] row_ Row
+		*/
+		void setColor(uchar* color_, size_t row_)
+		{
+			for (size_t i = 0; i < cols; i++) {
+				colors[row_*cols + i] = color_[i];
+			}
+		}
+
+		/**
+			Get point data of specified index
+
+			@param[in] row_ Row
+			@param[in] col_ Col
+			@return Return point data of specified index
+		*/
+		ElementType getPoint(size_t row_, size_t col_) const
+		{
+			return points[row_*cols + col_];
+		}
+
+		/**
+			Get normal information of specified index
+
+			@param[in] row_ Row
+			@param[in] col_ Col
+			@return Return normal information of specified index
+		*/
+		ElementType getNormal(size_t row_, size_t col_) const
+		{
+			return normals[row_*cols + col_];
+		}
+
+		/**
+			Get color information of specified index
+
+			@param[in] row_ Row
+			@param[in] col_ Col
+			@return Return color information of specified index
+		*/
+		uchar getColor(size_t row_, size_t col_) const
+		{
+			return colors[row_*cols + col_];
+		}
+
+		/**
+			Operator [] Access on point information
+
+			@param[in] index_ Dimension
+			@return Return pointer to point data
+		*/
+		ElementType* operator[](size_t index_) const
+		{
+			return &points[index_*cols];
+		}
+
+		/**
+			Get Pointer to point data
+
+			@param[in] row_ Row
+			@return Return pointer to point data
+		*/
+		ElementType* getPointPtr(size_t row_) const
+		{
+			return &points[row_*cols];
+		}
+
+		/**
+			Get Pointer to the normal
+
+			@param[in] row_ Row
+			@return Return pointer to the normal
+		*/
+		ElementType* getNormalPtr(size_t row_) const
+		{
+			return &normals[row_*cols];
+		}
+
+		/**
+			Get Pointer to color information
+
+			@param[in] row_ Row
+			@return Return pointer to color information
+		*/		
+		uchar* getColorPtr(size_t row_) const
+		{
+			return &colors[row_*cols];
+		}
+
+		 /**
+			Pointcloud
+		 */
+		 ElementType* points;
+		 
+		 /**
+			Normals
+		 */
+		 ElementType* normals;
+
+		 /**
+			Colors
+		 */
+		 uchar* colors;
 	};
 
 	////template <typename ElementType>
