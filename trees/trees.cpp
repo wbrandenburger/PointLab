@@ -76,6 +76,10 @@ int main(int argc, char* argv[]) {
 
 	trees::Matrix<float> pointcloudkdtree(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
 	
+
+	trees::PointcloudAoS<float> pointcloudAoS(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
+	std::cout << pointcloudAoS << std::endl;
+
 	/**
 		Build index
 	*/
@@ -187,57 +191,57 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 
-	typedef utils::HeapWrapperConcurrent<int> Heap;
+	//////////////typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 100000;
+	//////////////size_t n = 100000;
 
-	utils::Threadpool pool(24);
-	Heap heapConcurrent(n, true);
+	//////////////utils::Threadpool pool(24);
+	//////////////Heap heapConcurrent(n, true);
 
-	time.start();
+	//////////////time.start();
 
-	for (size_t i = 0; i < heapConcurrent.size; i++) {
-		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
-	}
-	pool.waitTasks();
+	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	//////////////	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	//////////////}
+	//////////////pool.waitTasks();
 
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
+	//////////////if (heapConcurrent.checkHeap()) {
+	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//////////////}
 
-	time.start();
+	//////////////time.start();
 
-	for (size_t i = 0; i < heapConcurrent.size; i++) {
-		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
-	}
-	pool.waitTasks();
+	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	//////////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
+	//////////////}
+	//////////////pool.waitTasks();
 
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
+	//////////////if (heapConcurrent.checkHeap()) {
+	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//////////////}
 
-	time.start();
+	//////////////time.start();
 
-	for (size_t i = 0; i < heapConcurrent.size; i++) {
-		while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent)));
-	}
-	pool.waitTasks();
+	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	//////////////	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent)));
+	//////////////}
+	//////////////pool.waitTasks();
 
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
+	//////////////if (heapConcurrent.checkHeap()) {
+	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//////////////}
 
-	pool.shutdown();
+	//////////////pool.shutdown();
 
-	trees::NewtonMethod<double> zero;
-	data datainstance;
-	std::cout << zero(datainstance, 1, 3, 0.000001) << std::endl; 
+	//////////////trees::NewtonMethod<double> zero;
+	//////////////data datainstance;
+	//////////////std::cout << zero(datainstance, 1, 3, 0.000001) << std::endl; 
 
 
 	return(0);
