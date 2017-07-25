@@ -32,9 +32,19 @@
 #include <thread>
 
 #include "trees.hpp"
+#include "math/zero.h"
 
 #include "tools/utils.h"
 #include "tools/io.h"
+
+struct data {
+
+	double operator() (double x)
+	{
+		return std::pow(x, 2) - 2;
+	}
+
+};
 
 int main(int argc, char* argv[]) {
 
@@ -177,9 +187,9 @@ int main(int argc, char* argv[]) {
 
 	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 31;
+	size_t n = 100000;
 
-	utils::Threadpool pool(1);
+	utils::Threadpool pool(24);
 	Heap heapConcurrent(n, true);
 
 	time.start();
@@ -195,9 +205,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
 
-	////////std::cout << heapConcurrent << std::endl;
-
-	//time.start();
+	time.start();
 
 	for (size_t i = 0; i < heapConcurrent.size; i++) {
 		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
@@ -209,8 +217,6 @@ int main(int argc, char* argv[]) {
 	if (heapConcurrent.checkHeap()) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
-
-	////////std::cout << heapConcurrent << std::endl;
 
 	time.start();
 
@@ -225,9 +231,13 @@ int main(int argc, char* argv[]) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
 
-	////////std::cout << heapConcurrent << std::endl;
-
 	pool.shutdown();
+
+	trees::NewtonMethod<double> zero;
+	data datainstance;
+	std::cout << zero(datainstance, 1, 3, 0.000001) << std::endl; 
+
 
 	return(0);
 }
+
