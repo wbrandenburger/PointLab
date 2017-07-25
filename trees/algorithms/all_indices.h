@@ -33,7 +33,7 @@
 #include "algorithms/nn_index.h"
 #include "algorithms/kdtree_index.h"
 
-#include "util/matrix.h"
+#include "utils/matrix.h"
 
 namespace trees
 {

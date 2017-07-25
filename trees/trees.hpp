@@ -34,7 +34,7 @@
 
 #include "algorithms/all_indices.h"
 
-#include "util/params.h"
+#include "utils/params.h"
 
 namespace trees
 {

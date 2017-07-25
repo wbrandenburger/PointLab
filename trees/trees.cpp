@@ -33,6 +33,8 @@
 
 #include "trees.hpp"
 #include "math/zero.h"
+#include "pointcloud/normal.h"
+#include "pointcloud/pointcloud.h"
 
 #include "tools/utils.h"
 #include "tools/io.h"

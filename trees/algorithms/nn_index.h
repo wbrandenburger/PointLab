@@ -32,10 +32,10 @@
 
 #include <assert.h>
 
-#include "util/matrix.h"
-#include "util/params.h"
-#include "util/result_set.h"
-#include "util/threadpool.h"
+#include "utils/matrix.h"
+#include "utils/params.h"
+#include "utils/result_set.h"
+#include "utils/threadpool.h"
 
 namespace trees
 {

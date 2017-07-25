@@ -35,11 +35,11 @@
 #include "defines.h"
 #include "algorithms/nn_index.h"
 
-#include "util/allocator.h"
-#include "util/dist.h"
-#include "util/matrix.h"
-#include "util/result_set.h"
-#include "util/params.h"
+#include "utils/allocator.h"
+#include "utils/dist.h"
+#include "utils/matrix.h"
+#include "utils/result_set.h"
+#include "utils/params.h"
 
 namespace trees
 {
