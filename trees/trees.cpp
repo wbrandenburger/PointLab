@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 
 	io::PlyIO plyIO;
 	size_t instances = plyIO.initialze(file);
-	trees::PointcloudSoA<float> pointcloudSoA(instances, 3);
+	trees::PointcloudAoS<float> pointcloudSoA(instances, 3);
 
 	
 	if (plyIO.readPly(pointcloudSoA)) {

@@ -77,7 +77,7 @@ namespace trees
 			
 			@param[in] point_ Point
 		*/
-		void setPoint(ElementType* point_)
+		void setPointPtr(ElementType* point_)
 		{
 			for (size_t i = 0; i < 3; i++) {
 				point[i] = point_[i];
@@ -89,7 +89,7 @@ namespace trees
 
 			@param[in] normal_ Normal
 		*/
-		void setNormal(ElementType* normal_)
+		void setNormalPtr(ElementType* normal_)
 		{
 			for (size_t i = 0; i < 3; i++) {
 				normal[i] = normal_[i];
@@ -101,7 +101,7 @@ namespace trees
 
 			@param[in] color_ Color
 		*/
-		void setColor(uchar* color_)
+		void setColorPtr(uchar* color_)
 		{
 			for (size_t i = 0; i < 3; i++) {
 				color[i] = color_[i];
@@ -114,7 +114,7 @@ namespace trees
 			@param[in] point_ Point
 			@parma[in] index_ Index
 		*/
-		void setPointElement(ElementType point_, size_t index_)
+		void setPoint(ElementType point_, size_t index_)
 		{
 			point[index_] = point_;
 		}
@@ -125,7 +125,7 @@ namespace trees
 			@param[in] normal_ Normal
 			@parma[in] index_ Index
 		*/
-		void setNormalElement(ElementType normal_, size_t index_)
+		void setNormal(ElementType normal_, size_t index_)
 		{
 			normal[index_] = normal_;
 		}
@@ -136,7 +136,7 @@ namespace trees
 			@param[in] color_ Color
 			@parma[in] index_ Index
 		*/
-		void setColorElement(uchar color_, size_t index_)
+		void setColor(uchar color_, size_t index_)
 		{
 			color[index_] = color_;
 		}
@@ -323,21 +323,21 @@ namespace trees
 
 			@param[in] points_ Points
 		*/
-		virtual void setPoints(ElementType* points_) = 0;
+		virtual void setPointsPtr(ElementType* points_) = 0;
 
 		/**
 			Set normals
 
 			@param[in] normals_ Normals
 		*/
-		virtual void setNormals(ElementType* normals_) = 0;
+		virtual void setNormalsPtr(ElementType* normals_) = 0;
 
 		/**
 			Set color information
 
 			@param[in] colors_ Colors
 		*/
-		virtual void setColors(uchar* colors_) = 0;
+		virtual void setColorsPtr(uchar* colors_) = 0;
 		
 		/**
 			Set point
@@ -345,7 +345,7 @@ namespace trees
 			@param[in] point_ Point
 			@param[in] row_ Row
 		*/
-		virtual void setPoint(ElementType* point_, size_t row_) = 0;
+		virtual void setPointPtr(ElementType* point_, size_t row_) = 0;
 
 		/**
 			Set normal
@@ -353,7 +353,7 @@ namespace trees
 			@param[in] normal_ Normal
 			@param[in] row_ Row
 		*/
-		virtual void setNormal(ElementType* normal_,size_t row_) = 0;
+		virtual void setNormalPtr(ElementType* normal_,size_t row_) = 0;
 
 		/**
 			Set color information
@@ -361,7 +361,7 @@ namespace trees
 			@param[in] color_ Color information
 			@param[in] row_ Row
 		*/
-		virtual void setColor(uchar* color_, size_t row_) = 0;
+		virtual void setColorPtr(uchar* color_, size_t row_) = 0;
 
 		/**
 			Set point
@@ -370,7 +370,7 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		virtual void setPointElement(ElementType point_, size_t row_, size_t col_) = 0;
+		virtual void setPoint(ElementType point_, size_t row_, size_t col_) = 0;
 
 		/**
 			Set normal
@@ -379,7 +379,7 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		virtual void setNormalElement(ElementType normal_,size_t row_, size_t col_) = 0;
+		virtual void setNormal(ElementType normal_,size_t row_, size_t col_) = 0;
 
 		/**
 			Set color information
@@ -388,7 +388,7 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		virtual void setColorElement(uchar color_, size_t row_, size_t col_) = 0;
+		virtual void setColor(uchar color_, size_t row_, size_t col_) = 0;
 
 		/**
 			Get point data of specified index
@@ -448,6 +448,27 @@ namespace trees
 			@return Return pointer to color information
 		*/		
 		virtual uchar* getColorPtr(size_t row_) const = 0;
+
+		/**
+			Get Pointer to point data
+
+			@return Return pointer to point data
+		*/
+		virtual ElementType* getPointsPtr() const = 0;
+
+		/**
+			Get Pointer to the normal
+
+			@return Return pointer to the normal
+		*/
+		virtual ElementType* getNormalsPtr() const = 0;
+
+		/**
+			Get Pointer to color information
+
+			@return Return pointer to color information
+		*/		
+		virtual uchar* getColorsPtr() const = 0;
 
 		/**
 			Rows
@@ -524,7 +545,7 @@ namespace trees
 		{
 			clear();
 
-			pointcloud = new PointCloudNode<ElementType> [rows];
+			pointcloud = new PointcloudNode<ElementType> [rows];
 		}
 		
 		/**
@@ -540,7 +561,7 @@ namespace trees
 			rows = rows_;
 			cols = cols_;
 
-			pointcloud = new PointCloudNode<ElementType >[rows];
+			pointcloud = new PointcloudNode<ElementType>[rows];
 		}
 		/**
 			Clear
@@ -576,10 +597,10 @@ namespace trees
 
 			@param[in] points_ Points
 		*/
-		void setPoints(ElementType* points_)
+		void setPointsPtr(ElementType* points_)
 		{
 			for (size_t i = 0; i < rows; i++) {
-				pointcloud[i].setPoint(&points_[i*cols]);
+				pointcloud[i].setPointPtr(&points_[i*cols]);
 			}
 		}
 
@@ -588,10 +609,10 @@ namespace trees
 
 			@param[in] normals_ Normals
 		*/
-		void setNormals(ElementType* normals_)
+		void setNormalsPtr(ElementType* normals_)
 		{
 			for (size_t i = 0; i < rows; i++) {
-				pointcloud[i].setNormal(&normals_[i*cols]);
+				pointcloud[i].setNormalPtr(&normals_[i*cols]);
 			}
 		}
 
@@ -600,10 +621,10 @@ namespace trees
 
 			@param[in] colors_ Colors
 		*/
-		void setColors(uchar* colors_)
+		void setColorsPtr(uchar* colors_)
 		{
 			for (size_t i = 0; i < rows; i++) {
-				pointcloud[i].setColor(&colors_[i*cols]);
+				pointcloud[i].setColorPtr(&colors_[i*cols]);
 			}
 		}
 
@@ -613,9 +634,9 @@ namespace trees
 			@param[in] point_ Point
 			@param[in] row_ Row
 		*/
-		void setPoint(ElementType* point_, size_t row_)
+		void setPointPtr(ElementType* point_, size_t row_)
 		{
-			pointcloud[row_].setPoint(point_);
+			pointcloud[row_].setPointPtr(point_);
 		}
 
 		/**
@@ -624,9 +645,9 @@ namespace trees
 			@param[in] normal_ Normal
 			@param[in] row_ Row
 		*/
-		void setNormal(ElementType* normal_, size_t row_)
+		void setNormalPtr(ElementType* normal_, size_t row_)
 		{
-			pointcloud[row_].setNormal(normal_);
+			pointcloud[row_].setNormalPtr(normal_);
 		}
 
 		/**
@@ -635,9 +656,9 @@ namespace trees
 			@param[in] color_ Color information
 			@param[in] row_ Row
 		*/
-		void setColor(uchar* color_, size_t row_)
+		void setColorPtr(uchar* color_, size_t row_)
 		{
-			pointcloud[row_].setColor(color_);
+			pointcloud[row_].setColorPtr(color_);
 		}
 
 		/**
@@ -647,9 +668,9 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		void setPointElement(ElementType point_, size_t row_, size_t col_)
+		void setPoint(ElementType point_, size_t row_, size_t col_)
 		{
-			pointcloud[row_].setPointElement(point_, col_);
+			pointcloud[row_].setPoint(point_, col_);
 		}
 
 		/**
@@ -659,9 +680,9 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		void setNormalElement(ElementType normal_, size_t row_, size_t col_)
+		void setNormal(ElementType normal_, size_t row_, size_t col_)
 		{
-			pointcloud[row_].setNormalElement(normal_, col_);
+			pointcloud[row_].setNormal(normal_, col_);
 		}
 
 		/**
@@ -671,9 +692,9 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		void setColorElement(uchar color_, size_t row_, size_t col_)
+		void setColor(uchar color_, size_t row_, size_t col_)
 		{
-			pointcloud[row_].setColorElement(color_, col_);
+			pointcloud[row_].setColor(color_, col_);
 		}
 
 		/**
@@ -754,6 +775,60 @@ namespace trees
 		uchar* getColorPtr(size_t row_) const
 		{
 			return pointcloud[row_].getColorPtr();
+		}
+
+		/**
+			Get Pointer to point data
+
+			@return Return pointer to point data
+		*/
+		ElementType* getPointsPtr() const
+		{
+			ElementType* new_points = new ElementType[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					new_points[i*cols + j] = getPoint(i, j);
+				}
+			}
+
+			return new_points;
+		}
+
+		/**
+			Get Pointer to the normal
+
+			@return Return pointer to the normal
+		*/
+		ElementType* getNormalsPtr() const
+		{
+			ElementType* new_normals = new ElementType[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					new_normals[i*cols + j] = getNormal(i, j);
+				}
+			}
+
+			return new_normals;
+		}
+
+		/**
+			Get Pointer to color information
+
+			@return Return pointer to color information
+		*/		
+		uchar* getColorsPtr() const
+		{
+			uchar* new_colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					new_colors[i*cols + j] = getColor(i, j);
+				}
+			}
+
+			return new_colors;
 		}
 
 		 /**
@@ -894,7 +969,7 @@ namespace trees
 
 			@param[in] points_ Points
 		*/
-		void setPoints(ElementType* points_)
+		void setPointsPtr(ElementType* points_)
 		{
 			points = new ElementType[rows*cols];
 
@@ -910,7 +985,7 @@ namespace trees
 
 			@param[in] normals_ Normals
 		*/
-		void setNormals(ElementType* normals_)
+		void setNormalsPtr(ElementType* normals_)
 		{
 			normals = new ElementType[rows*cols];
 
@@ -926,7 +1001,7 @@ namespace trees
 
 			@param[in] colors_ Colors
 		*/
-		void setColors(uchar* colors_)
+		void setColorsPtr(uchar* colors_)
 		{
 			colors = new uchar[rows*cols];
 
@@ -943,7 +1018,7 @@ namespace trees
 			@param[in] point_ Point
 			@param[in] row_ Row
 		*/
-		void setPoint(ElementType* point_, size_t row_)
+		void setPointPtr(ElementType* point_, size_t row_)
 		{
 			for (size_t i = 0; i < cols; i++) {
 				points[row_*cols + i] = point_[i];
@@ -956,7 +1031,7 @@ namespace trees
 			@param[in] normal_ Normal
 			@param[in] row_ Row
 		*/
-		void setNormal(ElementType* normal_, size_t row_)
+		void setNormalPtr(ElementType* normal_, size_t row_)
 		{
 			for (size_t i = 0; i < cols; i++) {
 				normals[row_*cols + i] = normal_[i];
@@ -969,7 +1044,7 @@ namespace trees
 			@param[in] color_ Color information
 			@param[in] row_ Row
 		*/
-		void setColor(uchar* color_, size_t row_)
+		void setColorPtr(uchar* color_, size_t row_)
 		{
 			for (size_t i = 0; i < cols; i++) {
 				colors[row_*cols + i] = color_[i];
@@ -983,7 +1058,7 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		void setPointElement(ElementType point_, size_t row_, size_t col_)
+		void setPoint(ElementType point_, size_t row_, size_t col_)
 		{
 			points[row_*cols + col_] = point_;
 		}
@@ -995,7 +1070,7 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		void setNormalElement(ElementType normal_, size_t row_, size_t col_)
+		void setNormal(ElementType normal_, size_t row_, size_t col_)
 		{
 			normals[row_*cols + col_] = normal_;
 		}
@@ -1007,7 +1082,7 @@ namespace trees
 			@param[in] row_ Row
 			@param[in] col_ Col
 		*/
-		void setColorElement(uchar color_, size_t row_, size_t col_)
+		void setColor(uchar color_, size_t row_, size_t col_)
 		{
 			colors[row_*cols + col_] = color_;
 		}
@@ -1090,6 +1165,60 @@ namespace trees
 		uchar* getColorPtr(size_t row_) const
 		{
 			return &colors[row_*cols];
+		}
+
+		/**
+			Get Pointer to point data
+
+			@return Return pointer to point data
+		*/
+		ElementType* getPointsPtr() const
+		{
+			ElementType* new_points = new ElementType[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					new_points[i*cols + j] = points[i*cols + j];
+				}
+			}
+
+			return new_points;
+		}
+
+		/**
+			Get Pointer to the normal
+
+			@return Return pointer to the normal
+		*/
+		ElementType* getNormalsPtr() const
+		{
+			ElementType* new_normals = new ElementType[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					new_normals[i*cols + j] = normals[i*cols + j];
+				}
+			}
+
+			return new_normals;
+		}
+
+		/**
+			Get Pointer to color information
+
+			@return Return pointer to color information
+		*/		
+		uchar* getColorsPtr() const
+		{
+			uchar* new_colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					new_colors[i*cols + j] = colors[i*cols + j];
+				}
+			}
+
+			return new_colors;
 		}
 
 		 /**
