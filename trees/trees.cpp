@@ -39,6 +39,8 @@
 #include "tools/io.h"
 #include "tools/pointcloud.h"
 
+#include "tools/pointcloud/common.h"
+
 #include "io/ioply.h"
 
 io::PlyIO plyIO;
@@ -70,23 +72,31 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 
 	std::cout << pointcloud << std::endl;
 
-	std::vector<int> list = { 10,20,30,40,50 };
-
-	pointcloud.getSubSet(list);
-
+	
 	pointcloud::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
-	pointcloud.clear();
-
 	std::cout << pointcloudcopy << std::endl;
+	
+	std::vector<int> list = { 0,1,2,3,4};
+	pointcloud::PointcloudSoA<ElementType> subsetSoA;
+	pointcloudcopy.getSubset(list,subsetSoA);
+	pointcloud::PointcloudAoS<ElementType> subsetAoS;
+	pointcloud.getSubset(list, subsetAoS);
+	
+	std::cout << subsetSoA << std::endl;
 
-	pointcloudcopy.getSubSet(list);
+	std::cout << subsetAoS << std::endl;
+
+	//pointcloud::computeMean(subset);
+
+	//subset.clear();
 
 	time.start();
 	if (plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloudcopy)) {
-		std::cout << "File with " << pointcloud.rows << " point has been written in "
+		std::cout << "File with " << pointcloudcopy.rows << " point has been written in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 
+	pointcloud.clear();
 	pointcloudcopy.clear();
 }
 
