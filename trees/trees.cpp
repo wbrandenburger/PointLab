@@ -40,7 +40,8 @@
 #include "tools/io.h"
 
 #include "io/ioply.h"
-#include "io/ioply.hpp"
+
+io::PlyIO plyIO;
 
 struct data {
 
@@ -50,6 +51,45 @@ struct data {
 	}
 
 };
+
+template<typename ElementType> void program(io::PlyIO& plyIO_)
+{
+	utils::Timer time;
+
+	std::vector<ElementType>::iterator it;
+
+	trees::PointcloudAoS<ElementType> pointcloud(plyIO_.getInstances(), 3);
+
+	time.start();
+	if (plyIO.readPly(pointcloud)) {
+		std::cout << "File with " << pointcloud.rows << " point has been read in "
+			<< time.stop() << " s into Pointcloud" << std::endl;
+	}
+
+
+	trees::Matrix<ElementType> pointcloudkdtree(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
+	pointcloudkdtree.clear();
+
+	std::cout << pointcloud << std::endl;
+
+	//trees::PointcloudAoS<ElementType>::PointIterator it;
+
+	//std::cout << it.pointer << std::endl;
+
+	trees::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
+	pointcloud.clear();
+
+
+	std::cout << pointcloudcopy << std::endl;
+
+	time.start();
+	if (plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloudcopy)) {
+		std::cout << "File with " << pointcloud.rows << " point has been written in "
+			<< time.stop() << " s into Pointcloud" << std::endl;
+	}
+
+	pointcloudcopy.clear();
+}
 
 int main(int argc, char* argv[]) {
 
@@ -70,34 +110,17 @@ int main(int argc, char* argv[]) {
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
 	utils::Timer time;
-	utils::Pointcloud<float> pointcloud;
 
-	time.start();
-	if (io::readply<float>(file, pointcloud)) {
-		std::cout << "File with " << pointcloud.points.rows << " point has been read in "
-			<< time.stop() << " s into Pointcloud" << std::endl;
+	plyIO.initialze(file);
+	
+	if (plyIO.getDataType() == 1) {
+		program<float>(plyIO);
 	}
-
-	time.start();
-
-	io::PlyIO plyIO;
-	size_t instances = plyIO.initialze(file);
-	trees::PointcloudAoS<float> pointcloudSoA(instances, 3);
-
-	
-	if (plyIO.readPly(pointcloudSoA)) {
-		std::cout << "File with " << pointcloud.points.rows << " point has been read in "
-			<< time.stop() << " s into Pointcloud" << std::endl;
+	else {
+		program<double>(plyIO);
 	}
-
-	trees::Matrix<float> pointcloudkdtree(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
 	
-
-	//trees::PointcloudSoA<float> pointcloudSoA(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
-	//std::cout << pointcloudSoA << std::endl;
-	plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloudSoA);
 	
-
 	///////////////////**
 	//////////////////	Build index
 	//////////////////*/
@@ -207,7 +230,6 @@ int main(int argc, char* argv[]) {
 	/**
 		Destroy the structures
 	*/
-	pointcloud.clear();
 
 	//////////////typedef utils::HeapWrapperConcurrent<int> Heap;
 

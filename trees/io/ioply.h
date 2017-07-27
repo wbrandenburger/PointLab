@@ -58,7 +58,7 @@ namespace io
 		/**
 			Constructor
 		*/
-		PlyIO() : file(nullptr), header(false), points(0), normals(0), colors(0) 
+		PlyIO() : file(nullptr), header(false), instances(0), points(0), normals(0), colors(0) 
 		{
 			point_break = 0;
 			counter =  0;
@@ -74,16 +74,14 @@ namespace io
 			
 			@param[in] file_ Name of file
 		*/
-		size_t initialze(char* file_)
+		void initialze(char* file_)
 		{
 			clear();
 			file = file_;
 
-			size_t instances = readHeader();
+			readHeader();
 
 			header = true;
-
-			return instances;
 		}
 
 		/**
@@ -94,10 +92,33 @@ namespace io
 			file = nullptr;
 			header = false;
 			point_break = 0;
+			instances = 0;
 			points = 0;
 			normals = 0;
 			colors = 0;
 			counter = 0;
+		}
+
+		/**
+			Get the data type of the points 
+		*/
+		size_t getDataType() const
+		{
+			switch (type) {
+			case PLY_TYPE_NULL : return 0; break;
+			case PLY_TYPE_FLOAT : return 1; break;
+			case PLY_TYPE_DOUBLE : return 2; break;
+			}
+
+			return 0;
+		}
+
+		/**
+			Get number of instances
+		*/
+		size_t getInstances() const
+		{
+			return instances;
 		}
 
 	private:
@@ -105,7 +126,7 @@ namespace io
 		/**
 			Type of pointcloud
 		*/
-		enum data_type
+		enum DataType
 		{
 			PLY_TYPE_NULL = 0,
 			PLY_TYPE_FLOAT = 1,
@@ -118,21 +139,13 @@ namespace io
 			@param[in] type_ Type in rply
 			@return Type in this class
 		*/
-		data_type getDataType(e_ply_type type_)
+		DataType getDataType(e_ply_type type_) const
 		{
 			switch (type_) {
-			case PLY_FLOAT32 :
-				return PLY_TYPE_FLOAT;
-				break;
-			case PLY_FLOAT64 :
-				return PLY_TYPE_DOUBLE;
-				break;
-			case PLY_FLOAT :
-				return PLY_TYPE_FLOAT;
-				break;
-			case PLY_DOUBLE :
-				return PLY_TYPE_DOUBLE;
-				break;
+			case PLY_FLOAT32 : return PLY_TYPE_FLOAT; break;
+			case PLY_FLOAT64 : return PLY_TYPE_DOUBLE; break;
+			case PLY_FLOAT : return PLY_TYPE_FLOAT; break;
+			case PLY_DOUBLE : return PLY_TYPE_DOUBLE; break;
 			}
 
 			return PLY_TYPE_NULL;
@@ -143,7 +156,7 @@ namespace io
 
 			@param[in] prop_name String of the property
 		*/
-		void setMetaInformation(const char *prop_name_, data_type type_)
+		void setMetaInformation(const char *prop_name_, DataType type_)
 		{
 			if (!strcmp(prop_name_, "x")) { type = type_; points = 1;}
 			if (!strcmp(prop_name_, "z")) { point_break = 3;}
@@ -158,7 +171,7 @@ namespace io
 		/**
 			Reads the header and and returns the number of points
 		*/
-		size_t readHeader() 
+		void readHeader() 
 		{
 			p_ply ply = ply_open(file, NULL, 0, NULL);
 			if (!ply) {
@@ -174,13 +187,12 @@ namespace io
 			p_ply_element elem = NULL;
 			elem = ply_get_next_element(ply, elem);
 
-			long instances = 0;
 			while (elem) {
 				const char *elem_name;
 				long elem_instances;
 				ply_get_element_info(elem, &elem_name, &elem_instances);
 				if (!std::strcmp("vertex", elem_name)) {
-					instances = elem_instances;
+					instances = (size_t) elem_instances;
 					p_ply_property prop = NULL;
 					prop = ply_get_next_property(elem, prop);
 					while (prop) {
@@ -197,8 +209,6 @@ namespace io
 			}
 
 			ply_close(ply);
-
-			return (size_t) instances;
 		}
 
 	private:
@@ -263,7 +273,7 @@ namespace io
 		*/
 		template <typename ElementType> bool readPly(trees::Pointcloud<ElementType>& pointcloud_)
 		{
-			if (header) {
+			if (!header) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -394,7 +404,13 @@ namespace io
 		/**
 			Data type of the pointcloud
 		*/
-		data_type type;
+		DataType type;
+
+		/** 
+			Instances of vertex
+		*/
+		size_t instances;
+
 		/**
 			Flag whether points are contained in file
 		*/

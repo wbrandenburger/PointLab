@@ -250,7 +250,7 @@ namespace trees
 		/**
 			Constructor
 		*/
-		Pointcloud() : rows(0), cols(0) {}
+		Pointcloud() : rows(0), cols(0), print_number(10) {}
 		
 		/**
 			Constructor
@@ -258,7 +258,7 @@ namespace trees
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(size_t rows_, size_t cols_) : rows(rows_), cols(cols_) {}
+		Pointcloud(size_t rows_, size_t cols_) : rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
 			Constructor
@@ -267,7 +267,7 @@ namespace trees
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(ElementType* points_, size_t rows_, size_t cols_) : rows(rows_), cols(cols_) {}
+		Pointcloud(ElementType* points_, size_t rows_, size_t cols_) : rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
 			Constructor
@@ -279,7 +279,7 @@ namespace trees
 			@param[in] cols_ Cols
 		*/
 		Pointcloud(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_) 
-			: rows(rows_), cols(cols_) {}
+			: rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
 			Set dimension
@@ -305,6 +305,14 @@ namespace trees
 			@param[in] cols_ Cols
 		*/
 		virtual void setPointcloud(size_t rows_, size_t cols_) = 0;
+
+		/**
+			Set the number of printed points
+		*/
+		void setPrintNumber(size_t print_number_)
+		{
+			print_number = print_number_;
+		}
 
 		/**
 			Clear
@@ -471,6 +479,47 @@ namespace trees
 		virtual uchar* getColorsPtr() const = 0;
 
 		/**
+			Pointer to begin of points
+
+			@return Pointer to begin of points
+		*/
+		virtual ElementType* beginPoints() const = 0;
+
+		/**
+			Pointer to begin of normals
+
+			@return Pointer to begin of normals
+		*/
+		virtual ElementType* beginNormals() const = 0;
+
+		/**
+			Pointer to begin of colors
+
+			@return Pointer to begin of colors
+		*/
+		virtual uchar* beginColors() const = 0;
+
+		/**
+			Pointer to end of points
+
+			@return Pointer to end of points
+		*/
+		virtual ElementType* endPoints() const = 0;
+
+		/**
+			Pointer to end of normals
+
+			@return Pointer to end of normals
+		*/
+		virtual ElementType* endNormals() const = 0;
+
+		/**
+			Pointer to end of colors
+
+			@return Pointer to end of colors
+		*/
+		virtual uchar* endColors() const = 0;
+		/**
 			Rows
 		*/
 		size_t rows;
@@ -480,7 +529,17 @@ namespace trees
 			Cols
 		*/
 		size_t cols;
+
+		/**
+			Number of printed points
+		*/
+		size_t print_number;
 	};
+
+	/** 
+		Forward declaration of class PointcloudSoA without derivation
+	*/
+	template<typename ElementType> class PointcloudSoA;
 
 	template<typename ElementType> class PointcloudAoS : public Pointcloud<ElementType>
 	{
@@ -539,6 +598,90 @@ namespace trees
 		}
 
 		/**
+			Copy constructor
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudAoS(const PointcloudAoS<ElementType>& pointcloud_)
+		{
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			pointcloud = new PointcloudNode<ElementType>[rows];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+		}
+		
+		/**
+			Copy constructor
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudAoS(const PointcloudSoA<ElementType>& pointcloud_)
+		{
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			pointcloud = new PointcloudNode<ElementType>[rows];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+		}
+
+		/**
+			Operator =
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudAoS& operator=(const PointcloudAoS<ElementType>& pointcloud_)
+		{
+			clear();
+
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			pointcloud = new PointcloudNode<ElementType>[rows];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+
+			return (*this);
+		}
+
+		/**
+			Operator =
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudAoS& operator=(const PointcloudSoA<ElementType>& pointcloud_)
+		{
+			clear();
+
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			pointcloud = new PointcloudNode<ElementType>[rows];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+
+			return (*this);
+		}
+
+		/**
 			Set pointcloud
 		*/
 		void setPointcloud()
@@ -563,11 +706,15 @@ namespace trees
 
 			pointcloud = new PointcloudNode<ElementType>[rows];
 		}
+
 		/**
 			Clear
 		*/
 		void clear()
 		{
+			rows = 0;
+			cols = 0;
+
 			if (pointcloud) delete[] pointcloud;
 		}
 
@@ -578,7 +725,7 @@ namespace trees
 		*/
 		void print(std::ostream& out_) const
 		{
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < print_number; i++) {
 				out_ << pointcloud[i].getPoint(0) << " "
 					<< pointcloud[i].getPoint(1) << " "
 					<< pointcloud[i].getPoint(2) << " "
@@ -831,10 +978,75 @@ namespace trees
 			return new_colors;
 		}
 
-		 /**
+		/**
+			Pointer to begin of points
+
+			@return Pointer to begin of points
+		*/
+		ElementType* beginPoints() const
+		{
+			return &pointcloud[0].point[0];
+		}
+
+		/**
+			Pointer to begin of normals
+
+			@return Pointer to begin of normals
+		*/
+		ElementType* beginNormals() const
+		{
+			return &pointcloud[0].normal[0];
+		}
+
+		/**
+			Pointer to begin of colors
+
+			@return Pointer to begin of colors
+		*/
+		uchar* beginColors() const
+		{
+			return &pointcloud[0].color[0];
+		}
+
+		/**
+			Pointer to end of points
+
+			@return Pointer to end of points
+		*/
+		ElementType* endPoints() const
+		{
+			return &pointcloud[rows - 1].point[cols - 1];
+		}
+
+		/**
+			Pointer to end of normals
+
+			@return Pointer to end of normals
+		*/
+		ElementType* endNormals() const
+		{
+			return &pointcloud[rows - 1].normal[cols - 1];
+		}
+
+		/**
+			Pointer to end of colors
+
+			@return Pointer to end of colors
+		*/
+		uchar* endColors() const
+		{
+			return &pointcloud[rows - 1].color[cols - 1];
+		}
+
+		template<typename IteratorType> struct Iterator 
+		{
+
+		};
+
+		/**
 			Pointcloud
-		 */
-		 PointcloudNode<ElementType>* pointcloud;
+		*/
+		PointcloudNode<ElementType>* pointcloud;
 
 	};
 
@@ -898,6 +1110,98 @@ namespace trees
 		}
 
 		/**
+			Copy constructor
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_)
+		{
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+		}
+		
+		/**
+			Copy constructor
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudSoA(const PointcloudAoS<ElementType>& pointcloud_)
+		{
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+		}
+
+		/**
+			Operator =
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudSoA& operator=(const PointcloudSoA<ElementType>& pointcloud_)
+		{
+			clear();
+
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+
+			return (*this);
+		}
+		
+		/**
+			Operator =
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudSoA& operator=(const PointcloudAoS<ElementType>& pointcloud_)
+		{
+			clear();
+
+			rows = pointcloud_.rows;
+			cols = pointcloud_.cols;
+
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
+
+			for (size_t i = 0; i < rows; i++) {
+				setPointPtr(pointcloud_.getPointPtr(i), i);
+				setNormalPtr(pointcloud_.getNormalPtr(i), i);
+				setColorPtr(pointcloud_.getColorPtr(i), i);
+			}
+
+			return (*this);
+		}
+
+		/**
 			Set pointcloud
 		*/
 		void setPointcloud()
@@ -932,6 +1236,9 @@ namespace trees
 		*/
 		void clear()
 		{
+			rows = 0;
+			cols = 0;
+
 			if (points) { delete[] points; }
 			if (normals) { delete[] normals; }
 			if (colors) { delete[] colors; }
@@ -944,7 +1251,7 @@ namespace trees
 		*/
 		void print(std::ostream& out_) const
 		{
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < print_number; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					if (points) {
 						out_ << points[i*cols + j] << " ";
@@ -1221,20 +1528,80 @@ namespace trees
 			return new_colors;
 		}
 
-		 /**
-			Pointcloud
-		 */
-		 ElementType* points;
-		 
-		 /**
-			Normals
-		 */
-		 ElementType* normals;
+		/**
+			Pointer to begin of points
 
-		 /**
+			@return Pointer to begin of points
+		*/
+		ElementType* beginPoints() const
+		{
+			return &points[0];
+		}
+
+		/**
+			Pointer to begin of normals
+
+			@return Pointer to begin of normals
+		*/
+		ElementType* beginNormals() const
+		{
+			return &normals[0];
+		}
+
+		/**
+			Pointer to begin of colors
+
+			@return Pointer to begin of colors
+		*/
+		uchar* beginColors() const
+		{
+			return &colors[0];
+		}
+
+		/**
+			Pointer to end of points
+
+			@return Pointer to end of points
+		*/
+		ElementType* endPoints() const
+		{
+			return &points[(rows-1)*cols + cols-1];
+		}
+
+		/**
+			Pointer to end of normals
+
+			@return Pointer to end of normals
+		*/
+		ElementType* endNormals() const
+		{
+			return &normals[(rows - 1)*cols + cols - 1];
+		}
+
+		/**
+			Pointer to end of colors
+
+			@return Pointer to end of colors
+		*/
+		uchar* endColors() const
+		{
+			return &colors[(rows - 1)*cols + cols - 1];
+		}
+
+		/**
+			Pointcloud
+		*/
+		ElementType* points;
+		 
+		/**
+			Normals
+		*/
+		ElementType* normals;
+
+		/**
 			Colors
-		 */
-		 uchar* colors;
+		*/
+		uchar* colors;
 	};
 	
 	/**
