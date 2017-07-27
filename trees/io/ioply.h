@@ -27,13 +27,11 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-
 #ifndef IO_IOPLY_H_
 #define IO_IOPLY_H_
 
 #include <rply.h>
 
-#include "utils/matrix.h"
 #include "pointcloud/pointcloud.h"
 
 namespace io

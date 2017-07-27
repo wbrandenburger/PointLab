@@ -8,6 +8,7 @@
 
 #include "tools/utils.h"
 #include "tools/io.h"
+#include "tools/pointcloud.h"
 
 
 int main(int argc, char* argv[]) {
@@ -27,11 +28,15 @@ int main(int argc, char* argv[]) {
 	char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/plane.ply";
 
 	utils::Timer time;
-	utils::Pointcloud<float> pointcloud;
+
+	io::PlyIO plyIO;
+	plyIO.initialze(file);
+
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(), 3);
 
 	time.start();
-	if (io::readply<float>(file, pointcloud)) {
-		std::cout << "File with " << pointcloud.points.rows << " point has been read in "
+	if (plyIO.readPly(pointcloud)) {
+		std::cout << "File with " << pointcloud.rows << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 
@@ -81,6 +86,7 @@ int main(int argc, char* argv[]) {
 		Destroy the structures
 	*/
 	pointcloud.clear();
+	delete[] pointcloudflann.ptr();
 	delete[] indices.ptr();
 	delete[] dists.ptr();
 

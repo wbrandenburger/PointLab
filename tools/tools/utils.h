@@ -27,8 +27,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_PROJECT_H_
-#define INCLUDE_PROJECT_H_
+#ifndef INCLUDE_UTILS_H_
+#define INCLUDE_UTILS_H_
 
 #include "utils/allocator.h"
 #include "utils/any.h"
@@ -36,9 +36,8 @@
 #include "utils/dist.h"
 #include "utils/heap.h"
 #include "utils/matrix.h"
-#include "utils/pointcloud.h"
 #include "utils/randomize.h"
 #include "utils/threadpool.h"
 #include "utils/timer.h"
 
-#endif /* INCLUDE_PROJECT_H_ */
+#endif /* INCLUDE_UTILS_H_ */

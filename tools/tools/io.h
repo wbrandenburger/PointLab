@@ -31,7 +31,6 @@
 #define INCLUDE_IO_H_
 
 #include "io/ioply.h"
-#include "io/ioply.hpp"
 #include "io/filereader.h"
 
 #endif /* INCLUDE_IO_H_ */

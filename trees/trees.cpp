@@ -33,11 +33,11 @@
 
 #include "trees.hpp"
 #include "math/zero.h"
-#include "pointcloud/normal.h"
-#include "pointcloud/pointcloud.h"
+
 
 #include "tools/utils.h"
 #include "tools/io.h"
+#include "tools/pointcloud.h"
 
 #include "io/ioply.h"
 
@@ -56,7 +56,7 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 {
 	utils::Timer time;
 
-	trees::PointcloudAoS<ElementType> pointcloud(plyIO_.getInstances(), 3);
+	pointcloud::PointcloudAoS<ElementType> pointcloud(plyIO_.getInstances(), 3);
 
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
@@ -74,7 +74,7 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 
 	pointcloud.getSubSet(list);
 
-	trees::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
+	pointcloud::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
 	pointcloud.clear();
 
 	std::cout << pointcloudcopy << std::endl;
