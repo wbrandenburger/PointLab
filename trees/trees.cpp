@@ -56,8 +56,6 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 {
 	utils::Timer time;
 
-	std::vector<ElementType>::iterator it;
-
 	trees::PointcloudAoS<ElementType> pointcloud(plyIO_.getInstances(), 3);
 
 	time.start();
@@ -72,13 +70,8 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 
 	std::cout << pointcloud << std::endl;
 
-	//trees::PointcloudAoS<ElementType>::PointIterator it;
-
-	//std::cout << it.pointer << std::endl;
-
 	trees::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
 	pointcloud.clear();
-
 
 	std::cout << pointcloudcopy << std::endl;
 

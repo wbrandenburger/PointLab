@@ -36,212 +36,6 @@ namespace trees
 {
 	typedef unsigned char uchar;
 
-	template<typename ElementType> struct PointcloudNode 
-	{
-		/**
-			Constructor
-		*/
-		PointcloudNode()
-		{
-			clear();
-		}
-
-		/**
-			Constructor
-
-			@param[in] point_ Point
-		*/
-		PointcloudNode(ElementType* point_) 
-		{
-			for (size_t i = 0; i < 3; i++) {
-				point[i] = point_[i];
-			}
-		}
-
-		/**
-			Constructor
-			
-			@param[in] point_ Point
-			@param[in] normal_ Normal
-			@param[in] color_ Color
-		*/
-		PointcloudNode(ElementType* point_, ElementType* normal_, uchar* color_)
-		{
-			setPoint(point_);
-			setNormal(normal_);
-			setColor(color_);
-		}
-
-		/**
-			Set point
-			
-			@param[in] point_ Point
-		*/
-		void setPointPtr(ElementType* point_)
-		{
-			for (size_t i = 0; i < 3; i++) {
-				point[i] = point_[i];
-			}
-		}
-
-		/**
-			Set normal
-
-			@param[in] normal_ Normal
-		*/
-		void setNormalPtr(ElementType* normal_)
-		{
-			for (size_t i = 0; i < 3; i++) {
-				normal[i] = normal_[i];
-			}
-		}
-		
-		/**
-			Set color
-
-			@param[in] color_ Color
-		*/
-		void setColorPtr(uchar* color_)
-		{
-			for (size_t i = 0; i < 3; i++) {
-				color[i] = color_[i];
-			}
-		}
-
-		/**
-			Set point
-			
-			@param[in] point_ Point
-			@parma[in] index_ Index
-		*/
-		void setPoint(ElementType point_, size_t index_)
-		{
-			point[index_] = point_;
-		}
-
-		/**
-			Set normal
-
-			@param[in] normal_ Normal
-			@parma[in] index_ Index
-		*/
-		void setNormal(ElementType normal_, size_t index_)
-		{
-			normal[index_] = normal_;
-		}
-		
-		/**
-			Set color
-
-			@param[in] color_ Color
-			@parma[in] index_ Index
-		*/
-		void setColor(uchar color_, size_t index_)
-		{
-			color[index_] = color_;
-		}
-		/**
-			Clear
-		*/
-		void clear()
-		{
-			for (size_t i = 0; i < 3; i++){
-				point[i] = NULL;
-				normal[i] = NULL;
-				color[i] = NULL;
-			}
-		}
-
-		/**
-			Operator [] Access on point information
-
-			@param[in] index_ Dimension
-			@return Return data element in this dimension
-		*/
-		ElementType operator[](size_t index_)
-		{
-			return point[index_];
-		}
-
-		/**
-			Get point data of specified index
-
-			@param[in] index_ Dimension
-			@return Return point data of specified index
-		*/
-		ElementType getPoint(size_t index_)
-		{
-			return point[index_];
-		}
-
-		/**
-			Get normal information of specified index
-
-			@param[in] index_ Dimension
-			@return Return normal information of specified index
-		*/
-		ElementType getNormal(size_t index_)
-		{
-			return normal[index_];
-		}
-	
-		/**
-			Get color information of specified index
-
-			@param[in] index_ Dimension
-			@return Return color information of specified index
-		*/
-		uchar getColor(size_t index_)
-		{
-			return color[index_];
-		}
-
-		/**
-			Get pointer to point data
-
-			@return Return pointer to point data
-		*/
-		ElementType* getPointPtr()
-		{
-			return &point[0];
-		}
-
-		/**
-			Get pointer to the normal
-
-			@return Return pointer to the normal
-		*/
-		ElementType* getNormalPtr()
-		{
-			return &normal[0];
-		}
-	
-		/**
-			Get pointer to color information
-
-			@return Return pointer to color information
-		*/
-		uchar* getColorPtr()
-		{
-			return &color[0];
-		}
-		/**
-			Point
-		*/
-		ElementType point[3];
-
-		/**
-			Normal
-		*/
-		ElementType normal[3];
-
-		/**
-			Color
-		*/
-		uchar color[3];
-	};
-
-
 	template<typename ElementType> class Pointcloud 
 	{
 	
@@ -479,51 +273,9 @@ namespace trees
 		virtual uchar* getColorsPtr() const = 0;
 
 		/**
-			Pointer to begin of points
-
-			@return Pointer to begin of points
-		*/
-		virtual ElementType* beginPoints() const = 0;
-
-		/**
-			Pointer to begin of normals
-
-			@return Pointer to begin of normals
-		*/
-		virtual ElementType* beginNormals() const = 0;
-
-		/**
-			Pointer to begin of colors
-
-			@return Pointer to begin of colors
-		*/
-		virtual uchar* beginColors() const = 0;
-
-		/**
-			Pointer to end of points
-
-			@return Pointer to end of points
-		*/
-		virtual ElementType* endPoints() const = 0;
-
-		/**
-			Pointer to end of normals
-
-			@return Pointer to end of normals
-		*/
-		virtual ElementType* endNormals() const = 0;
-
-		/**
-			Pointer to end of colors
-
-			@return Pointer to end of colors
-		*/
-		virtual uchar* endColors() const = 0;
-		/**
 			Rows
 		*/
 		size_t rows;
-
 		
 		/**
 			Cols
@@ -534,6 +286,211 @@ namespace trees
 			Number of printed points
 		*/
 		size_t print_number;
+	};
+		
+	template<typename ElementType> struct PointcloudNode 
+	{
+		/**
+			Constructor
+		*/
+		PointcloudNode()
+		{
+			clear();
+		}
+
+		/**
+			Constructor
+
+			@param[in] point_ Point
+		*/
+		PointcloudNode(ElementType* point_) 
+		{
+			for (size_t i = 0; i < 3; i++) {
+				point[i] = point_[i];
+			}
+		}
+
+		/**
+			Constructor
+			
+			@param[in] point_ Point
+			@param[in] normal_ Normal
+			@param[in] color_ Color
+		*/
+		PointcloudNode(ElementType* point_, ElementType* normal_, uchar* color_)
+		{
+			setPoint(point_);
+			setNormal(normal_);
+			setColor(color_);
+		}
+
+		/**
+			Set point
+			
+			@param[in] point_ Point
+		*/
+		void setPointPtr(ElementType* point_)
+		{
+			for (size_t i = 0; i < 3; i++) {
+				point[i] = point_[i];
+			}
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+		*/
+		void setNormalPtr(ElementType* normal_)
+		{
+			for (size_t i = 0; i < 3; i++) {
+				normal[i] = normal_[i];
+			}
+		}
+		
+		/**
+			Set color
+
+			@param[in] color_ Color
+		*/
+		void setColorPtr(uchar* color_)
+		{
+			for (size_t i = 0; i < 3; i++) {
+				color[i] = color_[i];
+			}
+		}
+
+		/**
+			Set point
+			
+			@param[in] point_ Point
+			@parma[in] index_ Index
+		*/
+		void setPoint(ElementType point_, size_t index_)
+		{
+			point[index_] = point_;
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@parma[in] index_ Index
+		*/
+		void setNormal(ElementType normal_, size_t index_)
+		{
+			normal[index_] = normal_;
+		}
+		
+		/**
+			Set color
+
+			@param[in] color_ Color
+			@parma[in] index_ Index
+		*/
+		void setColor(uchar color_, size_t index_)
+		{
+			color[index_] = color_;
+		}
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			for (size_t i = 0; i < 3; i++){
+				point[i] = NULL;
+				normal[i] = NULL;
+				color[i] = NULL;
+			}
+		}
+
+		/**
+			Operator [] Access on point information
+
+			@param[in] index_ Dimension
+			@return Return data element in this dimension
+		*/
+		ElementType operator[](size_t index_)
+		{
+			return point[index_];
+		}
+
+		/**
+			Get point data of specified index
+
+			@param[in] index_ Dimension
+			@return Return point data of specified index
+		*/
+		ElementType getPoint(size_t index_)
+		{
+			return point[index_];
+		}
+
+		/**
+			Get normal information of specified index
+
+			@param[in] index_ Dimension
+			@return Return normal information of specified index
+		*/
+		ElementType getNormal(size_t index_)
+		{
+			return normal[index_];
+		}
+	
+		/**
+			Get color information of specified index
+
+			@param[in] index_ Dimension
+			@return Return color information of specified index
+		*/
+		uchar getColor(size_t index_)
+		{
+			return color[index_];
+		}
+
+		/**
+			Get pointer to point data
+
+			@return Return pointer to point data
+		*/
+		ElementType* getPointPtr()
+		{
+			return &point[0];
+		}
+
+		/**
+			Get pointer to the normal
+
+			@return Return pointer to the normal
+		*/
+		ElementType* getNormalPtr()
+		{
+			return &normal[0];
+		}
+	
+		/**
+			Get pointer to color information
+
+			@return Return pointer to color information
+		*/
+		uchar* getColorPtr()
+		{
+			return &color[0];
+		}
+		/**
+			Point
+		*/
+		ElementType point[3];
+
+		/**
+			Normal
+		*/
+		ElementType normal[3];
+
+		/**
+			Color
+		*/
+		uchar color[3];
 	};
 
 	/** 
@@ -977,71 +934,6 @@ namespace trees
 
 			return new_colors;
 		}
-
-		/**
-			Pointer to begin of points
-
-			@return Pointer to begin of points
-		*/
-		ElementType* beginPoints() const
-		{
-			return &pointcloud[0].point[0];
-		}
-
-		/**
-			Pointer to begin of normals
-
-			@return Pointer to begin of normals
-		*/
-		ElementType* beginNormals() const
-		{
-			return &pointcloud[0].normal[0];
-		}
-
-		/**
-			Pointer to begin of colors
-
-			@return Pointer to begin of colors
-		*/
-		uchar* beginColors() const
-		{
-			return &pointcloud[0].color[0];
-		}
-
-		/**
-			Pointer to end of points
-
-			@return Pointer to end of points
-		*/
-		ElementType* endPoints() const
-		{
-			return &pointcloud[rows - 1].point[cols - 1];
-		}
-
-		/**
-			Pointer to end of normals
-
-			@return Pointer to end of normals
-		*/
-		ElementType* endNormals() const
-		{
-			return &pointcloud[rows - 1].normal[cols - 1];
-		}
-
-		/**
-			Pointer to end of colors
-
-			@return Pointer to end of colors
-		*/
-		uchar* endColors() const
-		{
-			return &pointcloud[rows - 1].color[cols - 1];
-		}
-
-		template<typename IteratorType> struct Iterator 
-		{
-
-		};
 
 		/**
 			Pointcloud
@@ -1526,66 +1418,6 @@ namespace trees
 			}
 
 			return new_colors;
-		}
-
-		/**
-			Pointer to begin of points
-
-			@return Pointer to begin of points
-		*/
-		ElementType* beginPoints() const
-		{
-			return &points[0];
-		}
-
-		/**
-			Pointer to begin of normals
-
-			@return Pointer to begin of normals
-		*/
-		ElementType* beginNormals() const
-		{
-			return &normals[0];
-		}
-
-		/**
-			Pointer to begin of colors
-
-			@return Pointer to begin of colors
-		*/
-		uchar* beginColors() const
-		{
-			return &colors[0];
-		}
-
-		/**
-			Pointer to end of points
-
-			@return Pointer to end of points
-		*/
-		ElementType* endPoints() const
-		{
-			return &points[(rows-1)*cols + cols-1];
-		}
-
-		/**
-			Pointer to end of normals
-
-			@return Pointer to end of normals
-		*/
-		ElementType* endNormals() const
-		{
-			return &normals[(rows - 1)*cols + cols - 1];
-		}
-
-		/**
-			Pointer to end of colors
-
-			@return Pointer to end of colors
-		*/
-		uchar* endColors() const
-		{
-			return &colors[(rows - 1)*cols + cols - 1];
 		}
 
 		/**
