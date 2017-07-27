@@ -39,6 +39,9 @@
 #include "tools/utils.h"
 #include "tools/io.h"
 
+#include "io/ioply.h"
+#include "io/ioply.hpp"
+
 struct data {
 
 	double operator() (double x)
@@ -62,7 +65,8 @@ int main(int argc, char* argv[]) {
 		i++;
 	}
 
-	char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/plane.ply";
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
 	utils::Timer time;
@@ -74,11 +78,24 @@ int main(int argc, char* argv[]) {
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 
+	time.start();
+	io::PlyIO plyIO;
+	size_t instances = plyIO.initialze(file);
+	
+	trees::PointcloudSoA<float> pointcloudSoA(instances, 3);
+	//pointcloudSoA.setPointcloud();
+	
+	if (plyIO.readPly(pointcloudSoA)) {
+		std::cout << "File with " << pointcloud.points.rows << " point has been read in "
+			<< time.stop() << " s into Pointcloud" << std::endl;
+	}
+
 	trees::Matrix<float> pointcloudkdtree(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
 	
 
-	trees::PointcloudSoA<float> pointcloudSoA(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
+	//trees::PointcloudSoA<float> pointcloudSoA(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
 	std::cout << pointcloudSoA << std::endl;
+	pointcloudSoA.clear();
 
 	/**
 		Build index

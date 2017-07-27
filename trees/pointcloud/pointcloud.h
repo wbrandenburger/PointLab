@@ -85,7 +85,7 @@ namespace trees
 		}
 
 		/**
-			Set color
+			Set normal
 
 			@param[in] normal_ Normal
 		*/
@@ -108,6 +108,38 @@ namespace trees
 			}
 		}
 
+		/**
+			Set point
+			
+			@param[in] point_ Point
+			@parma[in] index_ Index
+		*/
+		void setPointElement(ElementType point_, size_t index_)
+		{
+			point[index_] = point_;
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@parma[in] index_ Index
+		*/
+		void setNormalElement(ElementType normal_, size_t index_)
+		{
+			normal[index_] = normal_;
+		}
+		
+		/**
+			Set color
+
+			@param[in] color_ Color
+			@parma[in] index_ Index
+		*/
+		void setColorElement(uchar color_, size_t index_)
+		{
+			color[index_] = color_;
+		}
 		/**
 			Clear
 		*/
@@ -250,6 +282,31 @@ namespace trees
 			: rows(rows_), cols(cols_) {}
 
 		/**
+			Set dimension
+
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		void setDimension(size_t rows_, size_t cols_)
+		{
+			rows = rows_;
+			cols = cols_;
+		}
+		
+		/**
+			Set pointcloud
+		*/
+
+		virtual void setPointcloud() = 0;
+		/**
+			Set pointcloud
+
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		virtual void setPointcloud(size_t rows_, size_t cols_) = 0;
+
+		/**
 			Clear
 		*/
 		virtual void clear() = 0;
@@ -305,6 +362,33 @@ namespace trees
 			@param[in] row_ Row
 		*/
 		virtual void setColor(uchar* color_, size_t row_) = 0;
+
+		/**
+			Set point
+
+			@param[in] point_ Point
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		virtual void setPointElement(ElementType point_, size_t row_, size_t col_) = 0;
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		virtual void setNormalElement(ElementType normal_,size_t row_, size_t col_) = 0;
+
+		/**
+			Set color information
+
+			@param[in] color_ Color information
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		virtual void setColorElement(uchar color_, size_t row_, size_t col_) = 0;
 
 		/**
 			Get point data of specified index
@@ -393,6 +477,17 @@ namespace trees
 		/**
 			Constructor
 
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		PointcloudAoS(size_t rows_, size_t cols_) : Pointcloud(rows_,cols_)
+		{
+			pointcloud = new PointcloudNode<ElementType>[rows];
+		}
+
+		/**
+			Constructor
+
 			@param[in] points_ Points
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
@@ -423,11 +518,36 @@ namespace trees
 		}
 
 		/**
+			Set pointcloud
+		*/
+		void setPointcloud()
+		{
+			clear();
+
+			pointcloud = new PointCloudNode<ElementType> [rows];
+		}
+		
+		/**
+			Set pointcloud
+			
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		void setPointcloud(size_t rows_, size_t cols_)
+		{
+			clear();
+
+			rows = rows_;
+			cols = cols_;
+
+			pointcloud = new PointCloudNode<ElementType >[rows];
+		}
+		/**
 			Clear
 		*/
 		void clear()
 		{
-			delete pointcloud;
+			if (pointcloud) delete[] pointcloud;
 		}
 
 		/**
@@ -444,9 +564,9 @@ namespace trees
 					<< pointcloud[i].getNormal(0) << " "
 					<< pointcloud[i].getNormal(1) << " "
 					<< pointcloud[i].getNormal(2) << " "
-					<< pointcloud[i].getColor(0) << " "
-					<< pointcloud[i].getColor(1) << " "
-					<< pointcloud[i].getColor(2) << " "
+					<< (int) pointcloud[i].getColor(0) << " "
+					<< (int) pointcloud[i].getColor(1) << " "
+					<< (int) pointcloud[i].getColor(2) << " "
 					<< std::endl;
 			}
 		}
@@ -518,6 +638,42 @@ namespace trees
 		void setColor(uchar* color_, size_t row_)
 		{
 			pointcloud[row_].setColor(color_);
+		}
+
+		/**
+			Set point
+
+			@param[in] point_ Point
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setPointElement(ElementType point_, size_t row_, size_t col_)
+		{
+			pointcloud[row_].setPointElement(point_, col_);
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setNormalElement(ElementType normal_, size_t row_, size_t col_)
+		{
+			pointcloud[row_].setNormalElement(normal_, col_);
+		}
+
+		/**
+			Set color information
+
+			@param[in] color_ Color information
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setColorElement(uchar color_, size_t row_, size_t col_)
+		{
+			pointcloud[row_].setColorElement(color_, col_);
 		}
 
 		/**
@@ -621,6 +777,18 @@ namespace trees
 			normals = nullptr;
 			colors = nullptr;
 		}
+		/**
+			Constructor
+
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		PointcloudSoA(size_t rows_, size_t cols_) : Pointcloud(rows_,cols_)
+		{
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
+		}
 
 		/**
 			Constructor
@@ -633,8 +801,8 @@ namespace trees
 			: Pointcloud(rows_, cols_)
 		{
 			setPoints(points_);
-			normals = nullptr;
-			colors = nullptr;
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
 		}
 
 		/**
@@ -652,6 +820,36 @@ namespace trees
 			setPoints(points_);
 			setNormals(normals_);
 			setColors(colors_);
+		}
+
+		/**
+			Set pointcloud
+		*/
+		void setPointcloud()
+		{
+			clear();
+
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] rows_ Rows
+			@param[in] cols_ Cols
+		*/
+		void setPointcloud(size_t rows_, size_t cols_)
+		{
+			clear();
+
+			rows = rows_;
+			cols = cols_;
+
+			points = new ElementType[rows*cols];
+			normals = new ElementType[rows*cols];
+			colors = new uchar[rows*cols];
 		}
 
 		/**
@@ -684,7 +882,7 @@ namespace trees
 				}
 				for (size_t j = 0; j < cols; j++) {
 					if (colors) {
-						out_ << colors[i*cols + j] << " ";
+						out_ << (int) colors[i*cols + j] << " ";
 					}
 				}
 				out_ << std::endl;
@@ -776,6 +974,42 @@ namespace trees
 			for (size_t i = 0; i < cols; i++) {
 				colors[row_*cols + i] = color_[i];
 			}
+		}
+
+		/**
+			Set point
+
+			@param[in] point_ Point
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setPointElement(ElementType point_, size_t row_, size_t col_)
+		{
+			points[row_*cols + col_] = point_;
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setNormalElement(ElementType normal_, size_t row_, size_t col_)
+		{
+			normals[row_*cols + col_] = normal_;
+		}
+
+		/**
+			Set color information
+
+			@param[in] color_ Color information
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setColorElement(uchar color_, size_t row_, size_t col_)
+		{
+			colors[row_*cols + col_] = color_;
 		}
 
 		/**
@@ -873,107 +1107,6 @@ namespace trees
 		 */
 		 uchar* colors;
 	};
-
-	////template <typename ElementType>
-	////class Pointcloud {
-
-	////public:
-
-	////	/**
-	////		Constructor
-	////	*/
-	////	Pointcloud(void) : rows(0), cols(0)
-	////	{
-	////	}
-
-	////	/**
-	////		Constructor
-	////	
-	////		@param[in] rows_ Number of points
-	////		@param[in] cols_ Number of dimension
-	////	*/
-	////	Pointcloud(size_t rows_, size_t cols_)
-	////	{
-	////		points = Matrix<ElementType>(new ElementType[rows_*cols_], rows_, cols_);
-
-	////		rows = rows_;
-	////		cols = cols_;
-	////	}
-
-	////	/**
-	////		Deconstructor
-	////	*/
-	////	~Pointcloud(void)
-	////	{
-	////	}
-
-	////	/**
-	////		Deletes the point and color array
-	////	*/
-	////	void clear() const
-	////	{
-	////		points.clear();
-	////		colors.clear();
-	////	}
-
-	////	/**
-	////		Returns the pointer of the data array
-	////	
-	////		@return Pointer of pointcloud matrix
-	////	*/
-	////	ElementType* getPointsPtr() const
-	////	{
-	////		return points.getPtr();
-	////	}
-
-	////	/**
-	////		Sets the data array for the points of the pointcloud
-	////	
-	////		@param[in] rows_ Number of points
-	////		@param[in] cols_ Number of dimensions
-	////	*/
-	////	void setPoints(size_t rows_, size_t cols_)
-	////	{
-	////		points = Matrix<ElementType>(new ElementType[rows_*cols_], rows_, cols_);
-
-	////		rows = rows_;
-	////		cols = cols_;
-	////	}
-
-	////	/**
-	////		Sets the data array for the colorinformation
-	////		
-	////		@param[in] rows_ Number of points
-	////		@param[in] cols_ Number of colorchannels
-	////	*/
-	////	void setColors(size_t rows_, size_t cols_)
-	////	{
-	////		colors = Matrix<uchar>(new uchar[rows_*cols_], rows_, cols_);
-	////	}
-	////	
-	////public:
-
-	////	/**
-	////		Pointcloud
-	////	*/
-	////	Matrix<ElementType> points;
-	////	
-	////	/**
-	////		Color of points
-	////	*/
-	////	Matrix<uchar> colors;
-
-	////	/**
-	////		Number of points
-	////	*/
-	////	size_t rows;
-	////	
-	////	/**
-	////		Number of dimensions
-	////	*/
-	////	size_t cols;
-
-	////};
 	
 	/**
 		Operator << Prints the values of the heap
