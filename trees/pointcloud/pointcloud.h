@@ -676,6 +676,39 @@ namespace trees
 		}
 
 		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the pointcloud with the subset
+		*/
+		PointcloudAoS& getSubSet(std::vector<size_t> list_) const
+		{
+			PointcloudAoS<ElementType> subset(list_.size(), cols);
+			
+			for (size_t i = 0; i < list_.size(); i++) {
+				subset.pointcloud[i] = pointcloud[list_[i]];
+			}
+
+			return subset;
+		}
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the pointcloud with the subset
+		*/
+		PointcloudAoS& getSubSet(std::vector<int> list_) const
+		{
+			PointcloudAoS<ElementType> subset(list_.size(), cols);
+
+			for (size_t i = 0; i < list_.size(); i++) {
+				subset.pointcloud[i] = pointcloud[list_[i]];
+			}
+			return subset;
+		}
+
+		/**
 			Prints the pointcloud
 
 			@param[in,out] out_ Outstream
@@ -1134,6 +1167,43 @@ namespace trees
 			if (points) { delete[] points; }
 			if (normals) { delete[] normals; }
 			if (colors) { delete[] colors; }
+		}
+		
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the pointcloud with the subset
+		*/
+		PointcloudSoA& getSubSet(std::vector<size_t> list_) const
+		{
+			PointcloudSoA<ElementType> subset(list_.size(), cols);
+			
+			for (size_t i = 0; i < list_.size(); i++) {
+				subset.setPointPtr(getPointPtr(list_[i]),i);
+				subset.setNormalPtr(getNormalPtr(list_[i]), i);
+				subset.setColorPtr(getColorPtr(list_[i]), i);
+			}
+
+			return subset;
+		}
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the pointcloud with the subset
+		*/
+		PointcloudSoA& getSubSet(std::vector<int> list_) const
+		{
+			PointcloudSoA<ElementType> subset(list_.size(), cols);
+
+			for (size_t i = 0; i < list_.size(); i++) {
+				subset.setPointPtr(getPointPtr(list_[i]), i);
+				subset.setNormalPtr(getNormalPtr(list_[i]), i);
+				subset.setColorPtr(getColorPtr(list_[i]), i);
+			}
+			return subset;
 		}
 
 		/**

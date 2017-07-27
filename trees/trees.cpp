@@ -70,10 +70,16 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 
 	std::cout << pointcloud << std::endl;
 
+	std::vector<int> list = { 10,20,30,40,50 };
+
+	pointcloud.getSubSet(list);
+
 	trees::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
 	pointcloud.clear();
 
 	std::cout << pointcloudcopy << std::endl;
+
+	pointcloudcopy.getSubSet(list);
 
 	time.start();
 	if (plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloudcopy)) {
@@ -98,8 +104,8 @@ int main(int argc, char* argv[]) {
 		i++;
 	}
 
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply";
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
 	utils::Timer time;
