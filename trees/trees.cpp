@@ -76,7 +76,7 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 	pointcloud::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
 	std::cout << pointcloudcopy << std::endl;
 	
-	std::vector<int> list = { 0,1,2,3,4};
+	std::vector<size_t> list = { 0,1,2,3,4};
 	pointcloud::PointcloudSoA<ElementType> subsetSoA;
 	pointcloudcopy.getSubset(list,subsetSoA);
 	pointcloud::PointcloudAoS<ElementType> subsetAoS;
@@ -86,7 +86,7 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 
 	std::cout << subsetAoS << std::endl;
 
-	//pointcloud::computeMean(subset);
+	pointcloud::computeMean(pointcloud);
 
 	//subset.clear();
 
@@ -240,53 +240,53 @@ int main(int argc, char* argv[]) {
 		Destroy the structures
 	*/
 
-	//////////////typedef utils::HeapWrapperConcurrent<int> Heap;
+	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	//////////////size_t n = 100000;
+	size_t n = 100000;
 
-	//////////////utils::Threadpool pool(24);
-	//////////////Heap heapConcurrent(n, true);
+	utils::Threadpool pool(24);
+	Heap heapConcurrent(n, true);
 
-	//////////////time.start();
+	time.start();
 
-	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//////////////	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
-	//////////////}
-	//////////////pool.waitTasks();
+	for (size_t i = 0; i < heapConcurrent.size; i++) {
+		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	}
+	pool.waitTasks();
 
-	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	//////////////if (heapConcurrent.checkHeap()) {
-	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//////////////}
+	if (heapConcurrent.checkHeap()) {
+		std::cout << "Heapbedingung erfüllt" << std::endl;
+	}
 
-	//////////////time.start();
+	time.start();
 
-	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//////////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
-	//////////////}
-	//////////////pool.waitTasks();
+	for (size_t i = 0; i < heapConcurrent.size; i++) {
+		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
+	}
+	pool.waitTasks();
 
-	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	//////////////if (heapConcurrent.checkHeap()) {
-	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//////////////}
+	if (heapConcurrent.checkHeap()) {
+		std::cout << "Heapbedingung erfüllt" << std::endl;
+	}
 
-	//////////////time.start();
+	time.start();
 
-	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//////////////	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent)));
-	//////////////}
-	//////////////pool.waitTasks();
+	for (size_t i = 0; i < heapConcurrent.size; i++) {
+		while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent)));
+	}
+	pool.waitTasks();
 
-	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	//////////////if (heapConcurrent.checkHeap()) {
-	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//////////////}
+	if (heapConcurrent.checkHeap()) {
+		std::cout << "Heapbedingung erfüllt" << std::endl;
+	}
 
-	//////////////pool.shutdown();
+	pool.shutdown();
 
 	//////////////trees::NewtonMethod<double> zero;
 	//////////////data datainstance;

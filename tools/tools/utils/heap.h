@@ -837,6 +837,22 @@ namespace utils
 			return 1;
 		}
 
+		/**
+			Checks whether the elements are locked
+
+			@return Returns false if all elements are unlocked, otherwise the number of the element which is locked
+		*/
+		size_t checkLock() 
+		{
+			size_t loc = 0;
+			while (loc < count) {
+				if (heaparray[loc].getLock == 1) {
+					return loc;
+				}
+			}
+			return 0;
+		}
+
 	protected:
 		/**
 			Swap two heaparray elements
@@ -911,7 +927,8 @@ namespace utils
 						while (!heaparray[index_].unlockIndex());
 						while (!heaparray[new_index].unlockIndex());
 
-						return flag; }
+						return flag; 
+					}
 				}
 			}
 
@@ -1392,10 +1409,10 @@ namespace utils
 			while (!heaparray[heapvector[index_]].lockIndex());
 			heaparray[heapvector[index_]].value = value_;
 			bool flag = pushup(heapvector[index_]);
-			if (!flag) {
-				while (!heaparray[heapvector[index_]].lockIndex());
-				pulldown(heapvector[index_]);
-			}
+			//if (!flag) {
+			//	while (!heaparray[heapvector[index_]].lockIndex());
+			//	pulldown(heapvector[index_]);
+			//}
 		}
 
 	private:
