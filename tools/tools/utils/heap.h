@@ -339,21 +339,23 @@ namespace utils
 
 			bool flag = false;
 
-			while (index_ < (size + 1) / 2 - 1) {
+			while (index_ < std::pow(2, std::floor(std::log2(count))) - 1) { //(size + 1) / 2 - 1
+				
+				size_t new_index;
+				if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
+					new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
+				}
+				else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
+					new_index = 2 * index_ + 1;
+				}
+				else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
+					new_index = 2 * index_ + 2;
+				}
+				else {
+					return flag;
+				}
+
 				if (greater) {
-					size_t new_index;
-					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
-					}
-					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 1;
-					}
-					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 2;
-					}
-					else {
-						return flag;
-					}
 					if (heaparray[index_] < heaparray[new_index]) {
 						swap(index_, new_index);
 						index_ = new_index;
@@ -364,19 +366,6 @@ namespace utils
 					}
 				}
 				else {
-					size_t new_index;
-					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
-					}
-					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 1;
-					}
-					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 2;
-					}
-					else {
-						return flag;
-					}
 					if (heaparray[index_] > heaparray[new_index]) {
 						swap(index_, new_index);
 						index_ = new_index;
@@ -846,8 +835,8 @@ namespace utils
 		{
 			size_t loc = 0;
 			while (loc < count) {
-				if (heaparray[loc].getLock == 1) {
-					return loc;
+				if (heaparray[loc++].getLock() == 1) {
+					return loc-1;
 				}
 			}
 			return 0;
@@ -947,24 +936,40 @@ namespace utils
 
 			bool flag = false;
 
-			while (index_ < (size + 1) / 2 - 1) {
-				if (greater) {
-					size_t new_index;
-					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
-					}
-					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
+			while (index_ < std::pow(2,std::floor(std::log2(count)))-1) { //(size + 1) / 2 - 1
+				
+				while (!heaparray[2 * index_ + 1].lockIndex());
+				while (!heaparray[2 * index_ + 2].lockIndex());
+
+				size_t new_index;
+				if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
+					if (heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2]) {
 						new_index = 2 * index_ + 1;
-					}
-					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 2;
+						while (!heaparray[2 * index_ + 2].unlockIndex());
 					}
 					else {
-						while (!heaparray[index_].unlockIndex());
-						return flag;
+						new_index = 2 * index_ + 2;
+						while (!heaparray[2 * index_ + 1].unlockIndex());
 					}
+				}
+				else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
+					new_index = 2 * index_ + 1;
+					while (!heaparray[2 * index_ + 2].unlockIndex());
 
-					while (!heaparray[new_index].lockIndex());
+				}
+				else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
+					new_index = 2 * index_ + 2;
+					while (!heaparray[2 * index_ + 1].unlockIndex());
+				}
+				else {
+					while (!heaparray[index_].unlockIndex());
+					while (!heaparray[2 * index_ + 1].unlockIndex());
+					while (!heaparray[2 * index_ + 2].unlockIndex());
+
+					return flag;
+				}
+
+				if (greater) {
 					if (heaparray[index_] < heaparray[new_index]) {
 						swap(new_index, index_);
 						
@@ -981,22 +986,6 @@ namespace utils
 					}
 				}
 				else {
-					size_t new_index;
-					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = heaparray[2 * index_ + 1] < heaparray[2 * index_ + 2] ? 2 * index_ + 1 : 2 * index_ + 2;
-					}
-					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 1;
-					}
-					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-						new_index = 2 * index_ + 2;
-					}
-					else {
-						while (!heaparray[index_].unlockIndex());
-						return flag;
-					}
-
-					while (!heaparray[new_index].lockIndex());
 					if (heaparray[index_] > heaparray[new_index]) {
 						swap(new_index, index_);
 
@@ -1407,12 +1396,127 @@ namespace utils
 		void update(ElementType value_, size_t index_)
 		{
 			while (!heaparray[heapvector[index_]].lockIndex());
-			heaparray[heapvector[index_]].value = value_;
-			bool flag = pushup(heapvector[index_]);
-			//if (!flag) {
-			//	while (!heaparray[heapvector[index_]].lockIndex());
-			//	pulldown(heapvector[index_]);
-			//}
+			heaparray[heapvector[index_]].value = value_; 		
+			pushpull(heapvector[index_]);
+		}
+
+		/**
+			Push up and pull down a element in the heaparray
+
+			@param[in] index_ index of the element which has to push up
+		*/
+		void pushpull(size_t index_) {
+
+			bool flag = false;
+
+			while (index_ != 0) {
+				size_t new_index;
+				if (index_ % 2 == 0) {
+					new_index = (index_ / 2) - 1;
+				}
+				else {
+					new_index = (index_ - 1) / 2;
+				}
+
+				while (!heaparray[new_index].lockIndex());
+				if (greater) {
+					if (heaparray[new_index] < heaparray[index_]) {
+						swap(new_index, index_);
+
+						while (!heaparray[index_].unlockIndex());
+
+						index_ = new_index;
+						flag = true;
+					}
+					else {
+						while (!heaparray[new_index].unlockIndex());
+
+						break;
+					}
+				}
+				else {
+					if (heaparray[new_index] > heaparray[index_]) {
+						swap(new_index, index_);
+
+						while (!heaparray[index_].unlockIndex());
+
+						index_ = new_index;
+						flag = true;
+					}
+					else {
+						while (!heaparray[new_index].unlockIndex());
+
+						break;
+					}
+				}
+			}
+
+			if (!flag) {
+
+				while (index_ < std::pow(2, std::floor(std::log2(count))) - 1) { //(size + 1) / 2 - 1
+
+					while (!heaparray[2 * index_ + 1].lockIndex());
+					while (!heaparray[2 * index_ + 2].lockIndex());
+
+					size_t new_index;
+					if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
+						if (heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2]) {
+							new_index = 2 * index_ + 1;
+							while (!heaparray[2 * index_ + 2].unlockIndex());
+						}
+						else {
+							new_index = 2 * index_ + 2;
+							while (!heaparray[2 * index_ + 1].unlockIndex());
+						}
+					}
+					else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
+						new_index = 2 * index_ + 1;
+						while (!heaparray[2 * index_ + 2].unlockIndex());
+
+					}
+					else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
+						new_index = 2 * index_ + 2;
+						while (!heaparray[2 * index_ + 1].unlockIndex());
+					}
+					else {
+						while (!heaparray[2 * index_ + 1].unlockIndex());
+						while (!heaparray[2 * index_ + 2].unlockIndex());
+
+						break;
+					}
+
+					if (greater) {
+						if (heaparray[index_] < heaparray[new_index]) {
+							swap(new_index, index_);
+
+							while (!heaparray[index_].unlockIndex());
+
+							index_ = new_index;
+						}
+						else {
+							while (!heaparray[new_index].unlockIndex());
+
+							break;
+						}
+					}
+					else {
+						if (heaparray[index_] > heaparray[new_index]) {
+							swap(new_index, index_);
+
+							while (!heaparray[index_].unlockIndex());
+
+							index_ = new_index;
+						}
+						else {
+							while (!heaparray[new_index].unlockIndex());
+
+							break;
+						}
+					}
+				}
+			}
+
+			while (!heaparray[index_].unlockIndex());
 		}
 
 	private:
