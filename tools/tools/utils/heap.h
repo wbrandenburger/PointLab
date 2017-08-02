@@ -202,7 +202,7 @@ namespace utils
 			heaparray = new HeapNode<ElementType>[size];
 		}
 
-		virtual ~BaseHeap() = 0 {}
+		virtual ~BaseHeap() = 0;
 		
 		/**
 			Get the number of elements in the heaparray
@@ -218,21 +218,29 @@ namespace utils
 
 			@param[in] size_ Size of the heaparray
 		*/
-		virtual void setHeap(size_t size_) = 0 {}
+		virtual void setHeap(size_t size_) = 0;
+
+		/**
+			Sets the array and the size
+		*/
+		virtual void setHeap(void* pointer_, size_t size_) = 0;
 
 		/**
 			Sets the elements to zero
 		*/
-		virtual void clear() = 0 {}
+		virtual void clear() = 0;
 
 
 		/**
 			Get size of a node in the array
+
+			@return Size of a node in the array
 		*/	
 		size_t getSize()
 		{
-
+			return sizeof(HeapNode<ElementType>);
 		}
+
 		/**
 			Checks whether the elements in the heaparray are ordered
 
@@ -274,7 +282,7 @@ namespace utils
 
 			@param[in] size_ of the heaparray
 		*/
-		virtual void resize(size_t size_) = 0 {}
+		virtual void resize(size_t size_) = 0;
 
 
 		/**
@@ -283,7 +291,7 @@ namespace utils
 			@param[in] x first heaparray element
 			@param[in] y second heaparray element
 		*/
-		virtual void swap(size_t index_, size_t new_index) = 0 {}
+		virtual void swap(size_t index_, size_t new_index) = 0;
 
 		/**
 			Swap two heaparray elements
@@ -396,14 +404,14 @@ namespace utils
 			@param[in] value_ Element which will be added
 			@param[in] index_ Index ind the list of elements
 		*/
-		virtual void push(ElementType value_, size_t index_ = NULL) = 0 {}
+		virtual void push(ElementType value_, size_t index_ = NULL) = 0;
 
 		/**
 			Pops the minimal/maximal element;
 
 			@return minimal/maximal value of the heap
 		*/
-		virtual ElementType pop()  = 0 {}
+		virtual ElementType pop() = 0;
 
 	public:
 
@@ -467,6 +475,20 @@ namespace utils
 
 			size = computeInitialSize(size_);
 			heaparray = new HeapNode<ElementType>[size];
+			count = 0;
+		}
+
+		/**
+			Sets the array and the size
+		*/
+		void setHeap(void* pointer_, size_t size_)
+		{
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			size = size_;
+			heaparray = (HeapNode<ElementType>*) pointer_;
 			count = 0;
 		}
 
@@ -604,6 +626,20 @@ namespace utils
 			heaparray = new HeapNode<ElementType>[size];
 			heapvector.resize(size);
 
+			count = 0;
+		}
+
+		/**
+			Sets the array and the size
+		*/
+		void setHeap(void* pointer_, size_t size_)
+		{
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			size = size_;
+			heaparray = (HeapNode<ElementType>*) pointer_;
 			count = 0;
 		}
 
@@ -794,11 +830,26 @@ namespace utils
 			@param[in] size_ Size of the heaparray
 		*/
 		virtual void setHeap(size_t size_) = 0 {}
+		
+		/**
+			Sets the array and the size
+		*/
+		virtual void setHeap(void* pointer_, size_t size_) = 0;
 
 		/**
 			Sets the elements to zero
 		*/
 		virtual void clear() = 0 {}
+
+		/**
+			Get size of a node in the array
+
+			@return Size of a node in the array
+		*/	
+		size_t getSize()
+		{
+			return sizeof(HeapNodeConcurrent<ElementType>);
+		}
 
 		/**
 			Checks whether the elements in the heaparray are ordered
@@ -1130,6 +1181,21 @@ namespace utils
 		}
 
 		/**
+			Sets the array and the size
+		*/
+		void setHeap(void* pointer_, size_t size_)
+		{
+			if (heaparray) {
+				delete[] heaparray;
+			}
+			heapvector.clear();
+
+			size = size_;
+			heaparray = (HeapNodeConcurrent<ElementType>*) pointer_;
+			count = 0;
+		}
+
+		/**
 			Sets the elements to zero
 		*/
 		void clear() {
@@ -1258,6 +1324,21 @@ namespace utils
 			heaparray = new HeapNodeConcurrent<ElementType>[size];
 			heapvector.resize(size);
 
+			count = 0;
+		}
+
+		/**
+			Sets the array and the size
+		*/
+		void setHeap(void* pointer_, size_t size_)
+		{
+			if (heaparray) {
+				delete[] heaparray;
+			}
+			heapvector.clear();
+
+			size = size_;
+			heaparray = (HeapNodeConcurrent<ElementType>*) pointer_;
 			count = 0;
 		}
 
