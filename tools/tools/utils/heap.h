@@ -225,6 +225,14 @@ namespace utils
 		*/
 		virtual void clear() = 0 {}
 
+
+		/**
+			Get size of a node in the array
+		*/	
+		size_t getSize()
+		{
+
+		}
 		/**
 			Checks whether the elements in the heaparray are ordered
 

@@ -39,10 +39,6 @@
 #include "tools/io.h"
 #include "tools/pointcloud.h"
 
-#include "tools/pointcloud/common.h"
-
-#include "io/ioply.h"
-
 io::PlyIO plyIO;
 
 struct data {

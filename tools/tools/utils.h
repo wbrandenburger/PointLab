@@ -36,6 +36,7 @@
 #include "utils/dist.h"
 #include "utils/heap.h"
 #include "utils/matrix.h"
+#include "utils/queue.h"
 #include "utils/randomize.h"
 #include "utils/threadpool.h"
 #include "utils/timer.h"
