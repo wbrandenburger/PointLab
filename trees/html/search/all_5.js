@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['file',['file',['../classio_1_1_ply_i_o.html#af368f06d19b8f427194d9f6191f46cee',1,'io::PlyIO']]],
   ['findneighbors',['findNeighbors',['../classtrees_1_1_k_d_tree_index.html#a37e551977e3c3f772846040819a12e8f',1,'trees::KDTreeIndex::findNeighbors()'],['../classtrees_1_1_n_n_index.html#af48da46453e78744d8874c529e06b5ff',1,'trees::NNIndex::findNeighbors()']]],
   ['freebuild',['freeBuild',['../classtrees_1_1_n_n_index.html#a79c8c1c6ffd00422b97e9df49ff39ec6',1,'trees::NNIndex']]],
   ['freeindex',['freeIndex',['../classtrees_1_1_n_n_index.html#afc6b99a8f2693e8b446fc6697dac9f0d',1,'trees::NNIndex::freeIndex()'],['../classtrees_1_1_index.html#a3bbc8a66a33309b8f2f320d726ecabc9',1,'trees::Index::freeIndex()']]],

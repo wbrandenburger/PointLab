@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['size',['size',['../classtrees_1_1_n_n_index.html#a2c14aa447b5461fb839213f092881b23',1,'trees::NNIndex']]]
+  ['loc',['loc',['../classtrees_1_1_allocator.html#a150ef8b53806d3cb02c97170aea46787',1,'trees::Allocator']]]
 ];

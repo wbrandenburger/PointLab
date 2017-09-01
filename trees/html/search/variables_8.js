@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['usedmemory',['usedMemory',['../classtrees_1_1_allocator.html#a9a6f444512dd3e66121a821e114207dd',1,'trees::Allocator']]]
+  ['normals',['normals',['../classio_1_1_ply_i_o.html#a543d7d09bf12e07aed2b607975e81b62',1,'io::PlyIO']]]
 ];

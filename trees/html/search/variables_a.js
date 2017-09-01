@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['worst_5fdistance_5f',['worst_distance_',['../classtrees_1_1_unique_result_set.html#acdfe562ad6f99ae5f68b7e8af3d68171',1,'trees::UniqueResultSet']]]
+  ['remaining',['remaining',['../classtrees_1_1_allocator.html#a4db6c8c7b9ee3674503b1fb62b7e6b40',1,'trees::Allocator']]],
+  ['rows',['rows',['../classtrees_1_1_matrix.html#a88dfff3f217f59caec11e519b23153f6',1,'trees::Matrix']]]
 ];

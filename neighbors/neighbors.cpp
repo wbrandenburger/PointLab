@@ -90,6 +90,5 @@ int main(int argc, char* argv[]) {
 	delete[] indices.ptr();
 	delete[] dists.ptr();
 
-
 	return(0);
 }
