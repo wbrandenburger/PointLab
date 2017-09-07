@@ -242,58 +242,58 @@ int main(int argc, char* argv[]) {
 
 
 
-	typedef utils::HeapConcurrent<int> Heap;
+	//typedef utils::HeapConcurrent<int> Heap;
 
-	size_t n = 255;
-	size_t coresheap = 4;
-	utils::Threadpool pool(coresheap);
-	Heap heapConcurrent(n, coresheap, true);
-
-	utils::randSeed();
-
-	time.start();
-
-	for (size_t i = 0; i < heapConcurrent.size; i++) {
-		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
-	}
-	pool.waitTasks();
+	//size_t n = 255;
+	//size_t coresheap = 4;
+	//utils::Threadpool pool(coresheap);
+	//Heap heapConcurrent(n, coresheap, true);
 
 	//utils::randSeed();
+
+	//time.start();
+
 	//for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//	heapConcurrent.push(utils::randInt(n, 0));
+	//	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	//}
+	//pool.waitTasks();
+
+	////utils::randSeed();
+	////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	////	heapConcurrent.push(utils::randInt(n, 0));
+	////}
+
+	//std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
+
+	//if (heapConcurrent.checkHeap()) {
+	//	std::cout << "Heapbedingung erfüllt" << std::endl;
 	//}
 
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
+	////std::cout << heapConcurrent << std::endl;
 
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
+	////std::cout << heapConcurrent.checkLock() << std::endl;
 
-	//std::cout << heapConcurrent << std::endl;
-
-	//std::cout << heapConcurrent.checkLock() << std::endl;
-
-	//////////time.start();
+	////////////time.start();
 
 
-	//////////for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
-	//////////}
-	//////////pool.waitTasks();
+	////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	////////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
+	////////////}
+	////////////pool.waitTasks();
 
-	//////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	//////////if (heapConcurrent.checkHeap()) {
-	//////////	std::cout << " Heapbedingung erfüllt" << std::endl;
-	//////////}
+	////////////if (heapConcurrent.checkHeap()) {
+	////////////	std::cout << " Heapbedingung erfüllt" << std::endl;
+	////////////}
 
-	//////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
 
-	//////////if (heapConcurrent.checkHeap()) {
-	//////////	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//////////}
+	////////////if (heapConcurrent.checkHeap()) {
+	////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
+	////////////}
 
-	pool.shutdown();
+	//pool.shutdown();
 
 
 
