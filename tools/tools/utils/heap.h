@@ -38,7 +38,12 @@ namespace utils
 
 	inline size_t computeInitialSize(size_t size_) 
 	{
-		return std::pow(2, std::ceil(std::log2(size_)))-1;
+		return std::pow(2, std::ceil(std::log2(size_ + 1))) - 1;
+	} 
+
+	inline size_t computeInitialSizeConcurrent(size_t size_, size_t cores)
+	{
+		return (std::pow(2, std::ceil(std::log2(std::floor(size_ / cores) + 1 ))) - 1) * cores;
 	}
 
 	template<typename ElementType> struct HeapNode {
@@ -113,7 +118,7 @@ namespace utils
 	template<typename ElementType>
 	struct HeapNodeConcurrent : HeapNode<ElementType> {
 
-		boost::atomic<size_t> lock;
+		boost::atomic<bool> lock;
 
 		/**
 			Constructor
@@ -140,7 +145,7 @@ namespace utils
 
 			@return True if locked
 		*/
-		size_t getLock() {
+		bool getLock() {
 			return lock.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
@@ -151,7 +156,7 @@ namespace utils
 		*/
 		bool lockIndex() 
 		{
-			size_t lock_value = 0;
+			bool lock_value = 0;
 
 			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
@@ -163,7 +168,7 @@ namespace utils
 		*/
 		bool unlockIndex()
 		{
-			size_t unlock_value = 1;
+			bool unlock_value = 1;
 
 			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
@@ -201,8 +206,6 @@ namespace utils
 			size = computeInitialSize(size_);
 			heaparray = new HeapNode<ElementType>[size];
 		}
-
-		virtual ~BaseHeap() = 0;
 		
 		/**
 			Get the number of elements in the heaparray
@@ -801,26 +804,32 @@ namespace utils
 		/**
 			Constructor
 		*/
-		BaseHeapConcurrent() : heaparray(nullptr), size(0), count(0), countlock(0), greater(true) {}
+		BaseHeapConcurrent() : heaparray(nullptr), nodelocks(nullptr), size(0), cores(0), count(0), countlock(0), greater(true) {}
 		/**
 			Constructor
 
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		BaseHeapConcurrent(size_t size_, bool greater_ = true) : greater(greater_), count(0), countlock(0) {
-			size = computeInitialSize(size_);
+		BaseHeapConcurrent(size_t size_, size_t cores_, bool greater_ = true) : cores(cores_), greater(greater_), count(0), countlock(0) 
+		{
+			size = computeInitialSizeConcurrent(size_, cores_);
 			heaparray = new HeapNodeConcurrent<ElementType>[size];
-		}
+			nodelocks = new boost::atomic<bool>[std::floor(size / cores)];
 
-		virtual ~BaseHeapConcurrent() = 0 {}
+			for (int i = 0; i < std::floor(size / cores) + 1; i++) {
+				nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			}
+
+		}
 
 		/**
 			Get the number of elements in the heaparray
 
 			@return Number of elements
 		*/
-		size_t getElements() {
+		size_t getElements()
+		{
 			return count;
 		}
 
@@ -829,17 +838,17 @@ namespace utils
 
 			@param[in] size_ Size of the heaparray
 		*/
-		virtual void setHeap(size_t size_) = 0 {}
+		virtual void setHeap(size_t size_, size_t cores) = 0;
 		
 		/**
 			Sets the array and the size
 		*/
-		virtual void setHeap(void* pointer_, size_t size_) = 0;
+		virtual void setHeap(void* pointer_, size_t size_, size_t cores_) = 0;
 
 		/**
 			Sets the elements to zero
 		*/
-		virtual void clear() = 0 {}
+		virtual void clear() = 0;
 
 		/**
 			Get size of a node in the array
@@ -851,38 +860,93 @@ namespace utils
 			return sizeof(HeapNodeConcurrent<ElementType>);
 		}
 
+
 		/**
 			Checks whether the elements in the heaparray are ordered
 
 			@return True when the heaparray is ordered
 		*/
-		bool checkHeap() {
-			size_t begin = 0;
-			size_t depth = 0;
-			while (begin < (size + 1) / 2 - 1) {
-				size_t elements = (size_t)pow((float)2, (float)depth);
-				for (size_t i = 0; i < elements; i++) {
-					if (!heaparray[2 * begin + 1].isEmpty()) {
-						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 1]) { return 0; }
-						}
-						else {
-							if (heaparray[begin] > heaparray[2 * begin + 1]) { return 0; }
-						}
-					}
-					if (!heaparray[2 * begin + 2].isEmpty()) {
-						if (greater) {
-							if (heaparray[begin] < heaparray[2 * begin + 2]) { return 0; }
-						}
-						else {
-							if (heaparray[begin] > heaparray[2 * begin + 2]) { return 0; }
+		bool checkHeap()
+		{
+			return checkHeapRecursive(0);
+		}
+		/**
+			Checks recursively whether the elements in the heaparray are ordered
+
+			@return True when the heaparray is ordered
+		*/
+		bool checkHeapRecursive(size_t index_)
+		{
+			while ((index_ + 1) % cores != 0) {
+				if (index_ < count - 1) {
+					if (greater) {
+						if (heaparray[index_] < heaparray[index_ + 1]) {
+							return false;
 						}
 					}
-					begin = begin + 1;
+					else {
+						if (heaparray[index_] > heaparray[index_ + 1]) {
+							return false;
+						}
+					}
 				}
-				depth = depth + 1;
+				else {
+					return true;
+				}
+				index_++;
 			}
-			return 1;
+
+			size_t new_index_left = (2 * floor(index_ / cores) + 1) * cores;
+			if (new_index_left < count && !heaparray[new_index_left].isEmpty()) {
+				if (greater) {
+					if (heaparray[index_] < heaparray[new_index_left]) {
+						return false;
+					}
+					else {
+						if (!checkHeapRecursive(new_index_left)) {
+							return false;
+						}
+					}
+				}
+				else {
+					if (heaparray[index_] > heaparray[new_index_left]) {
+						return false;
+					}
+					else {
+						if (!checkHeapRecursive(new_index_left)) {
+							return false;
+						}
+					}
+
+				}
+			}
+
+			size_t new_index_right = (2 * floor(index_ / cores) + 2) * cores;
+			if (new_index_right < count && !heaparray[new_index_right].isEmpty()) {
+				if (greater) {
+					if (heaparray[index_] < heaparray[new_index_right]) {
+						return false;
+					}
+					else {
+						if (!checkHeapRecursive(new_index_right)) {
+							return false;
+						}
+					}
+				}
+				else {
+					if (heaparray[index_] > heaparray[new_index_right]) {
+						return false;
+					}
+					else {
+						if (!checkHeapRecursive(new_index_right)) {
+							return false;
+						}
+					}
+
+				}
+			}
+
+			return true;
 		}
 
 		/**
@@ -908,7 +972,7 @@ namespace utils
 			@param[in] x first heaparray element
 			@param[in] y second heaparray element
 		*/
-		virtual void swap(size_t index_, size_t new_index) = 0 {}
+		virtual void swap(size_t index_, size_t new_index) = 0;
 
 		/**
 			Swap two heaparray elements
@@ -928,143 +992,318 @@ namespace utils
 		}
 
 		/**
-			Push up a element in the heaparray
+			Sorts the element upwards
 
-			@param[in] index_ index of the element which has to push up
-			@return True when pushing the element up was successful
+			@param[in,out] index_ Index of the element which has tu be push upwards
+			@return True when the element is the first unlocked element in the list
 		*/
-		virtual bool pushup(size_t index_) {
+		bool sortUp(size_t& index_)
+		{
+			size_t indexLock = std::floor(index_ / cores);
 
-			bool flag = false;
+			while (!lockNode(indexLock));
 
-			while (index_ != 0) {
-				size_t new_index;
-				if (index_ % 2 == 0) {
-					new_index = (index_ / 2) - 1;
+			while (index_ % cores != 0) {
+				size_t new_index = index_ - 1;
+				while (!heaparray[new_index].lockIndex()) {
+					new_index--;
+					if (new_index + 1 % cores == 0) {
+						while (!unlockNode(indexLock));
+
+						return true;
+					}
 				}
-				else {
-					new_index = (index_ - 1) / 2;
-				}
 
-				while (!heaparray[new_index].lockIndex());
 				if (greater) {
 					if (heaparray[new_index] < heaparray[index_]) {
 						swap(new_index, index_);
 
 						while (!heaparray[index_].unlockIndex());
-						
-						index_ = new_index;
-						flag = true;
-					}
-					else { 
-						while (!heaparray[index_].unlockIndex());
-						while (!heaparray[new_index].unlockIndex());
 
-						return flag; }
+						index_ = new_index;
+					}
+					else {
+						while (!heaparray[new_index].unlockIndex());
+						while (!unlockNode(indexLock));
+
+						return false;
+					}
 				}
 				else {
 					if (heaparray[new_index] > heaparray[index_]) {
 						swap(new_index, index_);
 
 						while (!heaparray[index_].unlockIndex());
-						
-						index_ = new_index;
-						flag = true;
-					}
-					else { 
-						while (!heaparray[index_].unlockIndex());
-						while (!heaparray[new_index].unlockIndex());
 
-						return flag; 
+						index_ = new_index;
 					}
+					else {
+						while (!heaparray[new_index].unlockIndex());
+						while (!unlockNode(indexLock));
+
+						return false;
+					}
+				}
+			}
+
+			while (!unlockNode(indexLock));
+
+			return true;
+		}
+
+		/**
+			Sorts the element downwards
+
+			@param[in,out] index_ Index of the element which has tu be push downwards
+			@return True when the element is the last unlocked element in the list
+		*/
+		bool sortDown(size_t& index_)
+		{
+			size_t indexLock = std::floor(index_ / cores);
+
+			while (!lockNode(indexLock));
+
+			while ((index_ + 1) % cores != 0) {
+				size_t new_index = index_ + 1;
+				while (!heaparray[new_index].lockIndex()) {
+					new_index++;
+					if (new_index % cores == 0) {
+						while (!unlockNode(indexLock))
+
+						return true;
+					}
+					if (new_index == count) {
+						while (!unlockNode(indexLock))
+
+						return false;
+					}
+				}
+
+				if (greater) {
+					if (heaparray[new_index] < heaparray[index_]) {
+						swap(new_index, index_);
+
+						while (!heaparray[index_].unlockIndex());
+
+						index_ = new_index;
+					}
+					else {
+						while (!heaparray[new_index].unlockIndex());
+						while (!unlockNode(indexLock))
+
+						return false;
+					}
+				}
+				else {
+					if (heaparray[new_index] > heaparray[index_]) {
+						swap(new_index, index_);
+
+						while (!heaparray[index_].unlockIndex());
+
+						index_ = new_index;
+					}
+					else {
+						while (!heaparray[new_index].unlockIndex());
+						while (!unlockNode(indexLock))
+
+						return false;
+					}
+				}
+			}
+
+			while (!unlockNode(indexLock))
+
+			return true;
+		}
+
+		/**
+			Push up a element in the heaparray
+
+			@param[in,out] index_ index of the element which has to push up
+		*/
+		virtual void pushUp(size_t index_) {
+
+			while (index_ != 0) {
+
+				bool flag = true;
+				flag = sortUp(index_);
+
+				if (flag && std::floor(index_ / cores) != 0) {
+					size_t new_index;
+					if ( (int) std::floor(index_ / cores) % 2 == 0) {
+						new_index = ((std::floor(index_ / cores) / 2) - 1) * cores + cores - 1;
+					}
+					else {
+						new_index = ((std::floor(index_ / cores) - 1) / 2) * cores + cores - 1;
+					}
+
+					while (!heaparray[new_index].lockIndex()){			
+						new_index--;
+					}
+
+					if (greater) {
+						if (heaparray[new_index] < heaparray[index_]) {
+							swap(new_index, index_);
+
+							while (!heaparray[index_].unlockIndex());
+
+							index_ = new_index;
+						}
+						else {
+							while (!heaparray[index_].unlockIndex());
+							while (!heaparray[new_index].unlockIndex());
+
+							return;
+						}
+					}
+					else {
+						if (heaparray[new_index] > heaparray[index_]) {
+							swap(new_index, index_);
+
+							while (!heaparray[index_].unlockIndex());
+
+							index_ = new_index;
+						}
+						else {
+							while (!heaparray[index_].unlockIndex());
+							while (!heaparray[new_index].unlockIndex());
+
+							return;
+						}
+					}
+				}
+				else {
+					while (!heaparray[index_].unlockIndex());
+
+					return;
 				}
 			}
 
 			while (!heaparray[index_].unlockIndex());
 
-			return flag;
+			return;
 		}
 
 		/**
 			Pull down a element in the heaparray
 
-			@param[in] index_ index of the element which has to pull down
-			@return True when pulling the element down was successful
+			@param[in,out] index_ index of the element which has to pull down
 		*/
-		virtual bool pulldown(size_t index_) {
+		virtual void pullDown(size_t index_) {
 
-			bool flag = false;
+			while (index_ < count) { //(size + 1) / 2 - 1
 
-			while (index_ < std::pow(2,std::floor(std::log2(count)))-1) { //(size + 1) / 2 - 1
-				
-				while (!heaparray[2 * index_ + 1].lockIndex());
-				while (!heaparray[2 * index_ + 2].lockIndex());
+				bool flag = false;
 
-				size_t new_index;
-				if (!heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-					if (heaparray[2 * index_ + 1] > heaparray[2 * index_ + 2]) {
-						new_index = 2 * index_ + 1;
-						while (!heaparray[2 * index_ + 2].unlockIndex());
+				if (index_ + 1 % cores != 0) {
+					flag = sortDown(index_);
+				}
+
+				if (flag && index_ < (std::pow(std::floor(std::log2(std::floor(count / cores))), 2) - 1) * cores) {
+
+					size_t new_index_left = (2 * std::floor(index_ / cores) + 1) * cores;
+					while (!heaparray[new_index_left].lockIndex()) {
+						new_index_left++;
+					}
+					size_t new_index_right = (2 * std::floor(index_ / cores) + 2) * cores;
+					while (!heaparray[new_index_right].lockIndex()) {
+						new_index_right++;
+					}
+
+					size_t new_index;
+					if (!heaparray[new_index_left].isEmpty() && !heaparray[new_index_right].isEmpty()) {
+						if (heaparray[new_index_left] > heaparray[new_index_right]) {
+							new_index = new_index_left;
+							while (!heaparray[new_index_right].unlockIndex());
+						}
+						else {
+							new_index = new_index_right;
+							while (!heaparray[new_index_left].unlockIndex());
+						}
+					}
+					else if (!heaparray[new_index_left].isEmpty() && heaparray[new_index_right].isEmpty()) {
+						new_index = new_index_left;
+						while (!heaparray[new_index_right].unlockIndex());
+
+					}
+					else if (heaparray[new_index_left].isEmpty() && !heaparray[new_index_right].isEmpty()) {
+						new_index = new_index_right;
+						while (!heaparray[new_index_left].unlockIndex());
 					}
 					else {
-						new_index = 2 * index_ + 2;
-						while (!heaparray[2 * index_ + 1].unlockIndex());
-					}
-				}
-				else if (!heaparray[2 * index_ + 1].isEmpty() && heaparray[2 * index_ + 2].isEmpty()) {
-					new_index = 2 * index_ + 1;
-					while (!heaparray[2 * index_ + 2].unlockIndex());
+						while (!heaparray[index_].unlockIndex());
+						while (!heaparray[new_index_left].unlockIndex());
+						while (!heaparray[new_index_left].unlockIndex());
 
-				}
-				else if (heaparray[2 * index_ + 1].isEmpty() && !heaparray[2 * index_ + 2].isEmpty()) {
-					new_index = 2 * index_ + 2;
-					while (!heaparray[2 * index_ + 1].unlockIndex());
+						return;
+					}
+
+					if (greater) {
+						if (heaparray[index_] < heaparray[new_index]) {
+							swap(new_index, index_);
+
+							while (!heaparray[index_].unlockIndex());
+
+							index_ = new_index;
+						}
+						else {
+							while (!heaparray[index_].unlockIndex());
+							while (!heaparray[new_index].unlockIndex());
+
+							return;
+						}
+					}
+					else {
+						if (heaparray[index_] > heaparray[new_index]) {
+							swap(new_index, index_);
+
+							while (!heaparray[index_].unlockIndex());
+
+							index_ = new_index;
+						}
+						else {
+							while (!heaparray[index_].unlockIndex())
+								while (!heaparray[new_index].unlockIndex());
+
+							return;
+						}
+					}
 				}
 				else {
 					while (!heaparray[index_].unlockIndex());
-					while (!heaparray[2 * index_ + 1].unlockIndex());
-					while (!heaparray[2 * index_ + 2].unlockIndex());
 
-					return flag;
+					return;
 				}
 
-				if (greater) {
-					if (heaparray[index_] < heaparray[new_index]) {
-						swap(new_index, index_);
-						
-						while (!heaparray[index_].unlockIndex());
-						
-						index_ = new_index;
-						flag = true;
-					}
-					else {
-						while (!heaparray[index_].unlockIndex());
-						while (!heaparray[new_index].unlockIndex());
-
-						return flag;
-					}
-				}
-				else {
-					if (heaparray[index_] > heaparray[new_index]) {
-						swap(new_index, index_);
-
-						while (!heaparray[index_].unlockIndex());
-
-						index_ = new_index;
-						flag = true;
-					}
-					else {
-						while (!heaparray[index_].unlockIndex())
-						while (!heaparray[new_index].unlockIndex());
-
-						return flag;
-					}
-				}
 			}
-			
+
 			while (!heaparray[index_].unlockIndex());
 			
-			return flag;
+			return;
+		}
+
+		/**
+			Lock node
+
+			@return True if node could be locked
+		*/
+		bool lockNode(size_t index_) 
+		{
+			bool lock_value = 0;
+
+			return nodelocks[index_].compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
+		}
+
+		/**
+			Unlock node
+
+			@return True if count could be unlocked
+		*/
+		bool unlockNode(size_t index_)
+		{
+			bool unlock_value = 1;
+
+			return nodelocks[index_].compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -1074,7 +1313,7 @@ namespace utils
 		*/
 		bool lockCount()
 		{
-			size_t lock_value = 0;
+			bool lock_value = 0;
 
 			return countlock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
 		}
@@ -1086,7 +1325,7 @@ namespace utils
 		*/
 		bool unlockCount()
 		{
-			size_t unlock_value = 1;
+			bool unlock_value = 1;
 
 			return countlock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
 		}
@@ -1100,14 +1339,14 @@ namespace utils
 			@param[in] value_ Element which will be added
 			@param[in] index_ Index ind the list of elements
 		*/
-		virtual void push(ElementType value_, size_t index_ = NULL) = 0 {}
+		virtual void push(ElementType value_, size_t index_ = NULL) = 0;
 
 		/**
 			Pops the minimal/maximal element;
 
 			@return minimal/maximal value of the heap
 		*/
-		virtual ElementType pop() = 0 {}
+		virtual ElementType pop() = 0;
 
 	public:
 
@@ -1115,6 +1354,11 @@ namespace utils
 			heaparray with the size of 2^n-1
 		*/
 		HeapNodeConcurrent<ElementType>* heaparray;
+		
+		/**
+			Array with locks for nodes
+		*/
+		boost::atomic<bool>* nodelocks;
 
 		/**
 			Size of heaparray
@@ -1122,15 +1366,19 @@ namespace utils
 		size_t size;
 
 		/**
+			Number of parallel cores working in heap
+		*/
+		size_t cores;
+
+		/**
 			Number of elements in heap
 		*/
 		size_t count;
 
-
 		/**
 			Lock for count
 		*/
-		boost::atomic<size_t> countlock;
+		boost::atomic<bool> countlock;
 
 		/**
 			Flag which specifies wheter the set will be descendendly ordered
@@ -1154,7 +1402,7 @@ namespace utils
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		HeapConcurrent(size_t size_, bool greater_ = true) : BaseHeapConcurrent(size_, greater_) {
+		HeapConcurrent(size_t size_, size_t cores_, bool greater_ = true) : BaseHeapConcurrent(size_, cores_, greater_) {
 		}
 
 		/**
@@ -1162,6 +1410,7 @@ namespace utils
 		*/
 		~HeapConcurrent() {
 			delete[] heaparray;
+			delete[] nodelocks;
 		}
 
 		/**
@@ -1169,29 +1418,44 @@ namespace utils
 
 			@param[in] size_ Size of the heaparray
 		*/
-		void setHeap(size_t size_) {
+		void setHeap(size_t size_, size_t cores_) {
 
 			if (heaparray) {
 				delete[] heaparray;
+				delete[] nodelocks;
+			}
+			
+			cores = cores_;
+			size = computeInitialSizeConcurrent(size_, cores_);
+			heaparray = new HeapNodeConcurrent<ElementType>[size];
+			nodelocks = new boost::atomic<bool>[std::floor(size / cores)];
+
+			for (int i = 0; i < std::floor(size / cores) + 1; i++) {
+				nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 			}
 
-			size = computeInitialSize(size_);
-			heaparray = new HeapNodeConcurrent<ElementType>[size];
 			count = 0;
 		}
 
 		/**
 			Sets the array and the size
 		*/
-		void setHeap(void* pointer_, size_t size_)
+		void setHeap(void* pointer_, size_t size_, size_t cores_)
 		{
 			if (heaparray) {
 				delete[] heaparray;
+				delete[] nodelocks;
 			}
-			heapvector.clear();
 
+			cores = cores_;
 			size = size_;
 			heaparray = (HeapNodeConcurrent<ElementType>*) pointer_;
+			nodelocks = new boost::atomic<bool>[std::floor(size / cores)];
+
+			for (int i = 0; i < std::floor(size / cores) + 1; i++) {
+				nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			}
+
 			count = 0;
 		}
 
@@ -1201,6 +1465,10 @@ namespace utils
 		void clear() {
 			for (int i = 0; i < count; i++) {
 				heaparray[i].clear();
+			}
+
+			for (int i = 0; i < std::floor(size / cores) + 1; i++) {
+				nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 			}
 
 			count = 0;
@@ -1234,13 +1502,15 @@ namespace utils
 			}
 
 			while (!lockCount());
-			size_t countlockvalue = count;
+
 			while (!heaparray[count].lockIndex());
+			heaparray[count].value = value_;
+			size_t countlockvalue = count;
+
 			count++;
 			while (!unlockCount());
-			heaparray[countlockvalue].value = value_;
 			
-			pushup(countlockvalue);
+			pushUp(countlockvalue);
 		}
 
 		/**
@@ -1273,7 +1543,7 @@ namespace utils
 				while (!unlockCount());
 			}
 
-			pulldown(0);
+			pullDown(0);
 
 			return value;
 		}
@@ -1295,7 +1565,7 @@ namespace utils
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		HeapWrapperConcurrent(size_t size_, bool greater_ = true) : BaseHeapConcurrent(size_) {
+		HeapWrapperConcurrent(size_t size_, size_t cores_, bool greater_ = true) : BaseHeapConcurrent(size_, cores_, greater) {
 			heapvector.resize(computeInitialSize(size_));
 		}
 
@@ -1305,6 +1575,7 @@ namespace utils
 		~HeapWrapperConcurrent() 
 		{ 
 			delete[] heaparray; 
+			delete[] nodelocks;
 			heapvector.clear();
 		}
 
@@ -1317,11 +1588,13 @@ namespace utils
 
 			if (heaparray) {
 				delete[] heaparray;
+				delete[] nodelocks;
 			}
 			heapvector.clear();
 
 			size = computeInitialSize(size_);
 			heaparray = new HeapNodeConcurrent<ElementType>[size];
+			nodelocks = new boost::atomic<size_t>[std::floor(size / cores)];
 			heapvector.resize(size);
 
 			count = 0;
@@ -1334,11 +1607,13 @@ namespace utils
 		{
 			if (heaparray) {
 				delete[] heaparray;
+				delete[] nodelocks;
 			}
 			heapvector.clear();
 
 			size = size_;
 			heaparray = (HeapNodeConcurrent<ElementType>*) pointer_;
+			nodelocks = new boost::atomic<size_t>[std::floor(size / cores)];
 			count = 0;
 		}
 
@@ -1348,6 +1623,7 @@ namespace utils
 		void clear() {
 			for (int i = 0; i < count; i++) {
 				heaparray[i].clear();
+				nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 			}
 
 			heapvector.clear();

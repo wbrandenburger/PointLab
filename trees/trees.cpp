@@ -236,12 +236,20 @@ int main(int argc, char* argv[]) {
 		Destroy the structures
 	*/
 
-	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 4096;
 
-	utils::Threadpool pool(24);
-	Heap heapConcurrent(n, true);
+
+
+
+
+	typedef utils::HeapConcurrent<int> Heap;
+
+	size_t n = 255;
+	size_t coresheap = 4;
+	utils::Threadpool pool(coresheap);
+	Heap heapConcurrent(n, coresheap, true);
+
+	utils::randSeed();
 
 	time.start();
 
@@ -250,45 +258,43 @@ int main(int argc, char* argv[]) {
 	}
 	pool.waitTasks();
 
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
-
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
-
-	time.start();
-
-
-	for (size_t i = 0; i < heapConcurrent.size; i++) {
-		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
-	}
-	pool.waitTasks();
-
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
-
-	if (heapConcurrent.checkHeap()) {
-		std::cout << " Heapbedingung erfüllt" << std::endl;
-	}
-
-
-	//time.start();
-
+	//utils::randSeed();
 	//for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent)));
+	//	heapConcurrent.push(utils::randInt(n, 0));
 	//}
-	//pool.waitTasks();
 
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
 
 	if (heapConcurrent.checkHeap()) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
+
+	//std::cout << heapConcurrent << std::endl;
+
+	//std::cout << heapConcurrent.checkLock() << std::endl;
+
+	//////////time.start();
+
+
+	//////////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	//////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
+	//////////}
+	//////////pool.waitTasks();
+
+	//////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+
+	//////////if (heapConcurrent.checkHeap()) {
+	//////////	std::cout << " Heapbedingung erfüllt" << std::endl;
+	//////////}
+
+	//////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+
+	//////////if (heapConcurrent.checkHeap()) {
+	//////////	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//////////}
 
 	pool.shutdown();
 
-	//////////////trees::NewtonMethod<double> zero;
-	//////////////data datainstance;
-	//////////////std::cout << zero(datainstance, 1, 3, 0.000001) << std::endl; 
 
 
 	return(0);
