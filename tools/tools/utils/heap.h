@@ -71,7 +71,7 @@ namespace utils
 
 			@param[in] heap_node_ Instance of HeapNode
 		*/
-		bool operator < (const HeapNode& heap_node_)
+		virtual bool operator < (const HeapNode<ElementType>& heap_node_)
 		{
 			return value < heap_node_.value ? true : false;
 		}
@@ -81,11 +81,30 @@ namespace utils
 
 			@param[in] heap_node_ Instance of HeapNode
 		*/
-		bool operator > (const HeapNode& heap_node_)
+		virtual bool operator <= (const HeapNode<ElementType>& heap_node_)
+		{
+			return value <= heap_node_.value ? true : false;
+		}
+
+		/**
+			Operator < Compares two HeapNodes
+
+			@param[in] heap_node_ Instance of HeapNode
+		*/
+		virtual bool operator > (const HeapNode<ElementType>& heap_node_)
 		{
 			return value > heap_node_.value ? true : false;
 		}
+		
+		/**
+			Operator < Compares two HeapNodes
 
+			@param[in] heap_node_ Instance of HeapNode
+		*/
+		virtual bool operator >= (const HeapNode<ElementType>& heap_node_)
+		{
+			return value >= heap_node_.value ? true : false;
+		}
 		/**
 			Clears the structure
 		*/
@@ -178,7 +197,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		HeapSuperNodeConcurrent() : first_node(nullptr), last_node(nullptr), lock(0), greater(true) {}
+		HeapSuperNodeConcurrent() : first_node(nullptr), last_node(nullptr), lock(0) {}
 
 		void clear()
 		{
@@ -222,8 +241,8 @@ namespace utils
 		{
 			if (greater){
 				if (**push_node_ <= *last_node) {
-					*pull_node = *push_node;
-					*push_node = nullptr;
+					*pull_node_ = *push_node_;
+					*push_node_ = nullptr;
 				}
 				else if(**push_node_ > *first_node) {
 					*pull_node_ = last_node;
@@ -237,13 +256,15 @@ namespace utils
 					last_node = (*last_node).left_neighbor;
 					(*last_node).right_neighbor = nullptr;
 
-					*push_node = nullptr;
+					sort(*push_node_, greater);
+
+					*push_node_ = nullptr;
 				}
 			}
 			else {
 				if (**push_node_ >= *last_node) {
-					*pull_node = *push_node;
-					*push_node = nullptr;
+					*pull_node_ = *push_node_;
+					*push_node_ = nullptr;
 				}
 				else if (**push_node_ > *first_node) {
 					*pull_node_ = last_node;
@@ -257,7 +278,9 @@ namespace utils
 					last_node = (*last_node).left_neighbor;
 					(*last_node).right_neighbor = nullptr;
 
-					*push_node = nullptr;
+					sort(*push_node_, greater);
+
+					*push_node_ = nullptr;
 				}
 			}
 		}
@@ -271,29 +294,27 @@ namespace utils
 		{
 			if (greater) {
 				if (first_node) {
-					if (*node_ <= *first_node) {
+					if ( *node_ <= *first_node) {
 						HeapNodeConcurrent<ElementType>* next_node = first_node;
 						while (next_node) {
 							if (*node_ <= *next_node) {
 								next_node = (*next_node).right_neighbor;
 							}
 							else {
-								(*(*next_node).left_neighbor).right_neighbor = *node_;
-								(*next_node).left_neighbor = *node_;
-
+								(*(*next_node).left_neighbor).right_neighbor = node_;
 								(*node_).left_neighbor = (*next_node).left_neighbor;
+								(*next_node).left_neighbor = node_;
 								(*node_).right_neighbor = next_node;
 
-								break;
+								return;
 							}
 						}
 
-						(*node).left_neighbor = last_node;
+						(*node_).left_neighbor = last_node;
 
 						(*last_node).right_neighbor = node_;
 
 						last_node = node_;
-
 					}
 					else {
 						(*node_).right_neighbor = first_node;
@@ -305,7 +326,7 @@ namespace utils
 				}
 				else {
 					first_node = node_;
-					last_node = node;
+					last_node = node_;
 				}
 			}
 			else {
@@ -317,17 +338,16 @@ namespace utils
 								next_node = (*next_node).right_neighbor;
 							}
 							else {
-								(*(*next_node).left_neighbor).right_neighbor = *node_;
-								(*next_node).left_neighbor = *node_;
-
+								(*(*next_node).left_neighbor).right_neighbor = node_;
 								(*node_).left_neighbor = (*next_node).left_neighbor;
+								(*next_node).left_neighbor = node_;
 								(*node_).right_neighbor = next_node;
 
-								break;
+								return;
 							}
 						}
 
-						(*node).left_neighbor = last_node;
+						(*node_).left_neighbor = last_node;
 
 						(*last_node).right_neighbor = node_;
 
@@ -982,7 +1002,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		BaseHeapConcurrent() : heaparray(nullptr), size(0), cores(0), count(0), countlock(0), greater(true) {}
+		BaseHeapConcurrent() : heaparray(nullptr), size(0), cores(0), count(0), greater(true) {}
 
 		/**
 			Constructor
@@ -990,7 +1010,7 @@ namespace utils
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		BaseHeapConcurrent(size_t size_, size_t cores_, bool greater_ = true) : cores(cores_), greater(greater_), count(0), countlock(0) 
+		BaseHeapConcurrent(size_t size_, size_t cores_, bool greater_ = true) : cores(cores_), greater(greater_), count(0)
 		{
 			size = computeInitialSizeConcurrent(size_, cores_);
 			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
@@ -1003,7 +1023,7 @@ namespace utils
 		*/
 		size_t getElements()
 		{
-			return count;
+			return count.load(boost::memory_order_seq_cst);
 		}
 
 	//	/**
@@ -1098,11 +1118,11 @@ namespace utils
 
 				}
 
-				HeapNodeConcurrent<ElementType>* list_node = heaparray[index_].firstnode;
+				HeapNodeConcurrent<ElementType>* list_node = heaparray[index_].first_node;
 				while (list_node) {
 					if ((*list_node).right_neighbor) {
 						if (greater) {
-							if (*list_node >= (*list_node).right_neighbor){
+							if (*list_node >= *(*list_node).right_neighbor){
 								list_node = (*list_node).right_neighbor;
 							}
 							else {
@@ -1110,7 +1130,7 @@ namespace utils
 							}
 						}
 						else {
-							if (*list_node <= (*list_node).right_neighbor) {
+							if (*list_node <= *(*list_node).right_neighbor) {
 								list_node = (*list_node).right_neighbor;
 							}
 							else {
@@ -1127,97 +1147,44 @@ namespace utils
 		}
 
 	protected:
-		/**
-			Swap two heaparray elements
-
-			@param[in] x first heaparray element
-			@param[in] y second heaparray element
-		*/
-		virtual void swap(size_t index_, size_t new_index) = 0;
-
-		/**
-			Swap two heaparray elements
-
-			@param[in] x first heaparray element
-			@param[in] y second heaparray element
-		*/
-		void swapElements(HeapNodeConcurrent<ElementType>& x, HeapNodeConcurrent<ElementType>& y)
-		{
-			size_t swap_index = x.index;
-			x.index = y.index;
-			y.index = swap_index;
-			
-			ElementType swap_element = x.value;
-			x.value = y.value;
-			y.value = swap_element;
-		}
 
 		/**
 			Push up a element in the heaparray
 
-			@param[in,out] index_ index of the element which has to push up
+			@param[in] index_ index of the current node
+			@param[in] node_ Pointer to the element which has to be sorted in
 		*/
-		virtual void pushUp(size_t index_) {
+		virtual void pushUp(size_t index_, HeapNodeConcurrent<ElementType>* node_) 
+		{	
+			HeapNodeConcurrent<ElementType>* sortin_node = nullptr;
+			
+			size_t parent_index;
+			if (index_ % 2 == 0) {
+				parent_index = index_ / 2 - 1;
+			}
+			else {
+				parent_index = ( index_ - 1 ) / 2;
+			}
 
-			//while (index_ != 0) {
+			if (index_ > 0) {
+				while (!heaparray[parent_index].lockIndex());
+					heaparray[parent_index].push(&node_, &sortin_node, greater);
+				while (!heaparray[parent_index].unlockIndex());
+			}
+			else {
+				while (!heaparray[index_].lockIndex());
+					heaparray[index_].sort(node_, greater);
+				while (!heaparray[index_].unlockIndex());
+				return;
+			}
 
-			//	bool flag = true;
-			//	flag = sortUp(index_);
+			while (!heaparray[index_].lockIndex());
+				heaparray[index_].sort(sortin_node, greater);
+			while (!heaparray[index_].unlockIndex());
 
-			//	if (flag && std::floor(index_ / cores) != 0) {
-			//		size_t new_index;
-			//		if ( (int) std::floor(index_ / cores) % 2 == 0) {
-			//			new_index = ((std::floor(index_ / cores) / 2) - 1) * cores + cores - 1;
-			//		}
-			//		else {
-			//			new_index = ((std::floor(index_ / cores) - 1) / 2) * cores + cores - 1;
-			//		}
-
-			//		while (!heaparray[new_index].lockIndex()){			
-			//			new_index--;
-			//		}
-
-			//		if (greater) {
-			//			if (heaparray[new_index] < heaparray[index_]) {
-			//				swap(new_index, index_);
-
-			//				while (!heaparray[index_].unlockIndex());
-
-			//				index_ = new_index;
-			//			}
-			//			else {
-			//				while (!heaparray[index_].unlockIndex());
-			//				while (!heaparray[new_index].unlockIndex());
-
-			//				return;
-			//			}
-			//		}
-			//		else {
-			//			if (heaparray[new_index] > heaparray[index_]) {
-			//				swap(new_index, index_);
-
-			//				while (!heaparray[index_].unlockIndex());
-
-			//				index_ = new_index;
-			//			}
-			//			else {
-			//				while (!heaparray[index_].unlockIndex());
-			//				while (!heaparray[new_index].unlockIndex());
-
-			//				return;
-			//			}
-			//		}
-			//	}
-			//	else {
-			//		while (!heaparray[index_].unlockIndex());
-
-			//		return;
-			//	}
-			//}
-
-			//while (!heaparray[index_].unlockIndex());
-
-			//return;
+			if (node_) {
+				pushUp(parent_index, node_);
+			}
 		}
 
 	//	/**
@@ -1318,31 +1285,6 @@ namespace utils
 	//		return;
 	//	}
 
-		/**
-			Lock count
-
-			@return True if count could be locked
-		*/
-		bool lockCount()
-		{
-			bool lock_value = 0;
-
-			return countlock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
-		}
-
-		/**
-			Unlock count
-
-			@return True if count could be unlocked
-		*/
-		bool unlockCount()
-		{
-			bool unlock_value = 1;
-
-			return countlock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/* boost::memory_order_relaxed*/);
-		}
-
-
 	//public:
 
 	//	/**
@@ -1380,12 +1322,7 @@ namespace utils
 		/**
 			Number of elements in heap
 		*/
-		size_t count;
-
-		/**
-			Lock for count
-		*/
-		boost::atomic<bool> countlock;
+		boost::atomic<int> count;
 
 		/**
 			Flag which specifies wheter the set will be descendendly ordered
@@ -1393,32 +1330,31 @@ namespace utils
 		bool greater;
 	};
 
-	//template<typename ElementType>
-	//class HeapConcurrent : public BaseHeapConcurrent<ElementType> {
+	template<typename ElementType>
+	class HeapConcurrent : public BaseHeapConcurrent<ElementType> {
 
-	//public:
+	public:
 
-	//	/**
-	//		Constructor
-	//	*/
-	//	HeapConcurrent() : BaseHeapConcurrent() {}
+		/**
+			Constructor
+		*/
+		HeapConcurrent() : BaseHeapConcurrent() {}
 
-	//	/**
-	//		Constructor
+		/**
+			Constructor
 
-	//		@param[in] size_ size of the heaparray which has to be built
-	//		@param[in] greater Flag which specifies whether the set will be descendendly ordered
-	//	*/
-	//	HeapConcurrent(size_t size_, size_t cores_, bool greater_ = true) : BaseHeapConcurrent(size_, cores_, greater_) {
-	//	}
+			@param[in] size_ size of the heaparray which has to be built
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
+		*/
+		HeapConcurrent(size_t size_, size_t cores_, bool greater_ = true) : BaseHeapConcurrent(size_, cores_, greater_) {
+		}
 
-	//	/**
-	//		Desconstructor
-	//	*/
-	//	~HeapConcurrent() {
-	//		delete[] heaparray;
-	//		delete[] nodelocks;
-	//	}
+		/**
+			Desconstructor
+		*/
+		~HeapConcurrent() {
+			delete[] heaparray;
+		}
 
 	//	/**
 	//		Sets the pointer heaparray and size
@@ -1481,44 +1417,29 @@ namespace utils
 	//		count = 0;
 	//	}
 
-	//private:
+	public:
 
-	//	/**
-	//		Swap two heaparray elements
+		/**
+			Adds a new element
 
-	//		@param[in] x first heaparray element
-	//		@param[in] y second heaparray element
-	//	*/
-	//	void swap(size_t index_, size_t new_index)
-	//	{
-	//		swapElements(heaparray[new_index], heaparray[index_]);
-	//	}
+			@param[in] value_ element which will be added
+			@param[in] index_ the respective index for assigning purposes
+		*/
+		void push(ElementType value_, size_t index_ = NULL)
+		{
+			int count_value = count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 
-	//public:
+			if (count_value > size * cores) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
 
-	//	/**
-	//		Adds a new element
+			HeapNodeConcurrent<ElementType>* node = new HeapNodeConcurrent<ElementType>;
+			(*node).value = value_;
+			(*node).index = index_;
 
-	//		@param[in] value_ element which will be added
-	//	*/
-	//	void push(ElementType value_, size_t index_ = NULL)
-	//	{
-	//		if (count >= size) {
-	//			std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-	//			std::exit(EXIT_FAILURE);
-	//		}
-
-	//		while (!lockCount());
-
-	//		while (!heaparray[count].lockIndex());
-	//		heaparray[count].value = value_;
-	//		size_t countlockvalue = count;
-
-	//		count++;
-	//		while (!unlockCount());
-	//		
-	//		pushUp(countlockvalue);
-	//	}
+			pushUp(std::floor(count_value / cores), node);
+		}
 
 	//	/**
 	//		Pops the minimal/maximal element;
@@ -1554,7 +1475,7 @@ namespace utils
 
 	//		return value;
 	//	}
-	//};
+	};
 
 	//template<typename ElementType>
 	//class HeapWrapperConcurrent : public BaseHeapConcurrent<ElementType> 
@@ -1929,35 +1850,39 @@ namespace utils
 		return out_;
 	}
 
-	///**
-	//	Operator << Prints the values of the heap
+	/**
+		Operator << Prints the values of the heap
 
-	//	@param[in,out] out_ Outstream in which the node will be printed
-	//	@param[in] heap_ Node which values shall be printed
-	//*/
-	//template<typename ElementType>
-	//std::ostream& operator<<(std::ostream& out_, const HeapNodeConcurrent<ElementType>& heap_node_)
-	//{
-	//	out_ << heap_node_.value;
+		@param[in,out] out_ Outstream in which the node will be printed
+		@param[in] heap_super_node Node which values shall be printed
+	*/
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const HeapSuperNodeConcurrent<ElementType>& heap_super_node_)
+	{
+		HeapNodeConcurrent<ElementType>* heap_node = heap_super_node_.first_node;
+		while(heap_node) {
+			out_ << (*heap_node).value << " ";
+			heap_node = (*heap_node).right_neighbor;
+		}
 
-	//	return out_;
-	//}
+		return out_;
+	}
 
-	///**
-	//	Operator << Prints the values of the heap
+	/**
+		Operator << Prints the values of the heap
 
-	//	@param[in,out] out_ Outstream in which the heap will be printed
-	//	@param[in] heap_ Heap which values shall be printed
-	//*/
-	//template<typename ElementType>
-	//std::ostream& operator<<(std::ostream& out_, const BaseHeapConcurrent<ElementType>& heap_)
-	//{
-	//	for (size_t i = 0; i < heap_.count; i++) {
-	//		out_ << heap_.heaparray[i] << " ";
-	//	}
+		@param[in,out] out_ Outstream in which the heap will be printed
+		@param[in] heap_ Heap which values shall be printed
+	*/
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const BaseHeapConcurrent<ElementType>& heap_)
+	{
+		for (size_t i = 0; i < heap_.size; i++) {
+			out_ << heap_.heaparray[i] << std::endl;
+		}
 
-	//	return out_;
-	//}
+		return out_;
+	}
 }
 
 #endif /* UTILS_HEAP_H_ */
