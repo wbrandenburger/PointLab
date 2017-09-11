@@ -230,16 +230,72 @@ namespace utils
 
 			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
+		
+		/**
+			Pull an element
 
+			@param[in,out] pull_node_ Pointer to the element which has to be evaluated
+			@param[in,out] push_node_ Pointer to the element which has to be sorted in the previous node
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
+		*/
+		void pull(HeapNodeConcurrent<ElementType>** pull_node_, HeapNodeConcurrent<ElementType>** push_node_, bool greater_ = true)
+		{
+			if (greater_) {
+				if (**pull_node_ > *first_node) {
+					*push_node_ = *pull_node_;
+					*pull_node_ = nullptr;
+				}
+				else if (**pull_node_ <= *last_node) {
+					*push_node_ = first_node;
+
+					first_node = (*first_node).right_neighbor;
+					(*first_node).left_neighbor = nullptr;
+				}
+				else {
+					*push_node_ = first_node;
+
+					first_node = (*first_node).right_neighbor;
+					(*first_node).left_neighbor = nullptr;
+
+					sort(*pull_node_, greater_);
+
+					*pull_node_ = nullptr;
+				}
+			}
+			else {
+				if (**pull_node_ < *first_node) {
+					*push_node_ = *pull_node_;
+					*pull_node_ = nullptr;
+				}
+				else if (**pull_node_ >= *last_node) {
+					*push_node_ = first_node;
+
+					first_node = (*first_node).right_neighbor;
+					(*first_node).left_neighbor = nullptr;
+				}
+				else {
+					*push_node_ = first_node;
+
+					first_node = (*first_node).right_neighbor;
+					(*first_node).left_neighbor = nullptr;
+
+					sort(*pull_node_, greater_);
+
+					*pull_node_ = nullptr;
+				}
+			}
+		}
+		
 		/**
 			Push an element
 
 			@param[in,out] push_node_ Pointer to the element which has to be evaluated
 			@param[in,out] pull_node_ Pointer to the element which has to be sorted in the previous node
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		void push(HeapNodeConcurrent<ElementType>** push_node_, HeapNodeConcurrent<ElementType>** pull_node_, bool greater = true)
+		void push(HeapNodeConcurrent<ElementType>** push_node_, HeapNodeConcurrent<ElementType>** pull_node_, bool greater_ = true)
 		{
-			if (greater){
+			if (greater_){
 				if (**push_node_ <= *last_node) {
 					*pull_node_ = *push_node_;
 					*push_node_ = nullptr;
@@ -256,7 +312,7 @@ namespace utils
 					last_node = (*last_node).left_neighbor;
 					(*last_node).right_neighbor = nullptr;
 
-					sort(*push_node_, greater);
+					sort(*push_node_, greater_);
 
 					*push_node_ = nullptr;
 				}
@@ -278,7 +334,7 @@ namespace utils
 					last_node = (*last_node).left_neighbor;
 					(*last_node).right_neighbor = nullptr;
 
-					sort(*push_node_, greater);
+					sort(*push_node_, greater_);
 
 					*push_node_ = nullptr;
 				}
@@ -289,10 +345,11 @@ namespace utils
 			Sort a element in the list
 
 			@param[in] node_ Pointer to the element which has to be sorted in the list
+			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		void sort(HeapNodeConcurrent<ElementType>* node_, bool greater = true)
+		void sort(HeapNodeConcurrent<ElementType>* node_, bool greater_ = true)
 		{
-			if (greater) {
+			if (greater_) {
 				if (first_node) {
 					if ( *node_ <= *first_node) {
 						HeapNodeConcurrent<ElementType>* next_node = first_node;
@@ -1038,20 +1095,10 @@ namespace utils
 	//	*/
 	//	virtual void setHeap(void* pointer_, size_t size_, size_t cores_) = 0;
 
-	//	/**
-	//		Sets the elements to zero
-	//	*/
-	//	virtual void clear() = 0;
-
-	//	/**
-	//		Get size of a node in the array
-
-	//		@return Size of a node in the array
-	//	*/	
-	//	size_t getSize()
-	//	{
-	//		return sizeof(HeapNodeConcurrent<ElementType>);
-	//	}
+		///**
+		//	Sets the elements to zero
+		//*/
+		//virtual void clear() = 0;
 
 		/**
 			Checks whether the elements in the heaparray are ordered
@@ -1151,7 +1198,7 @@ namespace utils
 		/**
 			Push up a element in the heaparray
 
-			@param[in] index_ index of the current node
+			@param[in] index_ Index of the current node
 			@param[in] node_ Pointer to the element which has to be sorted in
 		*/
 		virtual void pushUp(size_t index_, HeapNodeConcurrent<ElementType>* node_) 
@@ -1185,6 +1232,65 @@ namespace utils
 			if (node_) {
 				pushUp(parent_index, node_);
 			}
+		}
+
+		/**
+			Pull down a element in the heaparray
+		
+			@param[in] index_ Index of the current node
+			@param[in] node_ Pointer to the element which has to be sorted in
+		*/
+		virtual void pullDown(size_t index_, HeapNodeConcurrent<ElementType>* node_)
+		{
+			//HeapNodeConcurrent<ElementType>* sortin_node = nullptr;
+
+			//size_t child_index;
+			//size_t child_left = index_ * 2 + 1;
+			//size_t child_right = index_ * 2 + 2;
+
+			//if (child_left < size){
+			//	while (!heaparray[child_left].lockIndex());
+			//    while (!heaparray[child_right].lockIndex());
+
+			//		if (greater) {
+			//			if (*heaparray[child_left].first_node >= *heaparray[child_right].first_node) {
+			//				while (!heaparray[child_right].unlockIndex());
+			//				child_index = child_left;
+			//			}
+			//			else {
+			//				while (!heaparray[child_left].unlockIndex());
+			//				child_index = child_right;
+			//			}
+			//		}
+			//		else {
+			//			if (*heaparray[child_left].first_node <= *heaparray[child_right].first_node) {
+			//				while (!heaparray[child_right].unlockIndex());
+			//				child_index = child_left;
+			//			}
+			//			else {
+			//				while (!heaparray[child_left].unlockIndex());
+			//				child_index = child_right;
+			//			}
+			//		}
+			//		
+			//		heaparray[child_index].pull(&node_, &sortin_node, greater);
+
+			//	while (!heaparray[child_index].unlockIndex());
+
+			//	while (!heaparray[index_].lockIndex());
+			//		heaparray[index_].sort(sortin_node, greater);
+			//	while (!heaparray[index_].unlockIndex());
+			//}
+			//else {
+			//	while (!heaparray[index_].lockIndex());
+			//		heaparray[index_].sort(node_, greater);
+			//	while (!heaparray[index_].unlockIndex());
+			//	return;
+			//}
+
+			//if (node_) {
+			//	pullDown(child_index, node_);
+			//}
 		}
 
 	public:
@@ -1304,20 +1410,20 @@ namespace utils
 	//		count = 0;
 	//	}
 
-	//	/**
-	//		Sets the elements to zero
-	//	*/
-	//	void clear() {
-	//		for (int i = 0; i < count; i++) {
-	//			heaparray[i].clear();
-	//		}
+		///**
+		//	Sets the elements to zero
+		//*/
+		//void clear() {
+		//	for (int i = 0; i < count; i++) {
+		//		heaparray[i].clear();
+		//	}
 
-	//		for (int i = 0; i < std::floor(size / cores) + 1; i++) {
-	//			nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
-	//		}
+		//	for (int i = 0; i < std::floor(size / cores) + 1; i++) {
+		//		nodelocks[i].store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+		//	}
 
-	//		count = 0;
-	//	}
+		//	count = 0;
+		//}
 
 	public:
 
@@ -1360,6 +1466,18 @@ namespace utils
 				heaparray[0].first_node = heaparray[0].first_node->right_neighbor;
 				heaparray[0].first_node->left_neighbor = nullptr;
 			while (!heaparray[0].unlockIndex());
+
+			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			size_t index = std::floor(count_value / cores);
+			while (!heaparray[index].lockIndex());
+				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
+				heaparray[index].last_node = heaparray[index].last_node->left_neighbor;
+				heaparray[index].last_node->right_neighbor = nullptr;
+
+				(*node).left_neighbor = nullptr;
+			while (!heaparray[index].unlockIndex());
+				
+			pullDown(0, node);
 
 			return value;
 		}
