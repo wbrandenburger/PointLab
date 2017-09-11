@@ -250,6 +250,8 @@ namespace utils
 
 					first_node = (*first_node).right_neighbor;
 					(*first_node).left_neighbor = nullptr;
+
+					(**push_node_).right_neighbor = nullptr;
 				}
 				else {
 					*push_node_ = first_node;
@@ -272,6 +274,8 @@ namespace utils
 
 					first_node = (*first_node).right_neighbor;
 					(*first_node).left_neighbor = nullptr;
+
+					(**push_node_).right_neighbor = nullptr;
 				}
 				else {
 					*push_node_ = first_node;
@@ -305,6 +309,8 @@ namespace utils
 
 					last_node = (*last_node).left_neighbor;
 					(*last_node).right_neighbor = nullptr;
+
+					(**pull_node_).left_neighbor = nullptr;
 				}
 				else {
 					*pull_node_ = last_node;
@@ -327,6 +333,8 @@ namespace utils
 
 					last_node = (*last_node).left_neighbor;
 					(*last_node).right_neighbor = nullptr;
+
+					(**pull_node_).left_neighbor = nullptr;
 				}
 				else {
 					*pull_node_ = last_node;
@@ -1242,55 +1250,55 @@ namespace utils
 		*/
 		virtual void pullDown(size_t index_, HeapNodeConcurrent<ElementType>* node_)
 		{
-			//HeapNodeConcurrent<ElementType>* sortin_node = nullptr;
+			HeapNodeConcurrent<ElementType>* sortin_node = nullptr;
 
-			//size_t child_index;
-			//size_t child_left = index_ * 2 + 1;
-			//size_t child_right = index_ * 2 + 2;
+			size_t child_index;
+			size_t child_left = index_ * 2 + 1;
+			size_t child_right = index_ * 2 + 2;
 
-			//if (child_left < size){
-			//	while (!heaparray[child_left].lockIndex());
-			//    while (!heaparray[child_right].lockIndex());
+			if (child_left < size){
+				while (!heaparray[child_left].lockIndex());
+			    while (!heaparray[child_right].lockIndex());
 
-			//		if (greater) {
-			//			if (*heaparray[child_left].first_node >= *heaparray[child_right].first_node) {
-			//				while (!heaparray[child_right].unlockIndex());
-			//				child_index = child_left;
-			//			}
-			//			else {
-			//				while (!heaparray[child_left].unlockIndex());
-			//				child_index = child_right;
-			//			}
-			//		}
-			//		else {
-			//			if (*heaparray[child_left].first_node <= *heaparray[child_right].first_node) {
-			//				while (!heaparray[child_right].unlockIndex());
-			//				child_index = child_left;
-			//			}
-			//			else {
-			//				while (!heaparray[child_left].unlockIndex());
-			//				child_index = child_right;
-			//			}
-			//		}
-			//		
-			//		heaparray[child_index].pull(&node_, &sortin_node, greater);
+					if (greater) {
+						if (*heaparray[child_left].first_node >= *heaparray[child_right].first_node) {
+							while (!heaparray[child_right].unlockIndex());
+							child_index = child_left;
+						}
+						else {
+							while (!heaparray[child_left].unlockIndex());
+							child_index = child_right;
+						}
+					}
+					else {
+						if (*heaparray[child_left].first_node <= *heaparray[child_right].first_node) {
+							while (!heaparray[child_right].unlockIndex());
+							child_index = child_left;
+						}
+						else {
+							while (!heaparray[child_left].unlockIndex());
+							child_index = child_right;
+						}
+					}
+					
+					heaparray[child_index].pull(&node_, &sortin_node, greater);
 
-			//	while (!heaparray[child_index].unlockIndex());
+				while (!heaparray[child_index].unlockIndex());
+			}
+			else {
+				while (!heaparray[index_].lockIndex());
+					heaparray[index_].sort(node_, greater);
+				while (!heaparray[index_].unlockIndex());
+				return;
+			}
 
-			//	while (!heaparray[index_].lockIndex());
-			//		heaparray[index_].sort(sortin_node, greater);
-			//	while (!heaparray[index_].unlockIndex());
-			//}
-			//else {
-			//	while (!heaparray[index_].lockIndex());
-			//		heaparray[index_].sort(node_, greater);
-			//	while (!heaparray[index_].unlockIndex());
-			//	return;
-			//}
+			while (!heaparray[index_].lockIndex());
+				heaparray[index_].sort(sortin_node, greater);
+			while (!heaparray[index_].unlockIndex());
 
-			//if (node_) {
-			//	pullDown(child_index, node_);
-			//}
+			if (node_) {
+				pullDown(child_index, node_);
+			}
 		}
 
 	public:
@@ -1467,7 +1475,7 @@ namespace utils
 				heaparray[0].first_node->left_neighbor = nullptr;
 			while (!heaparray[0].unlockIndex());
 
-			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
 				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
