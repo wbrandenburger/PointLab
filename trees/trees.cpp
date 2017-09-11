@@ -271,6 +271,10 @@ int main(int argc, char* argv[]) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
 
+	for (size_t i = 0; i < 1 /*heapConcurrent.size * heapConcurrent.cores*/; i++) {
+		heapConcurrent.pop();
+	}
+
 	std::cout << heapConcurrent << std::endl;
 
 	////std::cout << heapConcurrent.checkLock() << std::endl;

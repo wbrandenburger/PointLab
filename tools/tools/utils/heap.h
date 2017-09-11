@@ -1187,120 +1187,22 @@ namespace utils
 			}
 		}
 
-	//	/**
-	//		Pull down a element in the heaparray
+	public:
 
-	//		@param[in,out] index_ index of the element which has to pull down
-	//	*/
-	//	virtual void pullDown(size_t index_) {
+		/**
+			Adds a new element
 
-	//		while (index_ < count) { //(size + 1) / 2 - 1
+			@param[in] value_ Element which will be added
+			@param[in] index_ Index ind the list of elements
+		*/
+		virtual void push(ElementType value_, size_t index_ = NULL) = 0;
 
-	//			bool flag = false;
+		/**
+			Pops the minimal/maximal element;
 
-	//			if (index_ + 1 % cores != 0) {
-	//				flag = sortDown(index_);
-	//			}
-
-	//			if (flag && index_ < (std::pow(std::floor(std::log2(std::floor(count / cores))), 2) - 1) * cores) {
-
-	//				size_t new_index_left = (2 * std::floor(index_ / cores) + 1) * cores;
-	//				while (!heaparray[new_index_left].lockIndex()) {
-	//					new_index_left++;
-	//				}
-	//				size_t new_index_right = (2 * std::floor(index_ / cores) + 2) * cores;
-	//				while (!heaparray[new_index_right].lockIndex()) {
-	//					new_index_right++;
-	//				}
-
-	//				size_t new_index;
-	//				if (!heaparray[new_index_left].isEmpty() && !heaparray[new_index_right].isEmpty()) {
-	//					if (heaparray[new_index_left] > heaparray[new_index_right]) {
-	//						new_index = new_index_left;
-	//						while (!heaparray[new_index_right].unlockIndex());
-	//					}
-	//					else {
-	//						new_index = new_index_right;
-	//						while (!heaparray[new_index_left].unlockIndex());
-	//					}
-	//				}
-	//				else if (!heaparray[new_index_left].isEmpty() && heaparray[new_index_right].isEmpty()) {
-	//					new_index = new_index_left;
-	//					while (!heaparray[new_index_right].unlockIndex());
-
-	//				}
-	//				else if (heaparray[new_index_left].isEmpty() && !heaparray[new_index_right].isEmpty()) {
-	//					new_index = new_index_right;
-	//					while (!heaparray[new_index_left].unlockIndex());
-	//				}
-	//				else {
-	//					while (!heaparray[index_].unlockIndex());
-	//					while (!heaparray[new_index_left].unlockIndex());
-	//					while (!heaparray[new_index_left].unlockIndex());
-
-	//					return;
-	//				}
-
-	//				if (greater) {
-	//					if (heaparray[index_] < heaparray[new_index]) {
-	//						swap(new_index, index_);
-
-	//						while (!heaparray[index_].unlockIndex());
-
-	//						index_ = new_index;
-	//					}
-	//					else {
-	//						while (!heaparray[index_].unlockIndex());
-	//						while (!heaparray[new_index].unlockIndex());
-
-	//						return;
-	//					}
-	//				}
-	//				else {
-	//					if (heaparray[index_] > heaparray[new_index]) {
-	//						swap(new_index, index_);
-
-	//						while (!heaparray[index_].unlockIndex());
-
-	//						index_ = new_index;
-	//					}
-	//					else {
-	//						while (!heaparray[index_].unlockIndex())
-	//							while (!heaparray[new_index].unlockIndex());
-
-	//						return;
-	//					}
-	//				}
-	//			}
-	//			else {
-	//				while (!heaparray[index_].unlockIndex());
-
-	//				return;
-	//			}
-
-	//		}
-
-	//		while (!heaparray[index_].unlockIndex());
-	//		
-	//		return;
-	//	}
-
-	//public:
-
-	//	/**
-	//		Adds a new element
-
-	//		@param[in] value_ Element which will be added
-	//		@param[in] index_ Index ind the list of elements
-	//	*/
-	//	virtual void push(ElementType value_, size_t index_ = NULL) = 0;
-
-	//	/**
-	//		Pops the minimal/maximal element;
-
-	//		@return minimal/maximal value of the heap
-	//	*/
-	//	virtual ElementType pop() = 0;
+			@return minimal/maximal value of the heap
+		*/
+		virtual ElementType pop() = 0;
 
 	public:
 
@@ -1441,40 +1343,26 @@ namespace utils
 			pushUp(std::floor(count_value / cores), node);
 		}
 
-	//	/**
-	//		Pops the minimal/maximal element;
+		/**
+			Pops the minimal/maximal element;
 
-	//		@return minimal/maximal value of the heap
-	//	*/
-	//	ElementType pop() 
-	//	{
-	//		if (count == 0) {
-	//			std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-	//			std::exit(EXIT_FAILURE);
-	//		}
+			@return minimal/maximal value of the heap
+		*/
+		ElementType pop() 
+		{
+			if (count == 0) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
 
-	//		while (!heaparray[0].lockIndex());
-	//		ElementType value = heaparray[0].value;
+			while (!heaparray[0].lockIndex());
+				ElementType value = heaparray[0].first_node->value;
+				heaparray[0].first_node = heaparray[0].first_node->right_neighbor;
+				heaparray[0].first_node->left_neighbor = nullptr;
+			while (!heaparray[0].unlockIndex());
 
-	//		if (count == 1) {
-	//			while (!lockCount());
-	//			count--;
-	//			heaparray[count].clear();
-	//			while (!unlockCount());
-	//		}
-	//		else {
-	//			while (!lockCount());
-	//			count--;
-	//			while (!heaparray[count].lockIndex());
-	//			heaparray[0] = heaparray[count];
-	//			heaparray[count].clear();
-	//			while (!unlockCount());
-	//		}
-
-	//		pullDown(0);
-
-	//		return value;
-	//	}
+			return value;
+		}
 	};
 
 	//template<typename ElementType>
