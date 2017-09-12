@@ -140,15 +140,15 @@ namespace utils
 
 	};
 
+	template <typename ElementType> struct HeapSuperNodeConcurrent;
+
 	template<typename ElementType>
 	struct HeapNodeConcurrent : HeapNode<ElementType> {
-
-		//boost::atomic<bool> lock;
 
 		/**
 			Constructor
 		*/
-		HeapNodeConcurrent() : HeapNode(), left_neighbor(nullptr), right_neighbor(nullptr) {}
+		HeapNodeConcurrent() : HeapNode(), left_neighbor(nullptr), right_neighbor(nullptr), node(nullptr) {}
 
 		/**
 			Deconstructor
@@ -164,20 +164,7 @@ namespace utils
 
 			left_neighbor = nullptr;
 			right_neighbor = nullptr;
-		}
-
-		/**
-			Assign operator
-
-			@param[in] heapnode_ Reference of the element which has to be copied 
-		*/
-		void operator=(const HeapNodeConcurrent<ElementType>& heapnode_)
-		{
-			value = heapnode_.value;
-			index = heapnode_.index;
-
-			left_neighbor = heapnode_.left_neighbor;
-			right_neighbor = heapnode_.right_neighbor;
+			node = nullptr;
 		}
 
 		/**
@@ -189,6 +176,11 @@ namespace utils
 			Pointer to the left neighbor
 		*/
 		HeapNodeConcurrent<ElementType>* right_neighbor;
+
+		/**
+			Pointer to the node which contains this Heapnode
+		*/
+		HeapSuperNodeConcurrent<ElementType>* node;
 	};
 
 	template <typename ElementType>
@@ -274,6 +266,7 @@ namespace utils
 					(**push_node_).right_neighbor = nullptr;
 
 					sort(*pull_node_, greater_);
+					(**pull_node_).node = this;
 
 					*pull_node_ = nullptr;
 				}
@@ -310,6 +303,7 @@ namespace utils
 					(**push_node_).right_neighbor = nullptr;
 
 					sort(*pull_node_, greater_);
+					(**pull_node_).node = this;
 
 					*pull_node_ = nullptr;
 				}
@@ -358,6 +352,7 @@ namespace utils
 					(**pull_node_).left_neighbor = nullptr;
 
 					sort(*push_node_, greater_);
+					(**push_node_).node = this;
 
 					*push_node_ = nullptr;
 				}
@@ -394,6 +389,7 @@ namespace utils
 					(**pull_node_).left_neighbor = nullptr;
 
 					sort(*push_node_, greater_);
+					(**push_node_).node = this;
 
 					*push_node_ = nullptr;
 				}
@@ -1261,6 +1257,7 @@ namespace utils
 
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
+				(*sortin_node).node = &heaparray[index_];
 			while (!heaparray[index_].unlockIndex());
 
 			if (node_) {
@@ -1325,6 +1322,7 @@ namespace utils
 			}
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
+				(*sortin_node).node = &heaparray[index_];
 			while (!heaparray[index_].unlockIndex());
 
 			if (node_) {
