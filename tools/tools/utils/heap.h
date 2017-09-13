@@ -272,7 +272,6 @@ namespace utils
 					*pull_node_ = nullptr;
 				}
 				else if (**pull_node_ <= *last_node) {
-
 					*push_node_ = first_node;
 	
 					first_node = (*first_node).right_neighbor;
@@ -354,15 +353,16 @@ namespace utils
 			bool greater_ = true)
 		{
 			if (greater_){
-				if (!push_node_) { std::cout << "AFFENSCHEI?E" << std::endl; }
 				if (**push_node_ <= *last_node) {
 					*pull_node_ = *push_node_;
 					*push_node_ = nullptr;
 				}
-				else if(**push_node_ > *first_node) {
+				else if (**push_node_ > *first_node) {
 					*pull_node_ = last_node;
 
+					
 					last_node = (*last_node).left_neighbor;
+
 					if (last_node) {
 						(*last_node).right_neighbor = nullptr;
 					}
@@ -370,12 +370,16 @@ namespace utils
 						first_node = nullptr;
 					}
 
-					(**pull_node_).left_neighbor = nullptr;
+					if (*pull_node_) {
+						(**pull_node_).left_neighbor = nullptr;
+					}
 				}
 				else {
 					*pull_node_ = last_node;
-
+					
+					
 					last_node = (*last_node).left_neighbor;
+
 					if (last_node) {
 						(*last_node).right_neighbor = nullptr;
 					}
@@ -383,7 +387,9 @@ namespace utils
 						first_node = nullptr;
 					}
 
-					(**pull_node_).left_neighbor = nullptr;
+					if (*pull_node_) {
+						(**pull_node_).left_neighbor = nullptr;
+					}
 
 					sort(*push_node_, greater_);
 					(**push_node_).node = this;
@@ -399,7 +405,9 @@ namespace utils
 				else if (**push_node_ > *first_node) {
 					*pull_node_ = last_node;
 
+			
 					last_node = (*last_node).left_neighbor;
+
 					if (last_node) {
 						(*last_node).right_neighbor = nullptr;
 					}
@@ -407,12 +415,15 @@ namespace utils
 						first_node = nullptr;
 					}
 
-					(**pull_node_).left_neighbor = nullptr;
+					if (*pull_node_) {
+						(**pull_node_).left_neighbor = nullptr;
+					}
 				}
 				else {
 					*pull_node_ = last_node;
 
 					last_node = (*last_node).left_neighbor;
+
 					if (last_node) {
 						(*last_node).right_neighbor = nullptr;
 					}
@@ -420,7 +431,9 @@ namespace utils
 						first_node = nullptr;
 					}
 
-					(**pull_node_).left_neighbor = nullptr;
+					if (*pull_node_) {
+						(**pull_node_).left_neighbor = nullptr;
+					}
 
 					sort(*push_node_, greater_);
 					(**push_node_).node = this;
@@ -1289,6 +1302,11 @@ namespace utils
 				parent_index = ( index_ - 1 ) / 2;
 			}
 
+			if (!node_) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
 			if (index_ > 0) {
 				while (!heaparray[parent_index].lockIndex());
 					heaparray[parent_index].push(&node_, &sortin_node, greater);
@@ -1298,7 +1316,6 @@ namespace utils
 				sortin_node = node_;
 				node_ = nullptr;
 			}
-
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
@@ -1322,9 +1339,14 @@ namespace utils
 			size_t child_index;
 			size_t child_left = index_ * 2 + 1;
 			size_t child_right = index_ * 2 + 2;
+		
+
+			if (!node_) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
 
 			if (child_left <= std::floor((count.load(boost::memory_order_seq_cst /*boost::memory_order_relaxed*/ )-1)/cores)){
-				
 				while (!heaparray[child_left].lockIndex());
 			    while (!heaparray[child_right].lockIndex());
 
@@ -1364,6 +1386,7 @@ namespace utils
 				sortin_node = node_;
 				node_ = nullptr;
 			}
+
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
@@ -1867,8 +1890,6 @@ namespace utils
 						event = 1;
 					}
 				}
-
-				//heaparray[index].sort(node, greater);
 
 			while (!heaparray[index].unlockIndex());
 
