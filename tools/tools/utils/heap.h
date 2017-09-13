@@ -222,6 +222,9 @@ namespace utils
 		*/
 		HeapSuperNodeConcurrent() : first_node(nullptr), last_node(nullptr), lock(0), index(0) {}
 
+		/**
+			Clear
+		*/
 		void clear()
 		{
 			first_node = nullptr;
@@ -569,7 +572,12 @@ namespace utils
 			size = computeInitialSize(size_);
 			heaparray = new HeapNode<ElementType>[size];
 		}
-		
+
+		/**
+			Desconstructor
+		*/
+		virtual ~BaseHeap() {}	
+
 		/**
 			Get the number of elements in the heaparray
 
@@ -818,14 +826,52 @@ namespace utils
 			@param[in] size_ size of the heaparray which has to be built
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
-		Heap(size_t size_, bool greater_ = true) : BaseHeap(size_, greater) {
-		}
+		Heap(size_t size_, bool greater_ = true) : BaseHeap(size_, greater) {}
 	
 		/**
 			Desconstructor
 		*/
-		~Heap() { 
-			delete[] heaparray; 
+		~Heap()
+		{
+			clear();
+		}
+
+		/**
+			Copy-Constructor
+
+			@param[in] heap_ Heap
+		*/
+		Heap(const Heap& heap_)
+		{
+			greater = heap_.greater;
+
+			size = heap_.size;
+			heaparray = new HeapNode<ElementType>[size];
+			std::memcpy(heaparray, heap_.heaparray, sizeof(HeapNode<ElementType>)*size);
+
+			count = 0;
+		}
+
+		/**
+			Operator =
+
+			@param[in,out] heap_ Heap
+		*/
+		Heap& operator=(const Heap& heap_)
+		{
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			greater = heap_.greater;
+
+			size = heap_.size;
+			heaparray = new HeapNode<ElementType>[size];
+			std::memcpy(heaparray, heap_.heaparray, sizeof(HeapNode<ElementType>)*size);
+
+			count = 0;
+
+			return *this;
 		}
 
 		/**
@@ -959,11 +1005,50 @@ namespace utils
 			Desconstructor
 		*/
 		~HeapWrapper() 
-		{ 
-			delete[] heaparray; 
-			heapvector.clear();
+		{
+			clear();
 		}
 
+		/**
+			Copy-Constructor
+
+			@param[in] heap_ Heap
+		*/
+		HeapWrapper(const HeapWrapper& heap_)
+		{
+			greater = heap_.greater;
+
+			size = heap_.size;
+			heaparray = new HeapNode<ElementType>[size];
+			std::memcpy(heaparray, heap_.heaparray, sizeof(HeapNode<ElementType>)*size);
+			heapvector = heap_.heapvector;
+
+			count = 0;
+		}
+
+		/**
+			Operator =
+
+			@param[in,out] heap_ Heap
+		*/
+
+		Heap& operator=(const Heap& heap_)
+		{
+			if (heaparray) {
+				delete[] heaparray;
+			}
+
+			greater = heap_.greater;
+
+			size = heap_.size;
+			heaparray = new HeapNode<ElementType>[size];
+			std::memcpy(heaparray, heap_.heaparray, sizeof(HeapNode<ElementType>)*size);
+			heapvector = heap_.heapvector;
+
+			count = 0;
+			
+			return *this;
+		}
 		/**
 			Sets the pointer heaparray and size
 
@@ -1154,6 +1239,11 @@ namespace utils
 				heaparray[i].index = i;
 			}
 		}
+
+		/**
+			Desconstructor
+		*/
+		virtual ~BaseHeapConcurrent() {}
 
 		/**
 			Get the number of elements in the heaparray
@@ -1476,22 +1566,10 @@ namespace utils
 		*/
 		void setHeap(size_t size_, size_t cores_, bool greater_ = true) 
 		{
+			clear();
+
 			greater = greater_;
 
-			if (heaparray) {
-				for (size_t i = 0; i < size; i++) {
-					if (heaparray[i].last_node) {
-						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
-						while (node_delete) {
-							delete (*node_delete).right_neighbor;
-							node_delete = (*node_delete).left_neighbor;
-						}
-					}
-					delete heaparray[i].first_node;
-				}
-				delete[] heaparray;
-			}
-			
 			cores = cores_ + 1;
 			size = computeInitialSizeConcurrent(size_, cores_);
 			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
@@ -1513,22 +1591,9 @@ namespace utils
 		*/
 		void setHeap(HeapSuperNodeConcurrent<ElementType>* pointer_, size_t size_, size_t cores_, bool greater_ = true)
 		{
+			clear();
+
 			greater = greater_;
-
-			if (heaparray) {
-				for (size_t i = 0; i < size; i++) {
-
-					if (heaparray[i].last_node) {
-						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
-						while (node_delete) {
-							delete (*node_delete).right_neighbor;
-							node_delete = (*node_delete).left_neighbor;
-						}
-					}
-					delete heaparray[i].first_node;
-				}
-				delete[] heaparray;
-			}
 
 			cores = cores_ + 1;
 			size = size_;
@@ -1666,33 +1731,18 @@ namespace utils
 		*/
 		void setHeap(size_t size_, size_t cores_, bool greater_ = true) 
 		{
-			greater = greater_;
+			clear();
 
-			if (heaparray) {
-				for (size_t i = 0; i < size; i++) {
-					if (heaparray[i].last_node) {
-						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
-						while (node_delete) {
-							delete (*node_delete).right_neighbor;
-							node_delete = (*node_delete).left_neighbor;
-						}
-					}
-					delete heaparray[i].first_node;
-				}
-				delete[] heaparray;
-			}
+			greater = greater_;
+			
+			cores = cores_ + 1;
+			size = computeInitialSizeConcurrent(size_, cores_);
+			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
 			
 			for (size_t i = 0; i < size; i++) {
 				heaparray[i].index = i;
 			}
 
-			if (heap_nodes) {
-				delete[] heap_nodes;
-			}
-			
-			cores = cores_ + 1;
-			size = computeInitialSizeConcurrent(size_, cores_);
-			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
 			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
 
 			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
@@ -1708,34 +1758,18 @@ namespace utils
 		*/
 		void setHeap(HeapSuperNodeConcurrent<ElementType>* pointer_, size_t size_, size_t cores_, bool greater_ = true)
 		{
+			clear();
+
 			greater = greater_;
 
-			if (heaparray) {
-				for (size_t i = 0; i < size; i++) {
-
-					if (heaparray[i].last_node) {
-						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
-						while (node_delete) {
-							delete (*node_delete).right_neighbor;
-							node_delete = (*node_delete).left_neighbor;
-						}
-					}
-					delete heaparray[i].first_node;
-				}
-				delete[] heaparray;
-			}
+			cores = cores_ + 1;
+			size = size_;
+			heaparray = pointer_;
 
 			for (size_t i = 0; i < size; i++) {
 				heaparray[i].index = i;
 			}
 
-			if (heap_nodes) {
-				delete[] heap_nodes;
-			}
-
-			cores = cores_ + 1;
-			size = size_;
-			heaparray = pointer_;
 			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
 
 			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);

@@ -271,17 +271,17 @@ int main(int argc, char* argv[]) {
 	for (size_t i = 0; i < 1000; i++) {
 		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n * 2, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(2, 0))));
 	}
-	pool.waitTasks();
+	//pool.waitTasks();
 
-	
+	//
 
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
+	//if (heapConcurrent.checkHeap()) {
+	//	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//}
 
-	std::cout << heapConcurrent << std::endl;
+	//std::cout << heapConcurrent << std::endl;
 
-	pool.shutdown();
+	//pool.shutdown();
 
 	//heapConcurrent.clear();
 
