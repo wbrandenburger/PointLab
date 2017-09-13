@@ -242,10 +242,10 @@ int main(int argc, char* argv[]) {
 
 
 
-	typedef utils::HeapConcurrent<int> Heap;
+	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 28;
-	size_t coresheap = 4;
+	size_t n = 255;
+	size_t coresheap = 8;
 	utils::Threadpool pool(coresheap);
 	Heap heapConcurrent(n, coresheap , true);
 
@@ -261,10 +261,15 @@ int main(int argc, char* argv[]) {
 
 	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
 
-	int value;
-	size_t index;
-	for (size_t i = 0; i < 10 /* heapConcurrent.size * heapConcurrent.cores*/; i++) {
-		while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
+	//int value;
+	//size_t index;
+	//for (size_t i = 0; i < 10 /* heapConcurrent.size * heapConcurrent.cores*/; i++) {
+	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
+	//}
+	//pool.waitTasks();
+
+	for (size_t i = 0; i < 1000; i++) {
+		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n * 2, 0), utils::randInt(n - 1, 0))));
 	}
 	pool.waitTasks();
 

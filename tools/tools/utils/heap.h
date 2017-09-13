@@ -148,7 +148,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		HeapNodeConcurrent() : HeapNode(), left_neighbor(nullptr), right_neighbor(nullptr), node(nullptr) {}
+		HeapNodeConcurrent() : HeapNode(), left_neighbor(nullptr), right_neighbor(nullptr), node(nullptr), lock(0) {}
 
 		/**
 			Deconstructor
@@ -165,6 +165,32 @@ namespace utils
 			left_neighbor = nullptr;
 			right_neighbor = nullptr;
 			node = nullptr;
+
+			lock.store(0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+		}
+
+		/**
+			Lock this index
+
+			@return True if index could be locked
+		*/
+		bool lockIndex() 
+		{
+			bool lock_value = 0;
+
+			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+		}
+
+		/**
+			Unlock this index
+
+			@return True if index could be unlocked
+		*/
+		bool unlockIndex()
+		{
+			bool unlock_value = 1;
+
+			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -181,6 +207,11 @@ namespace utils
 			Pointer to the node which contains this Heapnode
 		*/
 		HeapSuperNodeConcurrent<ElementType>* node;
+
+		/**
+			Lock
+		*/
+		boost::atomic<bool> lock;
 	};
 
 	template <typename ElementType>
@@ -189,12 +220,14 @@ namespace utils
 		/**
 			Constructor
 		*/
-		HeapSuperNodeConcurrent() : first_node(nullptr), last_node(nullptr), lock(0) {}
+		HeapSuperNodeConcurrent() : first_node(nullptr), last_node(nullptr), lock(0), index(0) {}
 
 		void clear()
 		{
 			first_node = nullptr;
 			last_node = nullptr;
+
+			index = 0;
 
 			lock.store(0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
@@ -321,6 +354,7 @@ namespace utils
 			bool greater_ = true)
 		{
 			if (greater_){
+				if (!push_node_) { std::cout << "AFFENSCHEI?E" << std::endl; }
 				if (**push_node_ <= *last_node) {
 					*pull_node_ = *push_node_;
 					*push_node_ = nullptr;
@@ -490,10 +524,16 @@ namespace utils
 			Pointer to the first element of the list
 		*/
 		HeapNodeConcurrent<ElementType>* last_node;
+
 		/**
 			Lock
 		*/
 		boost::atomic<bool> lock;
+
+		/**
+			Index
+		*/
+		size_t index;
 	};
 
 	template<typename ElementType>
@@ -1096,6 +1136,10 @@ namespace utils
 		{
 			size = computeInitialSizeConcurrent(size_, cores_ + 1);
 			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
+
+			for (size_t i = 0; i < size; i++) {
+				heaparray[i].index = i;
+			}
 		}
 
 		/**
@@ -1429,6 +1473,10 @@ namespace utils
 			size = computeInitialSizeConcurrent(size_, cores_);
 			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
 
+			for (size_t i = 0; i < size; i++) {
+				heaparray[i].index = i;
+			}
+
 			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 		}
 
@@ -1462,6 +1510,10 @@ namespace utils
 			cores = cores_ + 1;
 			size = size_;
 			heaparray = pointer_;
+
+			for (size_t i = 0; i < size; i++) {
+				heaparray[i].index = i;
+			}
 
 			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 		}
@@ -1553,6 +1605,288 @@ namespace utils
 				
 			pullDown(0, node);
 		}
+	};
+
+	
+	template<typename ElementType>
+	class HeapWrapperConcurrent : public BaseHeapConcurrent<ElementType> {
+
+	public:
+
+		/**
+			Constructor
+		*/
+		HeapWrapperConcurrent() : BaseHeapConcurrent(), heap_nodes(nullptr) {}
+
+		/**
+			Constructor
+
+			@param[in] size_ size of the heaparray which has to be built
+			@param[in] greater_ Flag which specifies whether the set will be descendendly ordered
+		*/
+		HeapWrapperConcurrent(size_t size_, size_t cores_, bool greater_ = true) : BaseHeapConcurrent(size_, cores_, greater_)
+		{
+			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
+		}
+
+		/**
+			Desconstructor
+		*/
+		~HeapWrapperConcurrent() {}
+
+		/**
+			Sets the pointer heaparray and size
+
+			@param[in] size_ Size of the heaparray
+			@param[in] cores_ Number of cores
+			@param[in] greater_ Flag which specifies whether the set will be descendendly ordered
+		*/
+		void setHeap(size_t size_, size_t cores_, bool greater_ = true) 
+		{
+			greater = greater_;
+
+			if (heaparray) {
+				for (size_t i = 0; i < size; i++) {
+					if (heaparray[i].last_node) {
+						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
+						while (node_delete) {
+							delete (*node_delete).right_neighbor;
+							node_delete = (*node_delete).left_neighbor;
+						}
+					}
+					delete heaparray[i].first_node;
+				}
+				delete[] heaparray;
+			}
+			
+			for (size_t i = 0; i < size; i++) {
+				heaparray[i].index = i;
+			}
+
+			if (heap_nodes) {
+				delete[] heap_nodes;
+			}
+			
+			cores = cores_ + 1;
+			size = computeInitialSizeConcurrent(size_, cores_);
+			heaparray = new HeapSuperNodeConcurrent<ElementType>[size];
+			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
+
+			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+		}
+
+		/**
+			Sets the pointer heaparray and size
+
+			@param[in] pointer_ Pointer to the heap
+			@param[in] size_ Size of the heaparray
+			@param[in] cores_ Number of cores
+			@param[in] greater_ Flag which specifies whether the set will be descendendly ordered
+		*/
+		void setHeap(HeapSuperNodeConcurrent<ElementType>* pointer_, size_t size_, size_t cores_, bool greater_ = true)
+		{
+			greater = greater_;
+
+			if (heaparray) {
+				for (size_t i = 0; i < size; i++) {
+
+					if (heaparray[i].last_node) {
+						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
+						while (node_delete) {
+							delete (*node_delete).right_neighbor;
+							node_delete = (*node_delete).left_neighbor;
+						}
+					}
+					delete heaparray[i].first_node;
+				}
+				delete[] heaparray;
+			}
+
+			for (size_t i = 0; i < size; i++) {
+				heaparray[i].index = i;
+			}
+
+			if (heap_nodes) {
+				delete[] heap_nodes;
+			}
+
+			cores = cores_ + 1;
+			size = size_;
+			heaparray = pointer_;
+			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
+
+			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+		}
+
+		/**
+			Sets the elements to zero
+		*/
+		void clear() 
+		{	
+			if (heaparray) {
+				for (size_t i = 0; i < size; i++) {
+					if (heaparray[i].last_node) {
+						HeapNodeConcurrent<ElementType>* node_delete = (*heaparray[i].last_node).left_neighbor;
+						while (node_delete) {
+							delete (*node_delete).right_neighbor;
+							node_delete = (*node_delete).left_neighbor;
+						}
+					}
+					delete heaparray[i].first_node;
+				}
+				delete[] heaparray;
+			}
+			heaparray = nullptr;
+
+			if (heap_nodes) {
+				delete[] heap_nodes;
+			}
+			heap_nodes = nullptr;
+
+			size = 0;
+			cores = 0;
+			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+		}
+
+	public:
+
+		/**
+			Adds a new element
+
+			@param[in,out] value_ element which will be added
+			@param[in,out] index_ the respective index for assigning purposes
+		*/
+		void push(ElementType value_, size_t index_ = NULL)
+		{
+			int count_value = count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+
+			if (count_value > size * cores) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			HeapNodeConcurrent<ElementType>* node = new HeapNodeConcurrent<ElementType>;
+			(*node).value = value_;
+			(*node).index = index_;
+
+			heap_nodes[count_value] = node;
+
+			pushUp(std::floor(count_value / cores), node);
+		}
+
+		/**
+			Pops the minimal/maximal element;
+
+			@return minimal/maximal value of the heap
+		*/
+		void pop(ElementType& value_, size_t& index_) 
+		{
+			if (count == 0) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			while (!heaparray[0].lockIndex());
+				value_ = heaparray[0].first_node->value;
+				index_ = heaparray[0].first_node->index;
+				delete heaparray[0].first_node;
+
+				heaparray[0].first_node = heaparray[0].first_node->right_neighbor;
+				heaparray[0].first_node->left_neighbor = nullptr;
+			while (!heaparray[0].unlockIndex());
+
+			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
+			size_t index = std::floor(count_value / cores);
+			while (!heaparray[index].lockIndex());
+				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
+				heaparray[index].last_node = heaparray[index].last_node->left_neighbor;
+				if (heaparray[index].last_node) {
+					heaparray[index].last_node->right_neighbor = nullptr;
+				}
+				else {
+					heaparray[index].first_node = nullptr;
+				}
+				(*node).left_neighbor = nullptr;
+			while (!heaparray[index].unlockIndex());
+				
+			pullDown(0, node);
+		}
+
+		/**
+			Update a element in the array
+		*/
+		void update(ElementType value_, size_t index_)
+		{
+
+			while (!(*heap_nodes[index_]).lockIndex());
+
+			while (!heaparray[(*(*heap_nodes[index_]).node).index].lockIndex());
+
+				
+
+				//HeapNodeConcurrent<ElementType>* node = new HeapNodeConcurrent<ElementType>;
+				//(*node).value = value_;
+				//(*node).index = index_;
+
+				HeapNodeConcurrent<ElementType>* node = heap_nodes[index_];
+				size_t index = (*(*node).node).index;
+
+				if((*node).left_neighbor) {
+					(*(*node).left_neighbor).right_neighbor = (*node).right_neighbor;
+				}
+				else {
+					heaparray[index].first_node = (*node).right_neighbor;
+				}
+				
+				if ((*node).right_neighbor) {
+					(*(*node).right_neighbor).left_neighbor = (*node).left_neighbor;
+				}
+				else {
+					heaparray[index].last_node = (*node).left_neighbor;
+				}
+
+				(*node).right_neighbor = nullptr;
+				(*node).left_neighbor = nullptr;
+
+				(*node).value = value_;
+
+				size_t event;
+				if (greater) {
+					if (*node >= *heaparray[index].last_node) {
+						event = 0;
+					}
+					else {
+						event  = 1;
+					}
+				}
+				else {
+					if (*node <= *heaparray[index].last_node) {
+						event = 0;
+					}
+					else {
+						event = 1;
+					}
+				}
+
+				//heaparray[index].sort(node, greater);
+
+			while (!heaparray[index].unlockIndex());
+
+			switch (event) {
+			case 0: pushUp(index, node); break;
+			case 1: pullDown(index, node); break;
+			}
+
+			while (!(*heap_nodes[index_]).unlockIndex());
+		}
+
+	private:
+
+		/**
+			Array with pointers to the nodes in the heap
+		*/
+		HeapNodeConcurrent<ElementType>** heap_nodes;
+
 	};
 
 	/**
