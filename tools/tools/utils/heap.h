@@ -288,6 +288,7 @@ namespace utils
 					(**push_node_).right_neighbor = nullptr;
 				}
 				else {
+
 					*push_node_ = first_node;
 
 					first_node = (*first_node).right_neighbor;
@@ -306,43 +307,43 @@ namespace utils
 					*pull_node_ = nullptr;
 				}
 			}
-			else {
-				if (**pull_node_ < *first_node) {
-					*push_node_ = *pull_node_;
-					*pull_node_ = nullptr;
-				}
-				else if (**pull_node_ >= *last_node) {
-					*push_node_ = first_node;
+			//else {
+			//	if (**pull_node_ < *first_node) {
+			//		*push_node_ = *pull_node_;
+			//		*pull_node_ = nullptr;
+			//	}
+			//	else if (**pull_node_ >= *last_node) {
+			//		*push_node_ = first_node;
 
-					first_node = (*first_node).right_neighbor;
-					if (first_node) {
-						(*first_node).left_neighbor = nullptr;
-					}
-					else {
-						last_node = nullptr;
-					}
+			//		first_node = (*first_node).right_neighbor;
+			//		if (first_node) {
+			//			(*first_node).left_neighbor = nullptr;
+			//		}
+			//		else {
+			//			last_node = nullptr;
+			//		}
 
-					(**push_node_).right_neighbor = nullptr;
-				}
-				else {
-					*push_node_ = first_node;
+			//		(**push_node_).right_neighbor = nullptr;
+			//	}
+			//	else {
+			//		*push_node_ = first_node;
 
-					first_node = (*first_node).right_neighbor;
-					if (first_node) {
-						(*first_node).left_neighbor = nullptr;
-					}
-					else {
-						last_node = nullptr;
-					}
+			//		first_node = (*first_node).right_neighbor;
+			//		if (first_node) {
+			//			(*first_node).left_neighbor = nullptr;
+			//		}
+			//		else {
+			//			last_node = nullptr;
+			//		}
 
-					(**push_node_).right_neighbor = nullptr;
+			//		(**push_node_).right_neighbor = nullptr;
 
-					sort(*pull_node_, greater_);
-					(**pull_node_).node = this;
+			//		sort(*pull_node_, greater_);
+			//		(**pull_node_).node = this;
 
-					*pull_node_ = nullptr;
-				}
-			}
+			//		*pull_node_ = nullptr;
+			//	}
+			//}
 		}
 		
 		/**
@@ -1406,6 +1407,7 @@ namespace utils
 				sortin_node = node_;
 				node_ = nullptr;
 			}
+
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
@@ -1436,9 +1438,9 @@ namespace utils
 				std::exit(EXIT_FAILURE);
 			}
 
-			if (child_left <= std::floor((count.load(boost::memory_order_seq_cst /*boost::memory_order_relaxed*/ )-1)/cores)){
+			if (child_right <= std::floor((count.load(boost::memory_order_seq_cst /*boost::memory_order_relaxed*/ )-1)/cores)){
 				while (!heaparray[child_left].lockIndex());
-			    while (!heaparray[child_right].lockIndex());
+				while (!heaparray[child_right].lockIndex());
 
 					if (greater) {
 						if (!heaparray[child_right].first_node) {
@@ -1470,7 +1472,7 @@ namespace utils
 					}
 					heaparray[child_index].pull(&node_, &sortin_node, greater);
 
-				while (!heaparray[child_index].unlockIndex());
+					while (!heaparray[child_index].unlockIndex());
 			}
 			else {
 				sortin_node = node_;
@@ -1864,7 +1866,7 @@ namespace utils
 					heaparray[index].first_node = nullptr;
 				}
 				(*node).left_neighbor = nullptr;
-			while (!heaparray[index].unlockIndex());
+				while (!heaparray[index].unlockIndex());
 				
 			pullDown(0, node);
 		}

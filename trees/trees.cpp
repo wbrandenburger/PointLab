@@ -244,8 +244,8 @@ int main(int argc, char* argv[]) {
 
 	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 45;
-	size_t coresheap = 15;
+	size_t n = 9;
+	size_t coresheap = 2;
 	utils::Threadpool pool(coresheap);
 	Heap heapConcurrent(n, coresheap , true);
 
@@ -254,34 +254,37 @@ int main(int argc, char* argv[]) {
 	time.start();
 
 	utils::randSeed();
-	for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores; i++) {
+	int value;
+	size_t index;
+	for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores - 1; i++) {
 		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
 	}
+	//for (size_t i = 0; i < 10000; i++) {
+	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
+	//	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	//	
+	//}
 	pool.waitTasks();
 
 	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
 
-	//int value;
-	//size_t index;
-	//for (size_t i = 0; i < 10 /* heapConcurrent.size * heapConcurrent.cores*/; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
-	//}
-	//pool.waitTasks();
 
-	for (size_t i = 0; i < 1000; i++) {
+	for (size_t i = 0; i < 100000; i++) {
 		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n * 2, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(2, 0))));
 	}
-	//pool.waitTasks();
+	pool.waitTasks();
 
-	//
+	
 
-	//if (heapConcurrent.checkHeap()) {
-	//	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//}
+	if (heapConcurrent.checkHeap()) {
+		std::cout << "Heapbedingung erfüllt" << std::endl;
+	}
 
-	//std::cout << heapConcurrent << std::endl;
+	std::cout << heapConcurrent << std::endl;
 
-	//pool.shutdown();
+	heapConcurrent.clear();
+
+	pool.shutdown();
 
 	//heapConcurrent.clear();
 
