@@ -170,27 +170,34 @@ namespace utils
 		}
 
 		/**
-			Lock this index
-
-			@return True if index could be locked
+			Set the index of the respective node
 		*/
-		bool lockIndex() 
+		void setIndex() 
 		{
-			bool lock_value = 0;
+			index.store((*node).index, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 
-			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
 		/**
-			Unlock this index
+			Get the index of the respective node
 
-			@return True if index could be unlocked
+			@return The index of the respective node
 		*/
-		bool unlockIndex()
+		int getIndex()
 		{
-			bool unlock_value = 1;
+			return index.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+		}
 
-			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+		/**
+			Return True when unlocked
+		*/
+		bool indexLock()
+		{
+			if (index.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/) == -1) {
+				return false;
+			}
+
+			return true;
 		}
 
 		/**
@@ -209,9 +216,9 @@ namespace utils
 		HeapSuperNodeConcurrent<ElementType>* node;
 
 		/**
-			Lock
+			Index of the node
 		*/
-		boost::atomic<bool> lock;
+		boost::atomic<int> index;
 	};
 
 	template <typename ElementType>
@@ -288,7 +295,6 @@ namespace utils
 					(**push_node_).right_neighbor = nullptr;
 				}
 				else {
-
 					*push_node_ = first_node;
 
 					first_node = (*first_node).right_neighbor;
@@ -307,43 +313,43 @@ namespace utils
 					*pull_node_ = nullptr;
 				}
 			}
-			//else {
-			//	if (**pull_node_ < *first_node) {
-			//		*push_node_ = *pull_node_;
-			//		*pull_node_ = nullptr;
-			//	}
-			//	else if (**pull_node_ >= *last_node) {
-			//		*push_node_ = first_node;
+			else {
+				if (**pull_node_ < *first_node) {
+					*push_node_ = *pull_node_;
+					*pull_node_ = nullptr;
+				}
+				else if (**pull_node_ >= *last_node) {
+					*push_node_ = first_node;
 
-			//		first_node = (*first_node).right_neighbor;
-			//		if (first_node) {
-			//			(*first_node).left_neighbor = nullptr;
-			//		}
-			//		else {
-			//			last_node = nullptr;
-			//		}
+					first_node = (*first_node).right_neighbor;
+					if (first_node) {
+						(*first_node).left_neighbor = nullptr;
+					}
+					else {
+						last_node = nullptr;
+					}
 
-			//		(**push_node_).right_neighbor = nullptr;
-			//	}
-			//	else {
-			//		*push_node_ = first_node;
+					(**push_node_).right_neighbor = nullptr;
+				}
+				else {
+					*push_node_ = first_node;
 
-			//		first_node = (*first_node).right_neighbor;
-			//		if (first_node) {
-			//			(*first_node).left_neighbor = nullptr;
-			//		}
-			//		else {
-			//			last_node = nullptr;
-			//		}
+					first_node = (*first_node).right_neighbor;
+					if (first_node) {
+						(*first_node).left_neighbor = nullptr;
+					}
+					else {
+						last_node = nullptr;
+					}
 
-			//		(**push_node_).right_neighbor = nullptr;
+					(**push_node_).right_neighbor = nullptr;
 
-			//		sort(*pull_node_, greater_);
-			//		(**pull_node_).node = this;
+					sort(*pull_node_, greater_);
+					(**pull_node_).node = this;
 
-			//		*pull_node_ = nullptr;
-			//	}
-			//}
+					*pull_node_ = nullptr;
+				}
+			}
 		}
 		
 		/**
@@ -379,8 +385,7 @@ namespace utils
 					}
 				}
 				else {
-					*pull_node_ = last_node;
-					
+					*pull_node_ = last_node;			
 					
 					last_node = (*last_node).left_neighbor;
 
@@ -472,7 +477,6 @@ namespace utils
 								return;
 							}
 						}
-
 						(*node_).left_neighbor = last_node;
 
 						(*last_node).right_neighbor = node_;
@@ -492,44 +496,44 @@ namespace utils
 					last_node = node_;
 				}
 			}
-			else {
-				if (first_node) {
-					if (*node_ >= *first_node) {
-						HeapNodeConcurrent<ElementType>* next_node = first_node;
-						while (next_node) {
-							if (*node_ <= *next_node) {
-								next_node = (*next_node).right_neighbor;
-							}
-							else {
-								(*(*next_node).left_neighbor).right_neighbor = node_;
-								(*node_).left_neighbor = (*next_node).left_neighbor;
-								(*next_node).left_neighbor = node_;
-								(*node_).right_neighbor = next_node;
+			//else {
+			//	if (first_node) {
+			//		if (*node_ >= *first_node) {
+			//			HeapNodeConcurrent<ElementType>* next_node = first_node;
+			//			while (next_node) {
+			//				if (*node_ <= *next_node) {
+			//					next_node = (*next_node).right_neighbor;
+			//				}
+			//				else {
+			//					(*(*next_node).left_neighbor).right_neighbor = node_;
+			//					(*node_).left_neighbor = (*next_node).left_neighbor;
+			//					(*next_node).left_neighbor = node_;
+			//					(*node_).right_neighbor = next_node;
 
-								return;
-							}
-						}
+			//					return;
+			//				}
+			//			}
 
-						(*node_).left_neighbor = last_node;
+			//			(*node_).left_neighbor = last_node;
 
-						(*last_node).right_neighbor = node_;
+			//			(*last_node).right_neighbor = node_;
 
-						last_node = node_;
+			//			last_node = node_;
 
-					}
-					else {
-						(*node_).right_neighbor = first_node;
+			//		}
+			//		else {
+			//			(*node_).right_neighbor = first_node;
 
-						(*first_node).left_neighbor = node_;
-					
-						first_node = node_;
-					}
-				}
-				else {
-					first_node = node_;
-					last_node = node_;
-				}
-			}
+			//			(*first_node).left_neighbor = node_;
+			//		
+			//			first_node = node_;
+			//		}
+			//	}
+			//	else {
+			//		first_node = node_;
+			//		last_node = node_;
+			//	}
+			//}
 		}
 
 		/**
@@ -1368,9 +1372,8 @@ namespace utils
 				}
 
 			}
-			else {
-				return true;
-			}
+
+			return true;
 		}
 
 	protected:
@@ -1381,7 +1384,7 @@ namespace utils
 			@param[in] index_ Index of the current node
 			@param[in] node_ Pointer to the element which has to be sorted in
 		*/
-		virtual void pushUp(size_t index_, HeapNodeConcurrent<ElementType>* node_) 
+		void pushUp(size_t index_, HeapNodeConcurrent<ElementType>* node_) 
 		{	
 			HeapNodeConcurrent<ElementType>* sortin_node = nullptr;
 			
@@ -1424,7 +1427,7 @@ namespace utils
 			@param[in] index_ Index of the current node
 			@param[in] node_ Pointer to the element which has to be sorted in
 		*/
-		virtual void pullDown(size_t index_, HeapNodeConcurrent<ElementType>* node_)
+		void pullDown(size_t index_, HeapNodeConcurrent<ElementType>* node_)
 		{
 			HeapNodeConcurrent<ElementType>* sortin_node = nullptr;
 
@@ -1487,7 +1490,7 @@ namespace utils
 			if (node_) {
 				pullDown(child_index, node_);
 			}
-			
+
 		}
 
 	public:
@@ -1877,18 +1880,11 @@ namespace utils
 		void update(ElementType value_, size_t index_)
 		{
 
-			while (!(*heap_nodes[index_]).lockIndex());
+			HeapNodeConcurrent<ElementType>* node = heap_nodes[index_];
+			size_t index = (*(*node).node).index;
 
-			while (!heaparray[(*(*heap_nodes[index_]).node).index].lockIndex());
+			while (!heaparray[index].lockIndex());
 
-				
-
-				//HeapNodeConcurrent<ElementType>* node = new HeapNodeConcurrent<ElementType>;
-				//(*node).value = value_;
-				//(*node).index = index_;
-
-				HeapNodeConcurrent<ElementType>* node = heap_nodes[index_];
-				size_t index = (*(*node).node).index;
 
 				if((*node).left_neighbor) {
 					(*(*node).left_neighbor).right_neighbor = (*node).right_neighbor;
@@ -1896,7 +1892,7 @@ namespace utils
 				else {
 					heaparray[index].first_node = (*node).right_neighbor;
 				}
-				
+
 				if ((*node).right_neighbor) {
 					(*(*node).right_neighbor).left_neighbor = (*node).left_neighbor;
 				}
@@ -1908,9 +1904,15 @@ namespace utils
 				(*node).left_neighbor = nullptr;
 
 				(*node).value = value_;
-
 				size_t event;
 				if (greater) {
+					if (!heaparray[index].last_node) {
+						std::cout << " BITTE " << std::endl;
+					}
+					if (!heaparray[index].first_node) {
+						std::cout << " BITTE " << std::endl;
+					}
+
 					if (*node >= *heaparray[index].last_node) {
 						event = 0;
 					}
@@ -1933,8 +1935,6 @@ namespace utils
 			case 0: pushUp(index, node); break;
 			case 1: pullDown(index, node); break;
 			}
-
-			while (!(*heap_nodes[index_]).unlockIndex());
 		}
 
 	private:

@@ -256,7 +256,7 @@ int main(int argc, char* argv[]) {
 	utils::randSeed();
 	int value;
 	size_t index;
-	for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores - 1; i++) {
+	for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores ; i++) {
 		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
 	}
 	//for (size_t i = 0; i < 10000; i++) {
