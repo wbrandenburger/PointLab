@@ -170,34 +170,37 @@ namespace utils
 		}
 
 		/**
-			Set the index of the respective node
-		*/
-		void setIndex() 
-		{
-			index.store((*node).index, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			Lock this index
 
+			@return True if index could be locked
+		*/
+		bool lockIndex() 
+		{
+			bool lock_value = 0;
+
+			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
 		/**
-			Get the index of the respective node
+			Unlock this index
 
-			@return The index of the respective node
+			@return True if index could be unlocked
 		*/
-		int getIndex()
+		bool unlockIndex()
 		{
-			return index.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			bool unlock_value = 1;
+
+			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
-
+		
 		/**
-			Return True when unlocked
-		*/
-		bool indexLock()
-		{
-			if (index.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/) == -1) {
-				return false;
-			}
+			Get lock
 
-			return true;
+			@return Lock
+		*/
+		bool getLock()
+		{
+			return lock.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -218,7 +221,7 @@ namespace utils
 		/**
 			Index of the node
 		*/
-		boost::atomic<int> index;
+		boost::atomic<bool> lock;
 	};
 
 	template <typename ElementType>
@@ -265,6 +268,16 @@ namespace utils
 
 			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
 		}
+
+		/** 
+			Get lock
+
+			@return Lock
+		*/
+		bool getLock()
+		{
+			return lock.load( boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+		}
 		
 		/**
 			Pull an element
@@ -282,6 +295,9 @@ namespace utils
 					*pull_node_ = nullptr;
 				}
 				else if (**pull_node_ <= *last_node) {
+					while (!(*first_node).lockIndex());
+					(*first_node).node = nullptr;
+
 					*push_node_ = first_node;
 	
 					first_node = (*first_node).right_neighbor;
@@ -295,7 +311,11 @@ namespace utils
 					(**push_node_).right_neighbor = nullptr;
 				}
 				else {
+					while (!(*first_node).lockIndex());
+					(*first_node).node = nullptr;
+					
 					*push_node_ = first_node;
+					
 
 					first_node = (*first_node).right_neighbor;
 					if (first_node) {
@@ -309,6 +329,7 @@ namespace utils
 
 					sort(*pull_node_, greater_);
 					(**pull_node_).node = this;
+					while (!(**pull_node_).unlockIndex());
 
 					*pull_node_ = nullptr;
 				}
@@ -319,6 +340,9 @@ namespace utils
 					*pull_node_ = nullptr;
 				}
 				else if (**pull_node_ >= *last_node) {
+					while (!(*first_node).lockIndex());
+					(*first_node).node = nullptr;
+					
 					*push_node_ = first_node;
 
 					first_node = (*first_node).right_neighbor;
@@ -332,6 +356,9 @@ namespace utils
 					(**push_node_).right_neighbor = nullptr;
 				}
 				else {
+					while (!(*first_node).lockIndex());
+					(*first_node).node = nullptr;
+					
 					*push_node_ = first_node;
 
 					first_node = (*first_node).right_neighbor;
@@ -346,6 +373,7 @@ namespace utils
 
 					sort(*pull_node_, greater_);
 					(**pull_node_).node = this;
+					while (!(**pull_node_).unlockIndex());
 
 					*pull_node_ = nullptr;
 				}
@@ -368,6 +396,9 @@ namespace utils
 					*push_node_ = nullptr;
 				}
 				else if (**push_node_ > *first_node) {
+					while (!(*last_node).lockIndex());
+					(*last_node).node = nullptr;
+					
 					*pull_node_ = last_node;
 
 					
@@ -385,6 +416,9 @@ namespace utils
 					}
 				}
 				else {
+					while (!(*last_node).lockIndex());
+					(*last_node).node = nullptr;
+					
 					*pull_node_ = last_node;			
 					
 					last_node = (*last_node).left_neighbor;
@@ -402,6 +436,7 @@ namespace utils
 
 					sort(*push_node_, greater_);
 					(**push_node_).node = this;
+					while (!(**push_node_).unlockIndex());
 
 					*push_node_ = nullptr;
 				}
@@ -412,9 +447,11 @@ namespace utils
 					*push_node_ = nullptr;
 				}
 				else if (**push_node_ > *first_node) {
+					while (!(*last_node).lockIndex());
+					(*last_node).node = nullptr;
+					
 					*pull_node_ = last_node;
 
-			
 					last_node = (*last_node).left_neighbor;
 
 					if (last_node) {
@@ -429,6 +466,9 @@ namespace utils
 					}
 				}
 				else {
+					while (!(*last_node).lockIndex());
+					(*last_node).node = nullptr;
+					
 					*pull_node_ = last_node;
 
 					last_node = (*last_node).left_neighbor;
@@ -446,6 +486,7 @@ namespace utils
 
 					sort(*push_node_, greater_);
 					(**push_node_).node = this;
+					while (!(**push_node_).unlockIndex());
 
 					*push_node_ = nullptr;
 				}
@@ -496,44 +537,44 @@ namespace utils
 					last_node = node_;
 				}
 			}
-			//else {
-			//	if (first_node) {
-			//		if (*node_ >= *first_node) {
-			//			HeapNodeConcurrent<ElementType>* next_node = first_node;
-			//			while (next_node) {
-			//				if (*node_ <= *next_node) {
-			//					next_node = (*next_node).right_neighbor;
-			//				}
-			//				else {
-			//					(*(*next_node).left_neighbor).right_neighbor = node_;
-			//					(*node_).left_neighbor = (*next_node).left_neighbor;
-			//					(*next_node).left_neighbor = node_;
-			//					(*node_).right_neighbor = next_node;
+			else {
+				if (first_node) {
+					if (*node_ >= *first_node) {
+						HeapNodeConcurrent<ElementType>* next_node = first_node;
+						while (next_node) {
+							if (*node_ <= *next_node) {
+								next_node = (*next_node).right_neighbor;
+							}
+							else {
+								(*(*next_node).left_neighbor).right_neighbor = node_;
+								(*node_).left_neighbor = (*next_node).left_neighbor;
+								(*next_node).left_neighbor = node_;
+								(*node_).right_neighbor = next_node;
 
-			//					return;
-			//				}
-			//			}
+								return;
+							}
+						}
 
-			//			(*node_).left_neighbor = last_node;
+						(*node_).left_neighbor = last_node;
 
-			//			(*last_node).right_neighbor = node_;
+						(*last_node).right_neighbor = node_;
 
-			//			last_node = node_;
+						last_node = node_;
 
-			//		}
-			//		else {
-			//			(*node_).right_neighbor = first_node;
+					}
+					else {
+						(*node_).right_neighbor = first_node;
 
-			//			(*first_node).left_neighbor = node_;
-			//		
-			//			first_node = node_;
-			//		}
-			//	}
-			//	else {
-			//		first_node = node_;
-			//		last_node = node_;
-			//	}
-			//}
+						(*first_node).left_neighbor = node_;
+					
+						first_node = node_;
+					}
+				}
+				else {
+					first_node = node_;
+					last_node = node_;
+				}
+			}
 		}
 
 		/**
@@ -1401,24 +1442,26 @@ namespace utils
 				std::exit(EXIT_FAILURE);
 			}
 
-			if (index_ > 0) {
-				while (!heaparray[parent_index].lockIndex());
-					heaparray[parent_index].push(&node_, &sortin_node, greater);
-				while (!heaparray[parent_index].unlockIndex());
-			}
-			else {
+			//if (index_ > 0) {
+			//	while (!heaparray[parent_index].lockIndex());
+			//		heaparray[parent_index].push(&node_, &sortin_node, greater);
+			//	while (!heaparray[parent_index].unlockIndex());
+			//}
+			//else {
 				sortin_node = node_;
 				node_ = nullptr;
-			}
+			//}
 
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
+				while((*sortin_node).unlockIndex());
+				std::cout << boost::this_thread::get_id() << std::endl;
 			while (!heaparray[index_].unlockIndex());
 
-			if (node_) {
-				pushUp(parent_index, node_);
-			}
+			//if (node_) {
+			//	pushUp(parent_index, node_);
+			//}
 		}
 
 		/**
@@ -1485,6 +1528,7 @@ namespace utils
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
+				while ((*sortin_node).unlockIndex());
 			while (!heaparray[index_].unlockIndex());
 
 			if (node_) {
@@ -1655,6 +1699,7 @@ namespace utils
 			}
 
 			HeapNodeConcurrent<ElementType>* node = new HeapNodeConcurrent<ElementType>;
+			while (!(*node).lockIndex());
 			(*node).value = value_;
 			(*node).index = index_;
 
@@ -1685,6 +1730,8 @@ namespace utils
 			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
+				while ((*heaparray[index].last_node).lockIndex());
+				(*heaparray[index].last_node).node = nullptr;
 				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
 				heaparray[index].last_node = heaparray[index].last_node->left_neighbor;
 				if (heaparray[index].last_node) {
@@ -1828,6 +1875,7 @@ namespace utils
 			}
 
 			HeapNodeConcurrent<ElementType>* node = new HeapNodeConcurrent<ElementType>;
+			while (!(*node).lockIndex());
 			(*node).value = value_;
 			(*node).index = index_;
 
@@ -1860,6 +1908,8 @@ namespace utils
 			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
+				while (!(*heaparray[index].last_node).lockIndex());
+				(*heaparray[index].last_node).node = nullptr;
 				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
 				heaparray[index].last_node = heaparray[index].last_node->left_neighbor;
 				if (heaparray[index].last_node) {
@@ -1869,7 +1919,7 @@ namespace utils
 					heaparray[index].first_node = nullptr;
 				}
 				(*node).left_neighbor = nullptr;
-				while (!heaparray[index].unlockIndex());
+			while (!heaparray[index].unlockIndex());
 				
 			pullDown(0, node);
 		}
@@ -1881,10 +1931,20 @@ namespace utils
 		{
 
 			HeapNodeConcurrent<ElementType>* node = heap_nodes[index_];
+
+			while (!(*node).lockIndex());
+
+			while (!heaparray[(*(*node).node).index].lockIndex()) {
+				while (!(*node).unlockIndex());
+				boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+				while (!(*node).lockIndex());
+			}
+			
 			size_t index = (*(*node).node).index;
-
-			while (!heaparray[index].lockIndex());
-
+	
+			if (!(*node).right_neighbor && !(*node).left_neighbor) {
+				std::cout << "WASN JETZT LOS" << std::endl;
+				}
 
 				if((*node).left_neighbor) {
 					(*(*node).left_neighbor).right_neighbor = (*node).right_neighbor;
@@ -1906,18 +1966,11 @@ namespace utils
 				(*node).value = value_;
 				size_t event;
 				if (greater) {
-					if (!heaparray[index].last_node) {
-						std::cout << " BITTE " << std::endl;
-					}
-					if (!heaparray[index].first_node) {
-						std::cout << " BITTE " << std::endl;
-					}
-
 					if (*node >= *heaparray[index].last_node) {
 						event = 0;
 					}
 					else {
-						event  = 1;
+						event  = 0;
 					}
 				}
 				else {
@@ -1925,7 +1978,7 @@ namespace utils
 						event = 0;
 					}
 					else {
-						event = 1;
+						event = 0;
 					}
 				}
 
