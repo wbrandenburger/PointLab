@@ -244,8 +244,8 @@ int main(int argc, char* argv[]) {
 
 	typedef utils::HeapWrapperConcurrent<int> Heap;
 
-	size_t n = 1000;
-	size_t coresheap = 24;
+	size_t n = 15;
+	size_t coresheap = 1;
 	utils::Threadpool pool(coresheap);
 	Heap heapConcurrent(n, coresheap, true);
 
@@ -262,29 +262,35 @@ int main(int argc, char* argv[]) {
 	for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores ; i++) {
 		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
 	}
-	//for (size_t i = 0; i < 10000; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
+	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
+	
+	std::cout << heapConcurrent << std::endl;
+
+	for (size_t i = 0; i < 10 ; i++) {
+		while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
 	//	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
 	//	
-	//}
-	pool.waitTasks();
-
-	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
-
-	time.start();
-
-	for (size_t i = 0; i < 100000; i++) {
-		while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n * 2, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(2, 0))));
 	}
 	pool.waitTasks();
 
 	std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
+
+	//time.start();
+
+	//for (size_t i = 0; i < 100000; i++) {
+	//	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n * 2, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(2, 0))));
+	//}
+	//pool.waitTasks();
+
+	//std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
+
+	std::cout << heapConcurrent << std::endl;
 
 	if (heapConcurrent.checkHeap()) {
 		std::cout << "Heapbedingung erfüllt" << std::endl;
 	}
 
-	//std::cout << heapConcurrent << std::endl;
+	std::cout << heapConcurrent << std::endl;
 
 	heapConcurrent.clear();
 

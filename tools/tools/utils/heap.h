@@ -1392,6 +1392,9 @@ namespace utils
 
 				HeapNodeConcurrent<ElementType>* list_node = heaparray[index_].first_node;
 				while (list_node) {
+
+					std::cout << (*list_node).value << std::endl;
+
 					if ((*list_node).right_neighbor) {
 						if (greater) {
 							if (*list_node >= *(*list_node).right_neighbor){
@@ -1442,26 +1445,25 @@ namespace utils
 				std::exit(EXIT_FAILURE);
 			}
 
-			//if (index_ > 0) {
-			//	while (!heaparray[parent_index].lockIndex());
-			//		heaparray[parent_index].push(&node_, &sortin_node, greater);
-			//	while (!heaparray[parent_index].unlockIndex());
-			//}
-			//else {
+			if (index_ > 0) {
+				while (!heaparray[parent_index].lockIndex());
+					heaparray[parent_index].push(&node_, &sortin_node, greater);
+				while (!heaparray[parent_index].unlockIndex());
+			}
+			else {
 				sortin_node = node_;
 				node_ = nullptr;
-			//}
+			}
 
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
 				while((*sortin_node).unlockIndex());
-				std::cout << boost::this_thread::get_id() << std::endl;
 			while (!heaparray[index_].unlockIndex());
 
-			//if (node_) {
-			//	pushUp(parent_index, node_);
-			//}
+			if (node_) {
+				pushUp(parent_index, node_);
+			}
 		}
 
 		/**
@@ -1534,7 +1536,6 @@ namespace utils
 			if (node_) {
 				pullDown(child_index, node_);
 			}
-
 		}
 
 	public:
@@ -1721,26 +1722,29 @@ namespace utils
 			while (!heaparray[0].lockIndex());
 				value_ = heaparray[0].first_node->value;
 				index_ = heaparray[0].first_node->index;
-				delete heaparray[0].first_node;
 
-				heaparray[0].first_node = heaparray[0].first_node->right_neighbor;
-				heaparray[0].first_node->left_neighbor = nullptr;
+				HeapNodeConcurrent<ElementType>* node = (*heaparray[0].first_node).right_neighbor;
+				delete heaparray[0].first_node;
+				
+				heaparray[0].first_node = node;
+				(*node).left_neighbor = nullptr;	
 			while (!heaparray[0].unlockIndex());
 
-			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
+			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
 				while ((*heaparray[index].last_node).lockIndex());
-				(*heaparray[index].last_node).node = nullptr;
 				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
-				heaparray[index].last_node = heaparray[index].last_node->left_neighbor;
-				if (heaparray[index].last_node) {
-					heaparray[index].last_node->right_neighbor = nullptr;
-				}
-				else {
+				heaparray[index].last_node = (*node).left_neighbor;
+				
+				(*node).node = nullptr;
+				node->right_neighbor = nullptr;
+				node->left_neighbor = nullptr;
+
+				if (!heapparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
 				}
-				(*node).left_neighbor = nullptr;
 			while (!heaparray[index].unlockIndex());
 				
 			pullDown(0, node);
@@ -1899,29 +1903,32 @@ namespace utils
 			while (!heaparray[0].lockIndex());
 				value_ = heaparray[0].first_node->value;
 				index_ = heaparray[0].first_node->index;
-				delete heaparray[0].first_node;
 
-				heaparray[0].first_node = heaparray[0].first_node->right_neighbor;
-				heaparray[0].first_node->left_neighbor = nullptr;
+				HeapNodeConcurrent<ElementType>* node = (*heaparray[0].first_node).right_neighbor;
+				delete heaparray[0].first_node;
+				
+				heaparray[0].first_node = node;
+				(*node).left_neighbor = nullptr;	
 			while (!heaparray[0].unlockIndex());
 
-			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
+			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
-				while (!(*heaparray[index].last_node).lockIndex());
-				(*heaparray[index].last_node).node = nullptr;
+				while ((*heaparray[index].last_node).lockIndex());
 				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
-				heaparray[index].last_node = heaparray[index].last_node->left_neighbor;
-				if (heaparray[index].last_node) {
-					heaparray[index].last_node->right_neighbor = nullptr;
-				}
-				else {
+				heaparray[index].last_node = (*node).left_neighbor;
+				
+				(*node).node = nullptr;
+				node->right_neighbor = nullptr;
+				node->left_neighbor = nullptr;
+
+				if (!heapparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
 				}
-				(*node).left_neighbor = nullptr;
 			while (!heaparray[index].unlockIndex());
 				
-			pullDown(0, node);
+			/*pullDown(0, node);*/
 		}
 
 		/**
