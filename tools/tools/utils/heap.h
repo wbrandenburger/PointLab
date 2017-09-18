@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <boost/atomic.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace utils
 {
@@ -166,7 +167,7 @@ namespace utils
 			right_neighbor = nullptr;
 			node = nullptr;
 
-			lock.store(0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			lock.store(0, boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -178,7 +179,7 @@ namespace utils
 		{
 			bool lock_value = 0;
 
-			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -190,7 +191,7 @@ namespace utils
 		{
 			bool unlock_value = 1;
 
-			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 		
 		/**
@@ -200,7 +201,7 @@ namespace utils
 		*/
 		bool getLock()
 		{
-			return lock.load(boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			return lock.load(boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -242,7 +243,7 @@ namespace utils
 
 			index = 0;
 
-			lock.store(0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			lock.store(0, boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -254,7 +255,7 @@ namespace utils
 		{
 			bool lock_value = 0;
 
-			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			return lock.compare_exchange_weak(lock_value, 1, boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 
 		/**
@@ -266,7 +267,7 @@ namespace utils
 		{
 			bool unlock_value = 1;
 
-			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			return lock.compare_exchange_weak(unlock_value, 0, boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 
 		/** 
@@ -276,7 +277,7 @@ namespace utils
 		*/
 		bool getLock()
 		{
-			return lock.load( boost::memory_order_seq_cst/*boost::memory_order_relaxed*/);
+			return lock.load(boost::memory_order_acquire/*boost::memory_order_relaxed*/);
 		}
 		
 		/**
@@ -523,6 +524,7 @@ namespace utils
 						(*last_node).right_neighbor = node_;
 
 						last_node = node_;
+
 					}
 					else {
 						(*node_).right_neighbor = first_node;
@@ -1392,9 +1394,6 @@ namespace utils
 
 				HeapNodeConcurrent<ElementType>* list_node = heaparray[index_].first_node;
 				while (list_node) {
-
-					std::cout << (*list_node).value << std::endl;
-
 					if ((*list_node).right_neighbor) {
 						if (greater) {
 							if (*list_node >= *(*list_node).right_neighbor){
@@ -1412,6 +1411,9 @@ namespace utils
 								return false;
 							}
 						}
+					}
+					else {
+						return true;
 					}
 				}
 
@@ -1446,19 +1448,19 @@ namespace utils
 			}
 
 			if (index_ > 0) {
-				while (!heaparray[parent_index].lockIndex());
+				while (!heaparray[parent_index].lockIndex()) ;
 					heaparray[parent_index].push(&node_, &sortin_node, greater);
-				while (!heaparray[parent_index].unlockIndex());
+				while (!heaparray[parent_index].unlockIndex()) ;
 			}
 			else {
 				sortin_node = node_;
 				node_ = nullptr;
 			}
 
-			while (!heaparray[index_].lockIndex());
+			while (!heaparray[index_].lockIndex()) ;
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
-				while((*sortin_node).unlockIndex());
+				while(!(*sortin_node).unlockIndex());
 			while (!heaparray[index_].unlockIndex());
 
 			if (node_) {
@@ -1500,7 +1502,7 @@ namespace utils
 							child_index = child_left;
 						}
 						else {
-							while (!heaparray[child_left].unlockIndex());
+							while (!heaparray[child_left].unlockIndex()) ;
 							child_index = child_right;
 						}
 					}
@@ -1530,7 +1532,7 @@ namespace utils
 			while (!heaparray[index_].lockIndex());
 				heaparray[index_].sort(sortin_node, greater);
 				(*sortin_node).node = &heaparray[index_];
-				while ((*sortin_node).unlockIndex());
+				while (!(*sortin_node).unlockIndex());
 			while (!heaparray[index_].unlockIndex());
 
 			if (node_) {
@@ -1692,7 +1694,7 @@ namespace utils
 		*/
 		void push(ElementType value_, size_t index_ = NULL)
 		{
-			int count_value = count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			size_t count_value = (size_t) count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 
 			if (count_value > size * cores) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
@@ -1727,23 +1729,26 @@ namespace utils
 				delete heaparray[0].first_node;
 				
 				heaparray[0].first_node = node;
-				(*node).left_neighbor = nullptr;	
+				(*node).left_neighbor = nullptr;
 			while (!heaparray[0].unlockIndex());
 
-			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
 			
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
 				while ((*heaparray[index].last_node).lockIndex());
-				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
+				node = heaparray[index].last_node;
 				heaparray[index].last_node = (*node).left_neighbor;
 				
 				(*node).node = nullptr;
 				node->right_neighbor = nullptr;
 				node->left_neighbor = nullptr;
 
-				if (!heapparray[index].last_node) {
+				if (!heaparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
+				}
+				else {
+					(*heaparray[index].last_node).right_neighbor = nullptr;
 				}
 			while (!heaparray[index].unlockIndex());
 				
@@ -1871,7 +1876,7 @@ namespace utils
 		*/
 		void push(ElementType value_, size_t index_ = NULL)
 		{
-			int count_value = count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			size_t count_value = (size_t) count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
 
 			if (count_value > size * cores) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
@@ -1904,31 +1909,54 @@ namespace utils
 				value_ = heaparray[0].first_node->value;
 				index_ = heaparray[0].first_node->index;
 
-				HeapNodeConcurrent<ElementType>* node = (*heaparray[0].first_node).right_neighbor;
-				delete heaparray[0].first_node;
+				heap_nodes[index_] = nullptr;
+
+				HeapNodeConcurrent<ElementType>* first_node = heaparray[0].first_node;
+				heaparray[0].first_node = (*first_node).right_neighbor;
+				(*heaparray[0].first_node).left_neighbor = nullptr;
 				
-				heaparray[0].first_node = node;
-				(*node).left_neighbor = nullptr;	
+				delete first_node;
 			while (!heaparray[0].unlockIndex());
 
-			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
-
+			size_t count_value = (size_t) count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
 			size_t index = std::floor(count_value / cores);
-			while (!heaparray[index].lockIndex());
-				while ((*heaparray[index].last_node).lockIndex());
-				HeapNodeConcurrent<ElementType>* node = heaparray[index].last_node;
-				heaparray[index].last_node = (*node).left_neighbor;
-				
-				(*node).node = nullptr;
-				node->right_neighbor = nullptr;
-				node->left_neighbor = nullptr;
 
-				if (!heapparray[index].last_node) {
+			while (!heaparray[index].lockIndex());
+			int a = 0;
+			HeapNodeConcurrent<ElementType>* n = heaparray[index].first_node;
+			while (n) {
+				a++;
+				n = (*n).right_neighbor;
+			}
+
+			if (!heaparray[index].last_node) {
+				std::cout << index << " ------------------------------Problem------------------------------------" << std::endl;
+			}
+				while (!(*heaparray[index].last_node).lockIndex()) ;
+				HeapNodeConcurrent<ElementType>* last_node = heaparray[index].last_node;
+
+
+				m.lock();
+				std::cout << count_value << " " << cores << " " << (float)count_value / float(cores) << " " << a << " " << (*last_node).value << " " << index << std::endl;
+				m.unlock();
+
+
+				heaparray[index].last_node = (*last_node).left_neighbor;
+	
+				(*last_node).node = nullptr;
+				(*last_node).right_neighbor = nullptr;
+				(*last_node).left_neighbor = nullptr;
+
+				if (!heaparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
 				}
-			while (!heaparray[index].unlockIndex());
-				
-			/*pullDown(0, node);*/
+				else {
+					(*heaparray[index].last_node).right_neighbor = nullptr;
+				}
+
+				while (!heaparray[index].unlockIndex()) ;
+
+			pullDown(0, last_node);
 		}
 
 		/**
@@ -1940,7 +1968,7 @@ namespace utils
 			HeapNodeConcurrent<ElementType>* node = heap_nodes[index_];
 
 			while (!(*node).lockIndex());
-
+			
 			while (!heaparray[(*(*node).node).index].lockIndex()) {
 				while (!(*node).unlockIndex());
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
@@ -1949,10 +1977,6 @@ namespace utils
 			
 			size_t index = (*(*node).node).index;
 	
-			if (!(*node).right_neighbor && !(*node).left_neighbor) {
-				std::cout << "WASN JETZT LOS" << std::endl;
-				}
-
 				if((*node).left_neighbor) {
 					(*(*node).left_neighbor).right_neighbor = (*node).right_neighbor;
 				}
@@ -1977,7 +2001,7 @@ namespace utils
 						event = 0;
 					}
 					else {
-						event  = 0;
+						event  = 1;
 					}
 				}
 				else {
@@ -1985,16 +2009,32 @@ namespace utils
 						event = 0;
 					}
 					else {
-						event = 0;
+						event = 1;
 					}
 				}
 
-			while (!heaparray[index].unlockIndex());
+			while (!heaparray[index].unlockIndex()) ;
 
 			switch (event) {
 			case 0: pushUp(index, node); break;
 			case 1: pullDown(index, node); break;
 			}
+		}
+
+		/** 
+			Checks whether all nodes are unlocked
+			
+			@return True if all nodes are unlocked
+		*/
+		bool checkLock()
+		{
+			for (size_t i = 0; i < size; i++) {
+				if (heaparray[i].getLock()) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 	private:
@@ -2003,6 +2043,8 @@ namespace utils
 			Array with pointers to the nodes in the heap
 		*/
 		HeapNodeConcurrent<ElementType>** heap_nodes;
+
+		boost::mutex m;
 
 	};
 
