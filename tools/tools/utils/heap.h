@@ -285,17 +285,18 @@ namespace utils
 
 			@param[in,out] pull_node_ Pointer to the element which has to be evaluated
 			@param[in,out] push_node_ Pointer to the element which has to be sorted in the previous node
+			@param[in] last_node_ True when this node doesn' have children
 			@param[in] greater Flag which specifies whether the set will be descendendly ordered
 		*/
 		void pull(HeapNodeConcurrent<ElementType>** pull_node_, HeapNodeConcurrent<ElementType>** push_node_,
-			bool greater_ = true)
+			bool last_node_, bool greater_ = true)
 		{
 			if (greater_) {
 				if (**pull_node_ > *first_node) {
 					*push_node_ = *pull_node_;
 					*pull_node_ = nullptr;
 				}
-				else if (**pull_node_ <= *last_node) {
+				else if (**pull_node_ <= *last_node && !last_node_) {
 					while (!(*first_node).lockIndex());
 					(*first_node).node = nullptr;
 
@@ -340,7 +341,7 @@ namespace utils
 					*push_node_ = *pull_node_;
 					*pull_node_ = nullptr;
 				}
-				else if (**pull_node_ >= *last_node) {
+				else if (**pull_node_ >= *last_node && !last_node_) {
 					while (!(*first_node).lockIndex());
 					(*first_node).node = nullptr;
 					
@@ -1520,7 +1521,9 @@ namespace utils
 							child_index = child_right;
 						}
 					}
-					heaparray[child_index].pull(&node_, &sortin_node, greater);
+
+					bool last_node = child_index * 2 + 1 > std::floor((count.load(boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1) / cores) ? true : false;
+					heaparray[child_index].pull(&node_, &sortin_node,last_node, greater);
 
 					while (!heaparray[child_index].unlockIndex());
 			}
@@ -1712,7 +1715,8 @@ namespace utils
 		/**
 			Pops the minimal/maximal element;
 
-			@return minimal/maximal value of the heap
+			@param[in,out] value_ minimal/maximal value of the heap
+			@param[in,out] index_ of the minimal/maximal value of the heap
 		*/
 		void pop(ElementType& value_, size_t& index_) 
 		{
@@ -1725,24 +1729,24 @@ namespace utils
 				value_ = heaparray[0].first_node->value;
 				index_ = heaparray[0].first_node->index;
 
-				HeapNodeConcurrent<ElementType>* node = (*heaparray[0].first_node).right_neighbor;
-				delete heaparray[0].first_node;
-				
-				heaparray[0].first_node = node;
-				(*node).left_neighbor = nullptr;
-			while (!heaparray[0].unlockIndex());
+				HeapNodeConcurrent<ElementType>* first_node = heaparray[0].first_node;
+				heaparray[0].first_node = (*first_node).right_neighbor;
+				(*heaparray[0].first_node).left_neighbor = nullptr;
 
-			int count_value = count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
-			
-			size_t index = std::floor(count_value / cores);
+				delete first_node;
+			while (!heaparray[0].unlockIndex());
+	
+				size_t count_value = (size_t)count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
+				size_t index = std::floor(count_value / cores);
+
 			while (!heaparray[index].lockIndex());
-				while ((*heaparray[index].last_node).lockIndex());
-				node = heaparray[index].last_node;
-				heaparray[index].last_node = (*node).left_neighbor;
-				
-				(*node).node = nullptr;
-				node->right_neighbor = nullptr;
-				node->left_neighbor = nullptr;
+				while (!(*heaparray[index].last_node).lockIndex());
+				HeapNodeConcurrent<ElementType>* last_node = heaparray[index].last_node;
+				heaparray[index].last_node = (*last_node).left_neighbor;
+
+				(*last_node).node = nullptr;
+				(*last_node).right_neighbor = nullptr;
+				(*last_node).left_neighbor = nullptr;
 
 				if (!heaparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
@@ -1751,8 +1755,8 @@ namespace utils
 					(*heaparray[index].last_node).right_neighbor = nullptr;
 				}
 			while (!heaparray[index].unlockIndex());
-				
-			pullDown(0, node);
+
+			pullDown(0, last_node);
 		}
 	};
 
@@ -1896,7 +1900,8 @@ namespace utils
 		/**
 			Pops the minimal/maximal element;
 
-			@return minimal/maximal value of the heap
+			@param[in,out] value_ minimal/maximal value of the heap
+			@param[in,out] index_ of the minimal/maximal value of the heap
 		*/
 		void pop(ElementType& value_, size_t& index_) 
 		{
@@ -1906,61 +1911,50 @@ namespace utils
 			}
 
 			while (!heaparray[0].lockIndex());
+
 				value_ = heaparray[0].first_node->value;
 				index_ = heaparray[0].first_node->index;
-
+				
 				heap_nodes[index_] = nullptr;
 
 				HeapNodeConcurrent<ElementType>* first_node = heaparray[0].first_node;
 				heaparray[0].first_node = (*first_node).right_neighbor;
 				(*heaparray[0].first_node).left_neighbor = nullptr;
-				
+
 				delete first_node;
+
 			while (!heaparray[0].unlockIndex());
 
 			size_t count_value = (size_t) count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
 			size_t index = std::floor(count_value / cores);
-
 			while (!heaparray[index].lockIndex());
-			int a = 0;
-			HeapNodeConcurrent<ElementType>* n = heaparray[index].first_node;
-			while (n) {
-				a++;
-				n = (*n).right_neighbor;
-			}
-
-			if (!heaparray[index].last_node) {
-				std::cout << index << " ------------------------------Problem------------------------------------" << std::endl;
-			}
-				while (!(*heaparray[index].last_node).lockIndex()) ;
+				HeapNodeConcurrent<ElementType>* node = heaparray[index].first_node;
+				
+				while (!(*heaparray[index].last_node).lockIndex());
 				HeapNodeConcurrent<ElementType>* last_node = heaparray[index].last_node;
 
-
-				m.lock();
-				std::cout << count_value << " " << cores << " " << (float)count_value / float(cores) << " " << a << " " << (*last_node).value << " " << index << std::endl;
-				m.unlock();
-
-
 				heaparray[index].last_node = (*last_node).left_neighbor;
-	
+
 				(*last_node).node = nullptr;
 				(*last_node).right_neighbor = nullptr;
 				(*last_node).left_neighbor = nullptr;
-
+	
 				if (!heaparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
 				}
 				else {
 					(*heaparray[index].last_node).right_neighbor = nullptr;
 				}
-
-				while (!heaparray[index].unlockIndex()) ;
+			while (!heaparray[index].unlockIndex());
 
 			pullDown(0, last_node);
 		}
 
 		/**
 			Update a element in the array
+		
+			@param[in,out] value_ minimal/maximal value of the heap
+			@param[in,out] index_ of the minimal/maximal value of the heap
 		*/
 		void update(ElementType value_, size_t index_)
 		{
