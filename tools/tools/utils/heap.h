@@ -628,15 +628,6 @@ namespace utils
 		virtual ~BaseHeap() {}	
 
 		/**
-			Get the number of elements in the heaparray
-
-			@return Number of elements
-		*/
-		size_t getElements() {
-			return count;
-		}
-
-		/**
 			Sets the pointer heaparray and size
 
 			@param[in] size_ Size of the heaparray
@@ -835,6 +826,16 @@ namespace utils
 			@return minimal/maximal value of the heap
 		*/
 		virtual ElementType pop(ElementType& value_, size_t& index_) = 0;
+		
+		/**
+			Get the number of elements in the heap
+
+			@return Number of elements
+		*/
+		size_t getCount() const
+		{
+			return count;
+		}
 
 	public:
 
@@ -1295,16 +1296,6 @@ namespace utils
 		virtual ~BaseHeapConcurrent() {}
 
 		/**
-			Get the number of elements in the heaparray
-
-			@return Number of elements
-		*/
-		size_t getElements()
-		{
-			return count.load(boost::memory_order_seq_cst);
-		}
-
-		/**
 			Sets the pointer heaparray and size
 
 			@param[in] size_ Size of the heaparray
@@ -1489,7 +1480,7 @@ namespace utils
 				std::exit(EXIT_FAILURE);
 			}
 
-			if (child_right <= std::floor((count.load(boost::memory_order_seq_cst /*boost::memory_order_relaxed*/ )-1)/cores)){
+			if (child_right <= std::floor((count.load(boost::memory_order_seq_cst)-1)/cores)){
 				while (!heaparray[child_left].lockIndex());
 				while (!heaparray[child_right].lockIndex());
 
@@ -1522,7 +1513,7 @@ namespace utils
 						}
 					}
 
-					bool last_node = child_index * 2 + 1 > std::floor((count.load(boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1) / cores) ? true : false;
+					bool last_node = child_index * 2 + 1 > std::floor((count.load(boost::memory_order_seq_cst) - 1) / cores) ? true : false;
 					heaparray[child_index].pull(&node_, &sortin_node,last_node, greater);
 
 					while (!heaparray[child_index].unlockIndex());
@@ -1559,6 +1550,16 @@ namespace utils
 			@return minimal/maximal value of the heap
 		*/
 		virtual void pop(ElementType& value, size_t& index) = 0;
+
+		/**
+			Get number of elements in the heap
+
+			@return Number of elements in the heap
+		*/
+		size_t getCount() const
+		{
+			return (size_t)count.load(boost::memory_order_seq_cst);
+		}
 
 	public:
 
@@ -1633,7 +1634,7 @@ namespace utils
 				heaparray[i].index = i;
 			}
 
-			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			count.store(0, boost::memory_order_seq_cst);
 		}
 
 		/**
@@ -1658,7 +1659,7 @@ namespace utils
 				heaparray[i].index = i;
 			}
 
-			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			count.store(0, boost::memory_order_seq_cst);
 		}
 
 		/**
@@ -1684,7 +1685,7 @@ namespace utils
 
 			size = 0;
 			cores = 0;
-			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			count.store(0, boost::memory_order_seq_cst);
 		}
 
 	public:
@@ -1697,7 +1698,7 @@ namespace utils
 		*/
 		void push(ElementType value_, size_t index_ = NULL)
 		{
-			size_t count_value = (size_t) count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			size_t count_value = (size_t) count.fetch_add(1, boost::memory_order_seq_cst);
 
 			if (count_value > size * cores) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
@@ -1726,28 +1727,32 @@ namespace utils
 			}
 
 			while (!heaparray[0].lockIndex());
+
 				value_ = heaparray[0].first_node->value;
 				index_ = heaparray[0].first_node->index;
-
+				
 				HeapNodeConcurrent<ElementType>* first_node = heaparray[0].first_node;
 				heaparray[0].first_node = (*first_node).right_neighbor;
 				(*heaparray[0].first_node).left_neighbor = nullptr;
 
 				delete first_node;
-			while (!heaparray[0].unlockIndex());
-	
-				size_t count_value = (size_t)count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
-				size_t index = std::floor(count_value / cores);
 
+			while (!heaparray[0].unlockIndex());
+
+			size_t count_value = (size_t) count.fetch_sub(1, boost::memory_order_seq_cst) - 1;
+			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
+				HeapNodeConcurrent<ElementType>* node = heaparray[index].first_node;
+				
 				while (!(*heaparray[index].last_node).lockIndex());
 				HeapNodeConcurrent<ElementType>* last_node = heaparray[index].last_node;
+
 				heaparray[index].last_node = (*last_node).left_neighbor;
 
 				(*last_node).node = nullptr;
 				(*last_node).right_neighbor = nullptr;
 				(*last_node).left_neighbor = nullptr;
-
+	
 				if (!heaparray[index].last_node) {
 					heaparray[index].first_node = nullptr;
 				}
@@ -1810,7 +1815,7 @@ namespace utils
 
 			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
 
-			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			count.store(0, boost::memory_order_seq_cst);
 		}
 
 		/**
@@ -1837,7 +1842,7 @@ namespace utils
 
 			heap_nodes = new HeapNodeConcurrent<ElementType>*[size * cores];
 
-			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			count.store(0, boost::memory_order_seq_cst);
 		}
 
 		/**
@@ -1867,7 +1872,7 @@ namespace utils
 
 			size = 0;
 			cores = 0;
-			count.store(0, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			count.store(0, boost::memory_order_seq_cst);
 		}
 
 	public:
@@ -1880,7 +1885,7 @@ namespace utils
 		*/
 		void push(ElementType value_, size_t index_ = NULL)
 		{
-			size_t count_value = (size_t) count.fetch_add(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/);
+			size_t count_value = (size_t) count.fetch_add(1, boost::memory_order_seq_cst);
 
 			if (count_value > size * cores) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
@@ -1925,7 +1930,7 @@ namespace utils
 
 			while (!heaparray[0].unlockIndex());
 
-			size_t count_value = (size_t) count.fetch_sub(1, boost::memory_order_seq_cst /*boost::memory_order_relaxed*/) - 1;
+			size_t count_value = (size_t) count.fetch_sub(1, boost::memory_order_seq_cst) - 1;
 			size_t index = std::floor(count_value / cores);
 			while (!heaparray[index].lockIndex());
 				HeapNodeConcurrent<ElementType>* node = heaparray[index].first_node;
@@ -2065,7 +2070,10 @@ namespace utils
 	template<typename ElementType>
 	std::ostream& operator<<(std::ostream& out_, const BaseHeap<ElementType>& heap_)
 	{
-		for (size_t i = 0; i < heap_.count; i++) {
+		size_t number = heap_.getCount();
+		number = number < 7 ? number : 7;
+
+		for (size_t i = 0; i < number; i++) {
 			out_ << heap_.heaparray[i] << " ";
 		}
 
@@ -2099,7 +2107,10 @@ namespace utils
 	template<typename ElementType>
 	std::ostream& operator<<(std::ostream& out_, const BaseHeapConcurrent<ElementType>& heap_)
 	{
-		for (size_t i = 0; i <= std::floor((heap_.count-1)/heap_.cores); i++) {
+		size_t number = std::floor((heap_.getCount() - 1) / heap_.cores) + 1;
+		number = number < 7 ? number : 7;
+
+		for (size_t i = 0; i < number; i++) {
 			out_ << heap_.heaparray[i] << std::endl;
 		}
 

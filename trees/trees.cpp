@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
 		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
 	}
 
-	for (size_t i = 0; i < 4065; i++) {
+	for (size_t i = 0; i < 4032; i++) {
 		while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
 	}
 	pool.waitTasks();
