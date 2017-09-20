@@ -30,6 +30,8 @@
 #ifndef POINTCLOUD_POINTCLOUD_H_
 #define POINTCLOUD_POINTCLOUD_H_
 
+#include "utils/matrix.h"
+
 namespace pointcloud
 {
 	typedef unsigned char uchar;
@@ -732,6 +734,32 @@ namespace pointcloud
 		}
 
 		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the points 
+		*/
+		void getSubsetPoints(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
+		{
+			for (size_t i = 0; i < list.size(); i++) {
+				std::memcpy(subset_[i*subset_.cols],getPointPtr(list_[i]),subset_.cols);
+			}
+		}
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the points 
+		*/
+		void getSubsetPoints(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
+		{
+			for (size_t i = 0; i < list.size(); i++) {
+				std::memcpy(subset_[i*subset_.cols],getPointPtr(list_[i]),subset_.cols);
+			}
+		}
+
+		/**
 			Prints the pointcloud
 
 			@param[in,out] out_ Outstream
@@ -1235,6 +1263,31 @@ namespace pointcloud
 			}
 		}
 
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the points 
+		*/
+		void getSubsetPoints(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
+		{
+			for (size_t i = 0; i < list.size(); i++) {
+				std::memcpy(subset_[i*subset_.cols],getPointPtr(list_[i]),subset_.cols);
+			}
+		}
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@return Reference to the points 
+		*/
+		void getSubsetPoints(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
+		{
+			for (size_t i = 0; i < list.size(); i++) {
+				std::memcpy(subset_[i*subset_.cols],getPointPtr(list_[i]),subset_.cols);
+			}
+		}
 		/**
 			Prints the pointcloud
 

@@ -41,9 +41,10 @@ namespace trees
 		/**
 			Operator () which computes the L1-Distance between two points
 
-			@param a_ Pointer to the first point
-			@param b_ Pointer to the second point
-			@param dim_ Number of dimensions
+			@param[in] a_ Pointer to the first point
+			@param[in] b_ Pointer to the second point
+			@param[in] dim_ Number of dimensions
+			@return Distance
 		*/
 		ElementType operator()(ElementType* a_, ElementType* b_, size_t dim_) const
 		{
@@ -73,37 +74,89 @@ namespace trees
 		}
 
 		/**
+			Operator () which computes the L1-Distance between two a point and the zero-vector
+
+			@param[in] a_ Pointer to the first point
+			@param[in] dim_ Number of dimensions
+			@return Distance
+		*/
+		ElementType operator()(ElementType* a_, size_t dim_) const
+		{
+			ElementType result = ElementType();
+			ElementType diff0, diff1, diff2;
+
+			ElementType* last = a_ + dim_;
+			ElementType* lastgroup = last - 3;
+
+			while (a_ < lastgroup) {
+				diff0 = std::abs(a_[0]);
+				diff1 = std::abs(a_[1]);
+				diff2 = std::abs(a_[2]);
+
+				result += diff0 + diff1 + diff2;
+
+				a_ += 3;
+			}
+
+			while (a_ < last) {
+				diff0 = std::abs(*a_++);
+				result += diff0;
+			}
+
+			return result;
+		}
+		/**
 			Operator () which computes the distance of one dimension between two points
-	
-			@param a_ Value of the first point
-			@param b Value of the second point
+
+			@param[in] a_ Value of the first point
+			@param[in] b Value of the second point
+			@return Distance
 		*/
 		ElementType operator()(const ElementType& a_, const ElementType& b_) const {
 
 			return std::abs(a_ - b_);
 		}
-
 	};
 
 	/**
-		Structure which computes unrolled L2-Distances 
+		Structure which computes unrolled L2-Distances
 	*/
 	template<typename ElementType> struct L2Simple
 	{
-	
+
 		/**
 			Operator () which computes the L2-Distance between two points
 
-			@param a_ Pointer to the first point
-			@param b_ Pointer to the second point
-			@param dim_ Number of dimensions
+			@param[in] a_ Pointer to the first point
+			@param[in] b_ Pointer to the second point
+			@param[in] dim_ Number of dimensions
+			@return Distance
 		*/
 		ElementType operator()(ElementType* a_, ElementType* b_, size_t dim_) const
 		{
 			ElementType result = ElementType();
 			ElementType diff;
 			for (size_t i = 0; i < dim_; i++) {
-				diff = *a_++-*b_++:
+				diff = *a_++ - *b_++:
+				result += diff*diff;
+			}
+
+			return result;
+		}
+
+		/**
+			Operator () which computes the L2-Distance between a point and the zero-vector
+
+			@param[in] a_ Pointer to the first point
+			@param[in] dim_ Number of dimensions
+			@return Distance
+		*/
+		ElementType operator()(ElementType* a_, size_t dim_) const
+		{
+			ElementType result = ElementType();
+			ElementType diff;
+			for (size_t i = 0; i < dim_; i++) {
+				diff = *a_++;
 				result += diff*diff;
 			}
 
@@ -113,14 +166,15 @@ namespace trees
 		/**
 			Operator () which computes the distance of one dimension between two points
 
-			@param a_ Value of the first point
-			@param b Value of the second point		
+			@param[in] a_ Value of the first point
+			@param[in] b Value of the second point
+			@return Distance
 		*/
 		ElementType operator()(const ElementType& a_, const ElementType& b_) const {
-			
+
 			return (a_ - b_)*(a_ - b_);
 		}
-	
+
 	};
 
 	/**
@@ -129,11 +183,12 @@ namespace trees
 	template<typename ElementType> struct L2 {
 
 		/**
-			Operator () which computes the L2-Distance between two points
+		Operator () which computes the L2-Distance between two points
 
-			@param a_ Pointer to the first point
-			@param b_ Pointer to the second point
-			@param dim_ Number of dimensions
+			@param[in] a_ Pointer to the first point
+			@param[in] b_ Pointer to the second point
+			@param[in] dim_ Number of dimensions
+			@return Distance
 		*/
 		ElementType operator()(ElementType* a_, ElementType* b_, size_t dim_) const
 		{
@@ -148,8 +203,6 @@ namespace trees
 				diff1 = (a_[1] - b_[1]);
 				diff2 = (a_[2] - b_[2]);
 
-				std::cout << diff0 << " " << diff1 << " " << diff2 << std::endl;
-
 				result += diff0*diff0 + diff1*diff1 + diff2*diff2;
 
 				a_ += 3;
@@ -157,8 +210,41 @@ namespace trees
 			}
 
 			while (a_ < last) {
-				
 				diff0 = (*a_++ - *b_++);
+				result += diff0*diff0;
+			}
+
+			return result;
+		}
+
+		/**
+			Operator () which computes the L2-Distance between a point and  the zero-vector
+
+			@param[in] a_ Pointer to the first point
+			@param[in] b_ Pointer to the second point
+			@param[in] dim_ Number of dimensions
+			@return Distance
+		*/
+		ElementType operator()(ElementType* a_, size_t dim_) const
+		{
+			ElementType result = ElementType();
+			ElementType diff0, diff1, diff2;
+
+			ElementType* last = a_ + dim_;
+			ElementType* lastgroup = last - 3;
+
+			while (a_ < lastgroup) {
+				diff0 = a_[0];
+				diff1 = a_[1];
+				diff2 = a_[2];
+
+				result += diff0*diff0 + diff1*diff1 + diff2*diff2;
+
+				a_ += 3;
+			}
+
+			while (a_ < last) {
+				diff0 = *a_++;
 				result += diff0*diff0;
 			}
 
@@ -168,8 +254,10 @@ namespace trees
 		/**
 			Operator () which computes the distance of one dimension between two points
 
-			@param a_ Value of the first point
-			@param b Value of the second point
+			@param[in] a_ Value of the first point
+			@param[in] b Value of the second point
+			@return Distance
+
 		*/
 		ElementType operator()(const ElementType& a_, const ElementType& b_) const {
 
@@ -186,9 +274,11 @@ namespace trees
 		/**
 			Operator () which computes the max distance between two points
 
-			@param a_ Pointer to the first point
-			@param b_ Pointer to the second point
-			@param dim_ Number of dimensions
+			@param[in] a_ Pointer to the first point
+			@param[in] b_ Pointer to the second point
+			@param[in] dim_ Number of dimensions
+			@return Distance
+
 		*/
 		ElementType operator()(ElementType* a_, ElementType* b_, size_t dim_) const
 		{
@@ -219,6 +309,41 @@ namespace trees
 			return result;
 		}
 
+	};
+
+	/**
+		Structure which computes the difference between points
+	*/
+	template<typename ElementType> struct Difference 
+	{
+		/**
+			Operator () which computes the difference between two points
+
+			@param[in] a_ Pointer to the first point
+			@param[in] b_Pointer to the second point
+			@param[in,out] Pointer to the result
+			@param[in] dim_ Number of dimensions
+			@return Distance
+		*/
+		void operator()(ElementType* a_, ElementType* b_, ElementType* result_, size_t dim_) const
+		{
+			ElementType* last = a_ + dim_;
+			ElementType* lastgroup = last - 3;
+
+			while (a_ < lastgroup) {
+				result_[0] = a_[0] - b_[0];
+				result_[1] = a_[1] - b_[1];
+				result_[2] = a_[2] - b_[2];
+
+				a_ += 3;
+				b_ += 3;
+				result_ += 3;
+			}
+
+			while (a_ < last) {
+				*result_++ = *a_++ - *b_++;
+			}
+		}	
 	};
 
 }

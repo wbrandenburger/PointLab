@@ -31,7 +31,6 @@
 #define INCLUDE_POINTCLOUD_H_
 
 #include "pointcloud/common.h"
-#include "pointcloud/normal.h"
 #include "pointcloud/pointcloud.h"
 
 #endif /* INCLUDE_POINTCLOUD_H_ */
