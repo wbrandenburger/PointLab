@@ -94,32 +94,38 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 
 
 	utils::Matrix<ElementType> m(new ElementType[30], 10, 3);
-	m[0][0] = 0; m[0][1] = 1; m[0][2] = 7;
-	m[1][0] = 6; m[1][1] = 3; m[1][2] = 4;
-	m[2][0] = 3; m[2][1] = 6; m[2][2] = 9;
-	m[3][0] = 1; m[3][1] = 5; m[3][2] = 2;
-	m[4][0] = 7; m[4][1] = 7; m[4][2] = 4;
-	m[5][0] = 6; m[5][1] = 7; m[5][2] = 2;
-	m[6][0] = 4; m[6][1] = 7; m[6][2] = 9;
-	m[7][0] = 8; m[7][1] = 2; m[7][2] = 4;
-	m[8][0] = 5; m[8][1] = 3; m[8][2] = 1;
-	m[9][0] = 1; m[9][1] = 6; m[9][2] = 9;
+	//m[0][0] = 0; m[0][1] = 1; m[0][2] = 7;
+	//m[1][0] = 6; m[1][1] = 3; m[1][2] = 4;
+	//m[2][0] = 3; m[2][1] = 6; m[2][2] = 9;
+	//m[3][0] = 1; m[3][1] = 5; m[3][2] = 2;
+	//m[4][0] = 7; m[4][1] = 7; m[4][2] = 4;
+	//m[5][0] = 6; m[5][1] = 7; m[5][2] = 2;
+	//m[6][0] = 4; m[6][1] = 7; m[6][2] = 9;
+	//m[7][0] = 8; m[7][1] = 2; m[7][2] = 4;
+	//m[8][0] = 5; m[8][1] = 3; m[8][2] = 1;
+	//m[9][0] = 1; m[9][1] = 6; m[9][2] = 9;
 
-	utils::L2<ElementType> distance;
-	ElementType* p =m[5];
-	std::cout << p[0] << " " << p[1] << " " << p[2] << std::endl;
-	Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> principal_components;
-	utils::principalComponentAnalysis<ElementType>(m, m[5], principal_components, distance);
+	list = { 0,1,2,3,4,5,6,7,8,9 };
+	std::cout << list.size() << std::endl;
+	pointcloud.getSubsetPoints(list, m);
 
-	std::cout << principal_components << std::endl;
+	std::cout << m << std::endl;
 
-	m.clear();
+	//utils::L2<ElementType> distance;
+	//ElementType* p =m[5];
+	//std::cout << p[0] << " " << p[1] << " " << p[2] << std::endl;
+	//Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> principal_components;
+	//utils::principalComponentAnalysis<ElementType>(m, m[5], principal_components, distance);
 
-	subsetSoA.clear();
-	subsetAoS.clear();
+	//std::cout << principal_components << std::endl;
 
-	pointcloud.clear();
-	pointcloudcopy.clear();
+	//m.clear();
+
+	//subsetSoA.clear();
+	//subsetAoS.clear();
+
+	//pointcloud.clear();
+	//pointcloudcopy.clear();
 }
 
 int main(int argc, char* argv[]) {

@@ -139,6 +139,21 @@ namespace utils
 		ElementType* data; 
 	};
 
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const Matrix<ElementType>& matrix_)
+	{
+		size_t number = matrix_.rows < 10 ? matrix_.rows : 10;
+
+		for (size_t i = 0; i < number; i++) {
+			for (size_t j = 0; j < matrix_.cols; j++) {
+				out_ << matrix_[i][j] << " ";
+			}
+			out_ <<  std::endl;
+		}
+
+		return out_;
+	}
+
 }
 
 #endif /* UTILS_MATRIX_H_ */
