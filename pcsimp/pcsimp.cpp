@@ -10,6 +10,7 @@
 
 #include "tools/utils.h"
 #include "tools/io.h"
+#include "tools/math.h"
 #include "tools/pointcloud.h"
 
 int main(int argc, char* argv[]) {
@@ -56,6 +57,77 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud.clear();
 	pointcloudsimp.clear();
+
+
+
+	//typedef utils::HeapWrapperConcurrent<int> Heap;
+
+	//size_t n = 4080;
+	//size_t coresheap = 15;
+	//utils::Threadpool pool(coresheap);
+	//Heap heapConcurrent(n, coresheap, true);
+
+
+
+
+
+	//utils::randSeed();
+	//int value;
+	//size_t index;
+
+	//for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores; i++) {
+	//	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	//}
+
+	//for (size_t i = 0; i < 4032; i++) {
+	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
+	//}
+	//pool.waitTasks();
+
+	//std::cout << heapConcurrent << std::endl;
+	////time.start();
+	////for (size_t i = 0; i < 100000; i++) {
+	////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(n, 0))));
+	////}
+	////pool.waitTasks();
+	////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
+
+	////std::cout << heapConcurrent << std::endl;
+
+	//if (heapConcurrent.checkHeap()) {
+	//	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//}
+
+	//heapConcurrent.clear();
+
+	//pool.shutdown();
+
+	////heapConcurrent.clear();
+
+	//////std::cout << heapConcurrent.checkLock() << std::endl;
+
+	//////////////time.start();
+
+
+	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
+	//////////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
+	//////////////}
+	//////////////pool.waitTasks();
+
+	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+
+	//////////////if (heapConcurrent.checkHeap()) {
+	//////////////	std::cout << " Heapbedingung erfüllt" << std::endl;
+	//////////////}
+
+	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
+
+	//////////////if (heapConcurrent.checkHeap()) {
+	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
+	//////////////}
+
+	//
+
 
 
 	return(0);

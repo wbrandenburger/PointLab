@@ -49,7 +49,7 @@ namespace trees
 			@param[in] dataset_ Pointcloud
 			@param[in] params_ Input parameters
 		*/
-		Index(const Matrix<ElementType>& dataset_, const IndexParams& params_) : params(params_)
+		Index(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_) : params(params_)
 		{
 			treeIndex indexType = get_param<treeIndex>(params, "index");
 			nnIndex = createIndexByType<ElementType>(indexType, dataset_, params);
@@ -66,7 +66,7 @@ namespace trees
 		/**
 			Get the dataset
 		*/
-		void getDataset(Matrix<ElementType>& dataset_)
+		void getDataset(utils::Matrix<ElementType>& dataset_)
 		{
 			nnIndex->getDataset(dataset_);
 		}
@@ -84,7 +84,7 @@ namespace trees
 
 			@param[in] dataset_ Pointcloud
 		*/
-		void rebuild(const Matrix<ElementType>& dataset_)
+		void rebuild(const utils::Matrix<ElementType>& dataset_)
 		{
 			nnIndex->rebuild(dataset_);
 		}
@@ -108,9 +108,9 @@ namespace trees
 			@param[in] knn_ Number of nearest neighbors to return
 			@param[in] params_ Search parameters
 		*/
-		void knnSearch(const Matrix<ElementType>& queries_,
-			Matrix<size_t>& indices_,
-			Matrix<ElementType>& dists_,
+		void knnSearch(const utils::Matrix<ElementType>& queries_,
+			utils::Matrix<size_t>& indices_,
+			utils::Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_) 
 		{
@@ -126,9 +126,9 @@ namespace trees
 			@param[in] knn_ Number of nearest neighbors to return
 			@param[in] params_ Search parameters
 		*/
-		void knnSearch(const Matrix<ElementType>& queries_,
-			Matrix<int>& indices_,
-			Matrix<ElementType>& dists_,
+		void knnSearch(const utils::Matrix<ElementType>& queries_,
+			utils::Matrix<int>& indices_,
+			utils::Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_)
 		{
@@ -145,7 +145,7 @@ namespace trees
 			@param[in] radius_ The radius used for search
 			@param[in] params_ Search parameters
 		*/
-		void radiusSearch(const Matrix<ElementType>& queries_,
+		void radiusSearch(const utils::Matrix<ElementType>& queries_,
 			std::vector< std::vector<size_t>>& indices_,
 			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,
@@ -163,7 +163,7 @@ namespace trees
 			@param[in] radius_ The radius used for search
 			@param[in] params_ Search parameters
 		*/
-		void radiusSearch(const Matrix<ElementType>& queries_,
+		void radiusSearch(const utils::Matrix<ElementType>& queries_,
 			std::vector< std::vector<int>>& indices_,
 			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,

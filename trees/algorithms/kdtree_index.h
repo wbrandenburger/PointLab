@@ -35,9 +35,8 @@
 #include "defines.h"
 #include "algorithms/nn_index.h"
 
-#include "utils/allocator.h"
-#include "utils/dist.h"
-#include "utils/matrix.h"
+#include "tools/utils.h"
+
 #include "utils/result_set.h"
 #include "utils/params.h"
 

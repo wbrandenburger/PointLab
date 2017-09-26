@@ -32,141 +32,44 @@
 #include <thread>
 
 #include "trees.hpp"
-#include "math/zero.h"
 
 
 #include "tools/utils.h"
 #include "tools/io.h"
+#include "tools/math.h"
 #include "tools/pointcloud.h"
-
-io::PlyIO plyIO;
-
-struct data {
-
-	double operator() (double x)
-	{
-		return std::pow(x, 2) - 2;
-	}
-
-};
 
 template<typename ElementType> void program(io::PlyIO& plyIO_)
 {
+	/**
+		Read data
+	*/
 	utils::Timer time;
 
 	pointcloud::PointcloudAoS<ElementType> pointcloud(plyIO_.getInstances(), 3);
 
 	time.start();
-	if (plyIO.readPly(pointcloud)) {
+	if (plyIO_.readPly(pointcloud)) {
 		std::cout << "File with " << pointcloud.rows << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 
-
-	trees::Matrix<ElementType> pointcloudkdtree(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
-	pointcloudkdtree.clear();
-
 	std::cout << pointcloud << std::endl;
 
-	
-	pointcloud::PointcloudSoA<ElementType> pointcloudcopy(pointcloud);
-	std::cout << pointcloudcopy << std::endl;
-	
-	std::vector<size_t> list = { 0,1,2,3,4};
-	pointcloud::PointcloudSoA<ElementType> subsetSoA;
-	pointcloudcopy.getSubset(list,subsetSoA);
-	pointcloud::PointcloudAoS<ElementType> subsetAoS;
-	pointcloud.getSubset(list, subsetAoS);
-	
-	std::cout << subsetSoA << std::endl;
+	utils::Matrix<ElementType> matrix;
+	pointcloud.getMatrix(matrix);
 
-	std::cout << subsetAoS << std::endl;
+	std::cout << matrix << std::endl;
 
-	pointcloud::computeMean(pointcloud);
-
-	//subset.clear();
+	/**
+		Build index
+	*/
+	
+	trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
 
 	time.start();
-	if (plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloudcopy)) {
-		std::cout << "File with " << pointcloudcopy.rows << " point has been written in "
-			<< time.stop() << " s into Pointcloud" << std::endl;
-	}
-
-
-	utils::Matrix<ElementType> m(new ElementType[30], 10, 3);
-	//m[0][0] = 0; m[0][1] = 1; m[0][2] = 7;
-	//m[1][0] = 6; m[1][1] = 3; m[1][2] = 4;
-	//m[2][0] = 3; m[2][1] = 6; m[2][2] = 9;
-	//m[3][0] = 1; m[3][1] = 5; m[3][2] = 2;
-	//m[4][0] = 7; m[4][1] = 7; m[4][2] = 4;
-	//m[5][0] = 6; m[5][1] = 7; m[5][2] = 2;
-	//m[6][0] = 4; m[6][1] = 7; m[6][2] = 9;
-	//m[7][0] = 8; m[7][1] = 2; m[7][2] = 4;
-	//m[8][0] = 5; m[8][1] = 3; m[8][2] = 1;
-	//m[9][0] = 1; m[9][1] = 6; m[9][2] = 9;
-
-	list = { 0,1,2,3,4,5,6,7,8,9 };
-	std::cout << list.size() << std::endl;
-	pointcloud.getSubsetPoints(list, m);
-
-	std::cout << m << std::endl;
-
-	//utils::L2<ElementType> distance;
-	//ElementType* p =m[5];
-	//std::cout << p[0] << " " << p[1] << " " << p[2] << std::endl;
-	//Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> principal_components;
-	//utils::principalComponentAnalysis<ElementType>(m, m[5], principal_components, distance);
-
-	//std::cout << principal_components << std::endl;
-
-	//m.clear();
-
-	//subsetSoA.clear();
-	//subsetAoS.clear();
-
-	//pointcloud.clear();
-	//pointcloudcopy.clear();
-}
-
-int main(int argc, char* argv[]) {
-
-	std::cout << "----------------------- Main -----------------------" << std::endl;
-
-	int i = 0;
-	int cores = (unsigned int)std::thread::hardware_concurrency();
-	while (i < argc) {
-		if (!strcmp(argv[i], "--cores")) {
-			i++;
-			cores = std::stoi(argv[i]);
-		}
-		i++;
-	}
-
-	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply";
-	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
-
-	utils::Timer time;
-
-	plyIO.initialze(file);
-	
-	if (plyIO.getDataType() == 1) {
-		program<float>(plyIO);
-	}
-	else {
-		program<double>(plyIO);
-	}
-	
-	
-	///////////////////**
-	//////////////////	Build index
-	//////////////////*/
-	//////////////////
-	//////////////////trees::Index<float> index(pointcloudkdtree, trees::KDTreeIndexParams(20));
-
-	//////////////////time.start();
-	//////////////////index.buildIndex();
-	//////////////////std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
+	index.buildIndex();
+	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
 	///////////////////**
 	//////////////////	Search in pointcloud knn search
@@ -264,86 +167,34 @@ int main(int argc, char* argv[]) {
 
 	////io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
-	/**
-		Destroy the structures
-	*/
+}
 
+int main(int argc, char* argv[]) {
 
+	std::cout << "----------------------- Main -----------------------" << std::endl;
 
+	int i = 0;
+	int cores = (unsigned int)std::thread::hardware_concurrency();
+	while (i < argc) {
+		if (!strcmp(argv[i], "--cores")) {
+			i++;
+			cores = std::stoi(argv[i]);
+		}
+		i++;
+	}
 
-
-
-
-	typedef utils::HeapWrapperConcurrent<int> Heap;
-
-	size_t n = 4080;
-	size_t coresheap = 15;
-	utils::Threadpool pool(coresheap);
-	Heap heapConcurrent(n, coresheap, true);
-
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 	
-
+	io::PlyIO plyIO;
+	plyIO.initialze(file);
 	
-
-	utils::randSeed();
-	int value;
-	size_t index;
-
-	for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores ; i++) {
-		while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	if (plyIO.getDataType() == 1) {
+		program<float>(plyIO);
 	}
-
-	for (size_t i = 0; i < 4032; i++) {
-		while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
+	else {
+		program<double>(plyIO);
 	}
-	pool.waitTasks();
-
-	std::cout << heapConcurrent << std::endl;
-	//time.start();
-	//for (size_t i = 0; i < 100000; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(n, 0))));
-	//}
-	//pool.waitTasks();
-	//std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
-
-	//std::cout << heapConcurrent << std::endl;
-
-	if (heapConcurrent.checkHeap()) {
-		std::cout << "Heapbedingung erfüllt" << std::endl;
-	}
-
-	heapConcurrent.clear();
-
-	pool.shutdown();
-
-	//heapConcurrent.clear();
-
-	////std::cout << heapConcurrent.checkLock() << std::endl;
-
-	////////////time.start();
-
-
-	////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
-	////////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
-	////////////}
-	////////////pool.waitTasks();
-
-	////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
-
-	////////////if (heapConcurrent.checkHeap()) {
-	////////////	std::cout << " Heapbedingung erfüllt" << std::endl;
-	////////////}
-
-	////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
-
-	////////////if (heapConcurrent.checkHeap()) {
-	////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
-	////////////}
-
-	//
-
-
-
 
 	return(0);
 }

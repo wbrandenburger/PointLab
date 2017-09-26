@@ -76,6 +76,11 @@ namespace pointcloud
 			: rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
+			Deconstructor
+		*/
+		virtual ~Pointcloud() {}
+
+		/**
 			Set dimension
 
 			@param[in] rows_ Rows
@@ -120,11 +125,11 @@ namespace pointcloud
 		*/
 		virtual void print(std::ostream& out_) const = 0;
 
-				/**
+		/**
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the pointcloud with the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
 		virtual void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const = 0;
 
@@ -132,10 +137,26 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the pointcloud with the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
 		virtual void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const  = 0;
+		
+		/**
+			Generate a subset of the pointcloud
 
+			@param[in] list_ List with indices to elements of the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
+		*/
+		virtual void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const = 0;
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
+		*/
+		virtual void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const  = 0;
+		
 		/**
 			Set points
 
@@ -287,6 +308,13 @@ namespace pointcloud
 			@return Return pointer to color information
 		*/		
 		virtual uchar* getColorsPtr() const = 0;
+
+		/**
+			Get Matrix to points
+
+			@param[in] matrix_ Matrix which shall contain the points
+		*/
+		virtual void getMatrix(utils::Matrix<ElementType>& matrix_) const = 0;
 
 		/**
 			Rows
@@ -571,6 +599,14 @@ namespace pointcloud
 		}
 
 		/**
+			Deconstructor
+		*/
+		~PointcloudAoS()
+		{
+			clear();
+		}
+
+		/**
 			Copy constructor
 
 			@param[in] pointcloud_ Pointcloud
@@ -695,7 +731,7 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the pointcloud with the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
 		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
 		{
@@ -716,7 +752,7 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the pointcloud with the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
 		void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const
 		{
@@ -737,9 +773,9 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the points 
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubsetPoints(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
 				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*subset_.cols);
@@ -750,9 +786,9 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the points 
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubsetPoints(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
 				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*subset_.cols);
@@ -1019,6 +1055,23 @@ namespace pointcloud
 
 			return new_colors;
 		}
+				
+		/**
+			Get Matrix to points
+
+			@param[in] matrix_ Matrix which shall contain the points
+		*/
+		void getMatrix(utils::Matrix<ElementType>& matrix_) const
+		{
+			ElementType* data(new ElementType[rows*cols]);
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < cols; j++) {
+					data[i*cols + j] = pointcloud[i][j];
+				}
+			}
+
+			matrix_.setMatrix(data, rows, cols);
+		}
 
 		/**
 			Pointcloud
@@ -1084,6 +1137,14 @@ namespace pointcloud
 			setPoints(points_);
 			setNormals(normals_);
 			setColors(colors_);
+		}
+
+		/**
+			Deconstructor
+		*/
+		~PointcloudSoA()
+		{
+			clear();
 		}
 
 		/**
@@ -1225,7 +1286,7 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the pointcloud with the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
 		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
 		{
@@ -1246,7 +1307,7 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the pointcloud with the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
 		void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const
 		{
@@ -1267,9 +1328,9 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the points 
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubsetPoints(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
 				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*subset_.cols);
@@ -1280,9 +1341,9 @@ namespace pointcloud
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
-			@return Reference to the points 
+			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubsetPoints(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
 				std::memcpy(subset_[i],getPointPtr(list_[i]),sizeof(ElementType)*subset_.cols);
@@ -1565,6 +1626,19 @@ namespace pointcloud
 			}
 
 			return new_colors;
+		}
+
+		/**
+			Get Matrix to points
+
+			@param[in] matrix_ Matrix which shall contain the points
+		*/
+		void getMatrix(utils::Matrix<ElementType>& matrix_) const
+		{
+			ElementType* data(new ElementType[rows*cols]);
+			std::memcpy(data, points, sizeof(ElementType)*rows*cols);
+
+			matrix_.setMatrix(data, rows, cols);
 		}
 
 		/**

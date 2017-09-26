@@ -32,10 +32,10 @@
 
 #include <assert.h>
 
-#include "utils/matrix.h"
-#include "utils/params.h"
+#include "tools/utils.h"
+
 #include "utils/result_set.h"
-#include "utils/threadpool.h"
+#include "utils/params.h"
 
 namespace trees
 {
@@ -62,14 +62,14 @@ namespace trees
 		/**
 			Get the dataset
 		*/
-		virtual void getDataset(Matrix<ElementType>& dataset_) = 0;
+		virtual void getDataset(utils::Matrix<ElementType>& dataset_) = 0;
 
 		/**
 			Set parameters based on the input pointcloud
 			
 			@param[in] dataset_ Pointcloud
 		*/
-		void setDataset(const Matrix<ElementType>& dataset_)
+		void setDataset(const utils::Matrix<ElementType>& dataset_)
 		{
 			size = dataset_.rows;
 			veclen = dataset_.cols;
@@ -91,7 +91,7 @@ namespace trees
 
 			@param[in] dataset_ Pointcloud
 		*/
-		virtual void rebuild(const Matrix<ElementType>& dataset_) = 0;
+		virtual void rebuild(const utils::Matrix<ElementType>& dataset_) = 0;
 
 
 		/**
@@ -129,9 +129,9 @@ namespace trees
 			@param[in] knn_ Number of nearest neighbors to return
 			@param[in] params_ Search parameters
 		*/
-		void knnSearch(const Matrix<ElementType>& queries_,
-			Matrix<size_t>& indices_,
-			Matrix<ElementType>& dists_,
+		void knnSearch(const utils::Matrix<ElementType>& queries_,
+			utils::Matrix<size_t>& indices_,
+			utils::Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_)
 		{
@@ -141,7 +141,7 @@ namespace trees
 			assert(indices_.cols >= knn_);
 			assert(dists_.cols >= knn_);
 			
-			Threadpool pool(params_.cores);
+			utils::Threadpool pool(params_.cores);
 
 			for (int i = 0; i < queries_.rows; i++) {
 				while (!pool.runTask(boost::bind(&NNIndex<ElementType>::knnSearchThreadpool,
@@ -167,9 +167,9 @@ namespace trees
 			@param[in] params_ Search parameters
 			@param[in] index_ Number of the row of the queries
 		*/
-		void knnSearchThreadpool(const Matrix<ElementType>& queries_,
-								 Matrix<size_t>& indices_,
-								 Matrix<ElementType>& dists_,
+		void knnSearchThreadpool(const utils::Matrix<ElementType>& queries_,
+								 utils::Matrix<size_t>& indices_,
+								 utils::Matrix<ElementType>& dists_,
 								size_t knn_,
 								const TreeParams& params_,
 								size_t index_)
@@ -190,13 +190,13 @@ namespace trees
 			@param[in] knn_ Number of nearest neighbors to return
 			@param[in] params_ Search parameters
 		*/
-		void knnSearch(const Matrix<ElementType>& queries_,
-			Matrix<int>& indices_,
-			Matrix<ElementType>& dists_,
+		void knnSearch(const utils::Matrix<ElementType>& queries_,
+			utils::Matrix<int>& indices_,
+			utils::Matrix<ElementType>& dists_,
 			size_t knn_,
 			const TreeParams& params_)
 		{
-			flann::Matrix<size_t> indices(new size_t[indices_.rows*indices_.cols], indices_.rows, indices_.cols);
+			utils::::Matrix<size_t> indices(new size_t[indices_.rows*indices_.cols], indices_.rows, indices_.cols);
 			knnSearch(queries_, indices, dists_, knn_, params_);
 
 			for (size_t i = 0; i < indices_.rows; ++i) {
@@ -208,15 +208,15 @@ namespace trees
 		}
 
 		/**
-		Perform radius search
+			Perform radius search
 
-		@param[in] queries_ The query points for which to find the nearest neighbors
-		@param[in,out] indices_ The indices of the nearest neighbors found
-		@param[in,out] dists_ Distances to the nearest neighbors found
-		@param[in] radius_ The radius used for search
-		@param[in] params_ Search parameters
+			@param[in] queries_ The query points for which to find the nearest neighbors
+			@param[in,out] indices_ The indices of the nearest neighbors found
+			@param[in,out] dists_ Distances to the nearest neighbors found
+			@param[in] radius_ The radius used for search
+			@param[in] params_ Search parameters
 		*/
-		void radiusSearch(const Matrix<ElementType>& queries_,
+		void radiusSearch(const utils::Matrix<ElementType>& queries_,
 			std::vector< std::vector<size_t> >& indices_,
 			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,
@@ -224,7 +224,7 @@ namespace trees
 		{
 			assert(queries.cols == veclen());
 
-			Threadpool pool(params_.cores);
+			utils::Threadpool pool(params_.cores);
 
 			for (int i = 0; i < queries_.rows; i++) {
 				while (!pool.runTask(boost::bind(&NNIndex<ElementType>::radiusSearchThread,
@@ -250,7 +250,7 @@ namespace trees
 			@param[in] params_ Search parameters
 			@param[in] index_ Number of the row of the queries
 		*/
-		void radiusSearchThread(const Matrix<ElementType>& queries_,
+		void radiusSearchThread(const utils::Matrix<ElementType>& queries_,
 			std::vector< std::vector<size_t>>& indices_,
 			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,
@@ -278,7 +278,7 @@ namespace trees
 			@param[in] radius_ The radius used for search
 			@param[in] params_ Search parameters
 		*/
-		void radiusSearch(const Matrix<ElementType>& queries_,
+		void radiusSearch(const utils::Matrix<ElementType>& queries_,
 			std::vector<std::vector<int>>& indices_,
 			std::vector<std::vector<ElementType>>& dists_,
 			float radius_,
@@ -307,7 +307,7 @@ namespace trees
 		/**
 			Pointcloud
 		*/
-		Matrix<ElementType> dataset;
+		utils::Matrix<ElementType> dataset;
 	};
 
 }

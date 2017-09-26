@@ -33,7 +33,7 @@
 #include "algorithms/nn_index.h"
 #include "algorithms/kdtree_index.h"
 
-#include "utils/matrix.h"
+#include "tools/utils.h"
 
 namespace trees
 {
@@ -45,7 +45,7 @@ namespace trees
 		@return Returns a pointer of the created index
 	*/
 	template<template<typename> typename Index, typename ElementType>
-	inline NNIndex<ElementType>* createIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_)
+	inline NNIndex<ElementType>* createIndex(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_)
 	{
 		return new Index<ElementType>(dataset_, params_);
 	}
@@ -60,7 +60,7 @@ namespace trees
 	*/
 	template<typename ElementType>
 	inline NNIndex<ElementType>* createIndexByType(const treeIndex indexType_,
-		const Matrix<ElementType>& dataset_, const IndexParams& params_)
+		const utils::Matrix<ElementType>& dataset_, const IndexParams& params_)
 	{
 		NNIndex<ElementType>* nnIndex;
 

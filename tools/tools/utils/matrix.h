@@ -65,6 +65,10 @@ namespace utils
 		*/
 		Matrix(const Matrix<ElementType>& matrix_)
 		{
+			if (data) {
+				clear();
+			}
+
 			data = new ElementType[matrix_.rows*matrix_.cols];
 			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++){
 				data[i] = matrix_[std::ceil(i/3)][i%3];
@@ -74,12 +78,16 @@ namespace utils
 		}
 		
 		/**
-			Copy assignment operator
+			Operator =
 
 			@param[in] matrix_ Matrix which shall be copied
 		*/
 		void operator=(const Matrix<ElementType>& matrix_)
 		{
+			if (data) {
+				clear();
+			}
+
 			data = new ElementType[matrix_.rows*matrix_.cols];
 			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++) {
 				data[i] = matrix_[std::ceil(i / 3)][i % 3];
@@ -89,17 +97,35 @@ namespace utils
 		}
 
 		/**
+			Set Matrix
+			
+			@param[in] data_ Row-array of a specific Type
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		void setMatrix(ElementType* data_, size_t rows_, size_t cols_)
+		{
+			data = data_;
+			rows = rows_;
+			cols = cols_;
+		}
+
+		/**
 			Deconstructor
 		*/
 		~Matrix()
 		{
+			clear();
 		}
 
 		/**
 			Deletes the data array
 		*/
-		void clear() const
+		void clear()
 		{
+			rows = 0;
+			cols = 0;
+
 			delete[] data;
 		}
 
@@ -114,6 +140,26 @@ namespace utils
 		}
 
 		/**
+			Returns the number of rows
+
+			@return Number of rows
+		*/
+		size_t getRows() const
+		{
+			return rows;
+		}
+
+		/**
+			Returns the number of cols
+
+			@return Number of cols
+		*/
+		size_t getCols() const
+		{
+			return cols;
+		}
+
+		/**
 			Return the pointer of the indexth row
 
 			@param[in] index_ Index of the row
@@ -125,14 +171,17 @@ namespace utils
 		}
 		
 	public:
+
 		/** 
 			Rows of matrix 
 		*/
 		size_t rows; 
+
 		/** 
 			Columns of matrix 
 		*/
 		size_t cols;  
+
 		/** 
 			Pointer to data 
 		*/ 
