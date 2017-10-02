@@ -798,7 +798,10 @@ namespace pointcloud
 		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
-				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*subset_.cols);
+				//for (size_t j = 0; j < 3; j++) {
+				//	subset_[i][j] = getPoint(list_[i], j);
+				//}
+				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
 			}
 		}
 
@@ -811,7 +814,10 @@ namespace pointcloud
 		void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
-				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*subset_.cols);
+				//for (size_t j = 0; j < 3; j++) {
+				//	subset_[i][j] = getPoint(list_[i], j);
+				//}
+				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
 			}
 		}
 
@@ -1353,7 +1359,10 @@ namespace pointcloud
 		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
-				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*subset_.cols);
+				//for (size_t j = 0; j < 3; j++) {
+				//	subset_[i][j] = getPoint(list_[i], j);
+				//}
+				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
 			}
 		}
 
@@ -1366,9 +1375,13 @@ namespace pointcloud
 		void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
 		{
 			for (size_t i = 0; i < list_.size(); i++) {
-				std::memcpy(subset_[i],getPointPtr(list_[i]),sizeof(ElementType)*subset_.cols);
+				//for (size_t j = 0; j < 3; j++) {
+				//	subset_[i][j] = getPoint(list_[i], j);
+				//}
+				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
 			}
 		}
+
 		/**
 			Prints the pointcloud
 

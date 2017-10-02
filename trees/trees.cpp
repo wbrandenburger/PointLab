@@ -66,7 +66,7 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	/**
 		Build index
 	*/
-	
+
 	trees::Index<ElementType> index(matrix, trees::KDTreeIndexParams(20));
 
 	time.start();
@@ -82,22 +82,58 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	utils::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
 	utils::Matrix<ElementType> dists(new ElementType[querynumber*nn], querynumber, nn);
 
-
 	trees::TreeParams params;
 	params.cores = cores_;
-
-	//for (size_t i = 0; i < 98000;/*pointcloudkdtree.rows;*/ i++) {
-	//	index.remove(i);
-	//}
 
 	time.start();
 	index.knnSearch(matrix, indices, dists, nn, params);
 	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 
-	utils::randSeed();
-	size_t randIndex = utils::rand<size_t>(pointcloud.getRows(), 0);
 
-	std::cout << randIndex << std::endl;
+
+	utils::randSeed();
+	size_t rand_index = utils::rand<size_t>(pointcloud.getRows(), 0);
+	std::vector<size_t> rand_index_list = { rand_index };
+	utils::Matrix<ElementType> point_center(new ElementType[3], 1, 3);
+	pointcloud.getSubset(rand_index_list, point_center);
+
+	std::cout << rand_index << std::endl;
+
+	std::cout << point_center << std::endl;
+	
+	for (size_t i = 3; i < 100; i++) {
+		utils::Matrix<size_t> indices_center(new size_t[i], 1, i);
+		utils::Matrix<ElementType> dists_center(new ElementType[i], 1, i);
+
+		utils::Matrix<size_t> indices_neighbors(new size_t[i*i], i, i);
+		utils::Matrix<ElementType> dists_neighbors(new ElementType[i*i], i, i);
+
+		index.knnSearch(point_center, indices_center, dists_center, i, params);
+
+		std::vector<size_t> indices_neighbor_list(i);
+		for (size_t j = 0; j < i; j++) {
+			indices_neighbor_list[j] = indices_center[0][j];
+		}
+
+		utils::Matrix<ElementType> point_neighbors(new ElementType[3 * i], i, 3);
+		pointcloud.getSubset(indices_neighbor_list, point_neighbors);
+
+		index.knnSearch(point_neighbors, indices_neighbors, dists_neighbors, i, params);
+
+
+		indices_center.clear();
+		dists_center.clear();
+		indices_neighbors.clear();
+		dists_neighbors.clear();
+
+		point_neighbors.clear();
+	}
+	point_center.clear();
+
+
+
+
+
 
 
 
@@ -148,7 +184,8 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	plyIO_.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	index.freeIndex();
-
+	indices.clear();
+	dists.clear();
 	//time.start();
 	//size_t i = 0;
 	//for (size_t counter = 0; counter < 10000000000; counter++) {
