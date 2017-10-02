@@ -89,19 +89,25 @@ namespace utils
 	{
 		if (high_ == 0) {
 			if (std::is_same<ElementType, char>::value) {
-				high_ = 127;
+				high_ = std::pow(2,7)-1;
 			}
 			else if (std::is_same<ElementType, unsigned char>::value) {
-				high_ = 255;
+				high_ = std::pow(2, 8) - 1;
+			}
+			else if (std::is_same<ElementType, int>::value) {
+				high_ = std::pow(2, 31) - 1;
+			}
+			else if (std::is_same<ElementType, unsigned int>::value) {
+				high_ = std::pow(2, 32) - 1;
+			}
+			else if (std::is_same<ElementType, size_t>::value) {
+				high_ = std::pow(2, 64) - 1;
 			}
 			else if (std::is_same<ElementType, float>::value) {
 				high_ = 1;
 			}
 			else if (std::is_same<ElementType, double>::value) {
 				high_ = 1;
-			}
-			else {
-				high_ = 32767;
 			}
 		}
 

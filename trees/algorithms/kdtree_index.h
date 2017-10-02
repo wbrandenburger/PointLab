@@ -37,8 +37,8 @@
 
 #include "tools/utils.h"
 
-#include "utils/result_set.h"
 #include "utils/params.h"
+#include "utils/result_set.h"
 
 namespace trees
 {
@@ -75,14 +75,14 @@ namespace trees
 			@param[in] dataset_ Pointcloud
 			@param[in] params_ Input parameters for the tree
 		*/
-		KDTreeIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_ = KDTreeIndexParams()) : root_node(nullptr), dataset_nodes(nullptr)
+		KDTreeIndex(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_ = KDTreeIndexParams()) : root_node(nullptr), dataset_nodes(nullptr)
 		{
 			neighbor = get_param(params_, "neighbor", 30);
 			ordered = get_param(params_, "ordered", true);
 
 			setDataset(dataset_);
 
-			dataset_points = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
+			dataset_points = utils::Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
 			std::copy(dataset[0], dataset[0] + size*veclen, dataset_points[0]);
 		}
 	
@@ -197,7 +197,7 @@ namespace trees
 		/**
 			Get the dataset
 		*/
-		void getDataset(Matrix<ElementType>& dataset_) 
+		void getDataset(utils::Matrix<ElementType>& dataset_)
 		{
 			dataset_ = dataset_points;
 		}
@@ -219,12 +219,11 @@ namespace trees
 			root_node = divideTree(nullptr, 0, size, root_bbox);
 			
 			if (ordered) {
-				Matrix<ElementType> dataset_points_temp = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
+				utils::Matrix<ElementType> dataset_points_temp = utils::Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
 				for (size_t i = 0; i < size; ++i) {
 					std::copy(dataset_points[vind[i]], dataset_points[vind[i]] + veclen, dataset_points_temp[i]);
 				}
 				dataset_points = dataset_points_temp;
-				dataset_points_temp.clear();
 
 				NodePtr* dataset_nodes_temp = new NodePtr[size];
 				for (size_t i = 0; i < size; ++i) {
@@ -253,12 +252,11 @@ namespace trees
 
 			@param[in] dataset_ Pointcloud
 		*/
-		void rebuild(const Matrix<ElementType>& dataset_)
+		void rebuild(const utils::Matrix<ElementType>& dataset_)
 		{
 			setDataset(dataset_);
 
-			dataset_points.clear();
-			dataset_points = Matrix<ElementType>(new ElementType[size*veclen], size, veclen);
+			dataset_points.setMatrix(new ElementType[size*veclen], size, veclen);
 			std::copy(dataset[0], dataset[0] + size*veclen, dataset_points[0]);
 
 			buildIndex();
@@ -639,7 +637,7 @@ namespace trees
 		/**
 			Pooled memory allocator.
 		*/
-		PooledAllocator pool;
+		utils::PooledAllocator pool;
 
 		/**
 			Flag ordered pointcloud
@@ -649,7 +647,7 @@ namespace trees
 		/**
 			Pointcloud
 		*/
-		Matrix<ElementType> dataset_points;
+		utils::Matrix<ElementType> dataset_points;
 
 		/**
 			List with the indices to nodes
@@ -659,7 +657,7 @@ namespace trees
 		/**
 			Distance structure
 		*/
-		L2<ElementType> distance;
+		utils::L2<ElementType> distance;
 	};
 
 }

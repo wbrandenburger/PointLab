@@ -34,6 +34,8 @@
 
 #include "algorithms/all_indices.h"
 
+#include "tools/utils.h"
+
 #include "utils/params.h"
 
 namespace trees
@@ -49,7 +51,7 @@ namespace trees
 			@param[in] dataset_ Pointcloud
 			@param[in] params_ Input parameters
 		*/
-		Index(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_) : params(params_)
+		Index(const utils::Matrix<ElementType>&  dataset_, const IndexParams& params_) : params(params_)
 		{
 			treeIndex indexType = get_param<treeIndex>(params, "index");
 			nnIndex = createIndexByType<ElementType>(indexType, dataset_, params);

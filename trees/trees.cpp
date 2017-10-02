@@ -39,7 +39,9 @@
 #include "tools/math.h"
 #include "tools/pointcloud.h"
 
-template<typename ElementType> void program(io::PlyIO& plyIO_)
+typedef unsigned char uchar;
+
+template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 {
 	/**
 		Read data
@@ -65,116 +67,109 @@ template<typename ElementType> void program(io::PlyIO& plyIO_)
 		Build index
 	*/
 	
-	trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
+	trees::Index<ElementType> index(matrix, trees::KDTreeIndexParams(20));
 
 	time.start();
 	index.buildIndex();
 	std::cout << "KDTree has been built in " << time.stop() << " s" << std::endl;
 
-	///////////////////**
-	//////////////////	Search in pointcloud knn search
-	//////////////////*/
-	//////////////////int nn = 20;
-	//////////////////int querynumber = pointcloudkdtree.rows;
+	/**
+		Search in pointcloud knn search
+	*/
+	int nn = 20;
+	int querynumber = pointcloud.getRows();
+	std::cout << querynumber << " " << pointcloud.getRows() << std::endl;
+	utils::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
+	utils::Matrix<ElementType> dists(new ElementType[querynumber*nn], querynumber, nn);
 
-	//////////////////trees::Matrix<size_t> indices(new size_t[querynumber*nn], querynumber, nn);
-	//////////////////trees::Matrix<float> dists(new float[querynumber*nn], querynumber, nn);
 
-	///////////////////**
-	//////////////////	Generates a pointcloud with points whose neighbors shall searched for
-	//////////////////*/
-	//////////////////utils::randSeed();
-	//////////////////trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
-	//////////////////for (int i = 0; i < querynumber; i++) {
-	//////////////////	int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
-	//////////////////	for (int j = 0; j < pointcloudkdtree.cols; j++) {
-	//////////////////		query[i][j] = pointcloudkdtree[random][j];
-	//////////////////	}
-	//////////////////}
+	trees::TreeParams params;
+	params.cores = cores_;
 
-	//////////////////trees::TreeParams params;
-	//////////////////params.cores = cores;
+	//for (size_t i = 0; i < 98000;/*pointcloudkdtree.rows;*/ i++) {
+	//	index.remove(i);
+	//}
 
-	////////////////////for (size_t i = 0; i < 98000;/*pointcloudkdtree.rows;*/ i++) {
-	////////////////////	index.remove(i);
-	////////////////////}
+	time.start();
+	index.knnSearch(matrix, indices, dists, nn, params);
+	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 
-	//////////////////time.start();
-	//////////////////index.knnSearch(query, indices, dists, nn, params);
-	//////////////////std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
+	utils::randSeed();
+	size_t randIndex = utils::rand<size_t>(pointcloud.getRows(), 0);
 
-	//////////////////index.freeIndex();
+	std::cout << randIndex << std::endl;
 
-	///////////////////**
-	//////////////////	Colorize the pointcloud
-	//////////////////*/
-	//////////////////utils::randSeed();
-	//////////////////for (int i = 0; i < indices.rows; i++) {
-	//////////////////	int r = utils::rand<int>(255, 0);
-	//////////////////	int g = utils::rand<int>(255, 0);
-	//////////////////	int b = utils::rand<int>(255, 0);
-	//////////////////	for (int j = 0; j < indices.cols; j++) {
-	//////////////////		pointcloud.colors[indices[i][j]][0] = r;
-	//////////////////		pointcloud.colors[indices[i][j]][1] = g;
-	//////////////////		pointcloud.colors[indices[i][j]][2] = b;
-	//////////////////	}
-	//////////////////}
 
-	//////////////////io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
-	/////**
-	////	Search in pointcloud radius search
-	////*/
-	////float radius = 0.005;
-	////int querynumber = 12;// pointcloudkdtree.rows;
 
-	////std::vector<std::vector<int>> indices(querynumber);
-	////std::vector<std::vector<float>> dists(querynumber);
+	///**
+	//	Search in pointcloud radius search
+	//*/
+	//float radius = 0.005;
+	//int querynumber = 12;// pointcloudkdtree.rows;
 
-	/////**
-	////	Generates a pointcloud with points whose neighbors shall searched for
-	////*/
-	////utils::randSeed();
-	////trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
-	////for (int i = 0; i < querynumber; i++) {
-	////	int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
-	////	for (int j = 0; j < pointcloudkdtree.cols; j++) {
-	////		query[i][j] = pointcloudkdtree[random][j];
-	////	}
-	////}
+	//std::vector<std::vector<int>> indices(querynumber);
+	//std::vector<std::vector<float>> dists(querynumber);
 
-	////trees::TreeParams params;
-	////params.cores = cores;
+	///**
+	//	Generates a pointcloud with points whose neighbors shall searched for
+	//*/
+	//utils::randSeed();
+	//trees::Matrix<float> query(new float[querynumber*pointcloudkdtree.cols], querynumber, pointcloudkdtree.cols);
+	//for (int i = 0; i < querynumber; i++) {
+	//	int random = utils::rand<int>(pointcloudkdtree.rows - 1, 0);
+	//	for (int j = 0; j < pointcloudkdtree.cols; j++) {
+	//		query[i][j] = pointcloudkdtree[random][j];
+	//	}
+	//}
 
-	////time.start();
-	////index.radiusSearch(query, indices, dists, radius, params);
-	////std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
+	//trees::TreeParams params;
+	//params.cores = cores;
 
-	/////**
-	////	Colorize the pointcloud
-	////*/
-	////utils::randSeed();
-	////for (int i = 0; i < indices.size(); i++) {
-	////	int r = utils::rand<int>(255, 0);
-	////	int g = utils::rand<int>(255, 0);
-	////	int b = utils::rand<int>(255, 0);
-	////	for (int j = 0; j < indices[i].size(); j++) {
-	////		pointcloud.colors[indices[i][j]][0] = r;
-	////		pointcloud.colors[indices[i][j]][1] = g;
-	////		pointcloud.colors[indices[i][j]][2] = b;
-	////	}
-	////}
+	//time.start();
+	//index.radiusSearch(query, indices, dists, radius, params);
+	//std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
+	
+	/**
+		Colorize the pointcloud
+	*/
+	utils::randSeed();
+	for (size_t i = 0; i < indices.getRows(); i++) {
+		uchar r = utils::rand<uchar>(255, 0);
+		uchar g = utils::rand<uchar>(255, 0);
+		uchar b = utils::rand<uchar>(255, 0);
+		for (size_t j = 0; j < indices.getCols(); j++) {
+			pointcloud.setColor(r, indices[i][j], 0);
+			pointcloud.setColor(g, indices[i][j], 1);
+			pointcloud.setColor(b, indices[i][j], 2);
+		}
+	}
 
-	////io::writeply("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
+	plyIO_.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
+	index.freeIndex();
+
+	//time.start();
+	//size_t i = 0;
+	//for (size_t counter = 0; counter < 10000000000; counter++) {
+	//	i++;
+	//}
+	//std::cout << "Counter " << time.stop() << " s" << std::endl;
+
+	//time.start();
+	//boost::atomic<int> ia(0);
+	//for (size_t counter = 0; counter < 10000000000; counter++) {
+	//	ia.fetch_add(1);
+	//}
+	//std::cout << "Counter" << time.stop() << " s" << std::endl;
 }
 
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
 
-	int i = 0;
-	int cores = (unsigned int)std::thread::hardware_concurrency();
+	size_t i = 0;
+	size_t cores = (unsigned int)std::thread::hardware_concurrency();
 	while (i < argc) {
 		if (!strcmp(argv[i], "--cores")) {
 			i++;
@@ -190,10 +185,10 @@ int main(int argc, char* argv[]) {
 	plyIO.initialze(file);
 	
 	if (plyIO.getDataType() == 1) {
-		program<float>(plyIO);
+		program<float>(cores, plyIO);
 	}
 	else {
-		program<double>(plyIO);
+		program<double>(cores, plyIO);
 	}
 
 	return(0);

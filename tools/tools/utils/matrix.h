@@ -65,14 +65,11 @@ namespace utils
 		*/
 		Matrix(const Matrix<ElementType>& matrix_)
 		{
-			if (data) {
-				clear();
-			}
+			clear();
 
 			data = new ElementType[matrix_.rows*matrix_.cols];
-			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++){
-				data[i] = matrix_[std::ceil(i/3)][i%3];
-			}
+			std::memcpy(data, matrix_.getPtr(), sizeof(ElementType)*matrix_.rows*matrix_.cols);
+
 			rows = matrix_.rows;
 			cols = matrix_.cols;
 		}
@@ -84,14 +81,11 @@ namespace utils
 		*/
 		void operator=(const Matrix<ElementType>& matrix_)
 		{
-			if (data) {
-				clear();
-			}
+			clear();
 
 			data = new ElementType[matrix_.rows*matrix_.cols];
-			for (size_t i = 0; i < matrix_.rows*matrix_.cols; i++) {
-				data[i] = matrix_[std::ceil(i / 3)][i % 3];
-			}
+			std::memcpy(data, matrix_.getPtr(), sizeof(ElementType)*matrix_.rows*matrix_.cols);
+
 			rows = matrix_.rows;
 			cols = matrix_.cols;
 		}
@@ -105,6 +99,8 @@ namespace utils
 		*/
 		void setMatrix(ElementType* data_, size_t rows_, size_t cols_)
 		{
+			clear();
+
 			data = data_;
 			rows = rows_;
 			cols = cols_;
@@ -113,7 +109,7 @@ namespace utils
 		/**
 			Deconstructor
 		*/
-		~Matrix()
+		~Matrix(void)
 		{
 			clear();
 		}
@@ -125,8 +121,10 @@ namespace utils
 		{
 			rows = 0;
 			cols = 0;
-
-			delete[] data;
+			if (data) {
+				delete[] data;
+				data = nullptr;
+			}
 		}
 
 		/**

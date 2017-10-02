@@ -30,7 +30,7 @@
 #ifndef POINTCLOUD_POINTCLOUD_H_
 #define POINTCLOUD_POINTCLOUD_H_
 
-#include "utils/matrix.h"
+#include "tools/utils/matrix.h"
 
 namespace pointcloud
 {
@@ -228,6 +228,26 @@ namespace pointcloud
 			@param[in] col_ Col
 		*/
 		virtual void setColor(uchar color_, size_t row_, size_t col_) = 0;
+
+		/**
+			Get Rows
+			
+			@return Rows
+		*/
+		size_t getRows() const
+		{
+			return rows;
+		}
+		
+		/**
+			Get Cols
+			
+			@return Cols
+		*/
+		size_t getCols() const
+		{
+			return cols;
+		}
 
 		/**
 			Get point data of specified index

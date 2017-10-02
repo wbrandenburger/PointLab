@@ -35,11 +35,11 @@
 
 #include "defines.h"
 
-#include "utils/any.h"
+#include "tools/utils.h"
 
 namespace trees
 {
-	typedef std::map<std::string, Any> IndexParams;
+	typedef std::map<std::string, utils::Any> IndexParams;
 
 	/**
 		Structure which holds tree parameters
