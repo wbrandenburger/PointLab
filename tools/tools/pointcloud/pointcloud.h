@@ -38,7 +38,7 @@ namespace pointcloud
 
 	template<typename ElementType> class Pointcloud 
 	{
-	
+
 	public:
 
 		/**
@@ -354,6 +354,7 @@ namespace pointcloud
 		
 	template<typename ElementType> struct PointcloudNode 
 	{
+
 		/**
 			Constructor
 		*/

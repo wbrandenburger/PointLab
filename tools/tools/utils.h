@@ -38,6 +38,7 @@
 #include "utils/matrix.h"
 #include "utils/queue.h"
 #include "utils/pca.h"
+#include "utils/plot.h"
 #include "utils/randomize.h"
 #include "utils/threadpool.h"
 #include "utils/timer.h"

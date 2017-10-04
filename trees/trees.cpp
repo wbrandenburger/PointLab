@@ -33,11 +33,12 @@
 
 #include "trees.hpp"
 
-
 #include "tools/utils.h"
 #include "tools/io.h"
 #include "tools/math.h"
 #include "tools/pointcloud.h"
+
+#include <opencv2/highgui.hpp>
 
 typedef unsigned char uchar;
 
@@ -85,9 +86,9 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	trees::TreeParams params;
 	params.cores = cores_;
 
-	time.start();
-	index.knnSearch(matrix, indices, dists, nn, params);
-	std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
+	//time.start();
+	//index.knnSearch(matrix, indices, dists, nn, params);
+	//std::cout << "Search has been performed in " << time.stop() << " s" << std::endl;
 
 
 
@@ -132,11 +133,20 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 
 
 
+	cv::Mat plot_image;
+	std::vector<ElementType> array_x(2048);
+	std::vector<ElementType> array_y(2048);
+	for (size_t i = -32; i < 2048-32; i++) {
+		array_x[i + 32] = i;
+		array_y[i + 32] = i;
+	}
 
+	utils::plot(array_y, plot_image);
 
+	cv::namedWindow("Show input image", cv::WINDOW_NORMAL);
+	cv::imshow("Show input image", plot_image);
 
-
-
+	cvWaitKey(0);
 
 	///**
 	//	Search in pointcloud radius search
@@ -171,9 +181,9 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	*/
 	utils::randSeed();
 	for (size_t i = 0; i < indices.getRows(); i++) {
-		uchar r = utils::rand<uchar>(255, 0);
-		uchar g = utils::rand<uchar>(255, 0);
-		uchar b = utils::rand<uchar>(255, 0);
+		uchar  r = utils::rand<uchar >(255, 0);
+		uchar  g = utils::rand<uchar >(255, 0);
+		uchar  b = utils::rand<uchar >(255, 0);
 		for (size_t j = 0; j < indices.getCols(); j++) {
 			pointcloud.setColor(r, indices[i][j], 0);
 			pointcloud.setColor(g, indices[i][j], 1);
