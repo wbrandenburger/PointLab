@@ -136,9 +136,11 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	cv::Mat plot_image;
 	std::vector<ElementType> array_x(2048);
 	std::vector<ElementType> array_y(2048);
-	for (size_t i = -32; i < 2048-32; i++) {
+	for (int i = -32; i < 2048-32; i++) {
 		array_x[i + 32] = i;
 		array_y[i + 32] = i;
+
+		std::cout << array_y[i + 32] << std::endl;
 	}
 
 	utils::plot(array_y, plot_image);
