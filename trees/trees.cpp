@@ -131,24 +131,56 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	}
 	point_center.clear();
 
+	int versuch = 2048;
+	int shift = versuch / 3;
+	
+	//std::vector<ElementType> array_x(versuch);
+	//std::vector<ElementType> array_y1(versuch);
+	//std::vector<ElementType> array_y2(versuch);
+	//for (int i = -shift; i < versuch - shift; i++) {
+	//	array_x[i + shift] = i;
+	//	array_y1[i + shift] = i;
+	//	array_y2[i + shift] = i / 2;
+	//	array_y3[i + shift] = std::pow(i,1.025);
+	//	array_y4[i + shift] = std::pow(i/100, 2);
+	//}
+	//utils::PlotVector<ElementType> plot1("Versuch",1);
+	//plot1.setFunction(array_y1);
+	//plot1.setFunction(array_y2);
+	//plot1.setIntervall(array_x);
+	//plot1.plot();
 
-
-	cv::Mat plot_image;
-	std::vector<ElementType> array_x(2048);
-	std::vector<ElementType> array_y(2048);
-	for (int i = -32; i < 2048-32; i++) {
-		array_x[i + 32] = i;
-		array_y[i + 32] = i;
-
-		std::cout << array_y[i + 32] << std::endl;
+	//Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_x(versuch, 1);
+	//Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_y1(versuch, 1);
+	//Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_y2(versuch, 1);
+	//for (int i = -shift; i < versuch - shift; i++) {
+	//	eigen_x[i + shift] = i;
+	//	eigen_y1[i + shift] = i;
+	//	eigen_y2[i + shift] = i / 2;
+	//}
+	//utils::PlotEigen<ElementType> plot1("Versuch",1);
+	//plot1.setFunction(eigen_y1);
+	//plot1.setFunction(eigen_y2);
+	//plot1.setIntervall(eigen_x);
+	//plot1.plot();	
+	
+	utils::Matrix<ElementType> mat_x(new ElementType[versuch * 1], versuch, 1);
+	utils::Matrix<ElementType> mat_y1(new ElementType[versuch * 1], versuch, 1);
+	utils::Matrix<ElementType> mat_y2(new ElementType[versuch * 1], versuch, 1);
+	for (int i = -shift; i < versuch - shift; i++) {
+		mat_x[i + shift][0] = i;
+		mat_y1[i + shift][0] = i;
+		mat_y2[i + shift][0] = i / 2;
 	}
-
-	utils::plot(array_y, plot_image);
-
-	cv::namedWindow("Show input image", cv::WINDOW_NORMAL);
-	cv::imshow("Show input image", plot_image);
-
+	utils::PlotMat<ElementType> plot1("Versuch",1);
+	plot1.setFunction(&mat_y1);
+	plot1.setFunction(&mat_y2);
+	plot1.setIntervall(&mat_x);
+	plot1.plot();	
 	cvWaitKey(0);
+
+
+
 
 	///**
 	//	Search in pointcloud radius search

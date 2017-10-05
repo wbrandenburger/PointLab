@@ -227,12 +227,12 @@ int main(int argc, char** argv) {
 	std::cout << fundamentalmatrix << std::endl;
 
 	cv::namedWindow("IMG1", cv::WINDOW_NORMAL);
-	int mouseParam = CV_EVENT_FLAG_LBUTTON;
-	cvSetMouseCallback("IMG1", mouseHandler, &mouseParam);
 	cv::imshow("IMG1", img1);
-
 	cv::namedWindow("IMG2", cv::WINDOW_NORMAL);
 	cv::imshow("IMG2", img2);
+
+	int mouseParam = CV_EVENT_FLAG_LBUTTON;
+	cvSetMouseCallback("IMG1", mouseHandler, &mouseParam);
 
 	cv::waitKey(0);
 }

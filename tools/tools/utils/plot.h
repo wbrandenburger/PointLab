@@ -38,186 +38,1010 @@
 
 namespace utils
 {
-	/**
-		Compute the plot for a array
-
-		@param[in] y_ The data array which will be used for computation
-		@param[in,out] plot_image_ The resulting image with the plot
-		@param[in] color_ String which determines the color
-		@param[in] line_width_ Determines the width of the line
-	*/
-	template<typename ElementType>void plot(cv::Mat y_, cv::Mat& plot_image_, char* color = "red", size_t line_width = 1)
-	{
-		size_t size = 1024;
-
-		ElementType min = y_.ptr<ElementType>(0)[0];
-		ElementType max = y_.ptr<ElementType>(0)[0];
-		for (size_t i = 0; i < y_.cols; i++) {
-			if (y_.ptr< ElementType>(0)[i] > max) {
-				max = y_.ptr< ElementType>(0)[i];
-			}
-
-			if (y_.ptr< ElementType>(0)[i] < min) {
-				min = y_.ptr< ElementType>(0)[i];
-			}
-		}
-
-		ElementType height = max - min;
-
-		if (plot_image_.cols == 0 || plot_image_.rows == 0) {
-			plot_image_ = cv::Mat(size, size, CV_8UC3, cv::Scalar(0, 0, 0));
-		}
-
-		cv::Scalar lineColor;
-		if (!strcmp(color, "red")) { lineColor = cv::Scalar(0, 0, 255); }
-		if (!strcmp(color, "green")) { lineColor = cv::Scalar(0, 255, 0); }
-		if (!strcmp(color, "blue")) { lineColor = cv::Scalar(255, 0, 0); }
-		if (!strcmp(color, "cyan")) { lineColor = cv::Scalar(255, 255, 0); }
-		if (!strcmp(color, "magenta")) { lineColor = cv::Scalar(255, 0, 255); }
-		if (!strcmp(color, "yellow")) { lineColor = cv::Scalar(0, 255, 255); }
-
-		for (int i = 1; i < size - 1; i++) {
-			cv::line(plot_image_, cv::Point(i - 1, size - (y_.ptr< ElementType>(0)[std::round((i - 1)*((double)y_.size() / (double)size))] - min) * size / height),
-				cv::Point(i, size - (y_.ptr< ElementType>(0)[std::round((i)*((double)y_.size() / (double)size))] - min) * size / height),
-				lineColor, line_width, 8, 0);
-		}
-	}
 
 	/**
-		Compute the plot for a array
-
-		@param[in] y_ The data array which will be used for computation
-		@param[in,out] plot_image_ The resulting image with the plot
-		@param[in] color_ String which determines the color
-		@param[in] line_width_ Determines the width of the line
+		Structure which holds the current mouse position
 	*/
-	template<typename ElementType>void plot(std::vector<ElementType>& y_, cv::Mat& plot_image_, char* color = "red", size_t line_width = 1)
+	struct MousePosition
 	{
-		size_t size = 1024;
-
-		ElementType min = y_[0];
-		ElementType max = y_[0];
-		for (size_t i = 0; i < y_.size(); i++) {
-			if (y_[i] > max) {
-				max = y_[i];
-			}
-
-			if (y_[i] < min) {
-				min = y_[i];
-			}
-		}
 		
-		ElementType height = max - min;
+	public:
+		
+		/**
+			Constructor
+		*/
+		MousePosition() : x(NULL), y(NULL) {}
+			
+		/**
+			Constructor
 
-		if (plot_image_.cols == 0 || plot_image_.rows == 0) {
-			plot_image_ = cv::Mat(size, size, CV_8UC3, cv::Scalar(0, 0, 0));
+			@param[in] x_ Current position in x direction
+			@param[in] y_ Current position in y direction
+		*/
+		MousePosition(int x_, int y_)
+		{
+			x = x_;
+			y = y_;
 		}
 
-		cv::Scalar lineColor;
-		if (!strcmp(color, "red")) { lineColor = cv::Scalar(0, 0, 255); }
-		if (!strcmp(color, "green")) { lineColor = cv::Scalar(0, 255, 0); }
-		if (!strcmp(color, "blue")) { lineColor = cv::Scalar(255, 0, 0); }
-		if (!strcmp(color, "cyan")) { lineColor = cv::Scalar(255, 255, 0); }
-		if (!strcmp(color, "magenta")) { lineColor = cv::Scalar(255, 0, 255); }
-		if (!strcmp(color, "yellow")) { lineColor = cv::Scalar(0, 255, 255); }
+		/**
+			Set Position
 
-		for (int i = 1; i < size - 1; i++) {
-			cv::line(plot_image_, cv::Point(i - 1, size - (y_[std::round((i - 1)*((double)y_.size() / (double)size))] - min) * size / height),
-				cv::Point(i, size - (y_[std::round((i)*((double)y_.size() / (double)size))] - min) * size / height),
-				lineColor, line_width, 8, 0); 
+			@param[in] x_ Current position in x direction
+			@param[in] y_ Current position in y direction
+		*/
+		void setPostion(int x_, int y_)
+		{
+			x = x_;
+			y = y_;
 		}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			x = NULL;
+			y = NULL;
+		}
+
+		/**
+			Operator ==
+
+			@param[in] mouse_position_ Another instance of struct MousePosition
+		*/
+		bool operator==(const MousePosition&  mouse_position_) const
+		{
+			if ((*this).x == mouse_position_.x && (*this).y == mouse_position_.y) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+			Operator !=
+
+			@param[in] mouse_position_ Another instance of struct MousePosition
+		*/
+		bool operator!=(const MousePosition&  mouse_position_) const
+		{
+			if ((*this).x != mouse_position_.x || (*this).y != mouse_position_.y) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+			Operator >
+
+			@param[in] mouse_position_ Another instance of struct MousePosition
+		*/
+		bool operator>(const MousePosition&  mouse_position_) const
+		{
+			if ((*this).x > mouse_position_.getX()) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
+			Get x
+		*/
+		int getX() const
+		{
+			return x;
+		}
+
+		/**
+			Get y
+		*/
+		int getY() const
+		{
+			return y;
+		}
+
+	private:
+
+		/**
+			Current position in x direction
+		*/
+		int x;
+
+		/**
+			Current position in y direction
+		*/
+		int y;
+	};
+
+	std::ostream& operator<<(std::ostream& out_, const MousePosition& mouse_position_)
+	{
+		out_ << mouse_position_.getX() << " " << mouse_position_.getY();
+
+		return out_;
 	}
+
+	class Plot
+	{
+
+	public:
+
+		/**
+			Constructor
+		*/
+		Plot(char* window_name_ = "Plot 1", bool interaction_ = 0) : number_of_functions(0), size_plot(1024), number_of_elements(0),
+			starting_index(0), x_zero(NULL), mouse_position(MousePosition()),
+			window_name(window_name_), interaction(interaction_) {}
+
+		/**
+			Destructor
+		*/
+		~Plot() {}
+
+		/**
+			Set size of image
+		*/
+		virtual void setSize(size_t size_plot_) = 0;
+		/**
+			Clear
+		*/
+		virtual void clear() = 0;
+
+		/**
+			Zoom in
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		virtual void setZoomIn(const MousePosition mouse_position_) = 0;
+
+		/**
+			Zoom out
+		*/
+		virtual void setZoomOut() = 0;
+
+		/**
+			Set mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		virtual void setMousePosition(MousePosition mouse_position_) = 0;
+
+		/**
+			Get mouse position
+		*/
+		virtual  MousePosition getMousePosition() const = 0;
+
+		/**
+			Print x- and y-values for current mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		virtual void getValues(MousePosition mouse_position_) const = 0;
+
+ 		/**
+			Draw image
+		*/
+		virtual void drawImage() = 0;
+
+		/**
+			Plot
+		*/
+		virtual void plot() = 0;
+
+	protected:
+
+		/**
+			Number of functions
+		*/
+		size_t number_of_functions;
+
+		/**
+			Size of the image
+		*/
+		size_t size_plot;
+
+		/**
+			Number of elements
+		*/
+		size_t number_of_elements;
+
+		/**
+			Starting index
+		*/
+		size_t starting_index;
+
+		/**
+			Zero
+		*/
+		double x_zero;
+
+		/**
+			Image
+		*/
+		cv::Mat image_vector;
+
+		/**
+			Mouse position
+		*/
+		MousePosition mouse_position;
+
+		/**
+			Window
+		*/
+		char* window_name;
+
+		/**
+			Interaction
+		*/
+		bool interaction;
+	};
 
 	/**
-		Compute the plot for a array
+		Handle for mouse events
 
-		@param[in] y_ The data array which will be used for computation
-		@param[in,out] plot_image_ The resulting image with the plot
-		@param[in] color_ String which determines the color
-		@param[in] line_width_ Determines the width of the line
+		@param[in] event_ Mouse event
+		@param[in] x_ Current position in x direction
+		@param[in] y_ Current position in y direction
+		@param[in] flags_ Current parameter
+		@param[in] param_ Pointer to data
 	*/
-	template<typename ElementType>void plot(Eigen::Matrix<ElementType, Eigen::Dynamic, 1> y_, cv::Mat& plot_image_, char* color = "red", size_t line_width = 1)
+	static void mouseHandler(int event_, int x_, int y_, int flags_, void* param_)
 	{
-		size_t size = 1024;
+		if (event_ == CV_EVENT_LBUTTONDOWN)
+		{
+			MousePosition mouse_position(x_, y_);
+			Plot* plot = (Plot*) param_;
 
-		ElementType min = y_(0,0);
-		ElementType max = y_(0,0);
-		for (size_t i = 0; i < y_.size(); i++) {
-			if (y_(i, 0) > max) {
-				max = y_(i, 0);
+			(*plot).setMousePosition(mouse_position);
+
+		}
+		if (event_ == CV_EVENT_LBUTTONUP)
+		{
+			MousePosition mouse_position(x_, y_);
+			Plot* plot = (Plot*) param_;
+
+			if ((*plot).getMousePosition() != mouse_position) {
+				if ((*plot).getMousePosition() > mouse_position) {
+					MousePosition temp = (*plot).getMousePosition();
+					(*plot).setMousePosition(mouse_position);
+					mouse_position = temp;
+				}
+				(*plot).setZoomIn(mouse_position);
+					
+				(*plot).drawImage();
 			}
-
-			if (y_(i, 0) < min) {
-				min = y_(i, 0);
+			else {
+				(*plot).getValues(mouse_position);
 			}
 		}
+		if (event_ == CV_EVENT_RBUTTONUP)
+		{
+			Plot* plot = (Plot*) param_;
 
-		ElementType height = max - min;
-
-		if (plot_image_.cols == 0 || plot_image_.rows == 0) {
-			plot_image_ = cv::Mat(size, size, CV_8UC3, cv::Scalar(0, 0, 0));
+			(*plot).setZoomOut();
+			(*plot).drawImage();
 		}
 
-		cv::Scalar lineColor;
-		if (!strcmp(color, "red")) { lineColor = cv::Scalar(0, 0, 255); }
-		if (!strcmp(color, "green")) { lineColor = cv::Scalar(0, 255, 0); }
-		if (!strcmp(color, "blue")) { lineColor = cv::Scalar(255, 0, 0); }
-		if (!strcmp(color, "cyan")) { lineColor = cv::Scalar(255, 255, 0); }
-		if (!strcmp(color, "magenta")) { lineColor = cv::Scalar(255, 0, 255); }
-		if (!strcmp(color, "yellow")) { lineColor = cv::Scalar(0, 255, 255); }
+	}	
 
-		for (int i = 1; i < size - 1; i++) {
-			cv::line(plot_image_, cv::Point(i - 1, size - (y_(std::round((i - 1)*((double)y_.size() / (double)size)), 0) - min) * size / height),
-				cv::Point(i, size - (y_(std::round((i)*((double)y_.size() / (double)size)), 0) - min) * size / height),
-				lineColor, line_width, 8, 0);
-		}
-	}
-
-	/**
-		Compute the plot for a array
-
-		@param[in] y_ The data array which will be used for computation
-		@param[in,out] plot_image_ The resulting image with the plot
-		@param[in] color_ String which determines the color
-		@param[in] line_width_ Determines the width of the line
-	*/
-	template<typename ElementType>void plot(Matrix<ElementType> y_, cv::Mat& plot_image_, char* color = "red", size_t line_width = 1)
+	template<typename ElementType> class PlotVector : Plot 
 	{
-		size_t size = 1024;
 
-		ElementType min = y_[0][0];
-		ElementType max = y_[0][0];
-		for (size_t i = 0; i < y_.size(); i++) {
-			if (y_[i][0] > max) {
-				max = y_[i][0];
+	public:
+
+		/**
+			Constructor
+		*/
+		PlotVector(char* window_name_ = "Plot 1", bool interaction_ = 0) : Plot(window_name_, interaction_) {}
+
+		/**
+			Destructor
+		*/
+		~PlotVector() {}
+
+		/**
+			Set size of image
+		*/
+		void setSize(size_t size_plot_)
+		{
+			size_plot = size_plot_;
+		}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			number_of_functions = 0;
+			number_of_elements = 0;
+			starting_index = 0;
+			x_zero = NULL;
+			
+			mouse_position.clear();
+
+			functions.clear();
+			intervall.clear();
+		}
+
+		/**
+			Set function
+
+			@param[in] function_ Function which shall be plotted
+		*/
+		void setFunction(const std::vector<ElementType>& function_)
+		{
+			functions.push_back(function_);
+			number_of_functions++;
+
+			if (!number_of_elements) {
+				number_of_elements = functions[0].size();
+			}
+		}
+
+		/**
+			Set intervall
+		*/
+		void setIntervall(const std::vector<ElementType>& intervall_)
+		{
+			intervall = intervall_;
+			number_of_elements = intervall.size();
+
+			if (intervall[0] < 0 && intervall[number_of_elements - 1] > 0) {
+				size_t index = 0;
+				while (intervall[index] < 0) {
+					index++;
+				}
+
+				x_zero = (double)index / (double)number_of_elements*(double)size_plot;
+			}
+		}
+
+		/**
+			Set intervall
+		*/
+		void setIntervall()
+		{
+			if (!number_of_functions) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
 			}
 
-			if (y_[i][0] < min) {
-				min = y_[i][0];
+			if (intervall[starting_index] < 0 && intervall[starting_index + number_of_elements - 1] > 0) {
+				size_t index = starting_index;
+				while (intervall[index] < 0) {
+					index++;
+				}
+
+				x_zero = ((double)index - starting_index) / (double)number_of_elements*(double)size_plot;
+			}
+			else {
+				x_zero = NULL;
 			}
 		}
 
+		/**
+			Zoom in
 
-		ElementType height = max - min;
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void setZoomIn(const MousePosition mouse_position_) 
+		{
+			starting_index = (size_t)((double)mouse_position.getX() / (double)size_plot *  (double)number_of_elements) + starting_index;
+			number_of_elements = (size_t) ((double) (mouse_position_.getX() - mouse_position.getX()) / (double) size_plot * (double) number_of_elements);
 
-		if (plot_image_.cols == 0 || plot_image_.rows == 0) {
-			plot_image_ = cv::Mat(size, size, CV_8UC3, cv::Scalar(0, 0, 0));
+			setIntervall();
 		}
 
-		cv::Scalar lineColor;
-		if (!strcmp(color, "red")) { lineColor = cv::Scalar(0, 0, 255); }
-		if (!strcmp(color, "green")) { lineColor = cv::Scalar(0, 255, 0); }
-		if (!strcmp(color, "blue")) { lineColor = cv::Scalar(255, 0, 0); }
-		if (!strcmp(color, "cyan")) { lineColor = cv::Scalar(255, 255, 0); }
-		if (!strcmp(color, "magenta")) { lineColor = cv::Scalar(255, 0, 255); }
-		if (!strcmp(color, "yellow")) { lineColor = cv::Scalar(0, 255, 255); }
+		/**
+			Zoom out
+		*/
+		void setZoomOut()
+		{
+			starting_index = 0;
+			number_of_elements = functions[0].size();
 
-		for (int i = 1; i < size - 1; i++) {
-			cv::line(plot_image_, cv::Point(i - 1, size - (y_[std::round((i - 1)*((double)y_.size() / (double)size))][0] - min) * size / height),
-				cv::Point(i, size - (y_[std::round((i)*((double)y_.size() / (double)size))][0] - min) * size / height),
-				lineColor, line_width, 8, 0);
+			setIntervall();
 		}
-	}
+
+		/**
+			Set mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void setMousePosition(MousePosition mouse_position_) 
+		{
+			mouse_position = mouse_position_;
+		}
+
+		/**
+			Get mouse position
+		*/
+		MousePosition getMousePosition() const
+		{
+			return mouse_position;
+		}
+
+		/**
+			Print x- and y-values for current mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void getValues(MousePosition mouse_position_) const {
+
+			size_t index = std::round((double)mouse_position_.getX() / (double)size_plot *(double)number_of_elements + (double)starting_index);
+			std::cout << "x-value: " << intervall[index];
+			for (size_t i = 0; i < number_of_functions; i++) {
+				std::cout << " y-value: " << functions[i][index];
+			}
+			std::cout << std::endl;
+		}
+
+ 		/**
+			Draw image
+		*/
+		void drawImage() 
+		{
+			if (!number_of_functions) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			ElementType min = functions[0][starting_index];
+			ElementType max = functions[0][starting_index];
+	
+			for (size_t i = 0; i < number_of_functions; i++) {
+				for (size_t j = starting_index; j < starting_index + number_of_elements; j++) {
+					if (functions[i][j] > max) {
+						max = functions[i][j];
+					}
+
+					if (functions[i][j] < min) {
+						min = functions[i][j];
+					}
+				}
+			}
+
+			ElementType height = max - min;
+
+			image_vector = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
+
+			for (size_t i = 0; i < number_of_functions; i++) {
+
+				cv::Scalar lineColor;
+				switch (i % 6) {
+				case 0: lineColor = cv::Scalar(0, 0, 255); break;
+				case 1: lineColor = cv::Scalar(0, 255, 0); break;
+				case 2: lineColor = cv::Scalar(255, 0, 0); break;
+				case 3: lineColor = cv::Scalar(255, 255, 0); break;
+				case 4: lineColor = cv::Scalar(255, 0, 255); break;
+				case 5: lineColor = cv::Scalar(0, 255, 255); break;
+				}
+
+				double shift = size_plot / number_of_elements < 1 ? 1 : size_plot / number_of_elements;
+				double j = shift;
+				while (j < size_plot){
+					cv::line(image_vector, 
+						cv::Point(j - shift, size_plot - (functions[i][std::round((j - shift)*((double)number_of_elements / (double)size_plot))+starting_index] - min) * size_plot / height),
+						cv::Point(j, size_plot - (functions[i][std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index] - min) * size_plot / height),
+						lineColor, 1, 8, 0);
+					j += shift;
+				}
+
+			}
+
+			double y_zero = size_plot - (-min) * size_plot / height;
+			cv::line(image_vector, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
+
+			if (x_zero != NULL) {
+				cv::line(image_vector, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
+			}
+			cv::imshow(window_name, image_vector);
+		}
+
+		/**
+			Plot
+		*/
+		void plot()
+		{
+			drawImage();
+
+			if (interaction) {
+				cvSetMouseCallback(window_name, utils::mouseHandler, this);
+			}
+		}
+
+	private:
+
+		/**
+			Functions
+		*/
+		std::vector<std::vector<ElementType>> functions;
+
+		/**
+			Intervall
+		*/
+		std::vector<ElementType> intervall;
+	};
+
+	template<typename ElementType> class PlotEigen : Plot
+	{
+
+	public:
+
+		/**
+			Constructor
+		*/
+		PlotEigen(char* window_name_ = "Plot 1", bool interaction_ = 0) : Plot(window_name_, interaction_){}
+
+		/**
+			Destructor
+		*/
+		~PlotEigen() {}
+
+		/**
+			Set size of image
+		*/
+		void setSize(size_t size_plot_)
+		{
+			size_plot = size_plot_;
+		}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			number_of_functions = 0;
+			number_of_elements = 0;
+			starting_index = 0;
+			x_zero = NULL;
+			
+			mouse_position.clear();
+
+			functions.clear();
+			intervall = Eigen::Matrix<ElementType, Eigen::Dynamic, 1>();
+		}
+
+		/**
+			Set function
+
+			@param[in] function_ Function which shall be plotted
+		*/
+		void setFunction(const Eigen::Matrix<ElementType, Eigen::Dynamic, 1>& function_)
+		{
+			functions.push_back(function_);
+			number_of_functions++;
+
+			if (!number_of_elements) {
+				number_of_elements = functions[0].rows();
+			}
+		}
+
+		/**
+			Set intervall
+		*/
+		void setIntervall(const Eigen::Matrix<ElementType, Eigen::Dynamic, 1>& intervall_)
+		{
+			intervall = intervall_;
+			number_of_elements = intervall.rows();
+
+			if (intervall(0,0) < 0 && intervall(number_of_elements - 1,0) > 0) {
+				size_t index = 0;
+				while (intervall(index,0) < 0) {
+					index++;
+				}
+
+				x_zero = (double)index / (double)number_of_elements*(double)size_plot;
+			}
+		}
+
+		/**
+			Set intervall
+		*/
+		void setIntervall()
+		{
+			if (!number_of_functions) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			if (intervall(starting_index,0) < 0 && intervall(starting_index + number_of_elements - 1,0) > 0) {
+				size_t index = starting_index;
+				while (intervall(index,0) < 0) {
+					index++;
+				}
+
+				x_zero = ((double)index - starting_index) / (double)number_of_elements*(double)size_plot;
+			}
+			else {
+				x_zero = NULL;
+			}
+		}
+
+		/**
+			Zoom in
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void setZoomIn(const MousePosition mouse_position_) 
+		{
+			starting_index = (size_t)((double)mouse_position.getX() / (double)size_plot *  (double)number_of_elements) + starting_index;
+			number_of_elements = (size_t) ((double) (mouse_position_.getX() - mouse_position.getX()) / (double) size_plot * (double) number_of_elements);
+
+			setIntervall();
+		}
+
+		/**
+			Zoom out
+		*/
+		void setZoomOut()
+		{
+			starting_index = 0;
+			number_of_elements = functions[0].rows();
+
+			setIntervall();
+		}
+
+		/**
+			Set mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void setMousePosition(MousePosition mouse_position_) 
+		{
+			mouse_position = mouse_position_;
+		}
+
+		/**
+			Get mouse position
+		*/
+		MousePosition getMousePosition() const
+		{
+			return mouse_position;
+		}
+
+		/**
+			Print x- and y-values for current mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void getValues(MousePosition mouse_position_) const {
+
+			size_t index = std::round((double)mouse_position_.getX() / (double)size_plot *(double)number_of_elements + (double)starting_index);
+			std::cout << "x-value: " << intervall(index,0);
+			for (size_t i = 0; i < number_of_functions; i++) {
+				std::cout << " y-value: " << functions[i](index,0);
+			}
+			std::cout << std::endl;
+		}
+
+ 		/**
+			Draw image
+		*/
+		void drawImage() 
+		{
+			if (!number_of_functions) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			ElementType min = functions[0](starting_index,0);
+			ElementType max = functions[0](starting_index,0);
+	
+			for (size_t i = 0; i < number_of_functions; i++) {
+				for (size_t j = starting_index; j < starting_index + number_of_elements; j++) {
+					if (functions[i](j,0) > max) {
+						max = functions[i](j,0);
+					}
+
+					if (functions[i](j,0) < min) {
+						min = functions[i](j,0);
+					}
+				}
+			}
+
+			ElementType height = max - min;
+
+			image_vector = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
+
+			for (size_t i = 0; i < number_of_functions; i++) {
+
+				cv::Scalar lineColor;
+				switch (i % 6) {
+				case 0: lineColor = cv::Scalar(0, 0, 255); break;
+				case 1: lineColor = cv::Scalar(0, 255, 0); break;
+				case 2: lineColor = cv::Scalar(255, 0, 0); break;
+				case 3: lineColor = cv::Scalar(255, 255, 0); break;
+				case 4: lineColor = cv::Scalar(255, 0, 255); break;
+				case 5: lineColor = cv::Scalar(0, 255, 255); break;
+				}
+
+				double shift = size_plot / number_of_elements < 1 ? 1 : size_plot / number_of_elements;
+				double j = shift;
+				while (j < size_plot){
+					cv::line(image_vector, 
+						cv::Point(j - shift, size_plot - (functions[i](std::round((j - shift)*((double)number_of_elements / (double)size_plot))+starting_index,0) - min) * size_plot / height),
+						cv::Point(j, size_plot - (functions[i](std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index,0) - min) * size_plot / height),
+						lineColor, 1, 8, 0);
+					j += shift;
+				}
+
+			}
+
+			double y_zero = size_plot - (-min) * size_plot / height;
+			cv::line(image_vector, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
+
+			if (x_zero != NULL) {
+				cv::line(image_vector, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
+			}
+			cv::imshow(window_name, image_vector);
+		}
+
+		/**
+			Plot
+		*/
+		void plot()
+		{
+			drawImage();
+
+			if (interaction) {
+				cvSetMouseCallback(window_name, utils::mouseHandler, this);
+			}
+		}
+
+	private:
+
+		/**
+			Functions
+		*/
+		std::vector<Eigen::Matrix<ElementType, Eigen::Dynamic, 1>> functions;
+
+		/**
+			Intervall
+		*/
+		Eigen::Matrix<ElementType, Eigen::Dynamic, 1> intervall;
+	};
+
+	template<typename ElementType> class PlotMat : Plot 
+	{
+
+	public:
+
+		/**
+			Constructor
+		*/
+		PlotMat(char* window_name_ = "Plot 1", bool interaction_ = 0) : Plot(window_name_, interaction_) {}
+
+		/**
+			Destructor
+		*/
+		~PlotMat() {}
+
+		/**
+			Set size of image
+		*/
+		void setSize(size_t size_plot_)
+		{
+			size_plot = size_plot_;
+		}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			number_of_functions = 0;
+			number_of_elements = 0;
+			starting_index = 0;
+			x_zero = NULL;
+			
+			mouse_position.clear();
+
+			functions.clear();
+			(*intervall).clear();
+		}
+
+		/**
+			Set function
+
+			@param[in] function_ Function which shall be plotted
+		*/
+		void setFunction(utils::Matrix<ElementType>* function_)
+		{
+			functions.push_back(function_);		
+			number_of_functions++;
+
+			if (!number_of_elements) {
+				number_of_elements = (*functions[0]).getRows();
+			}
+		}
+
+		/**
+			Set intervall
+		*/
+		void setIntervall(utils::Matrix<ElementType>* intervall_)
+		{
+			intervall = intervall_;
+			number_of_elements = (*intervall).getRows();
+
+			if ((*intervall)[0][0] < 0 && (*intervall)[number_of_elements - 1][0] > 0) {
+				size_t index = 0;
+				while ((*intervall)[index][0] < 0) {
+					index++;
+				}
+
+				x_zero = (double)index / (double)number_of_elements*(double)size_plot;
+			}
+		}
+
+		/**
+			Set intervall
+		*/
+		void setIntervall()
+		{
+			if (!number_of_functions) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			if ((*intervall)[starting_index][0] < 0 && (*intervall)[starting_index + number_of_elements - 1][0] > 0) {
+				size_t index = starting_index;
+				while ((*intervall)[index][0] < 0) {
+					index++;
+				}
+
+				x_zero = ((double)index - starting_index) / (double)number_of_elements*(double)size_plot;
+			}
+			else {
+				x_zero = NULL;
+			}
+		}
+
+		/**
+			Zoom in
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void setZoomIn(const MousePosition mouse_position_) 
+		{
+			starting_index = (size_t)((double)mouse_position.getX() / (double)size_plot *  (double)number_of_elements) + starting_index;
+			number_of_elements = (size_t) ((double) (mouse_position_.getX() - mouse_position.getX()) / (double) size_plot * (double) number_of_elements);
+
+			setIntervall();
+		}
+
+		/**
+			Zoom out
+		*/
+		void setZoomOut()
+		{
+			starting_index = 0;
+			number_of_elements = (*functions[0]).getRows();
+
+			setIntervall();
+		}
+
+		/**
+			Set mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void setMousePosition(MousePosition mouse_position_) 
+		{
+			mouse_position = mouse_position_;
+		}
+
+		/**
+			Get mouse position
+		*/
+		MousePosition getMousePosition() const
+		{
+			return mouse_position;
+		}
+
+		/**
+			Print x- and y-values for current mouse position
+
+			@param[in] mouse_position_ Current mouse position
+		*/
+		void getValues(MousePosition mouse_position_) const {
+
+			size_t index = std::round((double)mouse_position_.getX() / (double)size_plot *(double)number_of_elements + (double)starting_index);
+			std::cout << "x-value: " << (*intervall)[index][0];
+			for (size_t i = 0; i < number_of_functions; i++) {
+				std::cout << " y-value: " << (*functions[i])[index][0];
+			}
+			std::cout << std::endl;
+		}
+
+ 		/**
+			Draw image
+		*/
+		void drawImage() 
+		{
+			if (!number_of_functions) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			ElementType min = (*functions[0])[starting_index][0];
+			ElementType max = (*functions[0])[starting_index][0];
+	
+			for (size_t i = 0; i < number_of_functions; i++) {
+				for (size_t j = starting_index; j < starting_index + number_of_elements; j++) {
+					if ((*functions[i])[j][0] > max) {
+						max = (*functions[i])[j][0];
+					}
+
+					if ((*functions[i])[j][0] < min) {
+						min = (*functions[i])[j][0];
+					}
+				}
+			}
+
+			ElementType height = max - min;
+
+			image_vector = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
+
+			for (size_t i = 0; i < number_of_functions; i++) {
+
+				cv::Scalar lineColor;
+				switch (i % 6) {
+				case 0: lineColor = cv::Scalar(0, 0, 255); break;
+				case 1: lineColor = cv::Scalar(0, 255, 0); break;
+				case 2: lineColor = cv::Scalar(255, 0, 0); break;
+				case 3: lineColor = cv::Scalar(255, 255, 0); break;
+				case 4: lineColor = cv::Scalar(255, 0, 255); break;
+				case 5: lineColor = cv::Scalar(0, 255, 255); break;
+				}
+
+				double shift = size_plot / number_of_elements < 1 ? 1 : size_plot / number_of_elements;
+				double j = shift;
+				while (j < size_plot){
+					cv::line(image_vector, 
+						cv::Point(j - shift, size_plot - ((*functions[i])[std::round((j - shift)*((double)number_of_elements / (double)size_plot))+starting_index][0] - min) * size_plot / height),
+						cv::Point(j, size_plot - ((*functions[i])[std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index][0] - min) * size_plot / height),
+						lineColor, 1, 8, 0);
+					j += shift;
+				}
+
+			}
+
+			double y_zero = size_plot - (-min) * size_plot / height;
+			cv::line(image_vector, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
+
+			if (x_zero != NULL) {
+				cv::line(image_vector, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
+			}
+			cv::imshow(window_name, image_vector);
+		}
+
+		/**
+			Plot
+		*/
+		void plot()
+		{
+			drawImage();
+
+			if (interaction) {
+				cvSetMouseCallback(window_name, utils::mouseHandler, this);
+			}
+		}
+
+	private:
+
+		/**
+			Functions
+		*/
+		std::vector<utils::Matrix<ElementType>*> functions;
+
+		/**
+			Intervall
+		*/
+		utils::Matrix<ElementType>* intervall;
+	};
 
 	//template<typename ElementType>void bar(cv::Mat y_, cv::Mat& plotImage_, char* color_ = "red")
 	//{
