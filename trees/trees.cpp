@@ -150,19 +150,19 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 	//plot1.setIntervall(array_x);
 	//plot1.plot();
 
-	//Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_x(versuch, 1);
-	//Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_y1(versuch, 1);
-	//Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_y2(versuch, 1);
-	//for (int i = -shift; i < versuch - shift; i++) {
-	//	eigen_x[i + shift] = i;
-	//	eigen_y1[i + shift] = i;
-	//	eigen_y2[i + shift] = i / 2;
-	//}
-	//utils::PlotEigen<ElementType> plot1("Versuch",1);
-	//plot1.setFunction(eigen_y1);
-	//plot1.setFunction(eigen_y2);
-	//plot1.setIntervall(eigen_x);
-	//plot1.plot();	
+	Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_x(versuch, 1);
+	Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_y1(versuch, 1);
+	Eigen::Matrix<ElementType, Eigen::Dynamic, 1> eigen_y2(versuch, 1);
+	for (int i = -shift; i < versuch - shift; i++) {
+		eigen_x[i + shift] = i;
+		eigen_y1[i + shift] = i;
+		eigen_y2[i + shift] = i / 2;
+	}
+	utils::PlotEigen<ElementType> plot1("Versuch 1",1);
+	plot1.setFunction(eigen_y1);
+	plot1.setFunction(eigen_y2);
+	plot1.setIntervall(eigen_x);
+	plot1.plot();	
 	
 	utils::Matrix<ElementType> mat_x(new ElementType[versuch * 1], versuch, 1);
 	utils::Matrix<ElementType> mat_y1(new ElementType[versuch * 1], versuch, 1);
@@ -172,11 +172,11 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 		mat_y1[i + shift][0] = i;
 		mat_y2[i + shift][0] = i / 2;
 	}
-	utils::PlotMat<ElementType> plot1("Versuch",1);
-	plot1.setFunction(&mat_y1);
-	plot1.setFunction(&mat_y2);
-	plot1.setIntervall(&mat_x);
-	plot1.plot();	
+	utils::PlotMat<ElementType> plot2("Versuch 2",1);
+	plot2.setFunction(&mat_y1);
+	plot2.setFunction(&mat_y2);
+	plot2.setIntervall(&mat_x);
+	plot2.plot();	
 	cvWaitKey(0);
 
 

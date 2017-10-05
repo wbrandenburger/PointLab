@@ -171,8 +171,8 @@ namespace utils
 		/**
 			Constructor
 		*/
-		Plot(char* window_name_ = "Plot 1", bool interaction_ = 0) : number_of_functions(0), size_plot(1024), number_of_elements(0),
-			starting_index(0), x_zero(NULL), mouse_position(MousePosition()),
+		Plot(char* window_name_ = "Plot 1", bool interaction_ = 0) : number_of_functions(0), size_plot(1024), 
+			number_of_elements(0), starting_index(0), x_zero(NULL), mouse_position(MousePosition()),
 			window_name(window_name_), interaction(interaction_) {}
 
 		/**
@@ -260,7 +260,7 @@ namespace utils
 		/**
 			Image
 		*/
-		cv::Mat image_vector;
+		cv::Mat image;
 
 		/**
 			Mouse position
@@ -334,7 +334,8 @@ namespace utils
 		/**
 			Constructor
 		*/
-		PlotVector(char* window_name_ = "Plot 1", bool interaction_ = 0) : Plot(window_name_, interaction_) {}
+		PlotVector(char* window_name_ = "Plot 1", bool interaction_ = 0) : 
+			Plot(window_name_, interaction_) {}
 
 		/**
 			Destructor
@@ -505,7 +506,7 @@ namespace utils
 
 			ElementType height = max - min;
 
-			image_vector = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
+			image = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
 
 			for (size_t i = 0; i < number_of_functions; i++) {
 
@@ -522,8 +523,8 @@ namespace utils
 				double shift = size_plot / number_of_elements < 1 ? 1 : size_plot / number_of_elements;
 				double j = shift;
 				while (j < size_plot){
-					cv::line(image_vector, 
-						cv::Point(j - shift, size_plot - (functions[i][std::round((j - shift)*((double)number_of_elements / (double)size_plot))+starting_index] - min) * size_plot / height),
+					cv::line(image,
+						cv::Point(j - shift, size_plot - (functions[i][std::round((j - shift)*((double)number_of_elements / (double)size_plot)) + starting_index] - min) * size_plot / height),
 						cv::Point(j, size_plot - (functions[i][std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index] - min) * size_plot / height),
 						lineColor, 1, 8, 0);
 					j += shift;
@@ -532,12 +533,12 @@ namespace utils
 			}
 
 			double y_zero = size_plot - (-min) * size_plot / height;
-			cv::line(image_vector, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
+			cv::line(image, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
 
 			if (x_zero != NULL) {
-				cv::line(image_vector, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
+				cv::line(image, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
 			}
-			cv::imshow(window_name, image_vector);
+			cv::imshow(window_name, image);
 		}
 
 		/**
@@ -573,7 +574,8 @@ namespace utils
 		/**
 			Constructor
 		*/
-		PlotEigen(char* window_name_ = "Plot 1", bool interaction_ = 0) : Plot(window_name_, interaction_){}
+		PlotEigen(char* window_name_ = "Plot 1", bool interaction_ = 0) : 
+			Plot(window_name_, interaction_){}
 
 		/**
 			Destructor
@@ -744,7 +746,7 @@ namespace utils
 
 			ElementType height = max - min;
 
-			image_vector = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
+			image = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
 
 			for (size_t i = 0; i < number_of_functions; i++) {
 
@@ -761,9 +763,9 @@ namespace utils
 				double shift = size_plot / number_of_elements < 1 ? 1 : size_plot / number_of_elements;
 				double j = shift;
 				while (j < size_plot){
-					cv::line(image_vector, 
-						cv::Point(j - shift, size_plot - (functions[i](std::round((j - shift)*((double)number_of_elements / (double)size_plot))+starting_index,0) - min) * size_plot / height),
-						cv::Point(j, size_plot - (functions[i](std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index,0) - min) * size_plot / height),
+					cv::line(image,
+						cv::Point(j - shift, size_plot - (functions[i](std::round((j - shift)*((double)number_of_elements / (double)size_plot)) + starting_index, 0) - min) * size_plot / height),
+						cv::Point(j, size_plot - (functions[i](std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index, 0) - min) * size_plot / height),
 						lineColor, 1, 8, 0);
 					j += shift;
 				}
@@ -771,12 +773,12 @@ namespace utils
 			}
 
 			double y_zero = size_plot - (-min) * size_plot / height;
-			cv::line(image_vector, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
+			cv::line(image, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
 
 			if (x_zero != NULL) {
-				cv::line(image_vector, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
+				cv::line(image, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
 			}
-			cv::imshow(window_name, image_vector);
+			cv::imshow(window_name, image);
 		}
 
 		/**
@@ -812,7 +814,8 @@ namespace utils
 		/**
 			Constructor
 		*/
-		PlotMat(char* window_name_ = "Plot 1", bool interaction_ = 0) : Plot(window_name_, interaction_) {}
+		PlotMat(char* window_name_ = "Plot 1", bool interaction_ = 0) :
+			Plot(window_name_, interaction_) {}
 
 		/**
 			Destructor
@@ -983,7 +986,7 @@ namespace utils
 
 			ElementType height = max - min;
 
-			image_vector = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
+			image = cv::Mat(size_plot, size_plot, CV_8UC3, cv::Scalar(0, 0, 0));
 
 			for (size_t i = 0; i < number_of_functions; i++) {
 
@@ -1000,8 +1003,8 @@ namespace utils
 				double shift = size_plot / number_of_elements < 1 ? 1 : size_plot / number_of_elements;
 				double j = shift;
 				while (j < size_plot){
-					cv::line(image_vector, 
-						cv::Point(j - shift, size_plot - ((*functions[i])[std::round((j - shift)*((double)number_of_elements / (double)size_plot))+starting_index][0] - min) * size_plot / height),
+					cv::line(image,
+						cv::Point(j - shift, size_plot - ((*functions[i])[std::round((j - shift)*((double)number_of_elements / (double)size_plot)) + starting_index][0] - min) * size_plot / height),
 						cv::Point(j, size_plot - ((*functions[i])[std::round(j*((double)number_of_elements / (double)size_plot)) + starting_index][0] - min) * size_plot / height),
 						lineColor, 1, 8, 0);
 					j += shift;
@@ -1010,12 +1013,12 @@ namespace utils
 			}
 
 			double y_zero = size_plot - (-min) * size_plot / height;
-			cv::line(image_vector, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
+			cv::line(image, cv::Point(0, y_zero), cv::Point(size_plot, y_zero), cv::Scalar(255, 255, 255), 1, 8, 0);
 
 			if (x_zero != NULL) {
-				cv::line(image_vector, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
+				cv::line(image, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
 			}
-			cv::imshow(window_name, image_vector);
+			cv::imshow(window_name, image);
 		}
 
 		/**
@@ -1042,47 +1045,6 @@ namespace utils
 		*/
 		utils::Matrix<ElementType>* intervall;
 	};
-
-	//template<typename ElementType>void bar(cv::Mat y_, cv::Mat& plotImage_, char* color_ = "red")
-	//{
-	//	int size = 1024;
-
-	//	ElementType min = y_.ptr<ElementType>(0)[0];
-	//	ElementType max = y_.ptr<ElementType>(0)[0];
-	//	for (int i = 0; i < y_.cols; i++) {
-	//		if (y_.ptr< ElementType>(0)[i] > max) {
-	//			max = y_.ptr< ElementType>(0)[i];
-	//		}
-
-	//		if (y_.ptr< ElementType>(0)[i] < min) {
-	//			std::cout << y_.ptr< ElementType>(0)[i] << std::endl;
-	//			min = y_.ptr< ElementType>(0)[i];
-	//		}
-	//	}
-
-	//	ElementType height = max - min;
-	//	for (int i = 1; i < y_.cols; i++) {
-	//		y_.ptr<ElementType>(0)[i] = (y_.ptr<ElementType>(0)[i] - min)*((ElementType)size / height);
-	//	}
-
-	//	if (plotImage_.cols == 0 || plotImage_.rows == 0) {
-	//		plotImage_ = cv::Mat(size, size, CV_8UC3, cv::Scalar(0, 0, 0));
-	//	}
-
-	//	cv::Scalar lineColor;
-	//	if (!strcmp(color_, "red")) { lineColor = cv::Scalar(0, 0, 255); }
-	//	if (!strcmp(color_, "green")) { lineColor = cv::Scalar(0, 255, 0); }
-	//	if (!strcmp(color_, "blue")) { lineColor = cv::Scalar(255, 0, 0); }
-	//	if (!strcmp(color_, "cyan")) { lineColor = cv::Scalar(255, 255, 0); }
-	//	if (!strcmp(color_, "magenta")) { lineColor = cv::Scalar(255, 0, 255); }
-	//	if (!strcmp(color_, "yellow")) { lineColor = cv::Scalar(0, 255, 255); }
-
-	//	for (int i = 1; i < size; i++) {
-	//		rectangle(plotImage_,cv::Point(i-1, size), 
-	//			cv::Point(i, size- std::round(y_.ptr<ElementType>(0)[(int)std::round((i)*((double)y_.cols / size))])), lineColor, CV_FILLED);
-
-	//	}
-	//}	
 }
 
 #endif /* UTILS_PLOT_H_*/	
