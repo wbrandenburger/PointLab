@@ -173,8 +173,8 @@ template<typename ElementType> void program(size_t cores_, io::PlyIO& plyIO_)
 		mat_y2[i + shift][0] = i / 2;
 	}
 	utils::PlotMat<ElementType> plot1("Versuch",1);
-	plot1.setFunction(&mat_y1);
-	plot1.setFunction(&mat_y2);
+	plot1.setFunction(mat_y1);
+	plot1.setFunction(mat_y2);
 	plot1.setIntervall(&mat_x);
 	plot1.plot();	
 	cvWaitKey(0);
