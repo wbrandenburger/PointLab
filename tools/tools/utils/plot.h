@@ -156,12 +156,29 @@ namespace utils
 		int y;
 	};
 
+	/**
+		Print currrent mouse position
+
+		@param[in] out_ Instance of ostream
+		@param[in] mouse_position_ Current mouse position
+		@return Instance of ostream 
+	 */
 	std::ostream& operator<<(std::ostream& out_, const MousePosition& mouse_position_)
 	{
 		out_ << mouse_position_.getX() << " " << mouse_position_.getY();
 
 		return out_;
 	}
+		/**
+		Handle for mouse events
+
+		@param[in] event_ Mouse event
+		@param[in] x_ Current position in x direction
+		@param[in] y_ Current position in y direction
+		@param[in] flags_ Current parameter
+		@param[in] param_ Pointer to data
+	*/
+	static void mouseHandler(int event_, int x_, int y_, int flags_, void* param_);
 
 	class Plot
 	{
@@ -181,13 +198,17 @@ namespace utils
 		~Plot() {}
 
 		/**
-			Set size of image
-		*/
-		virtual void setSize(size_t size_plot_) = 0;
-		/**
 			Clear
 		*/
 		virtual void clear() = 0;
+
+		/**
+			Set size of image
+		*/
+		virtual void setSize(size_t size_plot_)
+		{
+			size_plot = size_plot_;
+		}
 
 		/**
 			Zoom in
@@ -206,12 +227,18 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		virtual void setMousePosition(MousePosition mouse_position_) = 0;
+		virtual void setMousePosition(MousePosition mouse_position_) 
+		{
+			mouse_position = mouse_position_;
+		}
 
 		/**
 			Get mouse position
 		*/
-		virtual  MousePosition getMousePosition() const = 0;
+		virtual MousePosition getMousePosition() const
+		{
+			return mouse_position;
+		}
 
 		/**
 			Print x- and y-values for current mouse position
@@ -225,10 +252,18 @@ namespace utils
 		*/
 		virtual void drawImage() = 0;
 
+
 		/**
 			Plot
 		*/
-		virtual void plot() = 0;
+		virtual void plot()
+		{
+			drawImage();
+
+			if (interaction) {
+				cvSetMouseCallback(window_name, utils::mouseHandler, this);
+			}
+		}
 
 	protected:
 
@@ -292,7 +327,7 @@ namespace utils
 		if (event_ == CV_EVENT_LBUTTONDOWN)
 		{
 			MousePosition mouse_position(x_, y_);
-			Plot* plot = (Plot*) param_;
+			Plot* plot = (Plot*)param_;
 
 			(*plot).setMousePosition(mouse_position);
 
@@ -324,9 +359,9 @@ namespace utils
 			(*plot).drawImage();
 		}
 
-	}	
+	}
 
-	template<typename ElementType> class PlotVector : Plot 
+	template<typename ElementType> class PlotVector : public Plot 
 	{
 
 	public:
@@ -341,14 +376,6 @@ namespace utils
 			Destructor
 		*/
 		~PlotVector() {}
-
-		/**
-			Set size of image
-		*/
-		void setSize(size_t size_plot_)
-		{
-			size_plot = size_plot_;
-		}
 
 		/**
 			Clear
@@ -375,10 +402,6 @@ namespace utils
 		{
 			functions.push_back(function_);
 			number_of_functions++;
-
-			if (!number_of_elements) {
-				number_of_elements = functions[0].size();
-			}
 		}
 
 		/**
@@ -444,24 +467,6 @@ namespace utils
 			number_of_elements = functions[0].size();
 
 			setIntervall();
-		}
-
-		/**
-			Set mouse position
-
-			@param[in] mouse_position_ Current mouse position
-		*/
-		void setMousePosition(MousePosition mouse_position_) 
-		{
-			mouse_position = mouse_position_;
-		}
-
-		/**
-			Get mouse position
-		*/
-		MousePosition getMousePosition() const
-		{
-			return mouse_position;
 		}
 
 		/**
@@ -541,18 +546,6 @@ namespace utils
 			cv::imshow(window_name, image);
 		}
 
-		/**
-			Plot
-		*/
-		void plot()
-		{
-			drawImage();
-
-			if (interaction) {
-				cvSetMouseCallback(window_name, utils::mouseHandler, this);
-			}
-		}
-
 	private:
 
 		/**
@@ -566,7 +559,7 @@ namespace utils
 		std::vector<ElementType> intervall;
 	};
 
-	template<typename ElementType> class PlotEigen : Plot
+	template<typename ElementType> class PlotEigen : public Plot
 	{
 
 	public:
@@ -581,14 +574,6 @@ namespace utils
 			Destructor
 		*/
 		~PlotEigen() {}
-
-		/**
-			Set size of image
-		*/
-		void setSize(size_t size_plot_)
-		{
-			size_plot = size_plot_;
-		}
 
 		/**
 			Clear
@@ -615,10 +600,6 @@ namespace utils
 		{
 			functions.push_back(function_);
 			number_of_functions++;
-
-			if (!number_of_elements) {
-				number_of_elements = functions[0].rows();
-			}
 		}
 
 		/**
@@ -684,24 +665,6 @@ namespace utils
 			number_of_elements = functions[0].rows();
 
 			setIntervall();
-		}
-
-		/**
-			Set mouse position
-
-			@param[in] mouse_position_ Current mouse position
-		*/
-		void setMousePosition(MousePosition mouse_position_) 
-		{
-			mouse_position = mouse_position_;
-		}
-
-		/**
-			Get mouse position
-		*/
-		MousePosition getMousePosition() const
-		{
-			return mouse_position;
 		}
 
 		/**
@@ -781,18 +744,6 @@ namespace utils
 			cv::imshow(window_name, image);
 		}
 
-		/**
-			Plot
-		*/
-		void plot()
-		{
-			drawImage();
-
-			if (interaction) {
-				cvSetMouseCallback(window_name, utils::mouseHandler, this);
-			}
-		}
-
 	private:
 
 		/**
@@ -806,7 +757,7 @@ namespace utils
 		Eigen::Matrix<ElementType, Eigen::Dynamic, 1> intervall;
 	};
 
-	template<typename ElementType> class PlotMat : Plot 
+	template<typename ElementType> class PlotMat : public Plot
 	{
 
 	public:
@@ -821,14 +772,6 @@ namespace utils
 			Destructor
 		*/
 		~PlotMat() {}
-
-		/**
-			Set size of image
-		*/
-		void setSize(size_t size_plot_)
-		{
-			size_plot = size_plot_;
-		}
 
 		/**
 			Clear
@@ -855,10 +798,6 @@ namespace utils
 		{
 			functions.push_back(function_);		
 			number_of_functions++;
-
-			if (!number_of_elements) {
-				number_of_elements = (*functions[0]).getRows();
-			}
 		}
 
 		/**
@@ -924,24 +863,6 @@ namespace utils
 			number_of_elements = (*functions[0]).getRows();
 
 			setIntervall();
-		}
-
-		/**
-			Set mouse position
-
-			@param[in] mouse_position_ Current mouse position
-		*/
-		void setMousePosition(MousePosition mouse_position_) 
-		{
-			mouse_position = mouse_position_;
-		}
-
-		/**
-			Get mouse position
-		*/
-		MousePosition getMousePosition() const
-		{
-			return mouse_position;
 		}
 
 		/**
@@ -1019,18 +940,6 @@ namespace utils
 				cv::line(image, cv::Point(x_zero, 0), cv::Point(x_zero, size_plot), cv::Scalar(255, 255, 255), 1, 8, 0);
 			}
 			cv::imshow(window_name, image);
-		}
-
-		/**
-			Plot
-		*/
-		void plot()
-		{
-			drawImage();
-
-			if (interaction) {
-				cvSetMouseCallback(window_name, utils::mouseHandler, this);
-			}
 		}
 
 	private:
