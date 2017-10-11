@@ -209,7 +209,7 @@ namespace utils
 		*/
 		void draw()
 		{
-			//glPushMatrix(); /* GL_MODELVIEW is default */
+			glPushMatrix(); /* GL_MODELVIEW is default */
 
 			/**
 				Minimum and maximum y-value
@@ -229,6 +229,11 @@ namespace utils
 			glScalef(1.0 / (index_right - index_left), 1.0 / (y2 - y1), 1.0);
 			glTranslatef(0.0, -y1, 0.0);
 			
+			/**
+				Init the GL state
+			*/
+			glLineWidth(1.0f);
+
 			for (size_t i = 0; i < number_of_functions; i++) {
 
 				float r, g, b;
@@ -259,7 +264,7 @@ namespace utils
 			glVertex2f(0, 0);
 			glVertex2f(index_right-index_left, 0);
 			glEnd();
-			//glPopMatrix();
+			glPopMatrix();
 		}
 
 	private:
@@ -391,6 +396,11 @@ namespace utils
 			glScalef(1.0 / (index_right - index_left), 1.0 / (y2 - y1), 1.0);
 			glTranslatef(0.0, -y1, 0.0);
 			
+			/**
+				Init the GL state
+			*/
+			glLineWidth(1.0f);
+
 			for (size_t i = 0; i < number_of_functions; i++) {
 
 				float r, g, b;
@@ -465,6 +475,8 @@ namespace utils
 		*/	
 		GLPlotVector()
 		{
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+
 			clear();
 		}
 
@@ -546,6 +558,8 @@ namespace utils
 		*/
 		static void reshape(int width_, int height_)
 		{
+			glutSetWindow(glutGetWindow());
+
 			glViewport(0, 0, width_, height_);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
@@ -560,8 +574,6 @@ namespace utils
 		*/
 		void plot(char* window_name_ = nullptr)
 		{
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-
 			if (!window_name_) {
 				window_name_ = new char[10];
 				sprintf(window_name_, "Window %d", plots_vector.getNumberOfPlots() - 1);
@@ -577,12 +589,6 @@ namespace utils
 			glutIdleFunc(idle);
 			glutMouseWheelFunc(mouseWheel);
 			glutMouseFunc(mouseFunc);
-			
-			/**
-				Init the GL state
-			*/
-			glLineWidth(2.0);
-
 		}
 
 		/**
@@ -653,6 +659,8 @@ namespace utils
 		*/	
 		GLPlotMatrix()
 		{
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+			
 			clear();
 		}
 
@@ -746,8 +754,6 @@ namespace utils
 		*/
 		void plot(char* window_name_ = nullptr)
 		{
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-
 			if (!window_name_) {
 				window_name_ = new char[10];
 				sprintf(window_name_, "Window %d", plots_matrix.getNumberOfPlots() - 1);
@@ -763,11 +769,6 @@ namespace utils
 			glutIdleFunc(idle);
 			glutMouseWheelFunc(mouseWheel);
 			glutMouseFunc(mouseFunc);
-			
-			/**
-				Init the GL state
-			*/
-			glLineWidth(2.0);
 		}
 
 		/**

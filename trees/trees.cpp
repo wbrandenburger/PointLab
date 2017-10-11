@@ -286,7 +286,7 @@ int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 
 		int versuch = 2048;
-		int shift = versuch / 3;
+		int shift =  versuch / 3;
 		
 		std::vector<float> array_x(versuch);
 		std::vector<float> array_y1(versuch);
