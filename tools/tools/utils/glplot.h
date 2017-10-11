@@ -45,20 +45,20 @@ namespace utils
 	public:
 
 		/**
-		Constructor
+			Constructor
 		*/
 		PlotFunction() : index_left(0.0f), index_right(0.0f), 
 			number_of_functions(NULL), number_of_elements(NULL),zero(NULL) {}
 
 		/**
-		Destructor
+			Destructor
 		*/
 		~PlotFunction() {}
 
 		/**
-		Set y-values
+			Set y-values
 
-		@param[in] y_ y-values
+			@param[in] y_ y-values
 		*/
 		void setY(const std::vector<ElementType>& y_)
 		{
@@ -100,6 +100,11 @@ namespace utils
 
 		/**
 			Zoom in
+
+			@param[in] x_ Mouse position in x-direction
+			@param[in] y_ Mouse position in y-direction
+			@param[in] width_ Current width of the window
+			@param[in] height_ Current height of the window
 		*/
 		void zoomIn(int x_, int y_, int width_, int height_)
 		{
@@ -114,7 +119,7 @@ namespace utils
 		}
 
 		/**
-			Zoom in
+			Zoom Out
 		*/
 		void zoomOut()
 		{
@@ -139,6 +144,9 @@ namespace utils
 		{
 			glPushMatrix(); /* GL_MODELVIEW is default */
 
+			/**
+				Minimum and maximum y-value
+			*/
 			ElementType y2 = y[0][index_left];
 			ElementType y1 = y[0][index_left];
 			for (size_t i = 0; i < number_of_functions; i++) {
@@ -148,6 +156,9 @@ namespace utils
 				}
 			}
 
+			/**
+				Draw the functions
+			*/
 			glScalef(1.0 / (index_right - index_left), 1.0 / (y2 - y1), 1.0);
 			glTranslatef(0.0, -y1, 0.0);
 			
@@ -166,6 +177,10 @@ namespace utils
 
 				glEnd();
 			}
+
+			/**
+				Draw the axis
+			*/
 
 			glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -218,7 +233,9 @@ namespace utils
 		float zero;
 	};
 
-
+	/**
+		Forward declaration of struct Plots
+	*/
 	template<typename ElementType> struct Plots;
 
 	template<typename ElementType> class GLPlot
@@ -253,17 +270,9 @@ namespace utils
 		void setPlot()
 		{
 			plots.plot.push_back(new PlotFunction<ElementType>);
-			plots.current_plot = plots.number_of_plots;
+			plots.set_plot = plots.number_of_plots;
 			
 			plots.number_of_plots++;
-		}
-
-		/**
-			Set  current plot
-		*/
-		void setPlot(size_t current_plot_)
-		{
-			plots.current_plot = current_plot_;
 		}
 
 		/**
@@ -273,7 +282,7 @@ namespace utils
 		*/
 		void setY(const std::vector<ElementType>& y_)
 		{
-			(*plots.plot[plots.current_plot]).setY(y_);
+			(*plots.plot[plots.set_plot]).setY(y_);
 		}
 
 		/**
@@ -283,39 +292,55 @@ namespace utils
 		*/
 		void setX(const std::vector<ElementType>& x_)
 		{
-			(*plots.plot[plots.current_plot]).setX(x_);
+			(*plots.plot[plots.set_plot]).setX(x_);
 		}
 
-		/* Redrawing func */
+		/** 
+		Redrawing function 
+		*/
 		static void redraw(void)
 		{
-			glutSetWindow(plots.current_plot + 1);
+			glutSetWindow(plots.draw_plot + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
-			(*plots.plot[plots.current_plot]).draw();
+			(*plots.plot[plots.draw_plot]).draw();
 
 			glutSwapBuffers();
 		};
 
-		///* Idle proc. Redisplays, if called. */
+		/**  
+			Redisplays, if called 
+		*/
 		static void idle(void)
 		{
 			glutPostRedisplay();
 		};
 
-		static void reshape(int w, int h)
+		/**
+			Changes the size of the window
+			
+			@param[in] withd_ The new Width of the window
+			@param[in] height_ The new Height of the window
+		*/
+		static void reshape(int width_, int height_)
 		{
-			glViewport(0, 0, w, h);
+			glViewport(0, 0, width_, height_);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0, 1, 0, 1, -1, 1);
 			glMatrixMode(GL_MODELVIEW);
 		}
-
+				
+		/**
+			Creates the window and sets the callback functions
+			
+			@param[in] withd_ The new Width of the window
+			@param[in] height_ The new Height of the window
+		*/
 		void plot()
 		{
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
@@ -325,6 +350,8 @@ namespace utils
 			std::string ostring = os.str();
 
 			glutCreateWindow(ostring.c_str());
+
+			std::cout << glutGetWindow() << " " << NULL + 1 << std::endl;
 
 			/**
 				Register GLUT callbacks.
@@ -364,12 +391,12 @@ namespace utils
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
 			if (direction_ == 1) {
-				plots.current_plot = glutGetWindow() - 1;
-				(*plots.plot[plots.current_plot]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plots.draw_plot = glutGetWindow() - 1;
+				(*plots.plot[plots.draw_plot]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
-				plots.current_plot = glutGetWindow() - 1;
-				(*plots.plot[plots.current_plot]).zoomOut();
+				plots.draw_plot = glutGetWindow() - 1;
+				(*plots.plot[plots.draw_plot]).zoomOut();
 			}
 		}
 
@@ -394,8 +421,6 @@ namespace utils
 		static Plots<ElementType> plots;
 	};
 
-
-
 	/**
 		Plots
 	*/
@@ -403,18 +428,30 @@ namespace utils
 	
 	public:
 
+		/**
+			Structure with all plots
+		*/
 		std::vector<PlotFunction<ElementType>*> plot;
 
-		size_t  number_of_plots;
 		/**
-			Current plot
+			Number of plots
 		*/
-		size_t current_plot;
+		size_t  number_of_plots;
+		
+		/**
+			Plot for drawing
+		*/
+		size_t draw_plot;
+
+		/**
+			TPlot for setting
+		*/
+		size_t set_plot;
 
 		/**
 			Constructor
 		*/
-		Plots() : number_of_plots(0), current_plot(NULL) {
+		Plots() : number_of_plots(0), draw_plot(NULL), set_plot(NULL) {
 			clear();
 		}
 
@@ -436,11 +473,15 @@ namespace utils
 				}
 			}
 			number_of_plots = 0;
-			current_plot = NULL;
+			draw_plot = NULL;
+			set_plot = NULL;
 		}
 
 	};
 
+	/**
+		Static variable  GLPlot<ElementType>::plots
+	*/
 	template<typename ElementType> Plots<ElementType> GLPlot<ElementType>::plots;
 
 }
