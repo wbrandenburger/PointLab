@@ -298,7 +298,7 @@ int main(int argc, char* argv[]) {
 			array_y2[i + shift] = i / 2;
 			array_y3[i + shift] = i*3 / 4;
 		}
-		utils::GLPlot<float> plot;
+		utils::GLPlotVector<float> plot;
 		plot.setPlot();
 		plot.setY(array_y1);
 		plot.setY(array_y2);
