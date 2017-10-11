@@ -30,12 +30,9 @@
 #ifndef UTILS_GLPLOT_H_
 #define UTILS_GLPLOT_H_
 
-#include <GL/glut.h>
-#include <GL/freeglut.h>
+#include <GL/glew.h>
 #include <GL/GL.h>
-#include <GL/GLU.h>
-#include <GL/freeglut_ext.h>
-#include <GL/freeglut_std.h>
+#include <GL/freeglut.h>
 
 #include "eigen3/Eigen/Dense"
 
@@ -43,94 +40,408 @@
 
 namespace utils
 {
-#define WINDOW_TITLE_PREFIX "Window 1"
-
-	int CurrentWidth = 800, CurrentHeight = 600, WindowHandle = 0;
-
-	void Initialize(int, char*[]);
-	void InitWindow(int, char*[]);
-	void ResizeFunction(int, int);
-	void RenderFunction(void);
-
-	void Initialize(int argc, char* argv[])
+	template<typename ElementType> class PlotFunction
 	{
-		InitWindow(argc, argv);
+	public:
 
-		std::cout << "INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+		/**
+		Constructor
+		*/
+		PlotFunction() : index_left(0.0f), index_right(0.0f), 
+			number_of_functions(NULL), number_of_elements(NULL),zero(NULL) {}
 
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	}
+		/**
+		Destructor
+		*/
+		~PlotFunction() {}
 
-	void InitWindow(int argc, char* argv[])
-	{
-		glutInit(&argc, argv);
+		/**
+		Set y-values
 
-		glutInitContextVersion(4, 4);
-		glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-		glutInitContextProfile(GLUT_CORE_PROFILE);
+		@param[in] y_ y-values
+		*/
+		void setY(const std::vector<ElementType>& y_)
+		{
+			y.push_back(y_);
+			number_of_functions++;
 
-		glutSetOption(
-			GLUT_ACTION_ON_WINDOW_CLOSE,
-			GLUT_ACTION_GLUTMAINLOOP_RETURNS
-		);
+			if (!number_of_elements) {
+				number_of_elements = y[0].size();
 
-		glutInitWindowSize(CurrentWidth, CurrentHeight);
-
-		glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-
-		WindowHandle = glutCreateWindow(WINDOW_TITLE_PREFIX);
-
-		if (WindowHandle < 1) {
-			std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-			std::exit(EXIT_FAILURE);
+				index_left = 0;
+				index_right = number_of_elements;
+			}
 		}
 
-		glutReshapeFunc(ResizeFunction);
-		glutDisplayFunc(RenderFunction);
+		/**
+			Set x-values
 
-	}
+			@param[in] x_ x-values
+		*/
+		void setX(const std::vector<ElementType>& x_)
+		{
+			x = x_;
 
-	void ResizeFunction(int Width, int Height)
-	{
-		CurrentWidth = Width;
-		CurrentHeight = Height;
-		glViewport(0, 0, CurrentWidth, CurrentHeight);
-	}
+			if (!number_of_elements) {
+				number_of_elements = x.size();
 
-	void RenderFunction(void)
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				index_left = 0;
+				index_right = number_of_elements;
+			}
 
-		glutSwapBuffers();
-		glutPostRedisplay();
-	}
+			if (x[index_left] < 0 && x[index_right - 1] >= 0) {
+				for (size_t i = index_left + 1; i < index_right; i++) {
+					if (x[i - 1] < 0 && x[i] >= 0) {
+						zero = i;
+					}
+				}
+			}
+		}
 
+		/**
+			Zoom in
+		*/
+		void zoomIn(int x_, int y_, int width_, int height_)
+		{
+			float zoom_factor = 0.05f;
 
+			size_t temp_index_left = (size_t)index_left + (float)x_ / float(width_) * zoom_factor*((float)index_right - (float)index_left);
+			size_t temp_index_right = (size_t)index_right - (float(width_) - (float)x_) / float(width_) * zoom_factor*((float)index_right - (float)index_left);
 
-	struct point {
-		GLfloat x;
-		GLfloat y;
+			index_left = temp_index_left;
+			index_right = temp_index_right;
+
+		}
+
+		/**
+			Zoom in
+		*/
+		void zoomOut()
+		{
+			float zoom_factor = 0.05f;
+
+			index_left = (size_t)index_left - zoom_factor * (float)index_left;
+			index_right = (size_t)index_right + zoom_factor * (number_of_elements - index_right);
+		}
+
+		/**
+			Set zero
+		*/
+		void setZero() 
+		{
+
+		}
+
+		/**
+			Draw the functions
+		*/
+		void draw()
+		{
+			glPushMatrix(); /* GL_MODELVIEW is default */
+
+			ElementType y2 = y[0][index_left];
+			ElementType y1 = y[0][index_left];
+			for (size_t i = 0; i < number_of_functions; i++) {
+				for (size_t j = index_left; j < index_right; j++) {
+					y2 = y2 < y[i][j] ? y[i][j] : y2;
+					y1 = y1 > y[i][j] ? y[i][j] : y1;
+				}
+			}
+
+			glScalef(1.0 / (index_right - index_left), 1.0 / (y2 - y1), 1.0);
+			glTranslatef(0.0, -y1, 0.0);
+			
+			for (size_t i = 0; i < number_of_functions; i++) {
+
+				float r, g, b;
+				utils::colorSchemeRGB(r, g, b, i, number_of_functions);
+
+				glColor3f(r, g, b);
+
+				glBegin(GL_LINE_STRIP);
+
+				for (size_t j = index_left; j < index_right; j++) {
+					glVertex2f(j-index_left, y[i][j]);
+				}
+
+				glEnd();
+			}
+
+			glColor3f(1.0f, 1.0f, 1.0f);
+
+			glBegin(GL_LINE_STRIP);
+			glVertex2f(zero - index_left, y2);
+			glVertex2f(zero - index_left, y1);
+			glEnd();
+			glBegin(GL_LINE_STRIP);
+			glVertex2f(0, 0);
+			glVertex2f(index_right-index_left, 0);
+			glEnd();
+			glPopMatrix();
+		}
+
+	private:
+
+		/**
+			Current left index
+		*/
+		float index_left;
+
+		/**
+			Current right index
+		*/
+		float index_right;
+		
+		/**
+			Number of functions
+		*/
+		size_t number_of_functions;
+
+		/**
+			Number of elements
+		*/
+		size_t number_of_elements;
+
+		/**
+			y-values
+		*/
+		std::vector<std::vector<ElementType>> y;
+
+		/**
+			x-values
+		*/
+		std::vector<ElementType> x;
+
+		/**
+			Zero;
+		*/
+		float zero;
 	};
 
-	point graph[2000];
 
-	void plot(void)
+	template<typename ElementType> struct Plots;
+
+	template<typename ElementType> class GLPlot
 	{
-		for (size_t i = 0; i < 2000; i++) {
-			float x = (i - 1000.0) / 100.0;
-			graph[i].x = x;
-			graph[i].y = sin(x * 10.0) / (1.0 + x * x);
+
+	public:
+
+		/**
+			Constructor
+		*/	
+		GLPlot()
+		{
+			clear();
+		}
+
+		/**
+			Destructor
+		*/
+		~GLPlot() 
+		{
+			clear();
+		}
+
+		/**
+			Clear
+		*/
+		void clear() {}
+
+		/**
+			Set  a new plot
+		*/
+		void setPlot()
+		{
+			plots.plot.push_back(new PlotFunction<ElementType>);
+			plots.current_plot = plots.number_of_plots;
+			
+			plots.number_of_plots++;
+		}
+
+		/**
+			Set  current plot
+		*/
+		void setPlot(size_t current_plot_)
+		{
+			plots.current_plot = current_plot_;
+		}
+
+		/**
+			Set y-values
+
+			@param[in] y_ y-values	
+		*/
+		void setY(const std::vector<ElementType>& y_)
+		{
+			(*plots.plot[plots.current_plot]).setY(y_);
+		}
+
+		/**
+			Set x-values
+
+			@param[in] x_ x-values
+		*/
+		void setX(const std::vector<ElementType>& x_)
+		{
+			(*plots.plot[plots.current_plot]).setX(x_);
+		}
+
+		/* Redrawing func */
+		static void redraw(void)
+		{
+			glutSetWindow(plots.current_plot + 1);
+
+			glClearColor(0, 0, 0, 0);
+			glClear(GL_COLOR_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity(); 
+
+			(*plots.plot[plots.current_plot]).draw();
+
+			glutSwapBuffers();
+		};
+
+		///* Idle proc. Redisplays, if called. */
+		static void idle(void)
+		{
+			glutPostRedisplay();
+		};
+
+		static void reshape(int w, int h)
+		{
+			glViewport(0, 0, w, h);
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(0, 1, 0, 1, -1, 1);
+			glMatrixMode(GL_MODELVIEW);
+		}
+
+		void plot()
+		{
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+
+			std::ostringstream os;
+			os << "Window " << plots.number_of_plots - 1;
+			std::string ostring = os.str();
+
+			glutCreateWindow(ostring.c_str());
+
+			/**
+				Register GLUT callbacks.
+			*/
+			glutDisplayFunc(redraw);
+			glutKeyboardFunc(key);
+			glutReshapeFunc(reshape);
+			glutIdleFunc(idle);
+			glutMouseWheelFunc(mouseWheel);
+			glutMouseFunc(mouseFunc);
+			/**
+				Init the GL state
+			*/
+			glLineWidth(2.0);
+		}
+
+		/**
+			Callback for keyboard
+
+			@param[in] key_ Key
+			@param[in] x_ Mouse position in x-direction
+			@param[in] y_ Mouse position in y-direction
+		*/
+		static void key(unsigned char key_, int x_, int y_)
+		{
+			if (key_ == 27) { exit(0); }
+		};
+
+		/**
+			Callback for mouse wheel
+
+			@param[in] button_ 
+			@param[in] direction_ Direction in which the wheel is turned: 1 for up and -1 for down
+			@param[in] x_ Mouse position in x-direction
+			@param[in] y_ Mouse position in y-direction
+		*/
+		static void mouseWheel(int button_, int direction_, int x_, int y_)
+		{
+			if (direction_ == 1) {
+				plots.current_plot = glutGetWindow() - 1;
+				(*plots.plot[plots.current_plot]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+			}
+			else {
+				plots.current_plot = glutGetWindow() - 1;
+				(*plots.plot[plots.current_plot]).zoomOut();
+			}
+		}
+
+		/**
+			Callback for mouse
+
+			@param[in] button_ Button which is pushed: 0 for left, 1 for middle and 2 for right
+			@param[in] state_ Whether the button is released: 0 for pushing and 1 for releasing
+			@param[in] x_ Mouse position in x-direction
+			@param[in] y_ Mouse position in y-direction
+		*/
+		static void mouseFunc(int button_, int state_, int x_, int y_)
+		{
 		}
 
 
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	public:
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof graph, graph, GL_STATIC_DRAW);
+		/**
+			Several Plots		
+		*/
+		static Plots<ElementType> plots;
+	};
 
 
-	}
+
+	/**
+		Plots
+	*/
+	template<typename ElementType> struct Plots{
+	
+	public:
+
+		std::vector<PlotFunction<ElementType>*> plot;
+
+		size_t  number_of_plots;
+		/**
+			Current plot
+		*/
+		size_t current_plot;
+
+		/**
+			Constructor
+		*/
+		Plots() : number_of_plots(0), current_plot(NULL) {
+			clear();
+		}
+
+		/**
+			Destructor
+		*/
+		~Plots() 
+		{
+			clear();
+		}
+
+		/**
+			Clear
+		*/
+		void clear () {
+			if (number_of_plots) {
+				for (size_t i = 0; i < number_of_plots; i++) {
+					delete plot[i];
+				}
+			}
+			number_of_plots = 0;
+			current_plot = NULL;
+		}
+
+	};
+
+	template<typename ElementType> Plots<ElementType> GLPlot<ElementType>::plots;
 
 }
 

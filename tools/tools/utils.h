@@ -33,6 +33,7 @@
 #include "utils/allocator.h"
 #include "utils/any.h"
 #include "utils/balancedtree.h"
+#include "utils/color.h"
 #include "utils/dist.h"
 #include "utils/heap.h"
 #include "utils/matrix.h"
