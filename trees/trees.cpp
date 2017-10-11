@@ -317,8 +317,15 @@ int main(int argc, char* argv[]) {
 		plot.setY(array_y2);
 		plot.setX(array_x);
 		plot.plot();
-	glutMainLoop();
 
+
+
+	glutMainLoop();
+	glutSetWindow(1);
+	Sleep(1000);
+	glutSetWindow(2);
+	Sleep(1000);
+	glutSetWindow(3);
 	return(0);
 }
 

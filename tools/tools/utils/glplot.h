@@ -589,6 +589,12 @@ namespace utils
 			glutIdleFunc(idle);
 			glutMouseWheelFunc(mouseWheel);
 			glutMouseFunc(mouseFunc);
+
+			/**
+				Draw the initial image
+			*/
+			reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+			redraw();
 		}
 
 		/**
@@ -769,6 +775,12 @@ namespace utils
 			glutIdleFunc(idle);
 			glutMouseWheelFunc(mouseWheel);
 			glutMouseFunc(mouseFunc);
+
+			/**
+				Draw the initial image
+			*/
+			reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+			redraw();
 		}
 
 		/**
