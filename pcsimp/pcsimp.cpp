@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 	io::PlyIO plyIO;
 	plyIO.initialze(file);
 
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(), 3);
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances());
 
 	time.start();
 	if (plyIO.readPly(pointcloud)) {

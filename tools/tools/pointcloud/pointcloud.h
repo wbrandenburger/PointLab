@@ -52,7 +52,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(size_t rows_, size_t cols_ = 3) : rows(rows_), cols(cols_), print_number(10) {}
+		Pointcloud(size_t rows_) : rows(rows_), cols(3), print_number(10) {}
 
 		/**
 			Constructor
@@ -61,7 +61,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(ElementType* points_, size_t rows_, size_t cols_ = 3) : rows(rows_), cols(cols_), print_number(10) {}
+		Pointcloud(ElementType* points_, size_t rows_) : rows(rows_), cols(3), print_number(10) {}
 
 		/**
 			Constructor
@@ -72,8 +72,8 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_ = 3) 
-			: rows(rows_), cols(cols_), print_number(10) {}
+		Pointcloud(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_) 
+			: rows(rows_), cols(3), print_number(10) {}
 
 		/**
 			Deconstructor
@@ -86,10 +86,9 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		void setDimension(size_t rows_, size_t cols_ = 3)
+		void setDimension(size_t rows_)
 		{
 			rows = rows_;
-			cols = cols_;
 		}
 		
 		/**
@@ -103,7 +102,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		virtual void setPointcloud(size_t rows_, size_t cols_ = 3) = 0;
+		virtual void setPointcloud(size_t rows_) = 0;
 
 		/**
 			Set the number of printed points
@@ -582,7 +581,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudAoS(size_t rows_, size_t cols_ = 3) : Pointcloud(rows_, cols_)
+		PointcloudAoS(size_t rows_) : Pointcloud(rows_)
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 		}
@@ -594,8 +593,8 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudAoS(ElementType* points_, size_t rows_, size_t cols_ = 3) 
-			: Pointcloud(rows_, cols_)
+		PointcloudAoS(ElementType* points_, size_t rows_) 
+			: Pointcloud(rows_)
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 			setPoints(points_);
@@ -610,8 +609,8 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_ = 3)
-			: Pointcloud(rows_, cols_) 
+		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_)
+			: Pointcloud(rows_) 
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 			setPoints(points_);
@@ -727,12 +726,11 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		void setPointcloud(size_t rows_, size_t cols_ = 3)
+		void setPointcloud(size_t rows_)
 		{
 			clear();
 
 			rows = rows_;
-			cols = cols_;
 
 			pointcloud = new PointcloudNode<ElementType>[rows];
 		}
@@ -743,7 +741,6 @@ namespace pointcloud
 		void clear()
 		{
 			rows = 0;
-			cols = 0;
 
 			if (pointcloud) delete[] pointcloud;
 		}
@@ -756,7 +753,7 @@ namespace pointcloud
 		*/
 		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
 		{
-			subset_.setPointcloud(list_.size(), cols);
+			subset_.setPointcloud(list_.size());
 			
 			for (size_t i = 0; i < list_.size(); i++) {
 				if (list_[i] >= rows) {
@@ -777,7 +774,7 @@ namespace pointcloud
 		*/
 		void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const
 		{
-			subset_.setPointcloud(list_.size(), cols);
+			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
 				if (list_[i] >= rows) {
@@ -1127,7 +1124,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudSoA(size_t rows_, size_t cols_ = 3) : Pointcloud(rows_, cols_)
+		PointcloudSoA(size_t rows_) : Pointcloud(rows_)
 		{
 			points = new ElementType[rows*cols];
 			normals = new ElementType[rows*cols];
@@ -1141,8 +1138,8 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudSoA(ElementType* points_, size_t rows_, size_t cols_ = 3) 
-			: Pointcloud(rows_, cols_)
+		PointcloudSoA(ElementType* points_, size_t rows_) 
+			: Pointcloud(rows_)
 		{
 			setPoints(points_);
 			normals = new ElementType[rows*cols];
@@ -1158,8 +1155,8 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_ = 3)
-			: Pointcloud(rows_, cols_) 
+		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_)
+			: Pointcloud(rows_) 
 		{
 			setPoints(points_);
 			setNormals(normals_);
@@ -1284,12 +1281,11 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		void setPointcloud(size_t rows_, size_t cols_ = 3)
+		void setPointcloud(size_t rows_)
 		{
 			clear();
 
 			rows = rows_;
-			cols = cols_;
 
 			points = new ElementType[rows*cols];
 			normals = new ElementType[rows*cols];
@@ -1302,7 +1298,6 @@ namespace pointcloud
 		void clear()
 		{
 			rows = 0;
-			cols = 0;
 
 			if (points) { delete[] points; }
 			if (normals) { delete[] normals; }
@@ -1317,7 +1312,7 @@ namespace pointcloud
 		*/
 		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
 		{
-			subset_.setPointcloud(list_.size(), cols);
+			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
 				if (list_[i] >= rows) {
@@ -1338,7 +1333,7 @@ namespace pointcloud
 		*/
 		void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const
 		{
-			subset_.setPointcloud(list_.size(), cols);
+			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
 				if (list_[i] >= rows) {

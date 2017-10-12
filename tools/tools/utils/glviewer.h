@@ -38,6 +38,231 @@
 
 namespace utils
 {
+	template<typename ElementType> struct BoundingBox 
+	{
+	public:
+
+		/**
+			Constructor
+
+			@param[in] dataset_ Dataset
+			@param[in] number_of_elements_ Number of elements
+			@param[in] dim_ Specific dimension
+		*/
+		BoundingBox() : min(nullptr), max(nullptr), dim(NULL) {}
+
+		/**
+			Constructor
+
+			@param[in] dataset_ Dataset
+			@param[in] number_of_elements_ Number of elements
+			@param[in] dim_ Specific dimension
+		*/
+		BoundingBox(ElementType* dataset_, size_t number_of_elements, size_t dim_) :
+			min(nullptr), max(nullptr), dim(NULL)
+		{
+			min = new ElementType[dim_];
+			max = new ElementType[dim_];
+
+			std::memcpy(min, dataset_, sizeof(ElementType)*dim_);
+			std::memcpy(max, dataset_, sizeof(ElementType)*dim_);
+
+			for (size_t i = 0; i < number_of_elements * dim_; i++ )
+			{
+				setCompareValue(dataset_[i], i % dim_);
+			}
+		}
+
+		/**
+			Destructor
+		*/
+		~BoundingBox()
+		{
+			clear();
+		}
+
+		/**
+			Copy Constructor
+
+			@param[in] bounding_box_ Bounding Box
+		*/
+		BoundingBox(const BoundingBox<ElementType>& bounding_box_) : min(nullptr), max(nullptr), dim(NULL)
+		{
+			dim = bounding_box_.getDim();
+
+			min = new ElementType[dim];
+			max = new ElementType[dim];
+
+			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
+			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
+		}
+
+		/**
+			Operator =
+
+			@param[in] bounding_box_ Bounding Box
+		*/
+		BoundingBox& operator=(const BoundingBox<ElementType>& bounding_box_)
+		{
+			std::cout << "HIER " << std::endl;
+
+			clear();
+
+			dim = bounding_box_.getDim();
+
+			min = new ElementType[dim];
+			max = new ElementType[dim];
+
+			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
+			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
+
+			return (*this);
+		}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			if (min) {
+				delete[] min;
+				min = nullptr;
+			}
+
+			if (max) {
+				delete[] max;
+				max = nullptr;
+			}
+			dim = NULL;
+		}
+
+		/**
+			Get minimum value for specific dimension
+
+			@param[in] dim_ Specific dimension
+		*/
+		ElementType getMinDim(size_t dim_) const
+		{
+			return min[dim_];
+		}
+
+		/**
+			Get maximum value for specific dimension
+
+			@param[in] dim_ Specific dimension
+		*/
+		ElementType getMaxDim(size_t dim_) const
+		{
+			return max[dim_];
+		}
+
+		/**
+			Get dimension
+		*/
+		size_t getDim() const
+		{
+			return dim;
+		}
+
+		/**
+			Get minimum values
+		*/
+		ElementType* getMin() const
+		{
+			return min;
+		}
+
+		/**
+			Get maximum values
+		*/
+		ElementType* getMax() const
+		{
+			return max;
+		}	
+
+		/**
+			Get difference for a specific dimension
+		*/
+		ElementType getDifference(size_t dim_) const
+		{
+			return max[dim_] - min[dim_];
+		}
+
+		/**
+			Get difference for a specific dimension
+		*/
+		ElementType getMiddle(size_t dim_) const
+		{
+			return (max[dim_] + min[dim_]) / 2.0;
+		}
+
+		/**
+			Set value for specific dimension
+
+			@param[in] value_ Value
+			@param[in] dim_ Specific dimension
+		*/
+		void setValue(ElementType value_, size_t dim_)
+		{
+			min[dim_] = value_;
+			max[dim_] = value_;
+		}
+
+		/**
+			Compare and set value for specific dimension
+
+			@param[in] value_ Value
+			@param[in] dim_ Specific dimension
+		*/
+		void setCompareValue(ElementType value_, size_t dim_)
+		{
+			if (value_ < min[dim_]) {
+				min[dim_] = value_;
+			}
+
+			if (value_ > max[dim_]) {
+				max[dim_] = value_;
+			}
+		}
+
+	private:
+
+		/**
+			Minimum values
+		*/
+		ElementType* min;
+
+		/**
+			Maximum values
+		*/
+		ElementType* max;
+
+		/**
+			Dimension
+		*/
+		size_t dim;
+	};
+
+	/**
+		Operator << Prints the values of the bounding box
+
+		@param[in,out] out_ Outstream in which the bounding box will be printed
+		@param[in] bounding_box Bounding box which shall be printed
+	*/
+	template<typename ElementType>
+	std::ostream& operator<<(std::ostream& out_, const BoundingBox<ElementType>& bounding_box_)
+	{
+		out_ << "HUHU" << std::endl;
+
+		for (size_t i = 0; i <  bounding_box_.getDim(); i++) {
+			out_ << bounding_box_.getMinDim(i) << " " 
+				<< bounding_box_.getMaxDim(i) << " " 
+				<< bounding_box_.getDifference(i) << " " 
+				<< bounding_box_.getMiddle(i) << std::endl;
+		}
+		return out_;
+	}
+
 	template<typename ElementType> class ViewerInstance
 	{
 	public: 
@@ -58,10 +283,12 @@ namespace utils
 		{
 			if (points) {
 				delete[] points;
+				points = nullptr;
 			}
 
 			if (color) {
 				delete[] color;
+				color = nullptr;
 			}
 
 			number_of_elements;
@@ -78,6 +305,12 @@ namespace utils
 			color = pointcloud_.getColorsPtr();
 
 			number_of_elements = pointcloud_.getRows();
+
+			bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
+
+			std::cout << "HALLO" << std::endl;
+
+			std::cout << bounding_box << std::endl;
 		}
 
 		/**
@@ -87,6 +320,32 @@ namespace utils
 		{
 			glPushMatrix();
 
+				glEnableClientState(GL_VERTEX_ARRAY);
+			
+				glPointSize(1.0);
+				
+				//glScalef(1.0f / bounding_box.getDifference(0), 1.0f / bounding_box.getDifference(1), 1.0f / bounding_box.getDifference(2));
+				//glTranslatef(bounding_box.getMiddle(0), bounding_box.getMiddle(1), bounding_box.getMiddle(2));
+
+
+				//glPointSize(1.0);
+				//glBegin(GL_POINTS);
+				//for (int i = 0; number_of_elem; i++)
+				//{
+				//		glColor3f(texture[i][j][0] / 255, texture[i][j][1] / 255, texture[i][j][2] / 255);
+				//		x = imgdata[i][j][0];
+				//		y = imgdata[i][j][1];
+				//		z = imgdata[i][j][2];
+				//		glVertex3f(x, y, z);
+				//	}
+				//}
+				//glEnd();
+
+				glVertexPointer(3, GL_FLOAT, 0, points);
+				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				
+				glDrawArrays(GL_POINTS, 0, number_of_elements);
+
 			glPopMatrix();
 		}
 
@@ -94,7 +353,7 @@ namespace utils
 		/**
 			Points
 		*/
-		float* points;
+		ElementType* points;
 		
 		/**
 			Color
@@ -104,7 +363,12 @@ namespace utils
 		/**
 			Number of elements
 		*/
-		int number_of_elements;
+		size_t number_of_elements;
+
+		/**
+			Bounding box
+		*/
+		utils::BoundingBox<ElementType> bounding_box;
 	};
 
 	/**
@@ -125,7 +389,7 @@ namespace utils
 			int argc = 0;  char** argv;
 			glutInit(&argc, argv);
 			
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
 			clear();
 		}
@@ -171,8 +435,8 @@ namespace utils
 		{
 			glutSetWindow(viewer_instances.getCurrentInstance() + 1);
 
-			glClearColor(0, 0, 0, 0);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
