@@ -156,7 +156,7 @@ namespace utils
 	//	}
 
 	//	/** 
-	//	Redrawing function 
+	//		Redrawing function 
 	//	*/
 	//	static void redraw(void)
 	//	{
@@ -167,7 +167,7 @@ namespace utils
 	//		glMatrixMode(GL_MODELVIEW);
 	//		glLoadIdentity(); 
 
-	//		(*plots_vector.plot[plots_vector.getDrawPlot()]).draw();
+	//		//viewer_instances()[viewer_instances.getCurrentViewer()]
 	//		
 	//		glutSwapBuffers();
 	//		
@@ -179,7 +179,7 @@ namespace utils
 	//	static void idle(void)
 	//	{
 	//		glutPostRedisplay();
-	//	};
+	//	}
 
 	//	/**
 	//		Changes the size of the window
@@ -209,7 +209,7 @@ namespace utils
 	//			window_name_ = new char[10];
 	//			sprintf(window_name_, "Window %d", viewer_instances.getNumberOfInstances() - 1);
 	//		}
-	//		viewer_instances.setDrawPlot(glutCreateWindow(window_name_) - 1);
+	//		viewer_instances.setCurrentInstance(glutCreateWindow(window_name_) - 1);
 
 	//		/**
 	//			Register GLUT callbacks.
@@ -286,20 +286,60 @@ namespace utils
 	//	/** 
 	//		Constructor
 	//	*/
-	//	StaticViewerInstances() {}
+	//	StaticViewerInstances() : number_of_viewer(0), current_instance(NULL);
+	//	{
+	//		clear();
+	//	}
 
 	//	/**
 	//		Destructor
 	//	*/
+	//	~StaticViewerInstances()
+	//	{
+	//		clear();
+	//	}
 
 	//	/**
 	//		Clear
 	//	*/
 	//	void clear()
 	//	{
-
+	//		viewer_instances.clear();
+	//		number_of_viewer = 0;
+	//		current_instance = NULL;
 	//	}
 
+	//	/**
+	//		Get number of viewer
+	//	*/
+	//	size_t getNumberOfViewer()
+	//	{
+	//		return number_of_viewer;
+	//	}
+
+	//	/**
+	//		Set number of viewer
+	//	*/
+	//	void setNumberOfViewer(size_t number_of_viewer_)
+	//	{
+	//		number_of_viewer = number_of_viewer_;
+	//	}
+
+	//	/**
+	//		Get current instance
+	//	*/
+	//	size_t getCurrentInstance()
+	//	{
+	//		return current_instance;
+	//	}
+
+	//	/**
+	//		Set current instance
+	//	*/
+	//	void setCurrentInstance(size_t current_instance_)
+	//	{
+	//		current_instance = current_instance_;
+	//	}
 	//	/**
 	//		Operator()
 

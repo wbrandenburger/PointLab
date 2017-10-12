@@ -528,7 +528,7 @@ namespace utils
 		}
 
 		/** 
-		Redrawing function 
+			Redrawing function 
 		*/
 		static void redraw(void)
 		{
@@ -728,7 +728,7 @@ namespace utils
 		}
 
 		/** 
-		Redrawing function 
+			Redrawing function 
 		*/
 		static void redraw(void)
 		{
@@ -901,7 +901,7 @@ namespace utils
 		}
 
 		/**
-			Get number of plots
+			Get current plots
 		*/
 		size_t getCurrentPlot()
 		{
@@ -909,7 +909,7 @@ namespace utils
 		}
 
 		/**
-			Set number of plots
+			Set current plot
 		*/
 		void setCurrentPlot(size_t current_plot_)
 		{
