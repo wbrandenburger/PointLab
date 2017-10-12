@@ -30,6 +30,8 @@
 #ifndef UTILS_GLPLOT_H_
 #define UTILS_GLPLOT_H_
 
+#include <vector>
+
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <GL/freeglut.h>
@@ -462,8 +464,6 @@ namespace utils
 		Forward declaration of class StaticPlots
 	*/
 	template<typename ElementType> class PlotsMatrix;
-	
-	//template GLPlot
 
 	template<typename ElementType> class GLPlotVector
 	{
