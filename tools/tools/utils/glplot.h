@@ -502,7 +502,7 @@ namespace utils
 		void setPlot()
 		{
 			plots_vector.plot.push_back(new PlotFunctionVector<ElementType>);
-			plots_vector.setSetPlot(plots_vector.getNumberOfPlots());
+			plots_vector.setCurrentPlot(plots_vector.getNumberOfPlots());
 			
 			plots_vector.setNumberOfPlots(plots_vector.getNumberOfPlots() + 1 );
 		}
@@ -514,7 +514,7 @@ namespace utils
 		*/
 		void setY(const std::vector<ElementType>& y_)
 		{
-			(*plots_vector.plot[plots_vector.getSetPlot()]).setY(y_);
+			(*plots_vector.plot[plots_vector.getCurrentPlot()]).setY(y_);
 		}
 
 		/**
@@ -524,7 +524,7 @@ namespace utils
 		*/
 		void setX(const std::vector<ElementType>& x_)
 		{
-			(*plots_vector.plot[plots_vector.getSetPlot()]).setX(x_);
+			(*plots_vector.plot[plots_vector.getCurrentPlot()]).setX(x_);
 		}
 
 		/** 
@@ -532,14 +532,14 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow(plots_vector.getDrawPlot() + 1);
+			glutSetWindow(plots_vector.getCurrentPlot() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
-			(*plots_vector.plot[plots_vector.getDrawPlot()]).draw();
+			(*plots_vector.plot[plots_vector.getCurrentPlot()]).draw();
 			
 			glutSwapBuffers();
 			
@@ -581,7 +581,7 @@ namespace utils
 				window_name_ = new char[10];
 				sprintf(window_name_, "Window %d", plots_vector.getNumberOfPlots() - 1);
 			}
-			plots_vector.setDrawPlot(glutCreateWindow(window_name_) - 1);
+			plots_vector.setCurrentPlot(glutCreateWindow(window_name_) - 1);
 
 			/**
 				Register GLUT callbacks.
@@ -623,12 +623,12 @@ namespace utils
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
 			if (direction_ == 1) {
-				plots_vector.setDrawPlot(glutGetWindow() - 1);
-				(*plots_vector.plot[plots_vector.getDrawPlot()]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plots_vector.setCurrentPlot(glutGetWindow() - 1);
+				(*plots_vector.plot[plots_vector.getCurrentPlot()]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
-				plots_vector.setDrawPlot(glutGetWindow() - 1);
-				(*plots_vector.plot[plots_vector.getDrawPlot()]).zoomOut();
+				plots_vector.setCurrentPlot(glutGetWindow() - 1);
+				(*plots_vector.plot[plots_vector.getCurrentPlot()]).zoomOut();
 			}
 		}
 
@@ -643,9 +643,9 @@ namespace utils
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
 			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
-				plots_vector.setDrawPlot(glutGetWindow() - 1);
-				std::cout << (*plots_vector.plot[plots_vector.getDrawPlot()]).getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< (*plots_vector.plot[plots_vector.getDrawPlot()]).getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+				plots_vector.setCurrentPlot(glutGetWindow() - 1);
+				std::cout << (*plots_vector.plot[plots_vector.getCurrentPlot()]).getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< (*plots_vector.plot[plots_vector.getCurrentPlot()]).getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -702,7 +702,7 @@ namespace utils
 		void setPlot()
 		{
 			plots_matrix.plot.push_back(new PlotFunctionMatrix<ElementType>);
-			plots_matrix.setSetPlot(plots_matrix.getNumberOfPlots());
+			plots_matrix.setCurrentPlot(plots_matrix.getNumberOfPlots());
 			
 			plots_matrix.setNumberOfPlots(plots_matrix.getNumberOfPlots() + 1 );
 		}
@@ -714,7 +714,7 @@ namespace utils
 		*/
 		void setY(const utils::Matrix<ElementType>& y_)
 		{
-			(*plots_matrix.plot[plots_matrix.getSetPlot()]).setY(y_);
+			(*plots_matrix.plot[plots_matrix.getCurrentPlot()]).setY(y_);
 		}
 
 		/**
@@ -724,7 +724,7 @@ namespace utils
 		*/
 		void setX(const utils::Matrix<ElementType>& x_)
 		{
-			(*plots_matrix.plot[plots_matrix.getSetPlot()]).setX(x_);
+			(*plots_matrix.plot[plots_matrix.getCurrentPlot()]).setX(x_);
 		}
 
 		/** 
@@ -732,13 +732,14 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
+			glutSetWindow(plots_matrix.getCurrentPlot() + 1);
+
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 			
-			glutSetWindow(plots_matrix.getDrawPlot() + 1);
-			(*plots_matrix.plot[plots_matrix.getDrawPlot()]).draw();
+			(*plots_matrix.plot[plots_matrix.getCurrentPlot()]).draw();
 
 			glutSwapBuffers();
 		};
@@ -777,7 +778,7 @@ namespace utils
 				window_name_ = new char[10];
 				sprintf(window_name_, "Window %d", plots_matrix.getNumberOfPlots() - 1);
 			}
-			plots_matrix.setDrawPlot(glutCreateWindow(window_name_) - 1);
+			plots_matrix.setCurrentPlot(glutCreateWindow(window_name_) - 1);
 
 			/**
 				Register GLUT callbacks.
@@ -819,12 +820,12 @@ namespace utils
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
 			if (direction_ == 1) {
-				plots_matrix.setDrawPlot(glutGetWindow() - 1);
-				(*plots_matrix.plot[plots_matrix.getDrawPlot()]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plots_matrix.setCurrentPlot(glutGetWindow() - 1);
+				(*plots_matrix.plot[plots_matrix.getCurrentPlot()]).zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
-				plots_matrix.setDrawPlot(glutGetWindow() - 1);
-				(*plots_matrix.plot[plots_matrix.getDrawPlot()]).zoomOut();
+				plots_matrix.setCurrentPlot(glutGetWindow() - 1);
+				(*plots_matrix.plot[plots_matrix.getCurrentPlot()]).zoomOut();
 			}
 		}
 
@@ -839,9 +840,9 @@ namespace utils
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
 			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
-				plots_matrix.setDrawPlot(glutGetWindow() - 1);
-				std::cout << (*plots_matrix.plot[plots_matrix.getDrawPlot()]).getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< (*plots_matrix.plot[plots_matrix.getDrawPlot()]).getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+				plots_matrix.setCurrentPlot(glutGetWindow() - 1);
+				std::cout << (*plots_matrix.plot[plots_matrix.getCurrentPlot()]).getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< (*plots_matrix.plot[plots_matrix.getCurrentPlot()]).getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -871,16 +872,12 @@ namespace utils
 		/**
 			Constructor
 		*/
-		StaticPlots(void) : number_of_plots(0), draw_plot(NULL), set_plot(NULL) 
-		{
-		}
+		StaticPlots(void) : number_of_plots(0), current_plot(NULL) {}
 
 		/**
 			Destructor
 		*/
-		~StaticPlots()
-		{
-		}
+		~StaticPlots() {}
 
 		/**
 			Clear
@@ -906,33 +903,17 @@ namespace utils
 		/**
 			Get number of plots
 		*/
-		size_t getDrawPlot()
+		size_t getCurrentPlot()
 		{
-			return draw_plot;
+			return current_plot;
 		}
 
 		/**
 			Set number of plots
 		*/
-		void setDrawPlot(size_t draw_plot_)
+		void setCurrentPlot(size_t current_plot_)
 		{
-			draw_plot = draw_plot_;
-		}
-
-		/**
-			Get number of plots
-		*/
-		size_t getSetPlot()
-		{
-			return set_plot;
-		}
-
-		/**
-			Set number of plots
-		*/
-		void setSetPlot(size_t set_plot_)
-		{
-			set_plot = set_plot_;
+			current_plot = current_plot_;
 		}
 
 	protected:
@@ -942,14 +923,9 @@ namespace utils
 		size_t  number_of_plots;
 		
 		/**
-			Plot for drawing
+			Current plot
 		*/
-		size_t draw_plot;
-
-		/**
-			Plot for setting
-		*/
-		size_t set_plot;
+		size_t current_plot;
 	};
 
 	template<typename ElementType> class PlotsVector : public StaticPlots
@@ -982,8 +958,7 @@ namespace utils
 				}
 			}
 			number_of_plots = 0;
-			draw_plot = NULL;
-			set_plot = NULL;
+			current_plot = NULL;
 		}
 
 		/**
@@ -1022,8 +997,7 @@ namespace utils
 				}
 			}
 			number_of_plots = 0;
-			draw_plot = NULL;
-			set_plot = NULL;
+			current_plot = NULL;
 		}
 
 		/**
