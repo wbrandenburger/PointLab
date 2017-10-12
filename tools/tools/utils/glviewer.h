@@ -93,7 +93,6 @@ namespace utils
 		size_t number_of_elements;
 	};
 
-
 	//template<typename ElementType> class GLViewer
 	//{
 
@@ -283,6 +282,7 @@ namespace utils
 
 	//template<typename ElementType> class StaticViewerInstance
 	//{
+	//public:
 	//	/** 
 	//		Constructor
 	//	*/
@@ -299,6 +299,19 @@ namespace utils
 	//	{
 
 	//	}
+
+	//	/**
+	//		Operator()
+
+	//		@return plot Structure with plots
+	//	*/
+	//	std::vector<ViewerInstance<ElementType>>& operator()()
+	//	{
+	//		return viewer_instances;
+	//	}
+
+	//private:
+
 	//	/**
 	//		Number of viewer
 	//	*/
