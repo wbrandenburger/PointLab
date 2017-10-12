@@ -130,7 +130,7 @@ namespace utils
 	//	*/
 	//	void setPlot()
 	//	{
-	//		viewer_instances.plot.push_back(new ViewerInstance<ElementType>);
+	//		viewer_instances.plot.push_back(ViewerInstance<ElementType>());
 	//		viewer_instances.setSetPlot(plots_vector.getNumberOfPlots());
 	//		
 	//		viewer_instances.setNumberOfPlots(plots_vector.getNumberOfPlots() + 1 );
@@ -280,6 +280,45 @@ namespace utils
 	//	*/
 	//	static ViewerInstance<ElementType> viewer_instances;
 	//};
+
+	//template<typename ElementType> class StaticViewerInstance
+	//{
+	//	/** 
+	//		Constructor
+	//	*/
+	//	StaticViewerInstances() {}
+
+	//	/**
+	//		Destructor
+	//	*/
+
+	//	/**
+	//		Clear
+	//	*/
+	//	void clear()
+	//	{
+
+	//	}
+	//	/**
+	//		Number of viewer
+	//	*/
+	//	size_t  number_of_viewer;
+	//	
+	//	/**
+	//		Current plot
+	//	*/
+	//	size_t current_instance;
+
+	//	/**
+	//		Structure with all viewer
+	//	*/
+	//	std::vector<ViewerInstance<ElementType>> viewer_instances;
+	//};
+
+	///**
+	//	Static variable  GLPlot<ElementType>::plots_vector
+	//*/
+	//template<typename ElementType> StaticViewerInstance<ElementType> GLViewer<ElementType>::viewer_instances;
 
 }
 
