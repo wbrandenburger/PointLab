@@ -285,7 +285,7 @@ int main(int argc, char* argv[]) {
 	*/
 	utils::Timer time;
 	
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(), 3);
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances());
 	
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
@@ -301,7 +301,6 @@ int main(int argc, char* argv[]) {
 	viewer.plot();
 	viewer.mainLoop();
 
-	viewer.clear();
 
 		//int versuch = 2048;
 		//int shift =  versuch / 3;

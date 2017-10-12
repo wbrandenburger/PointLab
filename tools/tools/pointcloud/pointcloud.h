@@ -44,7 +44,7 @@ namespace pointcloud
 		/**
 			Constructor
 		*/
-		Pointcloud() : rows(0), cols(0), print_number(10) {}
+		Pointcloud() : rows(0), cols(3), print_number(10) {}
 		
 		/**
 			Constructor
@@ -52,7 +52,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(size_t rows_, size_t cols_) : rows(rows_), cols(cols_), print_number(10) {}
+		Pointcloud(size_t rows_, size_t cols_ = 3) : rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
 			Constructor
@@ -61,7 +61,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(ElementType* points_, size_t rows_, size_t cols_) : rows(rows_), cols(cols_), print_number(10) {}
+		Pointcloud(ElementType* points_, size_t rows_, size_t cols_ = 3) : rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
 			Constructor
@@ -72,7 +72,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		Pointcloud(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_) 
+		Pointcloud(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_ = 3) 
 			: rows(rows_), cols(cols_), print_number(10) {}
 
 		/**
@@ -86,7 +86,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		void setDimension(size_t rows_, size_t cols_)
+		void setDimension(size_t rows_, size_t cols_ = 3)
 		{
 			rows = rows_;
 			cols = cols_;
@@ -103,7 +103,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		virtual void setPointcloud(size_t rows_, size_t cols_) = 0;
+		virtual void setPointcloud(size_t rows_, size_t cols_ = 3) = 0;
 
 		/**
 			Set the number of printed points
@@ -582,7 +582,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudAoS(size_t rows_, size_t cols_) : Pointcloud(rows_,cols_)
+		PointcloudAoS(size_t rows_, size_t cols_ = 3) : Pointcloud(rows_, cols_)
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 		}
@@ -594,7 +594,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudAoS(ElementType* points_, size_t rows_, size_t cols_) 
+		PointcloudAoS(ElementType* points_, size_t rows_, size_t cols_ = 3) 
 			: Pointcloud(rows_, cols_)
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
@@ -610,7 +610,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_)
+		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_ = 3)
 			: Pointcloud(rows_, cols_) 
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
@@ -727,7 +727,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		void setPointcloud(size_t rows_, size_t cols_)
+		void setPointcloud(size_t rows_, size_t cols_ = 3)
 		{
 			clear();
 
@@ -1127,7 +1127,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudSoA(size_t rows_, size_t cols_) : Pointcloud(rows_,cols_)
+		PointcloudSoA(size_t rows_, size_t cols_ = 3) : Pointcloud(rows_, cols_)
 		{
 			points = new ElementType[rows*cols];
 			normals = new ElementType[rows*cols];
@@ -1141,7 +1141,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudSoA(ElementType* points_, size_t rows_, size_t cols_) 
+		PointcloudSoA(ElementType* points_, size_t rows_, size_t cols_ = 3) 
 			: Pointcloud(rows_, cols_)
 		{
 			setPoints(points_);
@@ -1158,7 +1158,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_)
+		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, size_t cols_ = 3)
 			: Pointcloud(rows_, cols_) 
 		{
 			setPoints(points_);
@@ -1284,7 +1284,7 @@ namespace pointcloud
 			@param[in] rows_ Rows
 			@param[in] cols_ Cols
 		*/
-		void setPointcloud(size_t rows_, size_t cols_)
+		void setPointcloud(size_t rows_, size_t cols_ = 3)
 		{
 			clear();
 
