@@ -501,10 +501,7 @@ namespace utils
 		*/
 		void setPlot()
 		{
-			plots_vector().push_back(PlotFunctionVector<ElementType>());
-			plots_vector.setCurrentPlot(plots_vector.getNumberOfPlots());
-			
-			plots_vector.setNumberOfPlots(plots_vector.getNumberOfPlots() + 1 );
+			plots_vector.setPlot();
 		}
 
 		/**
@@ -701,10 +698,7 @@ namespace utils
 		*/
 		void setPlot()
 		{
-			plots_matrix().push_back(PlotFunctionMatrix<ElementType>());
-			plots_matrix.setCurrentPlot(plots_matrix.getNumberOfPlots());
-			
-			plots_matrix.setNumberOfPlots(plots_matrix.getNumberOfPlots() + 1 );
+			plots_matrix.setPlot();
 		}
 
 		/**
@@ -958,6 +952,17 @@ namespace utils
 		}
 
 		/**
+			Set plot
+		*/
+		void setPlot()
+		{
+			plot.push_back(PlotFunctionVector<ElementType>());
+			
+			current_plot = number_of_plots;
+			number_of_plots++;
+		}
+
+		/**
 			Get current plotfunction
 		*/
 		PlotFunctionVector<ElementType>& getCurrentPlotFunction()
@@ -1008,6 +1013,17 @@ namespace utils
 			plot.clear();
 			number_of_plots = 0;
 			current_plot = NULL;
+		}
+
+		/**
+			Set plot
+		*/
+		void setPlot()
+		{
+			plot.push_back(PlotFunctionMatrix<ElementType>());
+			
+			current_plot = number_of_plots;
+			number_of_plots++;
 		}
 
 		/**
