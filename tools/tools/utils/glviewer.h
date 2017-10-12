@@ -93,6 +93,11 @@ namespace utils
 		size_t number_of_elements;
 	};
 
+	/**
+		Forward declaration of class StaticViewerInstance
+	*/
+	template<typename ElementType> class StaticViewerInstance;
+
 	template<typename ElementType> class GLViewer
 	{
 
@@ -103,12 +108,12 @@ namespace utils
 		*/	
 		GLViewer()
 		{
-			int argc; char** argv;
+			int argc = 0;  char** argv;
 			glutInit(&argc, argv);
-			
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+			//
+			//glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 
-			clear();
+			//clear();
 		}
 
 		/**
@@ -129,30 +134,17 @@ namespace utils
 		*/
 		void setPlot()
 		{
-			viewer_instances.plot.push_back(ViewerInstance<ElementType>());
-			viewer_instances.setSetPlot(plots_vector.getNumberOfPlots());
-			
-			viewer_instances.setNumberOfPlots(plots_vector.getNumberOfPlots() + 1 );
+			viewer_instances.setViewerInstance();
 		}
 
 		/**
-			Set y-values
+			Set pointlcoud
 
-			@param[in] y_ y-values	
+			@param[in] pointcloud_ Pointcloud
 		*/
-		void setY(const std::vector<ElementType>& y_)
+		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			(*plots_vector.plot[plots_vector.getSetPlot()]).setY(y_);
-		}
-
-		/**
-			Set x-values
-
-			@param[in] x_ x-values
-		*/
-		void setX(const std::vector<ElementType>& x_)
-		{
-			(*plots_vector.plot[plots_vector.getSetPlot()]).setX(x_);
+			viewer_instances.getCurrentViewerInstance().setPointcloud(pointcloud_);
 		}
 
 		/** 
@@ -160,14 +152,14 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow(plots_vector.getDrawPlot() + 1);
+			glutSetWindow(viewer_instances.getCurrentInstance() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
-			//viewer_instances()[viewer_instances.getCurrentViewer()]
+			viewer_instances.getCurrentViewerInstance().draw();
 			
 			glutSwapBuffers();
 			
@@ -207,7 +199,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Window %d", viewer_instances.getNumberOfInstances() - 1);
+				sprintf(window_name_, "Window %d", viewer_instances.getNumberOfViewer() - 1);
 			}
 			viewer_instances.setCurrentInstance(glutCreateWindow(window_name_) - 1);
 
@@ -277,110 +269,121 @@ namespace utils
 		/**
 			Structure where the different plots are organized		
 		*/
-		static ViewerInstance<ElementType> viewer_instances;
+		static StaticViewerInstance<ElementType> viewer_instances;
 	};
 
-	//template<typename ElementType> class StaticViewerInstance
-	//{
-	//public:
-	//	/** 
-	//		Constructor
-	//	*/
-	//	StaticViewerInstances() : number_of_viewer(0), current_instance(NULL);
-	//	{
-	//		clear();
-	//	}
+	template<typename ElementType> class StaticViewerInstance
+	{
+	public:
+		/** 
+			Constructor
+		*/
+		StaticViewerInstance() : number_of_viewer(0), current_instance(NULL)
+		{
+			clear();
+		}
 
-	//	/**
-	//		Destructor
-	//	*/
-	//	~StaticViewerInstances()
-	//	{
-	//		clear();
-	//	}
+		/**
+			Destructor
+		*/
+		~StaticViewerInstance()
+		{
+			clear();
+		}
 
-	//	/**
-	//		Clear
-	//	*/
-	//	void clear()
-	//	{
-	//		viewer_instances.clear();
-	//		number_of_viewer = 0;
-	//		current_instance = NULL;
-	//	}
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			//viewer_instances.clear();
+			//number_of_viewer = 0;
+			//current_instance = NULL;
+		}
 
-	//	/**
-	//		Get number of viewer
-	//	*/
-	//	size_t getNumberOfViewer()
-	//	{
-	//		return number_of_viewer;
-	//	}
+		/** 
+			Set viewer instance
+		*/
+		void setViewerInstance()
+		{
+			viewer_instance.push_back(ViewerInstance<ElementType>());
+			
+			current_instance = number_of_viewer;
+			number_of_viewer++;
+		}
 
-	//	/**
-	//		Set number of viewer
-	//	*/
-	//	void setNumberOfViewer(size_t number_of_viewer_)
-	//	{
-	//		number_of_viewer = number_of_viewer_;
-	//	}
+		/**
+			Get number of viewer
+		*/
+		size_t getNumberOfViewer()
+		{
+			return number_of_viewer;
+		}
 
-	//	/**
-	//		Get current instance
-	//	*/
-	//	size_t getCurrentInstance()
-	//	{
-	//		return current_instance;
-	//	}
+		/**
+			Set number of viewer
+		*/
+		void setNumberOfViewer(size_t number_of_viewer_)
+		{
+			number_of_viewer = number_of_viewer_;
+		}
 
-	//	/**
-	//		Set current instance
-	//	*/
-	//	void setCurrentInstance(size_t current_instance_)
-	//	{
-	//		current_instance = current_instance_;
-	//	}
+		/**
+			Get current instance
+		*/
+		size_t getCurrentInstance()
+		{
+			return current_instance;
+		}
 
-	//	/** 
-	//		Get current viewer instance
-	//	*/
-	//	ViewerInstance<ElementType>& getCurrentViewerInstance()
-	//	{
-	//		return viewer_instance[current_instance];
-	//	}
+		/**
+			Set current instance
+		*/
+		void setCurrentInstance(size_t current_instance_)
+		{
+			current_instance = current_instance_;
+		}
 
-	//	/**
-	//		Operator()
+		/** 
+			Get current viewer instance
+		*/
+		ViewerInstance<ElementType>& getCurrentViewerInstance()
+		{
+			return viewer_instances[current_instance];
+		}
 
-	//		@return plot Structure with plots
-	//	*/
-	//	std::vector<ViewerInstance<ElementType>>& operator()()
-	//	{
-	//		return viewer_instances;
-	//	}
+		/**
+			Operator()
 
-	//private:
+			@return plot Structure with plots
+		*/
+		std::vector<ViewerInstance<ElementType>>& operator()()
+		{
+			return viewer_instances;
+		}
 
-	//	/**
-	//		Number of viewer
-	//	*/
-	//	size_t  number_of_viewer;
-	//	
-	//	/**
-	//		Current plot
-	//	*/
-	//	size_t current_instance;
+	private:
 
-	//	/**
-	//		Structure with all viewer
-	//	*/
-	//	std::vector<ViewerInstance<ElementType>> viewer_instances;
-	//};
+		/**
+			Number of viewer
+		*/
+		size_t  number_of_viewer;
+		
+		/**
+			Current plot
+		*/
+		size_t current_instance;
 
-	///**
-	//	Static variable  GLPlot<ElementType>::plots_vector
-	//*/
-	//template<typename ElementType> StaticViewerInstance<ElementType> GLViewer<ElementType>::viewer_instances;
+		/**
+			Structure with all viewer
+		*/
+		std::vector<ViewerInstance<ElementType>> viewer_instances;
+	};
+
+	/**
+		Static variable  GLPlot<ElementType>::plots_vector
+	*/
+	template<typename ElementType> StaticViewerInstance<ElementType> GLViewer<ElementType>::viewer_instances;
 
 }
 

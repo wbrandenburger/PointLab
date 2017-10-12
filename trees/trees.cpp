@@ -34,7 +34,7 @@
 #include "trees.hpp"
 
 #include "tools/utils.h"
-////#include "tools/io.h"
+#include "tools/io.h"
 ////#include "tools/math.h"
 #include "tools/pointcloud.h"
 ////
@@ -257,64 +257,84 @@ int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
 
-	////size_t i = 0;
-	////size_t cores = (unsigned int)std::thread::hardware_concurrency();
-	////while (i < argc) {
-	////	if (!strcmp(argv[i], "--cores")) {
-	////		i++;
-	////		cores = std::stoi(argv[i]);
-	////	}
-	////	i++;
-	////}
-
-	////char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	//////char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
-	////
-	////io::PlyIO plyIO;
-	////plyIO.initialze(file);
-	////
-	////if (plyIO.getDataType() == 1) {
-	////	program<float>(cores, plyIO);
-	////}
-	////else {
-	////	program<double>(cores, plyIO);
-	////}
-
-	
-		int versuch = 2048;
-		int shift =  versuch / 3;
-		
-		std::vector<float> array_x(versuch);
-		std::vector<float> array_y1(versuch);
-		std::vector<float> array_y2(versuch);
-		std::vector<float> array_y3(versuch);
-		for (int i = -shift; i < versuch - shift; i++) {
-			array_x[i + shift] = i;
-			array_y1[i + shift] = i;
-			array_y2[i + shift] = i / 2;
-			array_y3[i + shift] = i*3 / 4;
+	size_t i = 0;
+	size_t cores = (unsigned int)std::thread::hardware_concurrency();
+	while (i < argc) {
+		if (!strcmp(argv[i], "--cores")) {
+			i++;
+			cores = std::stoi(argv[i]);
 		}
-		utils::GLPlotVector<float> plot;
-		plot.setPlot();
-		plot.setY(array_y1);
-		plot.setY(array_y2);
-		plot.setY(array_y3);
-		plot.setX(array_x);
-		plot.plot();
+		i++;
+	}
 
-		plot.setPlot();
-		plot.setY(array_y1);
-		plot.setY(array_y2);
-		plot.setX(array_x);
-		plot.plot();
-		
-		plot.setPlot();
-		plot.setY(array_y1);
-		plot.setY(array_y2);
-		plot.setX(array_x);
-		plot.plot();
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
+	
+	io::PlyIO plyIO;
+	plyIO.initialze(file);
+	
+	if (plyIO.getDataType() == 1) {
+		/*program<float>(cores, plyIO);*/
+	}
+	else {
+		/*program<double>(cores, plyIO);*/
+	}
 
-		plot.mainLoop();
+	/**
+		Read data
+	*/
+	utils::Timer time;
+	
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(), 3);
+	
+	time.start();
+	if (plyIO.readPly(pointcloud)) {
+		std::cout << "File with " << pointcloud.rows << " point has been read in "
+			<< time.stop() << " s into Pointcloud" << std::endl;
+	}
+	std::cout << pointcloud << std::endl;
+
+
+	utils::GLViewer<float> viewer;
+	//viewer.setPointcloud(pointcloud);
+	//viewer.plot();
+	//viewer.mainLoop();
+
+
+		//int versuch = 2048;
+		//int shift =  versuch / 3;
+		//
+		//std::vector<float> array_x(versuch);
+		//std::vector<float> array_y1(versuch);
+		//std::vector<float> array_y2(versuch);
+		//std::vector<float> array_y3(versuch);
+		//for (int i = -shift; i < versuch - shift; i++) {
+		//	array_x[i + shift] = i;
+		//	array_y1[i + shift] = i;
+		//	array_y2[i + shift] = i / 2;
+		//	array_y3[i + shift] = i*3 / 4;
+		//}
+		//utils::GLPlotVector<float> plot;
+		//plot.setPlot();
+		//plot.setY(array_y1);
+		//plot.setY(array_y2);
+		//plot.setY(array_y3);
+		//plot.setX(array_x);
+		//plot.plot();
+
+		//plot.setPlot();
+		//plot.setY(array_y1);
+		//plot.setY(array_y2);
+		//plot.setX(array_x);
+		//plot.plot();
+		//
+		//plot.setPlot();
+		//plot.setY(array_y1);
+		//plot.setY(array_y2);
+		//plot.setX(array_x);
+		//plot.plot();
+
+		//plot.mainLoop();
 
 	return(0);
 }

@@ -475,7 +475,7 @@ namespace utils
 		*/	
 		GLPlotVector()
 		{
-			int argc; char** argv;
+			int argc = 0; char** argv;
 			glutInit(&argc, argv);
 			
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
@@ -672,7 +672,7 @@ namespace utils
 		*/	
 		GLPlotMatrix()
 		{
-			int argc; char** argv;
+			int argc = 0; char** argv;
 			glutInit(&argc, argv);
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
