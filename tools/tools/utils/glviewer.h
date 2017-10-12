@@ -42,6 +42,7 @@ namespace utils
 
 	template<typename ElementType> class ViewerInstance
 	{
+	public: 
 		/**
 			Constructor
 		*/
@@ -61,6 +62,8 @@ namespace utils
 		{
 			points = pointcloud_.getPointsPtr();
 			color = pointcloud_.getColorsPtr();
+
+			number_of_elements = pointcloud_.getRows();
 		}
 
 		/**
@@ -73,6 +76,7 @@ namespace utils
 			glPopMatrix();
 		}
 
+	private:
 		/**
 			Points
 		*/
@@ -88,6 +92,8 @@ namespace utils
 		*/
 		size_t number_of_elements;
 	};
+
+
 
 }
 

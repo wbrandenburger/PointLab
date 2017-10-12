@@ -475,6 +475,9 @@ namespace utils
 		*/	
 		GLPlotVector()
 		{
+			int argc; char** argv;
+			glutInit(&argc, argv);
+			
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 
 			clear();
@@ -639,13 +642,20 @@ namespace utils
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
-			if (button_ == 0 && state_ == 1) {
+			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
 				plots_vector.setDrawPlot(glutGetWindow() - 1);
 				std::cout << (*plots_vector.plot[plots_vector.getDrawPlot()]).getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
 					<< (*plots_vector.plot[plots_vector.getDrawPlot()]).getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
+		/**
+			Start the loop
+		*/
+		void mainLoop()
+		{
+			glutMainLoop();
+		}
 
 	public:
 
@@ -665,6 +675,9 @@ namespace utils
 		*/	
 		GLPlotMatrix()
 		{
+			int argc; char** argv;
+			glutInit(&argc, argv);
+
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 			
 			clear();
@@ -825,13 +838,20 @@ namespace utils
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
-			if (button_ == 0 && state_ == 1) {
+			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
 				plots_matrix.setDrawPlot(glutGetWindow() - 1);
 				std::cout << (*plots_matrix.plot[plots_matrix.getDrawPlot()]).getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
 					<< (*plots_matrix.plot[plots_matrix.getDrawPlot()]).getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
+		/**
+			Start the loop
+		*/
+		void mainLoop()
+		{
+			glutMainLoop();
+		}
 
 	public:
 
