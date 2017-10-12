@@ -38,20 +38,34 @@
 
 namespace utils
 {
-	typedef unsigned char uchar;
-
 	template<typename ElementType> class ViewerInstance
 	{
 	public: 
 		/**
 			Constructor
 		*/
-		ViewerInstance() {}
+		ViewerInstance() : points(nullptr), color(nullptr), number_of_elements(NULL) {}
 
 		/**
 			Destructor
 		*/
 		~ViewerInstance() {}
+
+		/**
+			Clear
+		*/
+		void clear()
+		{
+			if (points) {
+				delete[] points;
+			}
+
+			if (color) {
+				delete[] color;
+			}
+
+			number_of_elements;
+		}
 
 		/**
 			Set pointcloud
@@ -76,21 +90,21 @@ namespace utils
 			glPopMatrix();
 		}
 
-	private:
+	public:
 		/**
 			Points
 		*/
-		ElementType* points;
+		float* points;
 		
 		/**
 			Color
 		*/
-		uchar* color;
+		unsigned char* color;
 
 		/**
 			Number of elements
 		*/
-		size_t number_of_elements;
+		int number_of_elements;
 	};
 
 	/**
@@ -110,10 +124,10 @@ namespace utils
 		{
 			int argc = 0;  char** argv;
 			glutInit(&argc, argv);
-			//
-			//glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+			
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 
-			//clear();
+			clear();
 		}
 
 		/**
@@ -127,12 +141,15 @@ namespace utils
 		/**
 			Clear
 		*/
-		void clear() {}
+		void clear() 
+		{
+			viewer_instances.clear();
+		}
 
 		/**
 			Set  a new plot
 		*/
-		void setPlot()
+		void setViewer()
 		{
 			viewer_instances.setViewerInstance();
 		}
@@ -296,9 +313,12 @@ namespace utils
 		*/
 		void clear()
 		{
-			//viewer_instances.clear();
-			//number_of_viewer = 0;
-			//current_instance = NULL;
+			for (size_t i = 0; i < number_of_viewer; i++) {
+				viewer_instances[i].clear();
+			}
+			viewer_instances.clear();
+			number_of_viewer = 0;
+			current_instance = NULL;
 		}
 
 		/** 
@@ -306,7 +326,7 @@ namespace utils
 		*/
 		void setViewerInstance()
 		{
-			viewer_instance.push_back(ViewerInstance<ElementType>());
+			viewer_instances.push_back(ViewerInstance<ElementType>());
 			
 			current_instance = number_of_viewer;
 			number_of_viewer++;

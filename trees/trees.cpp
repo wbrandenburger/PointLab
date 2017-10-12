@@ -296,10 +296,12 @@ int main(int argc, char* argv[]) {
 
 
 	utils::GLViewer<float> viewer;
-	//viewer.setPointcloud(pointcloud);
-	//viewer.plot();
-	//viewer.mainLoop();
+	viewer.setViewer();
+	viewer.setPointcloud(pointcloud);
+	viewer.plot();
+	viewer.mainLoop();
 
+	viewer.clear();
 
 		//int versuch = 2048;
 		//int shift =  versuch / 3;
