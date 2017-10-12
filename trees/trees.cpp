@@ -36,7 +36,7 @@
 #include "tools/utils.h"
 ////#include "tools/io.h"
 ////#include "tools/math.h"
-////#include "tools/pointcloud.h"
+#include "tools/pointcloud.h"
 ////
 ////#include <opencv2/highgui.hpp>
 
