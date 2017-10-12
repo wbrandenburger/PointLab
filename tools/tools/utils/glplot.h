@@ -514,7 +514,7 @@ namespace utils
 		*/
 		void setY(const std::vector<ElementType>& y_)
 		{
-			plots_vector()[plots_vector.getCurrentPlot()].setY(y_);
+			plots_vector.getCurrentPlotFunction().setY(y_);
 		}
 
 		/**
@@ -524,7 +524,7 @@ namespace utils
 		*/
 		void setX(const std::vector<ElementType>& x_)
 		{
-			plots_vector()[plots_vector.getCurrentPlot()].setX(x_);
+			plots_vector.getCurrentPlotFunction().setX(x_);
 		}
 
 		/** 
@@ -539,7 +539,7 @@ namespace utils
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
-			plots_vector()[plots_vector.getCurrentPlot()].draw();
+			plots_vector.getCurrentPlotFunction().draw();
 			
 			glutSwapBuffers();
 			
@@ -624,11 +624,11 @@ namespace utils
 		{
 			if (direction_ == 1) {
 				plots_vector.setCurrentPlot(glutGetWindow() - 1);
-				plots_vector()[plots_vector.getCurrentPlot()].zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plots_vector.getCurrentPlotFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
 				plots_vector.setCurrentPlot(glutGetWindow() - 1);
-				plots_vector()[plots_vector.getCurrentPlot()].zoomOut();
+				plots_vector.getCurrentPlotFunction().zoomOut();
 			}
 		}
 
@@ -644,8 +644,8 @@ namespace utils
 		{
 			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
 				plots_vector.setCurrentPlot(glutGetWindow() - 1);
-				std::cout << plots_vector()[plots_vector.getCurrentPlot()].getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< plots_vector()[plots_vector.getCurrentPlot()].getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+				std::cout << plots_vector.getCurrentPlotFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< plots_vector.getCurrentPlotFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -714,7 +714,7 @@ namespace utils
 		*/
 		void setY(const utils::Matrix<ElementType>& y_)
 		{
-			plots_matrix()[plots_matrix.getCurrentPlot()].setY(y_);
+			plots_matrix.getCurrentPlotFunction().setY(y_);
 		}
 
 		/**
@@ -724,7 +724,7 @@ namespace utils
 		*/
 		void setX(const utils::Matrix<ElementType>& x_)
 		{
-			plots_matrix()[plots_matrix.getCurrentPlot()].setX(x_);
+			plots_matrix.getCurrentPlotFunction().setX(x_);
 		}
 
 		/** 
@@ -739,7 +739,7 @@ namespace utils
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 			
-			plots_matrix()[plots_matrix.getCurrentPlot()].draw();
+			plots_matrix.getCurrentPlotFunction().draw();
 
 			glutSwapBuffers();
 		};
@@ -821,11 +821,11 @@ namespace utils
 		{
 			if (direction_ == 1) {
 				plots_matrix.setCurrentPlot(glutGetWindow() - 1);
-				plots_matrix()[plots_matrix.getCurrentPlot()].zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plots_matrix.getCurrentPlotFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
 				plots_matrix.setCurrentPlot(glutGetWindow() - 1);
-				plots_matrix()[plots_matrix.getCurrentPlot()].zoomOut();
+				plots_matrix.getCurrentPlotFunction().zoomOut();
 			}
 		}
 
@@ -841,8 +841,8 @@ namespace utils
 		{
 			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
 				plots_matrix.setCurrentPlot(glutGetWindow() - 1);
-				std::cout << plots_matrix()[plots_matrix.getCurrentPlot()].getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< plots_matrix()[plots_matrix.getCurrentPlot()].getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+				std::cout << plots_matrix.getCurrentPlotFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< plots_matrix.getCurrentPlotFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -901,7 +901,7 @@ namespace utils
 		}
 
 		/**
-			Get current plots
+			Get current plot
 		*/
 		size_t getCurrentPlot()
 		{
@@ -958,6 +958,14 @@ namespace utils
 		}
 
 		/**
+			Get current plotfunction
+		*/
+		PlotFunctionVector<ElementType>& getCurrentPlotFunction()
+		{
+			return plot[current_plot];
+		}
+
+		/**
 			Operator()
 
 			@return plot Structure with plots
@@ -1000,6 +1008,14 @@ namespace utils
 			plot.clear();
 			number_of_plots = 0;
 			current_plot = NULL;
+		}
+
+		/**
+			Get current plotfunction
+		*/
+		PlotFunctionMatrix<ElementType>& getCurrentPlotFunction()
+		{
+			return plot[current_plot];
 		}
 
 		/**
