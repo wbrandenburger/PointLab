@@ -59,17 +59,17 @@ namespace utils
 			@param[in] dim_ Specific dimension
 		*/
 		BoundingBox(ElementType* dataset_, size_t number_of_elements, size_t dim_) :
-			min(nullptr), max(nullptr), dim(NULL)
+			min(nullptr), max(nullptr), dim(dim_)
 		{
-			min = new ElementType[dim_];
-			max = new ElementType[dim_];
+			min = new ElementType[dim];
+			max = new ElementType[dim];
 
-			std::memcpy(min, dataset_, sizeof(ElementType)*dim_);
-			std::memcpy(max, dataset_, sizeof(ElementType)*dim_);
+			std::memcpy(min, dataset_, sizeof(ElementType)*dim);
+			std::memcpy(max, dataset_, sizeof(ElementType)*dim);
 
-			for (size_t i = 0; i < number_of_elements * dim_; i++ )
+			for (size_t i = 0; i < number_of_elements * dim; i++ )
 			{
-				setCompareValue(dataset_[i], i % dim_);
+				setCompareValue(dataset_[i], i % dim);
 			}
 		}
 
@@ -104,11 +104,11 @@ namespace utils
 		*/
 		BoundingBox& operator=(const BoundingBox<ElementType>& bounding_box_)
 		{
-			std::cout << "HIER " << std::endl;
-
 			clear();
 
 			dim = bounding_box_.getDim();
+
+			std::cout << dim << std::endl;
 
 			min = new ElementType[dim];
 			max = new ElementType[dim];
@@ -252,8 +252,6 @@ namespace utils
 	template<typename ElementType>
 	std::ostream& operator<<(std::ostream& out_, const BoundingBox<ElementType>& bounding_box_)
 	{
-		out_ << "HUHU" << std::endl;
-
 		for (size_t i = 0; i <  bounding_box_.getDim(); i++) {
 			out_ << bounding_box_.getMinDim(i) << " " 
 				<< bounding_box_.getMaxDim(i) << " " 
@@ -303,53 +301,143 @@ namespace utils
 		{
 			points = pointcloud_.getPointsPtr();
 			color = pointcloud_.getColorsPtr();
-
+		
 			number_of_elements = pointcloud_.getRows();
 
 			bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
-
-			std::cout << "HALLO" << std::endl;
-
+			
 			std::cout << bounding_box << std::endl;
+
+			gl_pointsize = 1;
+
+			gl_center_x = bounding_box.getMiddle(0);
+			gl_center_y = bounding_box.getMiddle(1);
+			gl_center_z = bounding_box.getMiddle(2);
+
+			gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
+			
+			gl_translate_x = 0.5;
+			gl_translate_y = 0.5;
+			gl_translate_z = 0.5;
+
+		}
+		
+		/**
+			Increase point size
+		*/
+		void increasePointSize()
+		{
+			if (gl_pointsize < 10) {
+				gl_pointsize++;
+			}
 		}
 
 		/**
-			Draw the points
+			Decrease point size
 		*/
-		void draw() 
+		void decreasePointSize()
 		{
+			if (gl_pointsize > 1) {
+				gl_pointsize--;
+			}
+		}
+
+		/**
+			Zoom in
+		*/
+		void zoomIn() {
+			gl_zoom = gl_zoom * 1.1;
+		}
+
+		/**
+			Zoom in
+		*/
+		void zoomOut() {
+			gl_zoom = gl_zoom / 1.1;
+		}
+
+		/**
+			Draw the pointcloud
+		*/
+		void draw()
+		{
+			if (std::is_same<float, ElementType>::value) {
+				drawf();
+			}
+			else {
+				drawd();
+			}
+		}
+
+		/**
+			Draw the pointcloud with float accurancy
+		*/
+		void drawf() 
+		{
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 
 				glEnableClientState(GL_VERTEX_ARRAY);
-			
-				glPointSize(1.0);
+				glEnableClientState(GL_COLOR_ARRAY);
 				
-				//glScalef(1.0f / bounding_box.getDifference(0), 1.0f / bounding_box.getDifference(1), 1.0f / bounding_box.getDifference(2));
-				//glTranslatef(bounding_box.getMiddle(0), bounding_box.getMiddle(1), bounding_box.getMiddle(2));
+				glLoadIdentity();
+				glTranslatef(-gl_center_x / gl_zoom, -gl_center_y / gl_zoom, -gl_center_z / gl_zoom);
+				glScalef(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
+				glTranslatef(gl_translate_x*gl_zoom, gl_translate_y*gl_zoom, gl_translate_z*gl_zoom);
 
-
-				//glPointSize(1.0);
-				//glBegin(GL_POINTS);
-				//for (int i = 0; number_of_elem; i++)
-				//{
-				//		glColor3f(texture[i][j][0] / 255, texture[i][j][1] / 255, texture[i][j][2] / 255);
-				//		x = imgdata[i][j][0];
-				//		y = imgdata[i][j][1];
-				//		z = imgdata[i][j][2];
-				//		glVertex3f(x, y, z);
-				//	}
-				//}
-				//glEnd();
+				glPointSize(gl_pointsize);
 
 				glVertexPointer(3, GL_FLOAT, 0, points);
+				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				glDrawArrays(GL_POINTS, 0, number_of_elements);
+
+
+				glDisableClientState(GL_COLOR_ARRAY);
+				glDisableClientState(GL_VERTEX_ARRAY);
+
+			glPopMatrix();
+
+			glutSwapBuffers();
+		}
+
+		/**
+			Draw the pointcloud with double accurancy
+		*/
+		void drawd() 
+		{
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+				
+				glPointSize(1.0);
+				glLoadIdentity();
+
+				//glScaled(1.0 / gl_zoom, 1.0 / gl_zoom, 1.0 / gl_zoom);
+
+				//glTranslated(gl_translate_x, gl_translate_y, gl_translate_z);
+				
+				glVertexPointer(3, GL_DOUBLE, 0, points);
 				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
 				
 				glDrawArrays(GL_POINTS, 0, number_of_elements);
 
-			glPopMatrix();
-		}
 
-	public:
+				glDisableClientState(GL_COLOR_ARRAY);
+				glDisableClientState(GL_VERTEX_ARRAY);
+
+			glPopMatrix();
+
+			glutSwapBuffers();
+
+		}
+	
+	private:
 		/**
 			Points
 		*/
@@ -369,6 +457,47 @@ namespace utils
 			Bounding box
 		*/
 		utils::BoundingBox<ElementType> bounding_box;
+
+		/**
+			Center in x-direction
+		*/
+		ElementType gl_center_x;
+
+		/**
+			Center in y-direction
+		*/
+		ElementType gl_center_y;
+
+		/**
+			Center in x-direction
+		*/
+		ElementType gl_center_z;
+		
+		/**
+			Translation in x-direction
+		*/
+		ElementType gl_translate_x;
+
+		/**
+			Translation in y-direction
+		*/
+		ElementType gl_translate_y;
+
+		/**
+			Translation in x-direction
+		*/
+		ElementType gl_translate_z;
+		
+		/**
+			Point size
+		*/
+		size_t gl_pointsize;
+
+		/**
+			Zoom factor
+		*/
+		ElementType gl_zoom;
+
 	};
 
 	/**
@@ -386,12 +515,18 @@ namespace utils
 		*/	
 		GLViewer()
 		{
+			clear();
+
 			int argc = 0;  char** argv;
 			glutInit(&argc, argv);
 			
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
-			clear();
+			if (!std::is_same<float,ElementType>::value && !std::is_same<double, ElementType>::value){
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
 		}
 
 		/**
@@ -433,17 +568,11 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
+
+
 			glutSetWindow(viewer_instances.getCurrentInstance() + 1);
 
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity(); 
-
 			viewer_instances.getCurrentViewerInstance().draw();
-			
-			glutSwapBuffers();
-			
 		};
 
 		/**  
@@ -482,6 +611,7 @@ namespace utils
 				window_name_ = new char[10];
 				sprintf(window_name_, "Window %d", viewer_instances.getNumberOfViewer() - 1);
 			}
+
 			viewer_instances.setCurrentInstance(glutCreateWindow(window_name_) - 1);
 
 			/**
@@ -510,7 +640,11 @@ namespace utils
 		*/
 		static void key(unsigned char key_, int x_, int y_)
 		{
-			if (key_ == 27) { exit(0); }
+			switch (key_) {		
+			case '+': viewer_instances.getCurrentViewerInstance().increasePointSize(); break;
+			case '-': viewer_instances.getCurrentViewerInstance().decreasePointSize(); break;
+			case 27: exit(0); break;
+			}
 		};
 
 		/**
@@ -523,6 +657,12 @@ namespace utils
 		*/
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
+			if (direction_ == 1) {
+				viewer_instances.getCurrentViewerInstance().zoomOut();
+			}
+			else {
+				viewer_instances.getCurrentViewerInstance().zoomIn();
+			}
 		}
 
 		/**
