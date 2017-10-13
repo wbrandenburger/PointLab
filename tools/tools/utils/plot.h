@@ -42,7 +42,7 @@ namespace utils
 	/**
 		Structure which holds the current mouse position
 	*/
-	struct MousePosition
+	class MousePosition
 	{
 		
 	public:
@@ -62,6 +62,14 @@ namespace utils
 		{
 			x = x_;
 			y = y_;
+		}
+
+		/**
+			Destructor
+		*/
+		~MousePosition() 
+		{
+			clear();
 		}
 
 		/**

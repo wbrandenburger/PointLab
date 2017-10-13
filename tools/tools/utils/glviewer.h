@@ -527,6 +527,7 @@ namespace utils
 				std::exit(EXIT_FAILURE);
 			}
 
+			mouse_button = NULL;
 		}
 
 		/**
@@ -543,6 +544,8 @@ namespace utils
 		void clear() 
 		{
 			viewer_instances.clear();
+			
+			mouse_button = NULL;
 		}
 
 		/**
@@ -623,6 +626,7 @@ namespace utils
 			glutIdleFunc(idle);
 			glutMouseWheelFunc(mouseWheel);
 			glutMouseFunc(mouseFunc);
+			glutMotionFunc(mouseMotion);
 
 			/**
 				Draw the initial image
@@ -675,6 +679,32 @@ namespace utils
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
+			if (!state_){
+				mouse_button = button_;
+			}
+			else {
+				mouse_button = NULL;
+			}
+
+		}
+
+		/**
+			Callback for mouse movement
+
+			@param[in] x_ Mouse position in x-direction
+			@param[in] y_ Mouse position in y-direction
+		*/
+		static void mouseMotion(int x_, int y_)
+		{
+			if (mouse_button == GLUT_LEFT_BUTTON){
+				std::cout << "Left" << std::endl;
+			}
+			else if (mouse_button == GLUT_MIDDLE_BUTTON) {
+				std::cout << "Middle" << std::endl;
+			}
+			else if (mouse_button == GLUT_RIGHT_BUTTON) {
+				std::cout << "Right" << std::endl;
+			}
 		}
 
 		/**
@@ -691,6 +721,11 @@ namespace utils
 			Structure where the different plots are organized		
 		*/
 		static StaticViewerInstance<ElementType> viewer_instances;
+
+		/**
+			Mouse button
+		*/
+		static int mouse_button;
 	};
 
 	template<typename ElementType> class StaticViewerInstance
@@ -805,10 +840,14 @@ namespace utils
 	};
 
 	/**
-		Static variable  GLPlot<ElementType>::plots_vector
+		Static variable GLViewer<ElementType>::viewer_instances
 	*/
 	template<typename ElementType> StaticViewerInstance<ElementType> GLViewer<ElementType>::viewer_instances;
 
+	/**
+		Static variable GLViewer<ElementType>::mouse_button
+	*/
+	template<typename ElementType> int GLViewer<ElementType>::mouse_button;
 }
 
 #endif /* UTILS_GLVIEWER_H_*/	
