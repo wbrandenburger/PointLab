@@ -85,6 +85,8 @@ namespace utils
 
 			utils::BoundingBox<ElementType> bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
 
+			std::cout << bounding_box << std::endl;
+
 			gl_pointsize = 1;
 
 			gl_center_x = 0.5;
@@ -94,8 +96,13 @@ namespace utils
 			gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
 			
 			for (size_t i = 0; i < number_of_elements * 3; i++) {
-				points[i] = points[i] - bounding_box.getMiddle(i % 3) * ( 1 / gl_zoom);
+				points[i] = (points[i] - bounding_box.getMiddle(i % 3)) * ( 1 / gl_zoom);
 			}
+			
+			utils::BoundingBox<ElementType> bounding_box_II = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
+
+			std::cout << bounding_box_II << std::endl;
+
 			gl_zoom = 1.0;
 
 			gl_rot_x = 0.0;
@@ -212,6 +219,7 @@ namespace utils
 					Link the points, colors and normals for drawing
 				*/
 				glVertexPointer(3, GL_FLOAT, 0, points);
+
 				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
 				glDrawArrays(GL_POINTS, 0, number_of_elements);
 				
@@ -480,7 +488,6 @@ namespace utils
 			glLoadIdentity();
 			
 			glOrtho(0, 1, 0, (float) height_ / (float)width_ , -1, 1);
-
 			glMatrixMode(GL_MODELVIEW);
 		}
 				
@@ -493,7 +500,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Window %d", viewer_instances.getNumberOfViewer() - 1);
+				sprintf(window_name_, "Pointcloud %d", viewer_instances.getNumberOfViewer() - 1);
 			}
 
 			glutInitWindowSize(500, 500);
