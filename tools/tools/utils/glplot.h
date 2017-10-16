@@ -576,7 +576,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Window %d", plots_vector.getNumberOfPlots() - 1);
+				sprintf(window_name_, "Function %d", plots_vector.getNumberOfPlots() - 1);
 			}
 			plots_vector.setCurrentPlot(glutCreateWindow(window_name_) - 1);
 
@@ -770,7 +770,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Window %d", plots_matrix.getNumberOfPlots() - 1);
+				sprintf(window_name_, "Function %d", plots_matrix.getNumberOfPlots() - 1);
 			}
 			plots_matrix.setCurrentPlot(glutCreateWindow(window_name_) - 1);
 
