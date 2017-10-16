@@ -46,7 +46,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		ViewerInstance() : points(nullptr), color(nullptr), number_of_elements(NULL) {}
+		ViewerInstance() : points(nullptr), color(nullptr), normals(nullptr), number_of_elements(NULL) {}
 
 		/**
 			Destructor
@@ -68,6 +68,11 @@ namespace utils
 				color = nullptr;
 			}
 
+			if (normals) {
+				delete[] normals;
+				normals = nullptr;
+			}
+
 			number_of_elements;
 		}
 
@@ -78,8 +83,15 @@ namespace utils
 		*/
 		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			points = pointcloud_.getPointsPtr();
-			color = pointcloud_.getColorsPtr();
+			if (pointcloud_.isPoints()) {
+				points = pointcloud_.getPointsPtr();
+			}
+			if (pointcloud_.isColor()) {
+				color = pointcloud_.getColorsPtr();
+			}
+			if (pointcloud_.isNormal()) {
+				normals = pointcloud_.getNormalsPtr();
+			}
 		
 			number_of_elements = pointcloud_.getRows();
 
@@ -188,8 +200,13 @@ namespace utils
 				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
 			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-			//glEnableClientState(GL_INDEX_ARRAY); glEnableClientState(GL_NORMAL_ARRAY);	
+			if (color) {
+				glEnableClientState(GL_COLOR_ARRAY);
+			}
+			if (normals) {
+				glEnableClientState(GL_NORMAL_ARRAY);
+			}
+			//glEnableClientState(GL_INDEX_ARRAY);
 
 				glLoadIdentity();
 
@@ -218,8 +235,12 @@ namespace utils
 					Link the points, colors and normals for drawing
 				*/
 				glVertexPointer(3, GL_FLOAT, 0, points);
-
-				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				if (color) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				}
+				if (normals) {
+					glNormalPointer(GL_FLOAT, 0, normals);
+				}
 				glDrawArrays(GL_POINTS, 0, number_of_elements);
 				
 				/**
@@ -245,8 +266,13 @@ namespace utils
 			/**
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
-			glDisableClientState(GL_COLOR_ARRAY);
 			glDisableClientState(GL_VERTEX_ARRAY);
+			if (color) {
+				glDisableClientState(GL_COLOR_ARRAY);
+			}
+			if (normals) {
+				glDisableClientState(GL_NORMAL_ARRAY);
+			}
 
 			glPopMatrix();
 
@@ -267,8 +293,13 @@ namespace utils
 				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
 			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-			//glEnableClientState(GL_INDEX_ARRAY); glEnableClientState(GL_NORMAL_ARRAY);	
+			if (color) {
+				glEnableClientState(GL_COLOR_ARRAY);
+			}
+			if (normals) {
+				glEnableClientState(GL_NORMAL_ARRAY);
+			}
+			//glEnableClientState(GL_INDEX_ARRAY);	
 				
 				glLoadIdentity();
 				
@@ -297,7 +328,12 @@ namespace utils
 					Link the points, colors and normals for drawing
 				*/
 				glVertexPointer(3, GL_DOUBLE, 0, points);
-				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				if (color) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				}
+				if (normals) {
+					glNormalPointer(GL_DOUBLE, 0, normals);
+				}
 				glDrawArrays(GL_POINTS, 0, number_of_elements);
 				
 				/**
@@ -324,8 +360,13 @@ namespace utils
 			/**
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
-			glDisableClientState(GL_COLOR_ARRAY);
 			glDisableClientState(GL_VERTEX_ARRAY);
+			if (color) {
+				glDisableClientState(GL_COLOR_ARRAY);
+			}
+			if (normals) {
+				glDisableClientState(GL_NORMAL_ARRAY);
+			}
 
 			glPopMatrix();
 
@@ -343,7 +384,12 @@ namespace utils
 			Color
 		*/
 		unsigned char* color;
-
+		
+		/**
+			Normals
+		*/
+		ElementType* normals;
+		
 		/**
 			Number of elements
 		*/
