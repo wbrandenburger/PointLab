@@ -56,12 +56,11 @@ namespace io
 		/**
 			Constructor
 		*/
-		PlyIO() : file(nullptr), header(false), instances(0), points(0), normals(0), colors(0) 
+		PlyIO() : file(nullptr), header(false), instances(0), point_flag(false), normal_flag(false), color_flag(0)
 		{
 			point_break = 0;
 			counter =  0;
 		}
-
 		/**
 			Deconstructor
 		*/
@@ -91,9 +90,9 @@ namespace io
 			header = false;
 			point_break = 0;
 			instances = 0;
-			points = 0;
-			normals = 0;
-			colors = 0;
+			point_flag = false;
+			normal_flag = false;
+			color_flag = 0;
 			counter = 0;
 		}
 
@@ -156,13 +155,13 @@ namespace io
 		*/
 		void setMetaInformation(const char *prop_name_, DataType type_)
 		{
-			if (!strcmp(prop_name_, "x")) { type = type_; points = 1;}
+			if (!strcmp(prop_name_, "x")) { type = type_; point_flag = true;}
 			if (!strcmp(prop_name_, "z")) { point_break = 3;}
-			if (!strcmp(prop_name_, "nx")) { normals = 1;}
+			if (!strcmp(prop_name_, "nx")) { normal_flag = true;}
 			if (!strcmp(prop_name_, "nz")) { point_break = 6; }
-			if (!strcmp(prop_name_, "diffuse_red")) { colors = 1;}
+			if (!strcmp(prop_name_, "diffuse_red")) { color_flag = 1;}
 			if (!strcmp(prop_name_, "diffuse_blue")) { point_break = 9; }
-			if (!strcmp(prop_name_, "red")) { colors = 2;}
+			if (!strcmp(prop_name_, "red")) { color_flag = 2;}
 			if (!strcmp(prop_name_, "blue")) { point_break = 9;}
 		}
 
@@ -288,7 +287,7 @@ namespace io
 				std::exit(EXIT_FAILURE);
 			}
 		
-			if (points) {
+			if (point_flag) {
 				ply_set_read_cb(ply, "vertex", "x", callbackPointcloud<ElementType>, &pointcloud_, 1);
 				ply_set_read_cb(ply, "vertex", "y", callbackPointcloud<ElementType>, &pointcloud_, 2);
 				ply_set_read_cb(ply, "vertex", "z", callbackPointcloud<ElementType>, &pointcloud_, 3);
@@ -298,19 +297,19 @@ namespace io
 				std::exit(EXIT_FAILURE);
 			}
 
-			if (normals) {
+			if (normal_flag) {
 				ply_set_read_cb(ply, "vertex", "nx", callbackPointcloud<ElementType>, &pointcloud_, 4);
 				ply_set_read_cb(ply, "vertex", "ny", callbackPointcloud<ElementType>, &pointcloud_, 5);
 				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloud<ElementType>, &pointcloud_, 6);
 			}
 		
-			if (colors == 1) {
+			if (color_flag== 1) {
 				ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloud<ElementType>, &pointcloud_, 7);
 				ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloud<ElementType>, &pointcloud_, 8);
 				ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloud<ElementType>, &pointcloud_, 9);
 			}
 			
-			if (colors == 2) {
+			if (color_flag == 2) {
 				ply_set_read_cb(ply, "vertex", "red", callbackPointcloud<ElementType>, &pointcloud_, 7);
 				ply_set_read_cb(ply, "vertex", "green", callbackPointcloud<ElementType>, &pointcloud_, 8);
 				ply_set_read_cb(ply, "vertex", "blue", callbackPointcloud<ElementType>, &pointcloud_, 9);
@@ -338,7 +337,7 @@ namespace io
 			ply_add_element(ply, "vertex", (long)pointcloud_.rows);
 		
 			e_ply_type ply_data_type = type == PLY_TYPE_FLOAT ? PLY_FLOAT32 : PLY_FLOAT64;
-			if (points) {
+			if (point_flag) {
 				ply_add_property(ply, "x", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "y", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
@@ -348,13 +347,13 @@ namespace io
 				std::exit(EXIT_FAILURE);
 			}
 
-			if (normals) {
+			if (normal_flag) {
 				ply_add_property(ply, "nx", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "ny", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "nz", ply_data_type, ply_data_type, ply_data_type);
 			}
 		
-			if (colors) {
+			if (color_flag) {
 				e_ply_type ply_color_type = PLY_UCHAR;
 				ply_add_property(ply, "red", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "green", ply_color_type, ply_color_type, ply_color_type);
@@ -390,6 +389,37 @@ namespace io
 		}
 
 		/**
+			Returns true if points are set
+
+			@return True if points are set
+		*/
+		bool isPoints() const
+		{
+			return point_flag;
+		}
+
+		/**
+			Returns true if colors are set
+
+			@return True if colors are set 
+		*/
+		bool isColor() const
+		{
+			return (bool)color_flag;
+		}
+
+		/**
+			Returns true if normals are set
+
+			@return True if normals are set 
+		*/
+		bool isNormal() const
+		{
+			return normal_flag;
+		}
+
+	private:
+		/**
 			Filename
 		*/
 		char* file;
@@ -412,17 +442,17 @@ namespace io
 		/**
 			Flag whether points are contained in file
 		*/
-		int points;
+		bool point_flag;
 
 		/**
 			Flag whether normals are contained in file
 		*/
-		int normals;
+		bool normal_flag;
 		
 		/**
 			Flag whether colors are contained in file
 		*/
-		int colors;
+		size_t color_flag;
 	};
 }
 

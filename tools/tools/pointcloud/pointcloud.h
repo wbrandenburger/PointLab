@@ -36,6 +36,14 @@ namespace pointcloud
 {
 	typedef unsigned char uchar;
 
+
+	enum PointcloudFlags
+	{
+		POINTCLOUD_POINTS = 1 << 0,
+		POINTCLOUD_COLORS = 1 << 1,
+		POINTCLOUD_NORMALS = 1 << 2,
+	};
+
 	template<typename ElementType> class Pointcloud 
 	{
 
@@ -43,37 +51,28 @@ namespace pointcloud
 
 		/**
 			Constructor
+			
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud() : rows(0), cols(3), print_number(10) {}
+		Pointcloud(unsigned char flags_) : rows(0), cols(3)
+		{
+			point_flag = (flags_ & 1 << 0) > 0;
+			color_flag = (flags_ & 1 << 1) > 0;
+			normal_flag = (flags_ & 1 << 2) > 0;
+		}
 		
 		/**
 			Constructor
 
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(size_t rows_) : rows(rows_), cols(3), print_number(10) {}
-
-		/**
-			Constructor
-
-			@param[in] points_ Points
-			@param[in] rows_ Rows
-			@param[in] cols_ Cols
-		*/
-		Pointcloud(ElementType* points_, size_t rows_) : rows(rows_), cols(3), print_number(10) {}
-
-		/**
-			Constructor
-
-			@param[in] points_ Points
-			@param[in] normals_ Normals
-			@param[in] colors_ Colors
-			@param[in] rows_ Rows
-			@param[in] cols_ Cols
-		*/
-		Pointcloud(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_) 
-			: rows(rows_), cols(3), print_number(10) {}
+		Pointcloud(size_t rows_, unsigned char flags_) : rows(rows_), cols(3) 
+		{
+			point_flag = (flags_ & 1 << 0) > 0 ;
+			color_flag = (flags_ & 1 << 1) > 0;
+			normal_flag = (flags_ & 1 << 2) > 0;
+		}
 
 		/**
 			Deconstructor
@@ -103,14 +102,6 @@ namespace pointcloud
 			@param[in] cols_ Cols
 		*/
 		virtual void setPointcloud(size_t rows_) = 0;
-
-		/**
-			Set the number of printed points
-		*/
-		void setPrintNumber(size_t print_number_)
-		{
-			print_number = print_number_;
-		}
 
 		/**
 			Clear
@@ -336,6 +327,37 @@ namespace pointcloud
 		virtual void getMatrix(utils::Matrix<ElementType>& matrix_) const = 0;
 
 		/**
+			Returns true if points are set
+
+			@return True if points are set
+		*/
+		bool isPoints() const
+		{
+			return point_flag;
+		}
+
+		/**
+			Returns true if colors are set
+
+			@return True if colors are set 
+		*/
+		bool isColor() const
+		{
+			return color_flag;
+		}
+
+		/**
+			Returns true if normals are set
+
+			@return True if normals are set 
+		*/
+		bool isNormal() const
+		{
+			return normal_flag;
+		}
+
+	protected:
+		/**
 			Rows
 		*/
 		size_t rows;
@@ -346,9 +368,19 @@ namespace pointcloud
 		size_t cols;
 
 		/**
-			Number of printed points
+			Flag for points
 		*/
-		size_t print_number;
+		bool point_flag;
+
+		/**
+			Flag for colors
+		*/
+		bool color_flag;
+
+		/**
+			Flag for normals
+		*/
+		bool normal_flag;
 	};
 		
 	template<typename ElementType> struct PointcloudNode 
@@ -569,8 +601,10 @@ namespace pointcloud
 
 		/**
 			Constructor
+
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS () : Pointcloud() 
+		PointcloudAoS (unsigned char flags_) : Pointcloud(flags_) 
 		{
 			pointcloud = nullptr;
 		}
@@ -579,9 +613,9 @@ namespace pointcloud
 			Constructor
 
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS(size_t rows_) : Pointcloud(rows_)
+		PointcloudAoS(size_t rows_, unsigned char flags_) : Pointcloud(rows_, flags_)
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 		}
@@ -591,10 +625,10 @@ namespace pointcloud
 
 			@param[in] points_ Points
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS(ElementType* points_, size_t rows_) 
-			: Pointcloud(rows_)
+		PointcloudAoS(ElementType* points_, size_t rows_, unsigned char flags_) 
+			: Pointcloud(rows_, flags_)
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 			setPoints(points_);
@@ -607,10 +641,10 @@ namespace pointcloud
 			@param[in] normals_ Normals
 			@param[in] colors_ Colors
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_)
-			: Pointcloud(rows_) 
+		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, unsigned char flags_)
+			: Pointcloud(rows_, flags_) 
 		{
 			pointcloud = new PointcloudNode<ElementType>[rows];
 			setPoints(points_);
@@ -826,7 +860,7 @@ namespace pointcloud
 		*/
 		void print(std::ostream& out_) const
 		{
-			size_t number = rows < print_number ? rows : print_number;
+			size_t number = rows < 10 ? rows : 10;
 			for (size_t i = 0; i < number; i++) {
 				out_ << pointcloud[i].getPoint(0) << " "
 					<< pointcloud[i].getPoint(1) << " "
@@ -1111,8 +1145,10 @@ namespace pointcloud
 
 		/**
 			Constructor
+
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA () : Pointcloud() 
+		PointcloudSoA (unsigned char flags_) : Pointcloud(flags_) 
 		{
 			points = nullptr;
 			normals = nullptr;
@@ -1122,9 +1158,9 @@ namespace pointcloud
 			Constructor
 
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(size_t rows_) : Pointcloud(rows_)
+		PointcloudSoA(size_t rows_, unsigned char flags_) : Pointcloud(rows_, flags_)
 		{
 			points = new ElementType[rows*cols];
 			normals = new ElementType[rows*cols];
@@ -1136,10 +1172,10 @@ namespace pointcloud
 
 			@param[in] points_ Points
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, size_t rows_) 
-			: Pointcloud(rows_)
+		PointcloudSoA(ElementType* points_, size_t rows_, unsigned char flags_) 
+			: Pointcloud(rows_, flags_)
 		{
 			setPoints(points_);
 			normals = new ElementType[rows*cols];
@@ -1153,10 +1189,10 @@ namespace pointcloud
 			@param[in] normals_ Normals
 			@param[in] colors_ Colors
 			@param[in] rows_ Rows
-			@param[in] cols_ Cols
+			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_)
-			: Pointcloud(rows_) 
+		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, unsigned char flags_)
+			: Pointcloud(rows_, flags) 
 		{
 			setPoints(points_);
 			setNormals(normals_);
@@ -1385,7 +1421,7 @@ namespace pointcloud
 		*/
 		void print(std::ostream& out_) const
 		{
-			size_t number = rows < print_number ? rows : print_number;
+			size_t number = rows < 10 ? rows : 10;
 			for (size_t i = 0; i < number; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					out_ << points[i*cols + j] << " ";

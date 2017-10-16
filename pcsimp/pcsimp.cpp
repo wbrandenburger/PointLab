@@ -38,11 +38,11 @@ int main(int argc, char* argv[]) {
 
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
-		std::cout << "File with " << pointcloud.rows << " point has been read in "
+		std::cout << "File with " << pointcloud.getRows() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 
-	pcsimp::Matrix<float> pointcloudsimp(pointcloud.getPointsPtr(), pointcloud.rows, pointcloud.cols);
+	pcsimp::Matrix<float> pointcloudsimp(pointcloud.getPointsPtr(), pointcloud.getRows(), 3);
 	
 	/**
 		Build index

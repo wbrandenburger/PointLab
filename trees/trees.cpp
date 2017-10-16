@@ -286,11 +286,22 @@ int main(int argc, char* argv[]) {
 	*/
 	utils::Timer time;
 	
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances());
+	unsigned char flags = 0;
+	if (plyIO.isPoints()) {
+		flags |= pointcloud::POINTCLOUD_POINTS;
+	}
+	if (plyIO.isColor()) {
+		flags |= pointcloud::POINTCLOUD_COLORS;
+	}
+	if (plyIO.isNormal()) {
+		flags |= pointcloud::POINTCLOUD_NORMALS;
+	}
+
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
 	
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
-		std::cout << "File with " << pointcloud.rows << " point has been read in "
+		std::cout << "File with " << pointcloud.getRows() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 	std::cout << pointcloud << std::endl;

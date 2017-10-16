@@ -83,9 +83,10 @@ namespace utils
 		
 			number_of_elements = pointcloud_.getRows();
 
+			/**
+				Compute the bounding box of the pointcloud
+			*/
 			utils::BoundingBox<ElementType> bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
-
-			std::cout << bounding_box << std::endl;
 
 			gl_pointsize = 1;
 
@@ -93,15 +94,13 @@ namespace utils
 			gl_center_y = 0.5;
 			gl_center_z = 0.5;
 
+			/**
+				Center and normalize the pointlcoud
+			*/
 			gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
-			
 			for (size_t i = 0; i < number_of_elements * 3; i++) {
 				points[i] = (points[i] - bounding_box.getMiddle(i % 3)) * ( 1 / gl_zoom);
 			}
-			
-			utils::BoundingBox<ElementType> bounding_box_II = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
-
-			std::cout << bounding_box_II << std::endl;
 
 			gl_zoom = 1.0;
 
