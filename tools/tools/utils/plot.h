@@ -35,149 +35,11 @@
 #include "eigen3/Eigen/Dense"
 
 #include "tools/utils/matrix.h"
+#include "tools/utils/mouseposition.h"
 
 namespace utils
 {
-
 	/**
-		Structure which holds the current mouse position
-	*/
-	class MousePosition
-	{
-		
-	public:
-		
-		/**
-			Constructor
-		*/
-		MousePosition() : x(NULL), y(NULL) {}
-			
-		/**
-			Constructor
-
-			@param[in] x_ Current position in x direction
-			@param[in] y_ Current position in y direction
-		*/
-		MousePosition(int x_, int y_)
-		{
-			x = x_;
-			y = y_;
-		}
-
-		/**
-			Destructor
-		*/
-		~MousePosition() 
-		{
-			clear();
-		}
-
-		/**
-			Set Position
-
-			@param[in] x_ Current position in x direction
-			@param[in] y_ Current position in y direction
-		*/
-		void setPostion(int x_, int y_)
-		{
-			x = x_;
-			y = y_;
-		}
-
-		/**
-			Clear
-		*/
-		void clear()
-		{
-			x = NULL;
-			y = NULL;
-		}
-
-		/**
-			Operator ==
-
-			@param[in] mouse_position_ Another instance of struct MousePosition
-		*/
-		bool operator==(const MousePosition&  mouse_position_) const
-		{
-			if ((*this).x == mouse_position_.x && (*this).y == mouse_position_.y) {
-				return true;
-			}
-
-			return false;
-		}
-
-		/**
-			Operator !=
-
-			@param[in] mouse_position_ Another instance of struct MousePosition
-		*/
-		bool operator!=(const MousePosition&  mouse_position_) const
-		{
-			if ((*this).x != mouse_position_.x || (*this).y != mouse_position_.y) {
-				return true;
-			}
-
-			return false;
-		}
-
-		/**
-			Operator >
-
-			@param[in] mouse_position_ Another instance of struct MousePosition
-		*/
-		bool operator>(const MousePosition&  mouse_position_) const
-		{
-			if ((*this).x > mouse_position_.getX()) {
-				return true;
-			}
-
-			return false;
-		}
-
-		/**
-			Get x
-		*/
-		int getX() const
-		{
-			return x;
-		}
-
-		/**
-			Get y
-		*/
-		int getY() const
-		{
-			return y;
-		}
-
-	private:
-
-		/**
-			Current position in x direction
-		*/
-		int x;
-
-		/**
-			Current position in y direction
-		*/
-		int y;
-	};
-
-	/**
-		Print currrent mouse position
-
-		@param[in] out_ Instance of ostream
-		@param[in] mouse_position_ Current mouse position
-		@return Instance of ostream 
-	 */
-	std::ostream& operator<<(std::ostream& out_, const MousePosition& mouse_position_)
-	{
-		out_ << mouse_position_.getX() << " " << mouse_position_.getY();
-
-		return out_;
-	}
-		/**
 		Handle for mouse events
 
 		@param[in] event_ Mouse event
@@ -197,7 +59,7 @@ namespace utils
 			Constructor
 		*/
 		Plot(char* window_name_ = "Plot 1", bool interaction_ = 0) : number_of_functions(0), size_plot(1024), 
-			number_of_elements(0), starting_index(0), x_zero(NULL), mouse_position(MousePosition()),
+			number_of_elements(0), starting_index(0), x_zero(NULL), mouse_position(utils::MousePosition()),
 			window_name(window_name_), interaction(interaction_) {}
 
 		/**
@@ -223,7 +85,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		virtual void setZoomIn(const MousePosition mouse_position_) = 0;
+		virtual void setZoomIn(const utils::MousePosition mouse_position_) = 0;
 
 		/**
 			Zoom out
@@ -235,7 +97,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		virtual void setMousePosition(MousePosition mouse_position_) 
+		virtual void setMousePosition(utils::MousePosition mouse_position_)
 		{
 			mouse_position = mouse_position_;
 		}
@@ -243,7 +105,7 @@ namespace utils
 		/**
 			Get mouse position
 		*/
-		virtual MousePosition getMousePosition() const
+		virtual utils::MousePosition getMousePosition() const
 		{
 			return mouse_position;
 		}
@@ -253,7 +115,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		virtual void getValues(MousePosition mouse_position_) const = 0;
+		virtual void getValues(utils::MousePosition mouse_position_) const = 0;
 
  		/**
 			Draw image
@@ -308,7 +170,7 @@ namespace utils
 		/**
 			Mouse position
 		*/
-		MousePosition mouse_position;
+		utils::MousePosition mouse_position;
 
 		/**
 			Window
@@ -334,7 +196,7 @@ namespace utils
 	{
 		if (event_ == CV_EVENT_LBUTTONDOWN)
 		{
-			MousePosition mouse_position(x_, y_);
+			utils::MousePosition mouse_position(x_, y_);
 			Plot* plot = (Plot*)param_;
 
 			(*plot).setMousePosition(mouse_position);
@@ -342,12 +204,12 @@ namespace utils
 		}
 		if (event_ == CV_EVENT_LBUTTONUP)
 		{
-			MousePosition mouse_position(x_, y_);
+			utils::MousePosition mouse_position(x_, y_);
 			Plot* plot = (Plot*) param_;
 
 			if ((*plot).getMousePosition() != mouse_position) {
 				if ((*plot).getMousePosition() > mouse_position) {
-					MousePosition temp = (*plot).getMousePosition();
+					utils::MousePosition temp = (*plot).getMousePosition();
 					(*plot).setMousePosition(mouse_position);
 					mouse_position = temp;
 				}
@@ -458,7 +320,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		void setZoomIn(const MousePosition mouse_position_) 
+		void setZoomIn(const utils::MousePosition mouse_position_)
 		{
 			starting_index = (size_t)((double)mouse_position.getX() / (double)size_plot *  (double)number_of_elements) + starting_index;
 			number_of_elements = (size_t) ((double) (mouse_position_.getX() - mouse_position.getX()) / (double) size_plot * (double) number_of_elements);
@@ -482,7 +344,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		void getValues(MousePosition mouse_position_) const {
+		void getValues(utils::MousePosition mouse_position_) const {
 
 			size_t index = std::round((double)mouse_position_.getX() / (double)size_plot *(double)number_of_elements + (double)starting_index);
 			std::cout << "x-value: " << intervall[index];
@@ -656,7 +518,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		void setZoomIn(const MousePosition mouse_position_) 
+		void setZoomIn(const utils::MousePosition mouse_position_)
 		{
 			starting_index = (size_t)((double)mouse_position.getX() / (double)size_plot *  (double)number_of_elements) + starting_index;
 			number_of_elements = (size_t) ((double) (mouse_position_.getX() - mouse_position.getX()) / (double) size_plot * (double) number_of_elements);
@@ -680,7 +542,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		void getValues(MousePosition mouse_position_) const {
+		void getValues(utils::MousePosition mouse_position_) const {
 
 			size_t index = std::round((double)mouse_position_.getX() / (double)size_plot *(double)number_of_elements + (double)starting_index);
 			std::cout << "x-value: " << intervall(index,0);
@@ -854,7 +716,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		void setZoomIn(const MousePosition mouse_position_) 
+		void setZoomIn(const utils::MousePosition mouse_position_)
 		{
 			starting_index = (size_t)((double)mouse_position.getX() / (double)size_plot *  (double)number_of_elements) + starting_index;
 			number_of_elements = (size_t) ((double) (mouse_position_.getX() - mouse_position.getX()) / (double) size_plot * (double) number_of_elements);
@@ -878,7 +740,7 @@ namespace utils
 
 			@param[in] mouse_position_ Current mouse position
 		*/
-		void getValues(MousePosition mouse_position_) const {
+		void getValues(utils::MousePosition mouse_position_) const {
 
 			size_t index = std::round((double)mouse_position_.getX() / (double)size_plot *(double)number_of_elements + (double)starting_index);
 			std::cout << "x-value: " << (*intervall)[index][0];

@@ -34,233 +34,12 @@
 #include <GL/GL.h>
 #include <GL/freeglut.h>
 
+#include "tools/utils/boundingbox.h"
+#include "tools/utils/mouseposition.h"
 #include "tools/pointcloud/pointcloud.h"
 
 namespace utils
 {
-	template<typename ElementType> struct BoundingBox 
-	{
-	public:
-
-		/**
-			Constructor
-
-			@param[in] dataset_ Dataset
-			@param[in] number_of_elements_ Number of elements
-			@param[in] dim_ Specific dimension
-		*/
-		BoundingBox() : min(nullptr), max(nullptr), dim(NULL) {}
-
-		/**
-			Constructor
-
-			@param[in] dataset_ Dataset
-			@param[in] number_of_elements_ Number of elements
-			@param[in] dim_ Specific dimension
-		*/
-		BoundingBox(ElementType* dataset_, size_t number_of_elements, size_t dim_) :
-			min(nullptr), max(nullptr), dim(dim_)
-		{
-			min = new ElementType[dim];
-			max = new ElementType[dim];
-
-			std::memcpy(min, dataset_, sizeof(ElementType)*dim);
-			std::memcpy(max, dataset_, sizeof(ElementType)*dim);
-
-			for (size_t i = 0; i < number_of_elements * dim; i++ )
-			{
-				setCompareValue(dataset_[i], i % dim);
-			}
-		}
-
-		/**
-			Destructor
-		*/
-		~BoundingBox()
-		{
-			clear();
-		}
-
-		/**
-			Copy Constructor
-
-			@param[in] bounding_box_ Bounding Box
-		*/
-		BoundingBox(const BoundingBox<ElementType>& bounding_box_) : min(nullptr), max(nullptr), dim(NULL)
-		{
-			dim = bounding_box_.getDim();
-
-			min = new ElementType[dim];
-			max = new ElementType[dim];
-
-			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
-			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
-		}
-
-		/**
-			Operator =
-
-			@param[in] bounding_box_ Bounding Box
-		*/
-		BoundingBox& operator=(const BoundingBox<ElementType>& bounding_box_)
-		{
-			clear();
-
-			dim = bounding_box_.getDim();
-
-			std::cout << dim << std::endl;
-
-			min = new ElementType[dim];
-			max = new ElementType[dim];
-
-			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
-			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
-
-			return (*this);
-		}
-
-		/**
-			Clear
-		*/
-		void clear()
-		{
-			if (min) {
-				delete[] min;
-				min = nullptr;
-			}
-
-			if (max) {
-				delete[] max;
-				max = nullptr;
-			}
-			dim = NULL;
-		}
-
-		/**
-			Get minimum value for specific dimension
-
-			@param[in] dim_ Specific dimension
-		*/
-		ElementType getMinDim(size_t dim_) const
-		{
-			return min[dim_];
-		}
-
-		/**
-			Get maximum value for specific dimension
-
-			@param[in] dim_ Specific dimension
-		*/
-		ElementType getMaxDim(size_t dim_) const
-		{
-			return max[dim_];
-		}
-
-		/**
-			Get dimension
-		*/
-		size_t getDim() const
-		{
-			return dim;
-		}
-
-		/**
-			Get minimum values
-		*/
-		ElementType* getMin() const
-		{
-			return min;
-		}
-
-		/**
-			Get maximum values
-		*/
-		ElementType* getMax() const
-		{
-			return max;
-		}	
-
-		/**
-			Get difference for a specific dimension
-		*/
-		ElementType getDifference(size_t dim_) const
-		{
-			return max[dim_] - min[dim_];
-		}
-
-		/**
-			Get difference for a specific dimension
-		*/
-		ElementType getMiddle(size_t dim_) const
-		{
-			return (max[dim_] + min[dim_]) / 2.0;
-		}
-
-		/**
-			Set value for specific dimension
-
-			@param[in] value_ Value
-			@param[in] dim_ Specific dimension
-		*/
-		void setValue(ElementType value_, size_t dim_)
-		{
-			min[dim_] = value_;
-			max[dim_] = value_;
-		}
-
-		/**
-			Compare and set value for specific dimension
-
-			@param[in] value_ Value
-			@param[in] dim_ Specific dimension
-		*/
-		void setCompareValue(ElementType value_, size_t dim_)
-		{
-			if (value_ < min[dim_]) {
-				min[dim_] = value_;
-			}
-
-			if (value_ > max[dim_]) {
-				max[dim_] = value_;
-			}
-		}
-
-	private:
-
-		/**
-			Minimum values
-		*/
-		ElementType* min;
-
-		/**
-			Maximum values
-		*/
-		ElementType* max;
-
-		/**
-			Dimension
-		*/
-		size_t dim;
-	};
-
-	/**
-		Operator << Prints the values of the bounding box
-
-		@param[in,out] out_ Outstream in which the bounding box will be printed
-		@param[in] bounding_box Bounding box which shall be printed
-	*/
-	template<typename ElementType>
-	std::ostream& operator<<(std::ostream& out_, const BoundingBox<ElementType>& bounding_box_)
-	{
-		for (size_t i = 0; i <  bounding_box_.getDim(); i++) {
-			out_ << bounding_box_.getMinDim(i) << " " 
-				<< bounding_box_.getMaxDim(i) << " " 
-				<< bounding_box_.getDifference(i) << " " 
-				<< bounding_box_.getMiddle(i) << std::endl;
-		}
-		return out_;
-	}
-
 	template<typename ElementType> class ViewerInstance
 	{
 	public: 
@@ -304,21 +83,23 @@ namespace utils
 		
 			number_of_elements = pointcloud_.getRows();
 
-			bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
-			
-			std::cout << bounding_box << std::endl;
+			utils::BoundingBox<ElementType> bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
 
 			gl_pointsize = 1;
 
-			gl_center_x = bounding_box.getMiddle(0);
-			gl_center_y = bounding_box.getMiddle(1);
-			gl_center_z = bounding_box.getMiddle(2);
+			gl_center_x = 0.5;
+			gl_center_y = 0.5;
+			gl_center_z = 0.5;
 
 			gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
 			
-			gl_translate_x = 0.5;
-			gl_translate_y = 0.5;
-			gl_translate_z = 0.5;
+			for (size_t i = 0; i < number_of_elements * 3; i++) {
+				points[i] = points[i] - bounding_box.getMiddle(i % 3) * ( 1 / gl_zoom);
+			}
+			gl_zoom = 1.0;
+
+			gl_rot_x = 0.0;
+			gl_rot_y = 0.0;
 
 		}
 		
@@ -357,6 +138,24 @@ namespace utils
 		}
 
 		/**
+			Translate
+		*/
+		void translate(int x_, int y_)
+		{
+			gl_center_x = gl_center_x + (float)x_/500.0f;
+			gl_center_y = gl_center_y - (float)y_/500.0f;
+		}
+
+		/**
+			Rotate
+		*/
+		void rotate(int x_, int y_)
+		{
+			gl_rot_x = gl_rot_x + (float)x_*0.5f;
+			gl_rot_y = gl_rot_y + (float)y_*0.5f;
+		}
+
+		/**
 			Draw the pointcloud
 		*/
 		void draw()
@@ -379,23 +178,68 @@ namespace utils
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 
-				glEnableClientState(GL_VERTEX_ARRAY);
-				glEnableClientState(GL_COLOR_ARRAY);
-				
-				glLoadIdentity();
-				glTranslatef(-gl_center_x / gl_zoom, -gl_center_y / gl_zoom, -gl_center_z / gl_zoom);
-				glScalef(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
-				glTranslatef(gl_translate_x*gl_zoom, gl_translate_y*gl_zoom, gl_translate_z*gl_zoom);
+			/**
+				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+			*/
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+			//glEnableClientState(GL_INDEX_ARRAY); glEnableClientState(GL_NORMAL_ARRAY);	
 
+				glLoadIdentity();
+
+				/**
+					Increase or decrease the entire pointcloud by the factor gl_zoom
+				*/
+
+				glScalef(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
+				/**
+					Translate the pointlcoud by the chosen centerpoint
+				*/
+
+				glTranslatef(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+				/**
+					Roatate the entire pointcloud around the x- and y-axis
+				*/
+				glRotatef(-1.0f*gl_rot_x, 0.0, 1.0f, 0.0);
+				glRotatef( 1.0f*gl_rot_y, 0.0, 0.0, 1.0f);
+
+				/**
+					Determine the size of the points
+				*/
 				glPointSize(gl_pointsize);
 
+				/**
+					Link the points, colors and normals for drawing
+				*/
 				glVertexPointer(3, GL_FLOAT, 0, points);
 				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
 				glDrawArrays(GL_POINTS, 0, number_of_elements);
+				
+				/**
+					Draw axis
+				*/				
+				glLineWidth(2.0f);
+				glBegin(GL_LINES);
+					glColor4f(1.0, 0.0, 0.0, 0.0);
+					glVertex3f(0.0, 0.0, 0.0);
+					glVertex3f(0.25f*gl_zoom, 0.0, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0, 1.0, 0.0, 0.0);
+					glVertex3f(0.0, 0.0, 0.0);
+					glVertex3f(0.0, 0.25f*gl_zoom, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0, 0.0, 1.0, 0.0);
+					glVertex3f(0.0, 0.0, 0.0);
+					glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
+				glEnd();
 
-
-				glDisableClientState(GL_COLOR_ARRAY);
-				glDisableClientState(GL_VERTEX_ARRAY);
+			/**
+				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+			*/
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
 
 			glPopMatrix();
 
@@ -411,32 +255,77 @@ namespace utils
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
-
-				glEnableClientState(GL_VERTEX_ARRAY);
-				glEnableClientState(GL_COLOR_ARRAY);
+			
+			/**
+				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+			*/
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+			//glEnableClientState(GL_INDEX_ARRAY); glEnableClientState(GL_NORMAL_ARRAY);	
 				
-				glPointSize(1.0);
 				glLoadIdentity();
-
-				//glScaled(1.0 / gl_zoom, 1.0 / gl_zoom, 1.0 / gl_zoom);
-
-				//glTranslated(gl_translate_x, gl_translate_y, gl_translate_z);
 				
+				/**
+					Increase or decrease the entire pointcloud by the factor gl_zoom
+				*/
+
+				glScaled(1.0 / gl_zoom, 1.0 / gl_zoom, 1.0 / gl_zoom);
+				/**
+					Translate the pointlcoud by the chosen centerpoint
+				*/
+
+				glTranslated(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+				/**
+					Roatate the entire pointcloud around the x- and y-axis
+				*/
+				glRotated(-1.0*gl_rot_x, 0.0, 1.0, 0.0);
+				glRotated( 1.0*gl_rot_y, 0.0, 0.0, 1.0);
+
+				/**
+					Determine the size of the points
+				*/
+				glPointSize(gl_pointsize);
+
+								/**
+					Link the points, colors and normals for drawing
+				*/
 				glVertexPointer(3, GL_DOUBLE, 0, points);
 				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
-				
 				glDrawArrays(GL_POINTS, 0, number_of_elements);
+				
+				/**
+					Draw axis
+				*/				
+				glLineWidth(2.0f);
+				glBegin(GL_LINES);
+					glColor4f(1.0, 0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.25*gl_zoom, 0.0, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0, 1.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.25*gl_zoom, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0, 0.0, 1.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.25*gl_zoom);
+				glEnd();
 
 
-				glDisableClientState(GL_COLOR_ARRAY);
-				glDisableClientState(GL_VERTEX_ARRAY);
+			/**
+				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+			*/
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
 
 			glPopMatrix();
 
 			glutSwapBuffers();
 
 		}
-	
+
 	private:
 		/**
 			Points
@@ -454,11 +343,6 @@ namespace utils
 		size_t number_of_elements;
 
 		/**
-			Bounding box
-		*/
-		utils::BoundingBox<ElementType> bounding_box;
-
-		/**
 			Center in x-direction
 		*/
 		ElementType gl_center_x;
@@ -474,19 +358,14 @@ namespace utils
 		ElementType gl_center_z;
 		
 		/**
-			Translation in x-direction
+			Rotation in x-direction
 		*/
-		ElementType gl_translate_x;
-
+		ElementType gl_rot_x;
+		
 		/**
-			Translation in y-direction
+			Rotation in x-direction
 		*/
-		ElementType gl_translate_y;
-
-		/**
-			Translation in x-direction
-		*/
-		ElementType gl_translate_z;
+		ElementType gl_rot_y;
 		
 		/**
 			Point size
@@ -599,7 +478,9 @@ namespace utils
 			glViewport(0, 0, width_, height_);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			glOrtho(0, 1, 0, 1, -1, 1);
+			
+			glOrtho(0, 1, 0, (float) height_ / (float)width_ , -1, 1);
+
 			glMatrixMode(GL_MODELVIEW);
 		}
 				
@@ -615,6 +496,7 @@ namespace utils
 				sprintf(window_name_, "Window %d", viewer_instances.getNumberOfViewer() - 1);
 			}
 
+			glutInitWindowSize(500, 500);
 			viewer_instances.setCurrentInstance(glutCreateWindow(window_name_) - 1);
 
 			/**
@@ -681,6 +563,8 @@ namespace utils
 		{
 			if (!state_){
 				mouse_button = button_;
+
+				mouse_position.setPosition(x_, y_);
 			}
 			else {
 				mouse_button = NULL;
@@ -696,14 +580,17 @@ namespace utils
 		*/
 		static void mouseMotion(int x_, int y_)
 		{
+			int x_difference;
+			int y_difference;
+
+			mouse_position.setPosition(x_, y_, x_difference, y_difference);
 			if (mouse_button == GLUT_LEFT_BUTTON){
-				std::cout << "Left" << std::endl;
+				viewer_instances.getCurrentViewerInstance().rotate(x_difference, y_difference);
 			}
 			else if (mouse_button == GLUT_MIDDLE_BUTTON) {
-				std::cout << "Middle" << std::endl;
 			}
 			else if (mouse_button == GLUT_RIGHT_BUTTON) {
-				std::cout << "Right" << std::endl;
+				viewer_instances.getCurrentViewerInstance().translate(x_difference, y_difference);
 			}
 		}
 
@@ -726,6 +613,11 @@ namespace utils
 			Mouse button
 		*/
 		static int mouse_button;
+
+		/**
+			Mouse position
+		*/
+		static utils::MousePosition mouse_position;
 	};
 
 	template<typename ElementType> class StaticViewerInstance
@@ -848,6 +740,12 @@ namespace utils
 		Static variable GLViewer<ElementType>::mouse_button
 	*/
 	template<typename ElementType> int GLViewer<ElementType>::mouse_button;
+
+	/**
+		Static variable GLViewer<ElementType>::mouse_button
+	*/
+	template<typename ElementType> utils::MousePosition GLViewer<ElementType>::mouse_position;
+
 }
 
 #endif /* UTILS_GLVIEWER_H_*/	
