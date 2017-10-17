@@ -27,9 +27,19 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_IO_H_
-#define INCLUDE_IO_H_
+#ifndef INCLUDE_GRAPHIC_H_
+#define INCLUDE_GRAPHIC_H_
 
-#include "io/ioply.h"
+#include "cuda.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 
-#endif /* INCLUDE_IO_H_ */
+#include "graphic/dist.cuh"
+#include "graphic/heap.cuh"
+#include "graphic/queue.cuh"
+#include "graphic/randomize.cuh"
+#include "graphic/result_set.cuh"
+
+#include "graphic/general.h"
+
+#endif /* INCLUDE_GRAPHIC_H_ */

@@ -27,9 +27,11 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_IO_H_
-#define INCLUDE_IO_H_
+#ifndef INCLUDE_MATH_H_
+#define INCLUDE_MATH_H_
 
-#include "io/ioply.h"
+#include "math/function.h"
+#include "math/adjustment.h"
+#include "math/zero.h"
 
-#endif /* INCLUDE_IO_H_ */
+#endif /* INCLUDE_MATH_H_ */

@@ -27,9 +27,16 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_IO_H_
-#define INCLUDE_IO_H_
+#ifndef POINTCLOUD_FEATURES_H_
+#define POINTCLOUD_FEATURES_H_
 
-#include "io/ioply.h"
+#include "tools/utils/matrix.h"
 
-#endif /* INCLUDE_IO_H_ */
+#include "eigen3/Eigen/Dense"
+
+namespace pointcloud
+{
+
+}
+
+#endif /* POINTCLOUD_FEATURES_H_ */

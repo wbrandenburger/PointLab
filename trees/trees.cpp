@@ -284,70 +284,70 @@ int main(int argc, char* argv[]) {
 	/**
 		Read data
 	*/
-	utils::Timer time;
-	
-	unsigned char flags = 0;
-	if (plyIO.isPoints()) {
-		flags |= pointcloud::POINTCLOUD_POINTS;
-	}
-	if (plyIO.isColor()) {
-		flags |= pointcloud::POINTCLOUD_COLORS;
-	}
-	if (plyIO.isNormal()) {
-		flags |= pointcloud::POINTCLOUD_NORMALS;
-	}
+	////////////utils::Timer time;
+	////////////
+	////////////unsigned char flags = 0;
+	////////////if (plyIO.isPoints()) {
+	////////////	flags |= pointcloud::POINTCLOUD_POINTS;
+	////////////}
+	////////////if (plyIO.isColor()) {
+	////////////	flags |= pointcloud::POINTCLOUD_COLORS;
+	////////////}
+	////////////if (plyIO.isNormal()) {
+	////////////	flags |= pointcloud::POINTCLOUD_NORMALS;
+	////////////}
 
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
-	
-	time.start();
-	if (plyIO.readPly(pointcloud)) {
-		std::cout << "File with " << pointcloud.getRows() << " point has been read in "
-			<< time.stop() << " s into Pointcloud" << std::endl;
-	}
-	std::cout << pointcloud << std::endl;
-
-
-	utils::GLViewer<float> viewer;
-	viewer.setViewer();
-	viewer.setPointcloud(pointcloud);
-	viewer.plot();
-	viewer.mainLoop();
+	////////////pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
+	////////////
+	////////////time.start();
+	////////////if (plyIO.readPly(pointcloud)) {
+	////////////	std::cout << "File with " << pointcloud.getRows() << " point has been read in "
+	////////////		<< time.stop() << " s into Pointcloud" << std::endl;
+	////////////}
+	////////////std::cout << pointcloud << std::endl;
 
 
-		//int versuch = 2048;
-		//int shift =  versuch / 3;
-		//
-		//std::vector<float> array_x(versuch);
-		//std::vector<float> array_y1(versuch);
-		//std::vector<float> array_y2(versuch);
-		//std::vector<float> array_y3(versuch);
-		//for (int i = -shift; i < versuch - shift; i++) {
-		//	array_x[i + shift] = i;
-		//	array_y1[i + shift] = i;
-		//	array_y2[i + shift] = i / 2;
-		//	array_y3[i + shift] = i*3 / 4;
-		//}
-		//utils::GLPlotVector<float> plot;
-		//plot.setPlot();
-		//plot.setY(array_y1);
-		//plot.setY(array_y2);
-		//plot.setY(array_y3);
-		//plot.setX(array_x);
-		//plot.plot();
+	////////////utils::GLViewer<float> viewer;
+	////////////viewer.setViewer();
+	////////////viewer.setPointcloud(pointcloud);
+	////////////viewer.plot();
+	////////////viewer.mainLoop();
 
-		//plot.setPlot();
-		//plot.setY(array_y1);
-		//plot.setY(array_y2);
-		//plot.setX(array_x);
-		//plot.plot();
-		//
-		//plot.setPlot();
-		//plot.setY(array_y1);
-		//plot.setY(array_y2);
-		//plot.setX(array_x);
-		//plot.plot();
 
-		//plot.mainLoop();
+		int versuch = 2048;
+		int shift =  versuch / 3;
+		
+		std::vector<float> array_x(versuch);
+		std::vector<float> array_y1(versuch);
+		std::vector<float> array_y2(versuch);
+		std::vector<float> array_y3(versuch);
+		for (int i = -shift; i < versuch - shift; i++) {
+			array_x[i + shift] = i;
+			array_y1[i + shift] = i;
+			array_y2[i + shift] = i / 2;
+			array_y3[i + shift] = i*3 / 4;
+		}
+		utils::GLPlotVector<float> plot;
+		plot.setPlot();
+		plot.setY(array_y1);
+		plot.setY(array_y2);
+		plot.setY(array_y3);
+		plot.setX(array_x);
+		plot.plot();
+
+		plot.setPlot();
+		plot.setY(array_y1);
+		plot.setY(array_y2);
+		plot.setX(array_x);
+		plot.plot();
+		
+		plot.setPlot();
+		plot.setY(array_y1);
+		plot.setY(array_y2);
+		plot.setX(array_x);
+		plot.plot();
+
+		plot.mainLoop();
 
 	return(0);
 }

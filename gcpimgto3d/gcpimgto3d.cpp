@@ -10,6 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
+#include "io/filereader.h"
 #include "tools/io.h"
 #include "tools/utils.h"
 #include "tools/image/utils.h"

@@ -27,9 +27,11 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_IO_H_
-#define INCLUDE_IO_H_
+#ifndef INCLUDE_POINTCLOUD_H_
+#define INCLUDE_POINTCLOUD_H_
 
-#include "io/ioply.h"
+#include "pointcloud/features.h"
+#include "pointcloud/normal.h"
+#include "pointcloud/pointcloud.h"
 
-#endif /* INCLUDE_IO_H_ */
+#endif /* INCLUDE_POINTCLOUD_H_ */

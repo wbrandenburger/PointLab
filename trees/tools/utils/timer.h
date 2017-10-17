@@ -27,9 +27,54 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_IO_H_
-#define INCLUDE_IO_H_
 
-#include "io/ioply.h"
+#ifndef UTILS_TIMER_H_
+#define UTILS_TIMER_H_
 
-#endif /* INCLUDE_IO_H_ */
+#include <time.h>
+
+namespace utils
+{
+	class Timer
+	{
+
+	public:
+
+		clock_t time;
+
+		/**
+			Constructor
+		*/
+		Timer()
+		{
+		}
+
+		/**
+			Deconstructor
+		*/
+		~Timer()
+		{
+		}
+
+		/**
+			Starts the timer
+		*/
+		void start()
+		{
+			time = (double) clock();
+		}
+
+		/**
+			Stops the timer
+			
+			@return duration of time betwenn invoking start and stop
+		*/
+		double stop()
+		{
+			return ((double)clock() - time) / CLOCKS_PER_SEC;
+		}
+	};
+
+}
+
+#endif /* UTILS_TIMER_H_ */

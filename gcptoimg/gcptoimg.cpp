@@ -16,7 +16,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "tools/io/filereader.h"
+#include "io/filereader.h"
 
 cv::Mat img;
 Eigen::Matrix3d cameraA;

@@ -27,9 +27,63 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef INCLUDE_IO_H_
-#define INCLUDE_IO_H_
 
-#include "io/ioply.h"
+#ifndef UTILS_COLOR_H_
+#define UTILS_COLOR_H_
 
-#endif /* INCLUDE_IO_H_ */
+namespace utils
+{
+	/**
+		Computes a color scheme within the range of red and blue
+
+		@param[in,out] r_ Red
+		@param[in,out] g_ Green
+		@param[in,out] b_ Blue
+		@param[in,out] index_ Index
+		@param[in,out] number_of_colors_ Number of Colors 
+	*/
+	void colorSchemeRGB(int& r_, int& g_, int& b_, size_t index_, size_t number_of_colors_) {
+		
+		float index = (float)number_of_colors_ / 2;
+		float increment = index_ > index ? 1 / std::ceil(index) :  1 / std::floor(index);
+
+		if (index_ < index) {
+			r_ = (int) 255 - 255 * increment * (float) index_;
+			g_ = (int) 255 * increment * (float) index_;
+			b_ = 0;
+		}
+		else {
+			r_ = 0;
+			g_ = (int) 255 - 255 * increment * (float) index_;
+			b_ = (int) 255 * increment * (float) index_;
+		}
+	}
+
+	/**
+		Computes a color scheme within the range of red and blue
+
+		@param[in,out] r_ Red
+		@param[in,out] g_ Green
+		@param[in,out] b_ Blue
+		@param[in,out] index_ Index
+		@param[in,out] number_of_colors_ Number of Colors
+	*/
+	void colorSchemeRGB(float& r_, float& g_, float& b_, size_t index_, size_t number_of_colors_) {
+
+		float index = (float)number_of_colors_ / 2;
+		float increment = index_ > index ? 1 / std::ceil(index) : 1 / std::floor(index);
+
+		if (index_ < index) {
+			r_ = 1.0 - increment * (float) index_;
+			g_ = increment * (float) index_;
+			b_ = 0.0f;
+		}
+		else {
+			r_ = 0.0f;
+			g_ = 1.0 - increment * (float)index_;
+			b_ = increment * (float) index_;
+		}
+	}
+
+}
+#endif /* UTILS_COLOR_H_ */
