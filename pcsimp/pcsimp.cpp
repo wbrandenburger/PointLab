@@ -27,107 +27,119 @@ int main(int argc, char* argv[]) {
 		i++;
 	}
 
-	char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/plane.ply";
-
-	utils::Timer time;
-	
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
+	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
+		
 	io::PlyIO plyIO;
 	plyIO.initialze(file);
+	
+	/**
+		Read data
+	*/
+	utils::Timer time;
+	
+	unsigned char flags = 0;
+	if (plyIO.isPoints()) {
+		flags |= pointcloud::POINTCLOUD_POINTS;
+	}
+	if (plyIO.isColor()) {
+		flags |= pointcloud::POINTCLOUD_COLORS;
+	}
+	if (plyIO.isNormal()) {
+		flags |= pointcloud::POINTCLOUD_NORMALS;
+	}
 
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances());
-
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
+	
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
 		std::cout << "File with " << pointcloud.getRows() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
+	std::cout << pointcloud << std::endl;
 
-	pcsimp::Matrix<float> pointcloudsimp(pointcloud.getPointsPtr(), pointcloud.getRows(), 3);
+	utils::GLViewer<float> viewer;
+	viewer.setViewer();
+	viewer.setPointcloud(pointcloud);
+	viewer.plot();
+	viewer.mainLoop();
+
+			//int versuch = 2048;
+			//int shift =  versuch / 3;
+			//
+			//std::vector<float> array_x(versuch);
+			//std::vector<float> array_y1(versuch);
+			//std::vector<float> array_y2(versuch);
+			//std::vector<float> array_y3(versuch);
+			//for (int i = -shift; i < versuch - shift; i++) {
+			//	array_x[i + shift] = i;
+			//	array_y1[i + shift] = i;
+			//	array_y2[i + shift] = i / 2;
+			//	array_y3[i + shift] = i*3 / 4;
+			//}
+			//utils::GLPlotVector<float> plot;
+			//plot.setPlot();
+			//plot.setY(array_y1);
+			//plot.setY(array_y2);
+			//plot.setY(array_y3);
+			//plot.setX(array_x);
+			//plot.plot();
 	
-	/**
-		Build index
-	*/
-	time.start();
-	pcsimp::Index<float> index(pointcloudsimp, pcsimp::MLSIndexParams(30,0.05f));
-
-	std::cout << "Simplification-index has been built in " << time.stop() << " s" << std::endl;
-
-	/**
-	Destroy the structures
-	*/
-	pointcloud.clear();
-	pointcloudsimp.clear();
-
-
-
-	//typedef utils::HeapWrapperConcurrent<int> Heap;
-
-	//size_t n = 4080;
-	//size_t coresheap = 15;
-	//utils::Threadpool pool(coresheap);
-	//Heap heapConcurrent(n, coresheap, true);
+			//plot.setPlot();
+			//plot.setY(array_y1);
+			//plot.setY(array_y2);
+			//plot.setX(array_x);
+			//plot.plot();
+			//
+			//plot.setPlot();
+			//plot.setY(array_y1);
+			//plot.setY(array_y2);
+			//plot.setX(array_x);
+			//plot.plot();
+	
+			//plot.mainLoop();
 
 
 
 
-
-	//utils::randSeed();
-	//int value;
-	//size_t index;
-
-	//for (size_t i = 0; i < heapConcurrent.size * heapConcurrent.cores; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::push, &heapConcurrent, utils::randInt(n, 0), i)));
+	//if (plyIO.getDataType() == 1) {
+	//	/*program<float>(cores, plyIO);*/
+	//}
+	//else {
+	//	/*program<double>(cores, plyIO);*/
 	//}
 
-	//for (size_t i = 0; i < 4032; i++) {
-	//	while (!pool.runTask(boost::bind(&Heap::pop, &heapConcurrent, boost::ref(value), boost::ref(index))));
-	//}
-	//pool.waitTasks();
-
-	//std::cout << heapConcurrent << std::endl;
-	////time.start();
-	////for (size_t i = 0; i < 100000; i++) {
-	////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0),/* i % (heapConcurrent.size * heapConcurrent.cores)*/utils::randInt(n, 0))));
-	////}
-	////pool.waitTasks();
-	////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " " << std::endl;
-
-	////std::cout << heapConcurrent << std::endl;
-
-	//if (heapConcurrent.checkHeap()) {
-	//	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//}
-
-	//heapConcurrent.clear();
-
-	//pool.shutdown();
-
-	////heapConcurrent.clear();
-
-	//////std::cout << heapConcurrent.checkLock() << std::endl;
-
-	//////////////time.start();
 
 
-	//////////////for (size_t i = 0; i < heapConcurrent.size; i++) {
-	//////////////	while (!pool.runTask(boost::bind(&Heap::update, &heapConcurrent, utils::randInt(n, 0), utils::randInt(n, 0))));
-	//////////////}
-	//////////////pool.waitTasks();
-
-	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
-
-	//////////////if (heapConcurrent.checkHeap()) {
-	//////////////	std::cout << " Heapbedingung erfüllt" << std::endl;
-	//////////////}
-
-	//////////////std::cout << time.stop() << " " << heapConcurrent.size << " " << heapConcurrent.count << " ";
-
-	//////////////if (heapConcurrent.checkHeap()) {
-	//////////////	std::cout << "Heapbedingung erfüllt" << std::endl;
-	//////////////}
-
+	//utils::Timer time;
 	//
+	//io::PlyIO plyIO;
+	//plyIO.initialze(file);
 
+	//pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances());
+
+	//time.start();
+	//if (plyIO.readPly(pointcloud)) {
+	//	std::cout << "File with " << pointcloud.getRows() << " point has been read in "
+	//		<< time.stop() << " s into Pointcloud" << std::endl;
+	//}
+
+	//pcsimp::Matrix<float> pointcloudsimp(pointcloud.getPointsPtr(), pointcloud.getRows(), 3);
+	//
+	///**
+	//	Build index
+	//*/
+	//time.start();
+	//pcsimp::Index<float> index(pointcloudsimp, pcsimp::MLSIndexParams(30,0.05f));
+
+	//std::cout << "Simplification-index has been built in " << time.stop() << " s" << std::endl;
+
+	///**
+	//Destroy the structures
+	//*/
+	//pointcloud.clear();
+	//pointcloudsimp.clear();
 
 
 	return(0);
