@@ -27,7 +27,6 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-
 #ifndef UTILS_RANDOMIZE_H_
 #define UTILS_RANDOMIZE_H_
 
@@ -38,7 +37,7 @@ namespace utils
 	*/
 	inline void randSeed()
 	{
-		srand(time(NULL));
+		srand((unsigned int) time(NULL));
 	}
 
 	/**

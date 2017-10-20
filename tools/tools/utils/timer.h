@@ -27,7 +27,6 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-
 #ifndef UTILS_TIMER_H_
 #define UTILS_TIMER_H_
 
@@ -40,7 +39,7 @@ namespace utils
 
 	public:
 
-		clock_t time;
+		double time;
 
 		/**
 			Constructor

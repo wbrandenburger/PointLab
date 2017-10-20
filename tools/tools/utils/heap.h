@@ -36,15 +36,14 @@
 
 namespace utils
 {
-
 	inline size_t computeInitialSize(size_t size_) 
 	{
-		return std::pow(2, std::ceil(std::log2(size_ + 1))) - 1;
+		return (size_t) std::pow(2, std::ceil(std::log2(size_ + 1))) - 1;
 	} 
 
 	inline size_t computeInitialSizeConcurrent(size_t size_, size_t cores)
 	{
-		return std::pow(2, std::ceil(std::log2(std::floor(size_ / cores) + 1 ))) - 1;
+		return (size_t) std::pow(2, std::ceil(std::log2(std::floor(size_ / cores) + 1 ))) - 1;
 	}
 
 	template<typename ElementType> struct HeapNode {

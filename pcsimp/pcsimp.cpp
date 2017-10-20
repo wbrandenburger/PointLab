@@ -73,10 +73,10 @@ int main(int argc, char* argv[]) {
 	float* array_y2(new float[versuch]);
 	float* array_y3(new float[versuch]);
 	for (int i = -shift; i < versuch - shift; i++) {
-		array_x[i + shift] = i;
-		array_y1[i + shift] = i;
-		array_y2[i + shift] = i / 2;
-		array_y3[i + shift] = i*3 / 4;
+		array_x[i + shift] = (float) i;
+		array_y1[i + shift] = (float) i;
+		array_y2[i + shift] = (float) i / 2;
+		array_y3[i + shift] = (float) i*3 / 4;
 	}
 	utils::GLPlot<float> plot;
 	plot.setPlot(versuch);
@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
 	plot.setY(array_y2);
 	plot.setX(array_x);
 	plot.plot();
+
 
 	plot.mainLoop();
 

@@ -70,7 +70,7 @@ namespace utils
 			@param size_ Number of bytes which shall be allocated
 			@return Returns a pointer to a piece of new memory of the given size in bytes
 		*/
-		virtual void* allocate(int size_) = 0;
+		virtual void* allocate(size_t size_) = 0;
 
 	protected:
 
@@ -142,7 +142,7 @@ namespace utils
 			@param size_ Number of bytes which shall be allocated
 			@return Returns a pointer to a piece of new memory of the given size in bytes
 		*/
-		void* allocate(int size_)
+		void* allocate(size_t size_)
 		{
 			/**
 				Check whether a new block must be allocated.  Note that the first word
@@ -200,7 +200,7 @@ namespace utils
 	@param[in,out] allocator_ Instance of PooledAllocator
 	@return Pointer to the allocated memory
 */
-inline void* operator new (std::size_t size_, utils::Allocator& allocator_)
+inline void* operator new (size_t size_, utils::Allocator& allocator_)
 {
 	return allocator_.allocate(size_);
 }

@@ -135,21 +135,21 @@ namespace utils
 		};
 
 		/// Specializations for small types.
-		#define SMALL_POLICY(TYPE) \
+		#define SMALL_ANY_POLICY(TYPE) \
 			template<> \
 			struct ChoosePolicy<TYPE> { typedef SmallAnyPolicy<TYPE> Type; \
 			}
 
-		SMALL_POLICY(signed char);
-		SMALL_POLICY(unsigned char);
-		SMALL_POLICY(signed short);
-		SMALL_POLICY(unsigned short);
-		SMALL_POLICY(signed int);
-		SMALL_POLICY(unsigned int);
-		SMALL_POLICY(signed long);
-		SMALL_POLICY(unsigned long);
-		SMALL_POLICY(float);
-		SMALL_POLICY(bool);
+		SMALL_ANY_POLICY(signed char);
+		SMALL_ANY_POLICY(unsigned char);
+		SMALL_ANY_POLICY(signed short);
+		SMALL_ANY_POLICY(unsigned short);
+		SMALL_ANY_POLICY(signed int);
+		SMALL_ANY_POLICY(unsigned int);
+		SMALL_ANY_POLICY(signed long);
+		SMALL_ANY_POLICY(unsigned long);
+		SMALL_ANY_POLICY(float);
+		SMALL_ANY_POLICY(bool);
 
 		/// This function will return a different policy for each type.
 		template<typename T> BaseAnyPolicy* getPolicy()

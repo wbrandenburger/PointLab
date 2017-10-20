@@ -32,7 +32,6 @@
 
 namespace utils
 {
-
 	template <typename ElementType>
 	class Matrix
 	{

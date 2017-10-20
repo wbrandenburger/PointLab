@@ -222,7 +222,7 @@ namespace image
 		int sum = 0;
 		for (int rows = 0; rows < kernel_.rows; rows++) {
 			for (int cols = 0; cols < kernel_.cols; cols++) {
-				sum += kernel_.ptr<float>(rows)[cols];
+				sum += (int) kernel_.ptr<float>(rows)[cols];
 			}
 		}
 		kernel_ = kernel_ / sum;

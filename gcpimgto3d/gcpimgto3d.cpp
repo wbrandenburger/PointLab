@@ -56,20 +56,20 @@ void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<
 		mean(0) /= coordinates.size();
 		mean(1) /= coordinates.size();
 				
-		size_t patchSize = 7;
-		int height1 = mean(0) - patchSize;
+		int patchSize = 7;
+		int height1 = (int) mean(0) - patchSize;
 		if (height1 < 0) {
 			height1 = 0;
 		}
-		int height2 = mean(0) + patchSize;
+		int height2 = (int) mean(0) + patchSize;
 		if (height2 > imgSize.height) {
 			height2 = imgSize.height;
 		}
-		int width1 = mean(1) - patchSize;
+		int width1 = (int) mean(1) - patchSize;
 		if (width1 < 0) {
 			width1 = 0;
 		}
-		int width2 = mean(1) + patchSize;
+		int width2 = (int) mean(1) + patchSize;
 		if (width2 > imgSize.width) {
 			width2 = imgSize.width;
 		}
@@ -96,10 +96,10 @@ void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<
 			patchStd(0) += std::pow(patchCoordinates[i][0] - patchMean(0), 2);
 			patchStd(1) += std::pow(patchCoordinates[i][1] - patchMean(1), 2);
 		}
-		patchStd /= patchCoordinates.size();
+		patchStd /= (double) patchCoordinates.size();
 		patchStd(0) = std::sqrt(patchStd(0)); patchStd(1) = std::sqrt(patchStd(1));
 
-		if (patchStd(1) < 2.0 && patchStd(1) < 2.0 & patchCoordinates.size() < 60) {
+		if (patchStd(1) < 2.0 && patchStd(1) < 2.0 && patchCoordinates.size() < 60) {
 			patchMean(0) += width1;
 			patchMean(1) += height1;
 			Eigen::Vector3d patchMeanA = cameraA.inverse()*patchMean;

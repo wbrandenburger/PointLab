@@ -27,7 +27,6 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-
 #ifndef UTILS_COLOR_H_
 #define UTILS_COLOR_H_
 
@@ -48,14 +47,14 @@ namespace utils
 		float increment = index_ > index ? 1 / std::ceil(index) :  1 / std::floor(index);
 
 		if (index_ < index) {
-			r_ = (int) 255 - 255 * increment * (float) index_;
-			g_ = (int) 255 * increment * (float) index_;
+			r_ =  255 - (int)(255.0f * increment * (float) index_);
+			g_ = (int)(255.0f * increment * (float) index_);
 			b_ = 0;
 		}
 		else {
 			r_ = 0;
-			g_ = (int) 255 - 255 * increment * (float) index_;
-			b_ = (int) 255 * increment * (float) index_;
+			g_ =  255 - (int)(255.0f * increment * (float) index_);
+			b_ = (int)(255.0f * increment * (float) index_);
 		}
 	}
 
@@ -74,13 +73,13 @@ namespace utils
 		float increment = index_ > index ? 1 / std::ceil(index) : 1 / std::floor(index);
 
 		if (index_ < index) {
-			r_ = 1.0 - increment * (float) index_;
+			r_ = 1.0f - increment * (float) index_;
 			g_ = increment * (float) index_;
 			b_ = 0.0f;
 		}
 		else {
 			r_ = 0.0f;
-			g_ = 1.0 - increment * (float)index_;
+			g_ = 1.0f - increment * (float)index_;
 			b_ = increment * (float) index_;
 		}
 	}
