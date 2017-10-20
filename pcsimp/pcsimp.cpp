@@ -79,17 +79,17 @@ int main(int argc, char* argv[]) {
 		array_y3[i + shift] = i*3 / 4;
 	}
 	utils::GLPlot<float> plot;
-	plot.setPlot();
-	plot.setY(array_y1,versuch);
-	plot.setY(array_y2, versuch);
-	plot.setY(array_y3, versuch);
-	plot.setX(array_x, versuch);
+	plot.setPlot(versuch);
+	plot.setY(array_y1);
+	plot.setY(array_y2);
+	plot.setY(array_y3);
+	plot.setX(array_x);
 	plot.plot();
 
-	plot.setPlot();
-	plot.setY(array_y1, versuch);
-	plot.setY(array_y2, versuch);
-	plot.setX(array_x, versuch);
+	plot.setPlot(versuch);
+	plot.setY(array_y1);
+	plot.setY(array_y2);
+	plot.setX(array_x);
 	plot.plot();
 
 	plot.mainLoop();
