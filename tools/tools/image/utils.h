@@ -304,7 +304,7 @@ namespace image
 	{
 		for (size_t rows = 0; rows < src_.rows; rows++) {
 			for (size_t cols = 0; cols < src_.cols; cols++) {
-				if (src_.ptr<ElementType>(rows)[cols] == value) {
+				if (src_.ptr<ElementType>(rows)[cols] ==  value) {
 					std::vector<size_t> coordinate{ rows, cols };
 					coordinates.push_back(coordinate);
 				}

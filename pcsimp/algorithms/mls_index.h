@@ -33,7 +33,7 @@
 #include "defines.h"
 #include "algorithms/nn_index.h"
 
-#include "util/matrix.h"
+#include "tools/utils/matrix.h"
 
 
 namespace pcsimp
@@ -66,7 +66,7 @@ namespace pcsimp
 			@param data_ pointcloud which sould be simplified
 			@param params_ input parameters for the simplification process
 		*/
-		MLSIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_ = MLSIndexParams())
+		MLSIndex(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_ = MLSIndexParams())
 		{
 			neighbor = get_param(params_, "neighbor", 30);
 			weight = get_param(params_, "weight", 0.05f);

@@ -30,12 +30,12 @@
 #ifndef PCSIMP_UTILS_PARAMS_H_
 #define PCSIMP_UTILS_PARAMS_H_
 
-#include "util/any.h"
+#include "tools/utils/any.h"
 #include <map>
 
 namespace pcsimp
 {
-	typedef std::map<std::string, any> IndexParams;
+	typedef std::map<std::string, utils::Any> IndexParams;
 
 	struct SimpParams {
 

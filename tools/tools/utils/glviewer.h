@@ -92,9 +92,43 @@ namespace utils
 			if (pointcloud_.isNormal()) {
 				normals = pointcloud_.getNormalsPtr();
 			}
-		
-			number_of_elements = pointcloud_.getRows();
 
+			number_of_elements = pointcloud_.getRows();
+			
+			setParameters();
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] pointcloud_ Pointcloud
+			@param[in] colors_ Colors
+			@param[in] normals_ Normals
+			@param[in] number_of_elements_ Number of elements
+		*/
+		void setPointcloud(ElementType* pointcloud_, unsigned char* color_, 
+			ElementType* normals_, size_t number_of_elements_)
+		{
+			if (pointcloud_) {
+				points = pointcloud_;
+			}
+			if (color_) {
+				color = color_;
+			}
+			if ( normals_) {
+				normals = normals_  ;
+			}
+
+			number_of_elements = number_of_elements_;
+
+			setParameters();
+		}
+
+		/**
+			Set initial parameters
+		*/
+		void setParameters()
+		{
 			/**
 				Compute the bounding box of the pointcloud
 			*/
@@ -118,8 +152,8 @@ namespace utils
 
 			gl_rot_x = 0.0;
 			gl_rot_y = 0.0;
-
 		}
+
 		
 		/**
 			Increase point size

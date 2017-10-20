@@ -572,10 +572,11 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Function %d", plot_instances.getNumberOfPlots() - 1);
+				sprintf(window_name_, "Function %d", (int) plot_instances.getNumberOfPlots() - 1);
 			}
 
-			size_t plot_index = glutCreateWindow(window_name_);
+			size_t plot_index = glutCreateWindow(window_name_)-1;
+			plot_instances.setIndex(plot_index);
 			plot_instances.setCurrentPlot(plot_index);
 
 			/**
@@ -715,9 +716,9 @@ namespace utils
 		/**
 			Set current plot
 		*/
-		void setCurrentPlot(size_t current_plot_)
+		void setCurrentPlot(size_t current_window_)
 		{
-			current_plot = current_plot_;
+			current_plot = plot_indices[current_window_];
 		}
 
 		/**
@@ -731,6 +732,14 @@ namespace utils
 
 			current_plot = number_of_plots;
 			number_of_plots++;
+		}
+
+		/**
+			Assign a window index with an plot index
+		*/
+		void setIndex(size_t window_index) 
+		{
+			plot_indices[window_index] = number_of_plots-1;
 		}
 
 		/**
@@ -750,6 +759,7 @@ namespace utils
 		{
 			return plot_instances;
 		}
+
 	private:
 		/**
 			Number of plots

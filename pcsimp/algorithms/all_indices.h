@@ -33,20 +33,20 @@
 #include "algorithms/nn_index.h"
 #include "algorithms/mls_index.h"
 
-#include "util/matrix.h"
+#include "tools/utils/matrix.h"
 
 namespace pcsimp
 {
 
 	template<template<typename> typename Index, typename ElementType>
-	inline NNIndex<ElementType>* createIndex(const Matrix<ElementType>& dataset_, const IndexParams& params_)
+	inline NNIndex<ElementType>* createIndex(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_)
 	{
 		return new Index<ElementType>(dataset_, params_);
 	}
 
 	template<typename ElementType>
 	inline NNIndex<ElementType>* createIndexByType(const pcsimpAlgorithm indexType_,
-		const Matrix<ElementType>& dataset_, const IndexParams& params_)
+		const utils::Matrix<ElementType>& dataset_, const IndexParams& params_)
 	{
 		NNIndex<ElementType>* nnIndex;
 

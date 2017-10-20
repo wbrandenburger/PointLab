@@ -48,7 +48,7 @@ namespace pcsimp
 			@param data_ pointcloud which sould be simplified
 			@param params_ input parameters for the simplification process
 		*/
-		Index(const Matrix<ElementType>& dataset_, const IndexParams& params_)
+		Index(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_)
 		{
 			pcsimpAlgorithm indexType = get_param<pcsimpAlgorithm>(params, "algorithm");
 			nnIndex = createIndexByType<ElementType>(indexType, dataset_, params_);

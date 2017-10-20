@@ -48,7 +48,6 @@ void gcpimgto3d(std::string txtnameImg_, std::string txtnameParam_, std::vector<
 		image::find<int>(imgLabel, coordinates, j);
 
 		Eigen::Vector3d mean(0.0, 0.0, 1.0);
-		float meanx, meany = 0;
 		for (size_t i = 0; i < coordinates.size(); i++) {
 			mean(0) += coordinates[i][0];
 			mean(1) += coordinates[i][1];
