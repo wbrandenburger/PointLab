@@ -45,8 +45,8 @@ namespace utils
 		*/
 		GLInstances()
 		{
-			if (!CURRENT_GL_WINDOWS) {
-				CURRENT_GL_WINDOWS = 0;
+			if (!current_gl_windows) {
+				current_gl_windows = 0;
 			}
 		}
 
@@ -57,37 +57,52 @@ namespace utils
 		{
 		}
 
+
+		/**
+		
+			
+		*/
+		void getWindowSpecification(size_t index_x_, size_t index_y_, size_t index_, 
+			size_t& x_, size_t& y_, size_t& width_, size_t& height_)
+		{	
+			int width = GetSystemMetrics(SM_CXSCREEN);
+			int height = GetSystemMetrics(SM_CYSCREEN);
+
+
+		}
+
 	private:
 	public:
 		/**
 			Number of called windows
 		*/
-		static size_t CURRENT_GL_WINDOWS;
+		static size_t current_gl_windows;
 
 		/**
 			Instance of plotting tool
 		*/
-		static utils::GLPlot<ElementType> GLPLOT;
+		static utils::GLPlot<ElementType> glplot;
 		/**
 			Instance of viewer tool
 		*/
-		static utils::GLViewer<ElementType> GLVIEWER;
+		static utils::GLViewer<ElementType> glviewer;
 	};
 
 	/**
 		Static variable GLInstances<ElementType>::CURRENT_GL_WINDOWS
 	*/
-	template<typename ElementType> size_t  GLInstances<ElementType>::CURRENT_GL_WINDOWS;
+	template<typename ElementType> size_t  GLInstances<ElementType>::current_gl_windows;
 
 	/**
 		Static variable GLInstances<ElementType>::GLPLOT
 	*/
-	template<typename ElementType> utils::GLPlot<ElementType> GLInstances<ElementType>::GLPLOT;
+	template<typename ElementType> utils::GLPlot<ElementType> GLInstances<ElementType>::glplot;
 
 	/**
 		Static variable GLInstances<ElementType>::GLPLOT
 	*/
-	template<typename ElementType> utils::GLViewer<ElementType> GLInstances<ElementType>::GLVIEWER;
+	template<typename ElementType> utils::GLViewer<ElementType> GLInstances<ElementType>::glviewer;
+
 }
 
 #endif /* UTILS_PARAMETERS_H_ */

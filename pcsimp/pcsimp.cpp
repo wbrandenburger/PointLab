@@ -80,27 +80,28 @@ int main(int argc, char* argv[]) {
 	}
 
 	glutInit(&argc, argv);
+	glutInitWindowSize(500, 500);
 
 	utils::GLInstances<float> glinstance;
 
-	glinstance.GLPLOT.setPlot(versuch);
-	glinstance.GLPLOT.setY(array_y1);
-	glinstance.GLPLOT.setY(array_y2);
-	glinstance.GLPLOT.setY(array_y3);
-	glinstance.GLPLOT.setX(array_x);
-	glinstance.GLPLOT.plot();
+	glinstance.glviewer.setViewer();
+	glinstance.glviewer.setPointcloud(pointcloud);
+	glinstance.glviewer.plot();
 
-	glinstance.GLPLOT.setPlot(versuch);
-	glinstance.GLPLOT.setY(array_y1);
-	glinstance.GLPLOT.setY(array_y2);
-	glinstance.GLPLOT.setX(array_x);
-	glinstance.GLPLOT.plot();
+	glinstance.glplot.setPlot(versuch);
+	glinstance.glplot.setY(array_y1);
+	glinstance.glplot.setY(array_y2);
+	glinstance.glplot.setY(array_y3);
+	glinstance.glplot.setX(array_x);
+	glinstance.glplot.plot();
 
-	glinstance.GLVIEWER.setViewer();
-	glinstance.GLVIEWER.setPointcloud(pointcloud);
-	glinstance.GLVIEWER.plot();
-
-	glinstance.GLPLOT.mainLoop();
+	glinstance.glplot.setPlot(versuch);
+	glinstance.glplot.setY(array_y1);
+	glinstance.glplot.setY(array_y2);
+	glinstance.glplot.setX(array_x);
+	glinstance.glplot.plot();
+	glinstance.current_gl_windows = 3;
+	glinstance.glplot.mainLoop();
 	//if (plyIO.getDataType() == 1) {
 	//	/*program<float>(cores, plyIO);*/
 	//}

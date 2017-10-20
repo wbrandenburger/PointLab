@@ -43,6 +43,46 @@
 
 namespace utils
 {
+	/** 
+
+		Providing a class which allows to visualize pointclouds
+		This pointcloud can be a instance of:
+			- pointcloud::Pointcloud<ElementType>
+			- ElementType* 
+
+		A instance of a plotting object can be called with
+			- utils::GLViewer<ElementType> viewer
+
+		This instance hold several plots which can be separate visualized.
+		To set a viewer call
+			- viewer.setViewer()
+		The setViewer() has to be called otherwise the pointclouds
+		cant be assigned.
+
+		To set the pointcloud call
+			- viewer.setPointcloud(<container>)
+
+		With the function plot()
+			- viewer.plot()
+		the data will be visualized.
+
+		To keep up a window with the results call mainLoop()
+			- viewer.mainLoop()
+		When there a other programs called which use OpenGL you have to
+		call mainLoop() once.
+
+		Example:
+		utils::GLViewer<ElementType> viewer;
+		viewer.setViewer();
+			pointcloud::Pointcloud<ElementType> pointcloud;
+			*
+			* Assigning values to pointcloud
+			*
+			viewer.setPointlcoud(pointcloud),
+		viewer.plot();
+		viewer.mainLoop();
+
+	*/
 	template<typename ElementType> class ViewerInstance
 	{
 	public: 
@@ -541,7 +581,7 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow((int)viewer_instances.getCurrentInstance() + 1);
+			glutSetWindow((int)viewer_instances.getCurrentWindow() + 1);
 
 			viewer_instances.getCurrentViewerInstance().draw();
 		};
@@ -585,7 +625,6 @@ namespace utils
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-			glutInitWindowSize(500, 500);
 
 			size_t window_index = glutCreateWindow(window_name_) - 1;
 			viewer_instances.setWindowIndex(window_index);
@@ -653,8 +692,6 @@ namespace utils
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
-			std::cout << glutGetWindow() << std::endl;
-
 			if (!state_){
 				mouse_button = button_;
 
@@ -720,7 +757,7 @@ namespace utils
 		/** 
 			Constructor
 		*/
-		StaticViewerInstance() : number_of_viewer(0), current_instance(NULL)
+		StaticViewerInstance() : number_of_viewer(0), current_instance(NULL), current_window(NULL)
 		{
 			clear();
 		}
@@ -744,6 +781,7 @@ namespace utils
 			viewer_instances.clear();
 			number_of_viewer = 0;
 			current_instance = NULL;
+			current_window = NULL;
 		}
 
 		/** 
@@ -787,6 +825,14 @@ namespace utils
 		void setCurrentInstance(size_t current_window_)
 		{
 			current_instance = viewer_indices[current_window_];
+			current_window = current_window_;
+		}
+
+		/**
+			Get current window
+		*/
+		size_t getCurrentWindow(){
+			return current_window;
 		}
 
 		/**
@@ -826,6 +872,11 @@ namespace utils
 			Current plot
 		*/
 		size_t current_instance;
+
+		/**
+			Current window
+		*/
+		size_t current_window;
 		
 		/**
 			Container which assign a instance to the windows

@@ -55,11 +55,11 @@ namespace utils
 		This instance hold several plots which can be separate visualized.
 		To set a plot call
 			- plot.setPlot(<number_of_elements>)
-		The setPlot(<number_of_elements>) has to be called otherwise the arrays c
-		ant be assigned.
+		The setPlot(<number_of_elements>) has to be called otherwise the arrays 
+		cant be assigned.
 
 		To set the values in x- and in y-direction call setX(), respectively
-		setY()
+		setY() call
 			- plot.setX(<container>)
 			- plot.setY(<container>)
 		Keep in  mind that the container have the same size. It is possible to
@@ -518,7 +518,7 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow((int) plot_instances.getCurrentInstance() + 1);
+			glutSetWindow((int) plot_instances.getCurrentWindow() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -726,6 +726,14 @@ namespace utils
 		void setCurrentInstance(size_t current_window_)
 		{
 			current_instance = plot_indices[current_window_];
+			current_window = current_window_;
+		}
+		
+		/**
+			Get current window
+		*/
+		size_t getCurrentWindow(){
+			return current_window;
 		}
 
 		/**
@@ -764,6 +772,11 @@ namespace utils
 			Current plot
 		*/
 		size_t current_instance;
+
+		/**
+			Current window
+		*/
+		size_t current_window;
 
 		/**
 			Container which assign a instance to the windows
