@@ -65,37 +65,41 @@ int main(int argc, char* argv[]) {
 	//viewer.plot();
 	//viewer.mainLoop();
 
-	int versuch = 2048;
-	int shift =  versuch / 3;
-			
-	float* array_x(new float[versuch]);
-	float* array_y1(new float[versuch]);
-	float* array_y2(new float[versuch]);
-	float* array_y3(new float[versuch]);
-	for (int i = -shift; i < versuch - shift; i++) {
-		array_x[i + shift] = (float) i;
-		array_y1[i + shift] = (float) i;
-		array_y2[i + shift] = (float) i / 2;
-		array_y3[i + shift] = (float) i*3 / 4;
-	}
-	utils::GLPlot<float> plot;
-	plot.setPlot(versuch);
-	plot.setY(array_y1);
-	plot.setY(array_y2);
-	plot.setY(array_y3);
-	plot.setX(array_x);
-	plot.plot();
+	////int versuch = 2048;
+	////int shift =  versuch / 3;
+	////		
+	////float* array_x(new float[versuch]);
+	////float* array_y1(new float[versuch]);
+	////float* array_y2(new float[versuch]);
+	////float* array_y3(new float[versuch]);
+	////for (int i = -shift; i < versuch - shift; i++) {
+	////	array_x[i + shift] = (float) i;
+	////	array_y1[i + shift] = (float) i;
+	////	array_y2[i + shift] = (float) i / 2;
+	////	array_y3[i + shift] = (float) i*3 / 4;
+	////}
+	////utils::GLPlot<float> plot;
+	////plot.setPlot(versuch);
+	////plot.setY(array_y1);
+	////plot.setY(array_y2);
+	////plot.setY(array_y3);
+	////plot.setX(array_x);
+	////plot.plot();
 
-	plot.setPlot(versuch);
-	plot.setY(array_y1);
-	plot.setY(array_y2);
-	plot.setX(array_x);
-	plot.plot();
+	////plot.setPlot(versuch);
+	////plot.setY(array_y1);
+	////plot.setY(array_y2);
+	////plot.setX(array_x);
+	////plot.plot();
+	//plot.mainLoop();
+	utils::GLInstances<float> glinstance1;
+	glinstance1.CURRENT_GL_WINDOWS++;
+	std::cout << glinstance1.CURRENT_GL_WINDOWS << std::endl;
 
-
-	plot.mainLoop();
-
-
+	utils::GLInstances<float> glinstance2;
+	glinstance1.CURRENT_GL_WINDOWS++;
+	std::cout << glinstance2.CURRENT_GL_WINDOWS << std::endl;
+	std::cout << glinstance1.CURRENT_GL_WINDOWS << std::endl;
 
 	//if (plyIO.getDataType() == 1) {
 	//	/*program<float>(cores, plyIO);*/

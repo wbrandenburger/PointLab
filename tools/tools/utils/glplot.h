@@ -31,11 +31,10 @@
 #define UTILS_GLPLOT_H_
 
 #include <vector>
+#include <map>
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-
-#include "eigen3/Eigen/Dense"
 
 #include "tools/utils/matrix.h"
 #include "tools/utils/parameters.h"
@@ -416,9 +415,9 @@ namespace utils
 	};
 
 	/**
-		Forward declaration of class StaticPlots
+		Forward declaration of class StaticPlotInstance
 	*/
-	template<typename ElementType> class StaticPlots;
+	template<typename ElementType> class StaticPlotInstance;
 
 	template<typename ElementType> class GLPlot
 	{
@@ -456,7 +455,7 @@ namespace utils
 		*/
 		void setPlot(size_t number_of_elements_)
 		{
-			plots.setPlot(number_of_elements_);
+			plot_instances.setPlot(number_of_elements_);
 		}
 
 		/**
@@ -467,7 +466,7 @@ namespace utils
 		*/
 		void setY(ElementType* y_)
 		{
-			plots.getCurrentPlotFunction().setY(y_);
+			plot_instances.getCurrentPlotFunction().setY(y_);
 		}
 
 		/**
@@ -477,7 +476,7 @@ namespace utils
 		*/
 		void setY(std::vector<ElementType>& y_)
 		{
-			plots.getCurrentPlotFunction().setY(y_);
+			plot_instances.getCurrentPlotFunction().setY(y_);
 		}
 
 		/**
@@ -487,7 +486,7 @@ namespace utils
 		*/
 		void setY(utils::Matrix<ElementType>& y_)
 		{
-			plots.getCurrentPlotFunction().setY(y_);
+			plot_instances.getCurrentPlotFunction().setY(y_);
 		}
 
 		/**
@@ -498,7 +497,7 @@ namespace utils
 
 		void setX(ElementType* x_)
 		{
-			plots.getCurrentPlotFunction().setX(x_);
+			plot_instances.getCurrentPlotFunction().setX(x_);
 		}
 
 		/**
@@ -508,7 +507,7 @@ namespace utils
 		*/
 		void setX(std::vector<ElementType>& x_)
 		{
-			plots.getCurrentPlotFunction().setX(x_);
+			plot_instances.getCurrentPlotFunction().setX(x_);
 		}
 
 		/**
@@ -518,7 +517,7 @@ namespace utils
 		*/
 		void setX(utils::Matrix<ElementType>& x_)
 		{
-			plots.getCurrentPlotFunction().setX(x_);
+			plot_instances.getCurrentPlotFunction().setX(x_);
 		}
 
 		/** 
@@ -526,14 +525,14 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow(plots.getCurrentPlot() + 1);
+			glutSetWindow(plot_instances.getCurrentPlot() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
-			plots.getCurrentPlotFunction().draw();
+			plot_instances.getCurrentPlotFunction().draw();
 			
 			glutSwapBuffers();
 			
@@ -573,9 +572,11 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Function %d", plots.getNumberOfPlots() - 1);
+				sprintf(window_name_, "Function %d", plot_instances.getNumberOfPlots() - 1);
 			}
-			plots.setCurrentPlot(glutCreateWindow(window_name_) - 1);
+
+			size_t plot_index = glutCreateWindow(window_name_);
+			plot_instances.setCurrentPlot(plot_index);
 
 			/**
 				Register GLUT callbacks.
@@ -617,12 +618,12 @@ namespace utils
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
 			if (direction_ == 1) {
-				plots.setCurrentPlot(glutGetWindow() - 1);
-				plots.getCurrentPlotFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plot_instances.setCurrentPlot(glutGetWindow() - 1);
+				plot_instances.getCurrentPlotFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
-				plots.setCurrentPlot(glutGetWindow() - 1);
-				plots.getCurrentPlotFunction().zoomOut();
+				plot_instances.setCurrentPlot(glutGetWindow() - 1);
+				plot_instances.getCurrentPlotFunction().zoomOut();
 			}
 		}
 
@@ -637,9 +638,9 @@ namespace utils
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
 			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
-				plots.setCurrentPlot(glutGetWindow() - 1);
-				std::cout << plots.getCurrentPlotFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< plots.getCurrentPlotFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+				plot_instances.setCurrentPlot(glutGetWindow() - 1);
+				std::cout << plot_instances.getCurrentPlotFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< plot_instances.getCurrentPlotFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -656,32 +657,33 @@ namespace utils
 		/**
 			Structure where the different plots are organized		
 		*/
-		static StaticPlots<ElementType> plots;
+		static StaticPlotInstance<ElementType> plot_instances;
 	};
 
 	/**
-		Plots
+		Plot Instance
 	*/
-	template<typename ElementType> class StaticPlots
+	template<typename ElementType> class StaticPlotInstance
 	{
 	public:
 		
 		/**
 			Constructor
 		*/
-		StaticPlots(void) : number_of_plots(0), current_plot(NULL) {}
+		StaticPlotInstance(void) : number_of_plots(0), current_plot(NULL) {}
 
 		/**
 			Destructor
 		*/
-		~StaticPlots() {}
+		~StaticPlotInstance() {}
 
 
 		/**
 			Clear
 		*/
 		void clear() {
-			plot.clear();
+			plot_instances.clear();
+			plot_indices.clear();
 			number_of_plots = 0;
 			current_plot = NULL;
 		}
@@ -725,7 +727,7 @@ namespace utils
 		*/
 		void setPlot(size_t number_of_elements_)
 		{
-			plot.push_back(PlotFunction<ElementType>(number_of_elements_));
+			plot_instances.push_back(PlotFunction<ElementType>(number_of_elements_));
 
 			current_plot = number_of_plots;
 			number_of_plots++;
@@ -736,7 +738,7 @@ namespace utils
 		*/
 		PlotFunction<ElementType>& getCurrentPlotFunction()
 		{
-			return plot[current_plot];
+			return plot_instances[current_plot];
 		}
 
 		/**
@@ -746,9 +748,9 @@ namespace utils
 		*/
 		std::vector<PlotFunction<ElementType>>& operator()()
 		{
-			return plot;
+			return plot_instances;
 		}
-	protected:
+	private:
 		/**
 			Number of plots
 		*/
@@ -760,15 +762,20 @@ namespace utils
 		size_t current_plot;
 
 		/**
+			Container which assign indices to the windows
+		*/
+		std::map<size_t, size_t> plot_indices;
+
+		/**
 			Structure with all plots
 		*/
-		std::vector<PlotFunction<ElementType>> plot;
+		std::vector<PlotFunction<ElementType>> plot_instances;
 	};
 
 	/**
-		Static variable  GLPlot<ElementType>::plots
+		Static variable GLPlot<ElementType>::plot_instances
 	*/
-	template<typename ElementType> StaticPlots<ElementType> GLPlot<ElementType>::plots;
+	template<typename ElementType> StaticPlotInstance<ElementType> GLPlot<ElementType>::plot_instances;
 }
 
 #endif /* UTILS_GLPLOT_H_*/	

@@ -43,8 +43,8 @@ namespace utils
 	*/
 	void colorSchemeRGB(int& r_, int& g_, int& b_, size_t index_, size_t number_of_colors_) {
 		
-		float index = (float)number_of_colors_ / 2;
-		float increment = index_ > index ? 1 / std::ceil(index) :  1 / std::floor(index);
+		float index = (float)number_of_colors_ / 2.0f;
+		float increment = index_ > index ? 1.0f / std::ceil(index) : 1.0f / std::floor(index);
 
 		if (index_ < index) {
 			r_ =  255 - (int)(255.0f * increment * (float) index_);
@@ -69,8 +69,8 @@ namespace utils
 	*/
 	void colorSchemeRGB(float& r_, float& g_, float& b_, size_t index_, size_t number_of_colors_) {
 
-		float index = (float)number_of_colors_ / 2;
-		float increment = index_ > index ? 1 / std::ceil(index) : 1 / std::floor(index);
+		float index = (float)number_of_colors_ / 2.0f;
+		float increment = index_ > index ? 1.0f / std::ceil(index) : 1.0f / std::floor(index);
 
 		if (index_ < index) {
 			r_ = 1.0f - increment * (float) index_;
@@ -82,6 +82,42 @@ namespace utils
 			g_ = 1.0f - increment * (float)index_;
 			b_ = increment * (float) index_;
 		}
+	}
+
+	/**
+		Computes a color scheme within the range of red and blue
+
+		@param[in,out] r_ Red
+		@param[in,out] g_ Green
+		@param[in,out] b_ Blue
+		@param[in,out] index_ Index
+		@param[in,out] number_of_colors_ Number of Colors 
+	*/
+	void colorSchemeRG(int& r_, int& g_, int& b_, size_t index_, size_t number_of_colors_) {
+		
+		float increment =  1.0f / (float) number_of_colors_;
+
+		r_ =  255 - (int)(255.0f * increment * (float) index_);
+		g_ = (int)(255.0f * increment * (float) index_);
+		b_ = 0;
+	}
+
+	/**
+		Computes a color scheme within the range of red and blue
+
+		@param[in,out] r_ Red
+		@param[in,out] g_ Green
+		@param[in,out] b_ Blue
+		@param[in,out] index_ Index
+		@param[in,out] number_of_colors_ Number of Colors
+	*/
+	void colorSchemeRG(float& r_, float& g_, float& b_, size_t index_, size_t number_of_colors_) {
+
+		float increment = 1.0f / (float) number_of_colors_;
+
+		r_ = 1.0f - increment * (float) index_;
+		g_ = increment * (float) index_;
+		b_ = 0.0f;
 	}
 
 }
