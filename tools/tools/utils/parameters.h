@@ -36,7 +36,7 @@
 namespace utils
 {
 	template<typename ElementType> class GLPlot;
-
+	template<typename ElementType> class GLViewer;
 	template<typename ElementType> class GLInstances
 	{
 	public:

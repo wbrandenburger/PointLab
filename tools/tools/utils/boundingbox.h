@@ -185,7 +185,7 @@ namespace utils
 		*/
 		ElementType getMiddle(size_t dim_) const
 		{
-			return (max[dim_] + min[dim_]) / 2.0;
+			return (max[dim_] + min[dim_]) / (ElementType)2.0;
 		}
 
 		/**

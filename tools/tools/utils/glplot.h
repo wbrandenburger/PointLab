@@ -257,12 +257,8 @@ namespace utils
 		{
 			float zoom_factor = 0.05f;
 
-			size_t temp_index_left = (size_t)index_left + (float)x_ / float(width_) * zoom_factor*((float)index_right - (float)index_left);
-			size_t temp_index_right = (size_t)index_right - (float(width_) - (float)x_) / float(width_) * zoom_factor*((float)index_right - (float)index_left);
-
-			index_left = temp_index_left;
-			index_right = temp_index_right;
-
+			index_left = index_left + (float)x_ / float(width_) * zoom_factor*(index_right - index_left);
+			index_right = index_right - ((float)width_ - (float)x_) / float(width_) * zoom_factor*(index_right - index_left);
 		}
 
 		/**
@@ -330,8 +326,8 @@ namespace utils
 			/**
 				Draw the functions
 			*/
-			glScalef(1.0 / (index_right - index_left), 1.0 / (y2 - y1), 1.0);
-			glTranslatef(0.0, -y1, 0.0);
+			glScalef(1.0f / (index_right - index_left), 1.0f / (y2 - y1), 1.0f);
+			glTranslatef(0.0f, -y1, 0.0f);
 			
 			/**
 				Init the GL state
@@ -347,8 +343,8 @@ namespace utils
 
 				glBegin(GL_LINE_STRIP);
 
-				for (size_t j = index_left; j < index_right; j++) {
-					glVertex2f(j-index_left, y[i][j]);
+				for (size_t j = (size_t) index_left; j < (size_t) index_right; j++) {
+					glVertex2f((float)j-index_left, y[i][j]);
 				}
 
 				glEnd();
@@ -429,10 +425,7 @@ namespace utils
 		*/	
 		GLPlot()
 		{
-			int argc = 0; char** argv;
-			glutInit(&argc, argv);
-			
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+
 
 			clear();
 		}
@@ -466,7 +459,7 @@ namespace utils
 		*/
 		void setY(ElementType* y_)
 		{
-			plot_instances.getCurrentPlotFunction().setY(y_);
+			plot_instances.getCurrentInstanceFunction().setY(y_);
 		}
 
 		/**
@@ -476,7 +469,7 @@ namespace utils
 		*/
 		void setY(std::vector<ElementType>& y_)
 		{
-			plot_instances.getCurrentPlotFunction().setY(y_);
+			plot_instances.getCurrentInstanceFunction().setY(y_);
 		}
 
 		/**
@@ -486,7 +479,7 @@ namespace utils
 		*/
 		void setY(utils::Matrix<ElementType>& y_)
 		{
-			plot_instances.getCurrentPlotFunction().setY(y_);
+			plot_instances.getCurrentInstanceFunction().setY(y_);
 		}
 
 		/**
@@ -497,7 +490,7 @@ namespace utils
 
 		void setX(ElementType* x_)
 		{
-			plot_instances.getCurrentPlotFunction().setX(x_);
+			plot_instances.getCurrentInstanceFunction().setX(x_);
 		}
 
 		/**
@@ -507,7 +500,7 @@ namespace utils
 		*/
 		void setX(std::vector<ElementType>& x_)
 		{
-			plot_instances.getCurrentPlotFunction().setX(x_);
+			plot_instances.getCurrentInstanceFunction().setX(x_);
 		}
 
 		/**
@@ -517,7 +510,7 @@ namespace utils
 		*/
 		void setX(utils::Matrix<ElementType>& x_)
 		{
-			plot_instances.getCurrentPlotFunction().setX(x_);
+			plot_instances.getCurrentInstanceFunction().setX(x_);
 		}
 
 		/** 
@@ -525,14 +518,14 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow(plot_instances.getCurrentPlot() + 1);
+			glutSetWindow((int) plot_instances.getCurrentInstance() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity(); 
 
-			plot_instances.getCurrentPlotFunction().draw();
+			plot_instances.getCurrentInstanceFunction().draw();
 			
 			glutSwapBuffers();
 			
@@ -575,9 +568,11 @@ namespace utils
 				sprintf(window_name_, "Function %d", (int) plot_instances.getNumberOfPlots() - 1);
 			}
 
-			size_t plot_index = glutCreateWindow(window_name_)-1;
-			plot_instances.setIndex(plot_index);
-			plot_instances.setCurrentPlot(plot_index);
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+
+			size_t window_index = glutCreateWindow(window_name_)-1;
+			plot_instances.setWindowIndex(window_index);
+			plot_instances.setCurrentInstance(window_index);
 
 			/**
 				Register GLUT callbacks.
@@ -619,12 +614,12 @@ namespace utils
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
 			if (direction_ == 1) {
-				plot_instances.setCurrentPlot(glutGetWindow() - 1);
-				plot_instances.getCurrentPlotFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+				plot_instances.setCurrentInstance(glutGetWindow() - 1);
+				plot_instances.getCurrentInstanceFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
-				plot_instances.setCurrentPlot(glutGetWindow() - 1);
-				plot_instances.getCurrentPlotFunction().zoomOut();
+				plot_instances.setCurrentInstance(glutGetWindow() - 1);
+				plot_instances.getCurrentInstanceFunction().zoomOut();
 			}
 		}
 
@@ -639,9 +634,9 @@ namespace utils
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
 			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
-				plot_instances.setCurrentPlot(glutGetWindow() - 1);
-				std::cout << plot_instances.getCurrentPlotFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< plot_instances.getCurrentPlotFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+				plot_instances.setCurrentInstance(glutGetWindow() - 1);
+				std::cout << plot_instances.getCurrentInstanceFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< plot_instances.getCurrentInstanceFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -671,7 +666,7 @@ namespace utils
 		/**
 			Constructor
 		*/
-		StaticPlotInstance(void) : number_of_plots(0), current_plot(NULL) {}
+		StaticPlotInstance(void) : number_of_plots(0), current_instance(NULL) {}
 
 		/**
 			Destructor
@@ -686,7 +681,19 @@ namespace utils
 			plot_instances.clear();
 			plot_indices.clear();
 			number_of_plots = 0;
-			current_plot = NULL;
+			current_instance = NULL;
+		}
+		/**
+			Set plot
+
+			@param[in] number_of_elements_ Number of elements
+		*/
+		void setPlot(size_t number_of_elements_)
+		{
+			plot_instances.push_back(PlotFunction<ElementType>(number_of_elements_));
+
+			current_instance = number_of_plots;
+			number_of_plots++;
 		}
 
 		/**
@@ -708,46 +715,33 @@ namespace utils
 		/**
 			Get current plot
 		*/
-		size_t getCurrentPlot()
+		size_t getCurrentInstance()
 		{
-			return current_plot;
+			return current_instance;
 		}
 
 		/**
 			Set current plot
 		*/
-		void setCurrentPlot(size_t current_window_)
+		void setCurrentInstance(size_t current_window_)
 		{
-			current_plot = plot_indices[current_window_];
-		}
-
-		/**
-			Set plot
-
-			@param[in] number_of_elements_ Number of elements
-		*/
-		void setPlot(size_t number_of_elements_)
-		{
-			plot_instances.push_back(PlotFunction<ElementType>(number_of_elements_));
-
-			current_plot = number_of_plots;
-			number_of_plots++;
+			current_instance = plot_indices[current_window_];
 		}
 
 		/**
 			Assign a window index with an plot index
 		*/
-		void setIndex(size_t window_index) 
+		void setWindowIndex(size_t window_index_) 
 		{
-			plot_indices[window_index] = number_of_plots-1;
+			plot_indices[window_index_] = number_of_plots-1;
 		}
 
 		/**
 			Get current plotfunction
 		*/
-		PlotFunction<ElementType>& getCurrentPlotFunction()
+		PlotFunction<ElementType>& getCurrentInstanceFunction()
 		{
-			return plot_instances[current_plot];
+			return plot_instances[current_instance];
 		}
 
 		/**
@@ -769,10 +763,10 @@ namespace utils
 		/**
 			Current plot
 		*/
-		size_t current_plot;
+		size_t current_instance;
 
 		/**
-			Container which assign indices to the windows
+			Container which assign a instance to the windows
 		*/
 		std::map<size_t, size_t> plot_indices;
 

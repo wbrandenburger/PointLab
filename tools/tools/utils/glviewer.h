@@ -30,6 +30,9 @@
 #ifndef UTILS_GLVIEWER_H_
 #define UTILS_GLVIEWER_H_
 
+#include <map>
+#include <vector>
+
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <GL/freeglut.h>
@@ -179,14 +182,14 @@ namespace utils
 			Zoom in
 		*/
 		void zoomIn() {
-			gl_zoom = gl_zoom * 1.1;
+			gl_zoom = gl_zoom * (ElementType) 1.1;
 		}
 
 		/**
 			Zoom in
 		*/
 		void zoomOut() {
-			gl_zoom = gl_zoom / 1.1;
+			gl_zoom = gl_zoom / (ElementType) 1.1;
 		}
 
 		/**
@@ -241,7 +244,7 @@ namespace utils
 				glEnableClientState(GL_NORMAL_ARRAY);
 			}
 			//glEnableClientState(GL_INDEX_ARRAY);
-			glIndexPointer
+
 				glLoadIdentity();
 
 				/**
@@ -263,7 +266,7 @@ namespace utils
 				/**
 					Determine the size of the points
 				*/
-				glPointSize(gl_pointsize);
+				glPointSize((GLfloat) gl_pointsize);
 
 				/**
 					Link the points, colors and normals for drawing
@@ -275,7 +278,7 @@ namespace utils
 				if (normals) {
 					glNormalPointer(GL_FLOAT, 0, normals);
 				}
-				glDrawArrays(GL_POINTS, 0, number_of_elements);
+				glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
 				//////std::vector<GLuint> indices;
 				//////// populate vertices
 				//////glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));
@@ -359,7 +362,7 @@ namespace utils
 				/**
 					Determine the size of the points
 				*/
-				glPointSize(gl_pointsize);
+				glPointSize((GLfloat)gl_pointsize);
 
 								/**
 					Link the points, colors and normals for drawing
@@ -371,7 +374,7 @@ namespace utils
 				if (normals) {
 					glNormalPointer(GL_DOUBLE, 0, normals);
 				}
-				glDrawArrays(GL_POINTS, 0, number_of_elements);
+				glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
 				//////std::vector<GLuint> indices;
 				//////// populate vertices
 				//////glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));
@@ -489,11 +492,6 @@ namespace utils
 		{
 			clear();
 
-			int argc = 0;  char** argv;
-			glutInit(&argc, argv);
-			
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-
 			if (!std::is_same<float,ElementType>::value && !std::is_same<double, ElementType>::value){
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
@@ -543,9 +541,7 @@ namespace utils
 		*/
 		static void redraw(void)
 		{
-
-
-			glutSetWindow(viewer_instances.getCurrentInstance() + 1);
+			glutSetWindow((int)viewer_instances.getCurrentInstance() + 1);
 
 			viewer_instances.getCurrentViewerInstance().draw();
 		};
@@ -585,11 +581,15 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Pointcloud %d", viewer_instances.getNumberOfViewer() - 1);
+				sprintf(window_name_, "Pointcloud %d", (int) viewer_instances.getNumberOfViewer() - 1);
 			}
 
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 			glutInitWindowSize(500, 500);
-			viewer_instances.setCurrentInstance(glutCreateWindow(window_name_) - 1);
+
+			size_t window_index = glutCreateWindow(window_name_) - 1;
+			viewer_instances.setWindowIndex(window_index);
+			viewer_instances.setCurrentInstance(window_index);
 
 			/**
 				Register GLUT callbacks.
@@ -653,6 +653,8 @@ namespace utils
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
+			std::cout << glutGetWindow() << std::endl;
+
 			if (!state_){
 				mouse_button = button_;
 
@@ -782,9 +784,17 @@ namespace utils
 		/**
 			Set current instance
 		*/
-		void setCurrentInstance(size_t current_instance_)
+		void setCurrentInstance(size_t current_window_)
 		{
-			current_instance = current_instance_;
+			current_instance = viewer_indices[current_window_];
+		}
+
+		/**
+			Assign a window index with an plot index
+		*/
+		void setWindowIndex(size_t window_index_) 
+		{
+			viewer_indices[window_index_] = number_of_viewer-1;
 		}
 
 		/** 
@@ -816,6 +826,11 @@ namespace utils
 			Current plot
 		*/
 		size_t current_instance;
+		
+		/**
+			Container which assign a instance to the windows
+		*/
+		std::map<size_t, size_t> viewer_indices;
 
 		/**
 			Structure with all viewer

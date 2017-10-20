@@ -79,6 +79,8 @@ int main(int argc, char* argv[]) {
 		array_y3[i + shift] = (float) i*3 / 4;
 	}
 
+	glutInit(&argc, argv);
+
 	utils::GLInstances<float> glinstance;
 
 	glinstance.GLPLOT.setPlot(versuch);
@@ -94,9 +96,11 @@ int main(int argc, char* argv[]) {
 	glinstance.GLPLOT.setX(array_x);
 	glinstance.GLPLOT.plot();
 
+	glinstance.GLVIEWER.setViewer();
+	glinstance.GLVIEWER.setPointcloud(pointcloud);
+	glinstance.GLVIEWER.plot();
+
 	glinstance.GLPLOT.mainLoop();
-
-
 	//if (plyIO.getDataType() == 1) {
 	//	/*program<float>(cores, plyIO);*/
 	//}
