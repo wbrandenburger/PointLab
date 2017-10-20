@@ -68,10 +68,10 @@ int main(int argc, char* argv[]) {
 	int versuch = 2048;
 	int shift =  versuch / 3;
 			
-	std::vector<float> array_x(versuch);
-	std::vector<float> array_y1(versuch);
-	std::vector<float> array_y2(versuch);
-	std::vector<float> array_y3(versuch);
+	float* array_x(new float[versuch]);
+	float* array_y1(new float[versuch]);
+	float* array_y2(new float[versuch]);
+	float* array_y3(new float[versuch]);
 	for (int i = -shift; i < versuch - shift; i++) {
 		array_x[i + shift] = i;
 		array_y1[i + shift] = i;
@@ -80,18 +80,17 @@ int main(int argc, char* argv[]) {
 	}
 	utils::GLPlotVector<float> plot;
 	plot.setPlot();
-	plot.setY(array_y1);
-	plot.setY(array_y2);
-	plot.setY(array_y3);
-	plot.setX(array_x);
+	plot.setY(array_y1,versuch);
+	plot.setY(array_y2, versuch);
+	plot.setY(array_y3, versuch);
+	plot.setX(array_x, versuch);
 	plot.plot();
 
-	//utils::GLPlotVector<float> plot2;
-	//plot2.setPlot();
-	//plot2.setY(array_y1);
-	//plot2.setY(array_y2);
-	//plot2.setX(array_x);
-	//plot2.plot();
+	plot.setPlot();
+	plot.setY(array_y1, versuch);
+	plot.setY(array_y2, versuch);
+	plot.setX(array_x, versuch);
+	plot.plot();
 
 	plot.mainLoop();
 
