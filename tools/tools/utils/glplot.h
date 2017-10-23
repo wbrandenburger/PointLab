@@ -30,14 +30,14 @@
 #ifndef UTILS_GLPLOT_H_
 #define UTILS_GLPLOT_H_
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include <GL/glew.h>
+#include <GL/GL.h>
 #include <GL/freeglut.h>
 
 #include "tools/utils/matrix.h"
-#include "tools/utils/parameters.h"
 
 namespace utils
 {
@@ -422,7 +422,7 @@ namespace utils
 
 		/**
 			Constructor
-		*/	
+		*/
 		GLPlot()
 		{
 
@@ -433,7 +433,7 @@ namespace utils
 		/**
 			Destructor
 		*/
-		~GLPlot() 
+		~GLPlot()
 		{
 			clear();
 		}
@@ -455,7 +455,6 @@ namespace utils
 			Set y-values
 
 			@param[in] y_ y-values
-			@param[in] number_of_elements_ Number of elements
 		*/
 		void setY(ElementType* y_)
 		{
@@ -465,7 +464,7 @@ namespace utils
 		/**
 			Set y-values
 
-			@param[in] y_ y-values	
+			@param[in] y_ y-values
 		*/
 		void setY(std::vector<ElementType>& y_)
 		{
@@ -475,7 +474,7 @@ namespace utils
 		/**
 			Set y-values
 
-			@param[in] y_ y-values	
+			@param[in] y_ y-values
 		*/
 		void setY(utils::Matrix<ElementType>& y_)
 		{
@@ -513,26 +512,26 @@ namespace utils
 			plot_instances.getCurrentInstanceFunction().setX(x_);
 		}
 
-		/** 
-			Redrawing function 
+		/**
+			Redrawing function
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow((int) plot_instances.getCurrentWindow() + 1);
+			glutSetWindow((int)plot_instances.getCurrentWindow() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity(); 
+			glLoadIdentity();
 
 			plot_instances.getCurrentInstanceFunction().draw();
-			
+
 			glutSwapBuffers();
-			
+
 		};
 
-		/**  
-			Redisplays, if called 
+		/**
+			Redisplays, if called
 		*/
 		static void idle(void)
 		{
@@ -541,7 +540,7 @@ namespace utils
 
 		/**
 			Changes the size of the window
-			
+
 			@param[in] width_ The new Width of the window
 			@param[in] height_ The new Height of the window
 		*/
@@ -555,22 +554,22 @@ namespace utils
 			glOrtho(0, 1, 0, 1, -1, 1);
 			glMatrixMode(GL_MODELVIEW);
 		}
-				
+
 		/**
 			Creates the window and sets the callback functions
-			
+
 			@param[in] window_name_ Name of the window
 		*/
 		void plot(char* window_name_ = nullptr)
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Function %d", (int) plot_instances.getNumberOfPlots() - 1);
+				sprintf(window_name_, "Function %d", (int)plot_instances.getNumberOfPlots() - 1);
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 
-			size_t window_index = glutCreateWindow(window_name_)-1;
+			size_t window_index = glutCreateWindow(window_name_) - 1;
 			plot_instances.setWindowIndex(window_index);
 			plot_instances.setCurrentInstance(window_index);
 
@@ -606,7 +605,7 @@ namespace utils
 		/**
 			Callback for mouse wheel
 
-			@param[in] button_ 
+			@param[in] button_
 			@param[in] direction_ Direction in which the wheel is turned: 1 for up and -1 for down
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
@@ -651,7 +650,7 @@ namespace utils
 	public:
 
 		/**
-			Structure where the different plots are organized		
+			Structure where the different plots are organized
 		*/
 		static StaticPlotInstance<ElementType> plot_instances;
 	};
@@ -662,7 +661,7 @@ namespace utils
 	template<typename ElementType> class StaticPlotInstance
 	{
 	public:
-		
+
 		/**
 			Constructor
 		*/
@@ -728,20 +727,20 @@ namespace utils
 			current_instance = plot_indices[current_window_];
 			current_window = current_window_;
 		}
-		
+
 		/**
 			Get current window
 		*/
-		size_t getCurrentWindow(){
+		size_t getCurrentWindow() {
 			return current_window;
 		}
 
 		/**
 			Assign a window index with an plot index
 		*/
-		void setWindowIndex(size_t window_index_) 
+		void setWindowIndex(size_t window_index_)
 		{
-			plot_indices[window_index_] = number_of_plots-1;
+			plot_indices[window_index_] = number_of_plots - 1;
 		}
 
 		/**
@@ -755,7 +754,7 @@ namespace utils
 		/**
 			Operator()
 
-		@	return plot Structure with plots
+			@	return plot Structure with plots
 		*/
 		std::vector<PlotFunction<ElementType>>& operator()()
 		{
@@ -767,7 +766,7 @@ namespace utils
 			Number of plots
 		*/
 		size_t  number_of_plots;
-		
+
 		/**
 			Current plot
 		*/

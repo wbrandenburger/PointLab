@@ -30,49 +30,258 @@
 #ifndef UTILS_PARAMETERS_H_
 #define UTILS_PARAMETERS_H_
 
-#include "tools/utils/glplot.h"
-#include "tools/utils/glviewer.h"
+#include <vector>
+
+#include <Windows.h>
+
+#include "tools/utils/matrix.h"
+#include "tools/utils/windowspec.h"
 
 namespace utils
 {
+	/**
+		Forward declaration of class GLPLot
+	*/
 	template<typename ElementType> class GLPlot;
+
+	/**
+		Forward declaration of class GLViewer
+	*/
 	template<typename ElementType> class GLViewer;
-	template<typename ElementType> class GLInstances
+
+	enum struct GLInstance {
+		NONE = 0,
+		GLVIEWER = 1,
+		GLPLOT = 2
+	};
+
+	template<typename ElementType> class GLView
 	{
 	public:
 		/**
 			Constructor
 		*/
-		GLInstances()
+		GLView()
 		{
-			if (!current_gl_windows) {
-				current_gl_windows = 0;
-			}
 		}
 
 		/**
 			Destructor
 		*/
-		~GLInstances()
+		~GLView()
 		{
 		}
 
+		/**
+			Initializes a viewer and sets a instance of a container, where the data can be assigned
+		*/
+		void setViewer()
+		{
+			glviewer.setViewer();
+
+			current_instance = GLInstance::GLVIEWER;
+		}
 
 		/**
-		
-			
+			Initializes a graph plot and sets a instance of a container, where the data can be assigned
+
+			@param[in] number_of_elements_ Number of elements
 		*/
-		void getWindowSpecification(size_t index_x_, size_t index_y_, size_t index_, 
-			size_t& x_, size_t& y_, size_t& width_, size_t& height_)
-		{	
-			int width = GetSystemMetrics(SM_CXSCREEN);
-			int height = GetSystemMetrics(SM_CYSCREEN);
+		void setPlot(size_t number_of_elements_)
+		{
+			glplot.setPlot(number_of_elements_);
 
+			current_instance = GLInstance::GLPLOT;
+		}
 
+		/**
+			Sets the x-data array for plotting
+
+			@param[in] x_ x-values
+		*/
+		void setX(ElementType* x_)
+		{
+			if (current_instance == GLInstance::GLVIEWER) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot.setX(x_);
+		}
+
+		/**
+			Sets the x-data array for plotting
+
+			@param[in] y_ y-values
+		*/
+		void setX(std::vector<ElementType>& x_)
+		{
+			if (current_instance == GLInstance::GLVIEWER) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot.setX(x_);
+		}
+		
+		/**
+			Sets the x-data array for plotting
+
+			@param[in] y_ y-values
+		*/
+		void setX(utils::Matrix<ElementType>& x_)
+		{
+			if (current_instance == GLInstance::GLVIEWER) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot.setX(x_);
+		}
+
+		/**
+			Sets the y-data array for plotting
+
+			@param[in] y_ y-values
+		*/
+		void setY(ElementType* y_)
+		{
+			if (current_instance == GLInstance::GLVIEWER) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot.setY(y_);
+		}
+
+		/**
+			Sets the x-data array for plotting
+
+			@param[in] y_ y-values
+		*/
+		void setY(std::vector<ElementType>& y_)
+		{
+			if (current_instance == GLInstance::GLVIEWER) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot.setY(y_);
+		}
+		
+		/**
+			Sets the x-data array for plotting
+
+			@param[in] y_ y-values
+		*/
+		void setY(utils::Matrix<ElementType>& y_)
+		{
+			if (current_instance == GLInstance::GLVIEWER) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot.setY(y_);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		{
+			if (current_instance == GLInstance::GLPLOT) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glviewer.setPointcloud(pointcloud_);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] points_ Pointcloud
+			@param[in] colors_ Colors
+			@param[in] normals_ Normals
+			@param[in] number_of_elements_ Number of elements
+		*/
+		void setPointcloud(ElementType* points_, unsigned char* color_,
+			ElementType* normals_, size_t number_of_elements_) 
+		{
+			if (current_instance == GLInstance::GLPLOT) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glviewer.setPointcloud(points_, color_, normals_, number_of_elements_);
+		}
+
+		/**
+			Creates the window and sets the callback functions	
+		*/
+		void plot()
+		{
+			switch (current_instance) {
+			case GLInstance::GLVIEWER:	
+				glviewer.plot(); 
+				break;
+			case GLInstance::GLPLOT:	
+				glplot.plot(); 
+				break;
+			default:	
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;	
+				std::exit(EXIT_FAILURE);
+				break;
+			}
+			current_instance = GLInstance::NONE;
+		}
+
+		/**
+			Creates a subwindow and sets the callback functions	
+		*/
+		void subPlot(size_t windows_x_, size_t windows_y_, size_t index_)
+		{
+			size_t screen_width = (size_t) GetSystemMetrics(SM_CXSCREEN);
+			size_t screen_height = (size_t) GetSystemMetrics(SM_CYSCREEN);
+
+			size_t index_window_x = index_ % windows_x_;
+			size_t index_window_y = index_ / windows_x_;
+
+			size_t width = screen_width / windows_x_;
+			size_t height = screen_height / windows_y_;
+
+			size_t position_x = width * index_window_x;
+			size_t position_y = height * index_window_y;
+
+			utils::WindowSpec window_spec(position_x, position_y, width, height);
+
+			//switch (current_instance) {
+			//case GLInstance::GLVIEWER:
+			//	glviewer.plot();
+			//	break;
+			//case GLInstance::GLPLOT:
+			//	glplot.plot();
+			//	break;
+			//default:
+			//	std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+			//	std::exit(EXIT_FAILURE);
+			//	break;
+			//}
+			//current_instance = GLInstance::NONE;
+		}
+
+		/**
+			Start the loop
+		*/
+		void mainLoop()
+		{
+			glutMainLoop();
 		}
 
 	private:
-	public:
+		
 		/**
 			Number of called windows
 		*/
@@ -82,26 +291,32 @@ namespace utils
 			Instance of plotting tool
 		*/
 		static utils::GLPlot<ElementType> glplot;
+		
 		/**
 			Instance of viewer tool
 		*/
 		static utils::GLViewer<ElementType> glviewer;
+
+		/**
+			Current instance
+		*/
+		GLInstance current_instance;
 	};
 
 	/**
-		Static variable GLInstances<ElementType>::CURRENT_GL_WINDOWS
+		Static variable GLView<ElementType>::current_gl_windows
 	*/
-	template<typename ElementType> size_t  GLInstances<ElementType>::current_gl_windows;
+	template<typename ElementType> size_t  GLView<ElementType>::current_gl_windows = 0;
 
 	/**
-		Static variable GLInstances<ElementType>::GLPLOT
+		Static variable GLView<ElementType>::glplot
 	*/
-	template<typename ElementType> utils::GLPlot<ElementType> GLInstances<ElementType>::glplot;
+	template<typename ElementType> utils::GLPlot<ElementType> GLView<ElementType>::glplot;
 
 	/**
-		Static variable GLInstances<ElementType>::GLPLOT
+		Static variable GLView<ElementType>::glviewer
 	*/
-	template<typename ElementType> utils::GLViewer<ElementType> GLInstances<ElementType>::glviewer;
+	template<typename ElementType> utils::GLViewer<ElementType> GLView<ElementType>::glviewer;
 
 }
 

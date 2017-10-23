@@ -359,7 +359,7 @@ namespace trees
 			@param[in,out] max_elem_ Maximal value
 
 		*/
-		void computeMinMax(size_t* ind_, int count_, int dim_, ElementType& min_elem_, ElementType& max_elem_)
+		void computeMinMax(size_t* ind_, int count_, size_t dim_, ElementType& min_elem_, ElementType& max_elem_)
 		{
 			min_elem_ = dataset_points[ind_[0]][dim_];
 			max_elem_ = dataset_points[ind_[0]][dim_];
@@ -411,7 +411,7 @@ namespace trees
 					span = max_elem - min_elem;
 					if (span>max_span) {
 						max_span = span;
-						cutfeat_ = i;
+						cutfeat_ = (int) i;
 						cutval_ = (min_elem + max_elem) / 2;
 					}
 				}

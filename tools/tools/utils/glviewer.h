@@ -144,16 +144,16 @@ namespace utils
 		/**
 			Set pointcloud
 
-			@param[in] pointcloud_ Pointcloud
+			@param[in] points_ Points
 			@param[in] colors_ Colors
 			@param[in] normals_ Normals
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPointcloud(ElementType* pointcloud_, unsigned char* color_, 
+		void setPointcloud(ElementType* points_, unsigned char* color_, 
 			ElementType* normals_, size_t number_of_elements_)
 		{
-			if (pointcloud_) {
-				points = pointcloud_;
+			if (points_) {
+				points = points_;
 			}
 			if (color_) {
 				color = color_;
