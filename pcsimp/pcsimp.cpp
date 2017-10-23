@@ -13,6 +13,8 @@
 #include "tools/math.h"
 #include "tools/pointcloud.h"
 
+#include "trees/trees.hpp"
+
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
@@ -109,8 +111,9 @@ int main(int argc, char* argv[]) {
 	//	/*program<double>(cores, plyIO);*/
 	//}
 
-
-
+	utils::Matrix<float> matrix;
+	pointcloud.getMatrix(matrix);
+	trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
 	//utils::Timer time;
 	//
 	//io::PlyIO plyIO;
