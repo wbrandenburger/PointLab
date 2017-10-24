@@ -609,11 +609,11 @@ namespace utils
 			glViewport(0, 0, width_, height_);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			if (height_ < width_) {
-				glOrtho(0.0, 1.0, 0.0, (double)height_ / (double)width_, -1.0, 1.0);
+			if (height_ > width_) {
+				glOrtho(0.0, 1.0,0.0, (double)height_ / (double)width_, -1.0, 1.0);
 			}
 			else{
-				glOrtho(0.0, (double)width_ / (double)height_, 0.0, 1.0, -1.0, 1.0);
+				glOrtho(0.0, (double)width_ / (double)height_,0.0, 1.0, -1.0, 1.0);
 			}
 			glMatrixMode(GL_MODELVIEW);
 		}
@@ -669,7 +669,7 @@ namespace utils
 			switch (key_) {		
 			case '+': viewer_instances.getCurrentViewerInstance().increasePointSize(); break;
 			case '-': viewer_instances.getCurrentViewerInstance().decreasePointSize(); break;
-			case 27: exit(0); break;
+			case 27	: glutLeaveMainLoop(); break;
 			}
 		};
 

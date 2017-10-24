@@ -603,7 +603,9 @@ namespace utils
 		*/
 		static void key(unsigned char key_, int x_, int y_)
 		{
-			if (key_ == 27) { exit(0); }
+			switch (key_) {
+			case 27: glutLeaveMainLoop(); break;
+			}
 		};
 
 		/**

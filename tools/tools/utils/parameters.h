@@ -37,19 +37,13 @@
 #include "tools/utils/matrix.h"
 #include "tools/utils/windowspec.h"
 
+#include "tools/utils/glplot.h"
+#include "tools/utils/glviewer.h"
+
 namespace utils
 {
-	/**
-		Forward declaration of class GLPLot
-	*/
-	template<typename ElementType> class GLPlot;
-
-	/**
-		Forward declaration of class GLViewer
-	*/
-	template<typename ElementType> class GLViewer;
-
-	enum struct GLInstance {
+	enum struct GLInstance 
+	{
 		NONE = 0,
 		GLVIEWER = 1,
 		GLPLOT = 2
@@ -63,6 +57,12 @@ namespace utils
 		*/
 		GLView()
 		{
+			int argc = 0;
+			char** argv;
+			
+			glutInit(&argc, argv);
+
+			glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 		}
 
 		/**
@@ -71,6 +71,11 @@ namespace utils
 		~GLView()
 		{
 		}
+
+		/**
+			Copy constructor
+		*/
+		GLView(const GLView<ElementType>& glview_) = delete;
 
 		/**
 			Initializes a viewer and sets a instance of a container, where the data can be assigned
@@ -281,11 +286,6 @@ namespace utils
 		}
 
 	private:
-		
-		/**
-			Number of called windows
-		*/
-		static size_t current_gl_windows;
 
 		/**
 			Instance of plotting tool
@@ -302,11 +302,6 @@ namespace utils
 		*/
 		GLInstance current_instance;
 	};
-
-	/**
-		Static variable GLView<ElementType>::current_gl_windows
-	*/
-	template<typename ElementType> size_t  GLView<ElementType>::current_gl_windows = 0;
 
 	/**
 		Static variable GLView<ElementType>::glplot

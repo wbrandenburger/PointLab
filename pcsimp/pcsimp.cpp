@@ -81,9 +81,6 @@ int main(int argc, char* argv[]) {
 		array_y3[i + shift] = (float) i*3 / 4;
 	}
 
-	glutInit(&argc, argv);
-	glutInitWindowSize(500, 500);
-
 	utils::GLView<float> glview;
 
 	glview.setViewer();
@@ -114,6 +111,9 @@ int main(int argc, char* argv[]) {
 	utils::Matrix<float> matrix;
 	pointcloud.getMatrix(matrix);
 	trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
+
+	std::cout << "NOCH NICHT" << std::endl;
+
 	//utils::Timer time;
 	//
 	//io::PlyIO plyIO;
