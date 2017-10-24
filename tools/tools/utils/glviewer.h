@@ -246,10 +246,13 @@ namespace utils
 		/**
 			Rotate
 		*/
-		void rotate(int x_, int y_)
+		void rotate(int x_old_, int y_old_, int x_new_, int y_new_)
 		{
-			gl_rot_x = gl_rot_x + (float)x_*0.5f;
-			gl_rot_y = gl_rot_y + (float)y_*0.5f;
+			/**
+				Compute the radius of the imaginary sphere
+			*/
+			gl_rot_x = gl_rot_x + (float)(x_new_ - x_old_)*0.5f;
+			gl_rot_y = gl_rot_y + (float)(y_new_ - y_old_)*0.5f;
 		}
 
 		/**
@@ -720,16 +723,20 @@ namespace utils
 		*/
 		static void mouseMotion(int x_, int y_)
 		{
-			int x_difference;
-			int y_difference;
-
-			mouse_position.setPosition(x_, y_, x_difference, y_difference);
 			if (mouse_button == GLUT_LEFT_BUTTON){
-				viewer_instances.getCurrentViewerInstance().rotate(x_difference, y_difference);
+				viewer_instances.getCurrentViewerInstance().rotate(mouse_position.getX(), 
+					mouse_position.getY(), x_, y_);
+				
+				mouse_position.setPosition(x_, y_);
 			}
 			else if (mouse_button == GLUT_MIDDLE_BUTTON) {
+				mouse_position.setPosition(x_, y_);
 			}
 			else if (mouse_button == GLUT_RIGHT_BUTTON) {
+				int x_difference;
+				int y_difference;
+
+				mouse_position.setPosition(x_, y_, x_difference, y_difference);
 				viewer_instances.getCurrentViewerInstance().translate(x_difference, y_difference);
 			}
 		}
