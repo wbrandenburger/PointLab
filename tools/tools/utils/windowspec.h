@@ -36,8 +36,9 @@
 
 namespace utils
 {
-	struct WindowSpec
+	class WindowSpec
 	{
+	public:
 		/**
 			Constructor
 		*/
@@ -81,6 +82,48 @@ namespace utils
 			width = width_;
 			height = height_;
 		}
+
+		/**
+			Get window position in x-direction
+
+			@return Window position in x-direction
+		*/
+		size_t getPositionX()
+		{
+			return position_x;
+		}
+
+		/**
+			Get window position in y-direction
+
+			@return Window position in y-direction
+		*/
+		size_t getPositionY()
+		{
+			return position_y;
+		}
+
+		/**
+			Get width of the window
+
+			@return Width of the window
+		*/
+		size_t getWidth()
+		{
+			return width;
+		}
+
+		/**
+			Get height of the window
+
+			@return Height of the window
+		*/
+		size_t getHeight()
+		{
+			return height;
+		}
+
+	private:
 
 		/**
 			Window position in x-direction

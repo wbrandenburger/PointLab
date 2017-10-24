@@ -38,6 +38,7 @@
 #include <GL/freeglut.h>
 
 #include "tools/utils/matrix.h"
+#include "tools/utils/windowspec.h"
 
 namespace utils
 {
@@ -551,7 +552,7 @@ namespace utils
 			glViewport(0, 0, width_, height_);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			glOrtho(0, 1, 0, 1, -1, 1);
+			glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 			glMatrixMode(GL_MODELVIEW);
 		}
 
@@ -560,7 +561,7 @@ namespace utils
 
 			@param[in] window_name_ Name of the window
 		*/
-		void plot(char* window_name_ = nullptr)
+		void plot(char* window_name_ = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
@@ -568,6 +569,9 @@ namespace utils
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+
+			glutInitWindowSize((int)window_spec.getWidth(), (int)window_spec.getHeight());
+			glutInitWindowPosition((int)window_spec.getPositionX(), (int)window_spec.getPositionY());
 
 			size_t window_index = glutCreateWindow(window_name_) - 1;
 			plot_instances.setWindowIndex(window_index);

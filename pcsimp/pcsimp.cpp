@@ -88,24 +88,20 @@ int main(int argc, char* argv[]) {
 
 	glview.setViewer();
 	glview.setPointcloud(pointcloud);
-	glview.plot();
+	glview.subPlot(2, 2, 0);
 
 	glview.setPlot(versuch);
 	glview.setY(array_y1);
 	glview.setY(array_y2);
 	glview.setY(array_y3);
 	glview.setX(array_x);
-	glview.plot();
+	glview.subPlot(2, 2, 1);
 
 	glview.setPlot(versuch);
 	glview.setY(array_y1);
 	glview.setY(array_y2);
 	glview.setX(array_x);
-	glview.plot();
-
-	glview.subPlot(3, 3, 8);
-	glview.subPlot(4, 2, 3);
-	glview.subPlot(6, 1, 3);
+	glview.subPlot(2, 2, 2);
 
 	glview.mainLoop();
 	//if (plyIO.getDataType() == 1) {

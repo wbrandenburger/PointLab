@@ -257,19 +257,19 @@ namespace utils
 
 			utils::WindowSpec window_spec(position_x, position_y, width, height);
 
-			//switch (current_instance) {
-			//case GLInstance::GLVIEWER:
-			//	glviewer.plot();
-			//	break;
-			//case GLInstance::GLPLOT:
-			//	glplot.plot();
-			//	break;
-			//default:
-			//	std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-			//	std::exit(EXIT_FAILURE);
-			//	break;
-			//}
-			//current_instance = GLInstance::NONE;
+			switch (current_instance) {
+			case GLInstance::GLVIEWER:
+				glviewer.plot(nullptr, window_spec);
+				break;
+			case GLInstance::GLPLOT:
+				glplot.plot(nullptr, window_spec);
+				break;
+			default:
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+				break;
+			}
+			current_instance = GLInstance::NONE;
 		}
 
 		/**
