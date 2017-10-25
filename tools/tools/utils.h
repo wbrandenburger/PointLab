@@ -1,7 +1,9 @@
 /***********************************************************************
 * Software License Agreement (BSD License)
 *
-* Copyright 2017  Wolfgang Brandenburger. All rights reserved.
+* Copyright 2017	Wolfgang Brandenburger
+*					(w.brandenburger@unibw.de).
+*					All rights reserved.
 *
 * THE BSD LICENSE
 *
@@ -37,12 +39,12 @@
 #include "utils/color.h"
 #include "utils/dist.h"
 #include "utils/glplot.h"
+#include "utils/glview.h"
 #include "utils/glviewer.h"
 #include "utils/heap.h"
 #include "utils/matrix.h"
 #include "utils/mouseposition.h"
 #include "utils/queue.h"
-#include "utils/parameters.h"
 #include "utils/pca.h"
 #include "utils/plot.h"
 #include "utils/randomize.h"

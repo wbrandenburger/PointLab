@@ -33,5 +33,6 @@
 #include "pointcloud/features.h"
 #include "pointcloud/normal.h"
 #include "pointcloud/pointcloud.h"
+#include "pointcloud/quaterion.h"
 
 #endif /* INCLUDE_POINTCLOUD_H_ */

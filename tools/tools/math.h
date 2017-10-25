@@ -30,8 +30,8 @@
 #ifndef INCLUDE_MATH_H_
 #define INCLUDE_MATH_H_
 
-#include "math/function.h"
 #include "math/adjustment.h"
+#include "math/function.h"
 #include "math/zero.h"
 
 #endif /* INCLUDE_MATH_H_ */
