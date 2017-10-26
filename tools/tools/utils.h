@@ -39,6 +39,7 @@
 #include "utils/color.h"
 #include "utils/dist.h"
 #include "utils/glplot.h"
+#include "utils/glplot3d.h"
 #include "utils/glview.h"
 #include "utils/glviewer.h"
 #include "utils/heap.h"

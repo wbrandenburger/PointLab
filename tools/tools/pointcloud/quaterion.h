@@ -120,12 +120,10 @@ namespace pointcloud
 
 			@param[in] Quaterion_ An instance of class Quaterion
 		*/
-		Quaterion(Quaterion<ElementType>&& quaterion_) : v(nullptr)
+		Quaterion(const Quaterion<ElementType>&& quaterion_) : v(nullptr)
 		{
 			v = new ElementType[4];
 			std::memcpy(v, quaterion_.getQuaterion(), sizeof(ElementType) * 4);
-
-			quaterion_.clear();
 		};
 
 		/**
@@ -147,14 +145,12 @@ namespace pointcloud
 	
 			@param[in] class_ An instance of class Quaterion
 		*/
-		Quaterion& operator=(Quaterion<ElementType>&& quaterion_)
+		Quaterion& operator=(const Quaterion<ElementType>&& quaterion_)
 		{
 			clear();
 
 			v = new ElementType[4];
 			std::memcpy(v, quaterion_.getQuaterion(), sizeof(ElementType) * 4);
-
-			quaterion_.clear();
 
 			return *this;
 		};

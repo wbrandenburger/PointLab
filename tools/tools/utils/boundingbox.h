@@ -92,6 +92,22 @@ namespace utils
 			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
 			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
 		}
+		
+		/**
+			Copy Constructor
+
+			@param[in] bounding_box_ Bounding Box
+		*/
+		BoundingBox(const BoundingBox<ElementType>&& bounding_box_) : min(nullptr), max(nullptr), dim(NULL)
+		{
+			dim = bounding_box_.getDim();
+
+			min = new ElementType[dim];
+			max = new ElementType[dim];
+
+			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
+			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
+		}
 
 		/**
 			Operator =
@@ -99,6 +115,26 @@ namespace utils
 			@param[in] bounding_box_ Bounding Box
 		*/
 		BoundingBox& operator=(const BoundingBox<ElementType>& bounding_box_)
+		{
+			clear();
+
+			dim = bounding_box_.getDim();
+
+			min = new ElementType[dim];
+			max = new ElementType[dim];
+
+			std::memcpy(min, bounding_box_.getMin(), sizeof(ElementType)*dim);
+			std::memcpy(max, bounding_box_.getMax(), sizeof(ElementType)*dim);
+
+			return (*this);
+		}
+
+		/**
+			Operator =
+
+			@param[in] bounding_box_ Bounding Box
+		*/
+		BoundingBox& operator=(const BoundingBox<ElementType>&& bounding_box_)
 		{
 			clear();
 
@@ -128,6 +164,37 @@ namespace utils
 				max = nullptr;
 			}
 			dim = NULL;
+		}
+
+		/**
+			Set the bounding box
+
+			@param[in] dataset_ Dataset
+			@param[in] number_of_elements_ Number of elements
+			@param[in] dim_ Specific dimension
+		*/
+		void setBoundingBox(ElementType* dataset_, size_t number_of_elements, size_t dim_)
+		{
+			if (dim && dim != dim_) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+			
+			dim = dim_;
+			
+			if (!min) {
+				min = new ElementType[dim];
+				std::memcpy(min, dataset_, sizeof(ElementType)*dim);
+			}
+			if (!max) {
+				max = new ElementType[dim];
+				std::memcpy(max, dataset_, sizeof(ElementType)*dim);
+			}
+
+			for (size_t i = 0; i < number_of_elements * dim; i++ )
+			{
+				setCompareValue(dataset_[i], i % dim);
+			}
 		}
 
 		/**
