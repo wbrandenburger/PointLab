@@ -100,7 +100,10 @@ namespace utils
 		/**
 			Destructor
 		*/
-		~ViewerInstance() {}
+		~ViewerInstance() 
+		{
+			clear();
+		}
 
 		/**
 			Clear
