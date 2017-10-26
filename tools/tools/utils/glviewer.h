@@ -273,16 +273,6 @@ namespace utils
 		void rotate(int x_old_, int y_old_, int x_new_, int y_new_)
 		{
 			/**
-				Normalize the coordinates
-			*/
-			int width = glutGet(GLUT_WINDOW_WIDTH);
-			int height = glutGet(GLUT_WINDOW_HEIGHT);
-
-			ElementType x_old = (ElementType)x_old_ / (ElementType)width;
-			ElementType y_old = (ElementType)y_old_ / (ElementType)height;
-			ElementType x_new = (ElementType)x_new_ / (ElementType)width;
-			ElementType y_new = (ElementType)y_new_ / (ElementType)height;
-			/**
 				Compute the radius of the imaginary sphere
 			*/
 			ElementType max_x = gl_center_x > (ElementType)0.5 ? gl_center_x : (ElementType)1.0 - gl_center_x;
@@ -290,11 +280,20 @@ namespace utils
 
 			ElementType radius_sqr = max_x*max_x + max_y*max_y;
 
-			std::cout << radius_sqr;
+			/**
+				Normalize the coordinates
+			*/
+			int width = glutGet(GLUT_WINDOW_WIDTH);
+			int height = glutGet(GLUT_WINDOW_HEIGHT);
+
+			ElementType x_old = (ElementType)x_old_ / (ElementType)width - gl_center_x;
+			ElementType y_old = (ElementType)y_old_ / (ElementType)height - gl_center_y;
+			ElementType x_new = (ElementType)x_new_ / (ElementType)width - gl_center_x;
+			ElementType y_new = (ElementType)y_new_ / (ElementType)height - gl_center_y;
 
 			ElementType z_old = std::sqrt(radius_sqr - x_old*x_old - y_old*y_old);
 			ElementType z_new = std::sqrt(radius_sqr - x_new*x_new - y_new*y_new);
-			std::cout << z_old << z_new << std::endl;
+
 			/**
 				Compute the rotation axis
 			*/
@@ -302,9 +301,16 @@ namespace utils
 			ElementType y = z_new*x_old - x_new*z_old;
 			ElementType z = x_new*y_old - y_new*x_old;
 
-			ElementType w = std::asin(sqrt(x*x + y*y + z*z) / radius_sqr)*(ElementType)100.0;
-			std::cout << w << " " << x << " " << y << " " << z << std::endl;
+			ElementType n = std::sqrt(x*x + y*y + z*z);
+			x = x / n; y = y / n; z = z/n;
+			ElementType w = 0.1;
+			//std::cout << w << " " << x << " " << y << " " << z << std::endl;
+			/*
+			if (x_new_ > 0 && x_new_ < width && y_new_ > 0 && y_new_ < height) {
+			std::acos((x_new*x_old + y_new*y_old + z_new*z_old) /
+			(std::sqrt(x_new*x_new + y_new*y_new + z_new*z_new) * std::sqrt(x_old*x_old + y_old*y_old + z_old*z_old)));*/
 			pointcloud::Quaterion<ElementType> quaterion_new(w, x, y, z);
+			
 			quaterion *= quaterion_new;
 
 			/**
@@ -373,10 +379,10 @@ namespace utils
 
 				float gl_rot_x_, gl_rot_y_, gl_rot_z_;
 				quaterion.getEulerAngles(gl_rot_x_, gl_rot_y_, gl_rot_z_);
-
-				glRotatef(-1.0f* toDeg<ElementType>(gl_rot_x_), 0.0, 1.0f, 0.0);
-				glRotatef( 1.0f *toDeg<ElementType>(gl_rot_y_), 0.0, 0.0, 1.0f);
-
+				//std::cout << toDeg<ElementType>(gl_rot_x_) << " " << toDeg<ElementType>(gl_rot_y_) << " " << toDeg<ElementType>(gl_rot_z_) << std::endl;
+				glRotatef( -1.0f *toDeg<ElementType>(gl_rot_x_), 1.0f, 0.0, 0.0);
+				glRotatef( 1.0f *toDeg<ElementType>(gl_rot_y_), 0.0, 1.0f, 0.0);
+				glRotatef( 1.0f *toDeg<ElementType>(gl_rot_z_), 0.0, 0.0, 1.0f);
 				/**
 					Determine the size of the points
 				*/
