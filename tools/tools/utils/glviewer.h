@@ -154,22 +154,11 @@ namespace utils
 			Set pointcloud
 
 			@param[in] points_ Points
-			@param[in] colors_ Colors
-			@param[in] normals_ Normals
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPointcloud(ElementType* points_, unsigned char* color_, 
-			ElementType* normals_, size_t number_of_elements_)
+		void setPointcloud(ElementType* points_, size_t number_of_elements_)
 		{
-			if (points_) {
-				points = points_;
-			}
-			if (color_) {
-				color = color_;
-			}
-			if ( normals_) {
-				normals = normals_  ;
-			}
+			points = points_;
 
 			number_of_elements = number_of_elements_;
 
@@ -625,6 +614,18 @@ namespace utils
 		{
 			viewer_instances.getCurrentViewerInstance().setPointcloud(pointcloud_);
 		}
+
+		/**
+			Set pointcloud
+
+			@param[in] points_ Pointcloud
+			@param[in] number_of_elements_ Number of elements
+		*/
+		void setPointcloud(ElementType* points_, size_t number_of_elements_) 
+		{
+			viewer_instances.getCurrentViewerInstance().setPointcloud(points_, number_of_elements);
+		}
+
 
 		/** 
 			Redrawing function 

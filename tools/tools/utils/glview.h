@@ -38,15 +38,17 @@
 #include "tools/utils/windowspec.h"
 
 #include "tools/utils/glplot.h"
+#include "tools/utils/glplot3d.h"
 #include "tools/utils/glviewer.h"
 
 namespace utils
 {
-	enum struct GLInstance 
+	enum struct GLInstance
 	{
 		NONE = 0,
 		GLVIEWER = 1,
-		GLPLOT = 2
+		GLPLOT = 2,
+		GLPLOT3D = 3
 	};
 
 	template<typename ElementType> class GLView
@@ -123,13 +125,23 @@ namespace utils
 		}
 
 		/**
+			Initializes a viewer for a plot in 3d and sets a instance of a container, where the data can be assigned
+		*/
+		void setPlot3D()
+		{
+			glplot3d.setPlot3D();
+
+			current_instance = GLInstance::GLPLOT3D;
+		}
+
+		/**
 			Sets the x-data array for plotting
 
 			@param[in] x_ x-values
 		*/
 		void setX(ElementType* x_)
 		{
-			if (current_instance == GLInstance::GLVIEWER) {
+			if (current_instance != GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -144,7 +156,7 @@ namespace utils
 		*/
 		void setX(std::vector<ElementType>& x_)
 		{
-			if (current_instance == GLInstance::GLVIEWER) {
+			if (current_instance != GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -159,7 +171,7 @@ namespace utils
 		*/
 		void setX(utils::Matrix<ElementType>& x_)
 		{
-			if (current_instance == GLInstance::GLVIEWER) {
+			if (current_instance != GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -174,7 +186,7 @@ namespace utils
 		*/
 		void setY(ElementType* y_)
 		{
-			if (current_instance == GLInstance::GLVIEWER) {
+			if (current_instance != GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -189,7 +201,7 @@ namespace utils
 		*/
 		void setY(std::vector<ElementType>& y_)
 		{
-			if (current_instance == GLInstance::GLVIEWER) {
+			if (current_instance != GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -204,7 +216,7 @@ namespace utils
 		*/
 		void setY(utils::Matrix<ElementType>& y_)
 		{
-			if (current_instance == GLInstance::GLVIEWER) {
+			if (current_instance != GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -219,7 +231,7 @@ namespace utils
 		*/
 		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			if (current_instance == GLInstance::GLPLOT) {
+			if (current_instance != GLInstance::GLVIEWER) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
@@ -231,19 +243,16 @@ namespace utils
 			Set pointcloud
 
 			@param[in] points_ Pointcloud
-			@param[in] colors_ Colors
-			@param[in] normals_ Normals
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPointcloud(ElementType* points_, unsigned char* color_,
-			ElementType* normals_, size_t number_of_elements_) 
+		void setPointcloud(ElementType* points_, size_t number_of_elements_) 
 		{
 			if (current_instance == GLInstance::GLPLOT) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
 
-			glviewer.setPointcloud(points_, color_, normals_, number_of_elements_);
+			glviewer.setPointcloud(points_, number_of_elements_);
 		}
 
 		/**
@@ -321,6 +330,11 @@ namespace utils
 		static utils::GLViewer<ElementType> glviewer;
 
 		/**
+			Instance of plotting in 3d
+		*/
+		static utils::GLPlot3D<ElementType> glplot3d;
+
+		/**
 			Current instance
 		*/
 		GLInstance current_instance;
@@ -335,6 +349,11 @@ namespace utils
 		Static variable GLView<ElementType>::glviewer
 	*/
 	template<typename ElementType> utils::GLViewer<ElementType> GLView<ElementType>::glviewer;
+
+	/**
+		Static variable GLPlot3D<ElementType>::glplot3d
+	*/
+	template<typename ElementType> utils::GLPlot3D<ElementType> GLView<ElementType>::glplot3d;
 
 }
 
