@@ -36,12 +36,12 @@ namespace pointcloud
 {
 	typedef unsigned char uchar;
 
-
 	enum PointcloudFlags
 	{
 		POINTCLOUD_POINTS = 1 << 0,
 		POINTCLOUD_COLORS = 1 << 1,
 		POINTCLOUD_NORMALS = 1 << 2,
+		POINTCLOUD_INDICES = 1 << 3
 	};
 
 	template<typename ElementType> class Pointcloud 
@@ -59,6 +59,7 @@ namespace pointcloud
 			point_flag = (flags_ & 1 << 0) > 0;
 			color_flag = (flags_ & 1 << 1) > 0;
 			normal_flag = (flags_ & 1 << 2) > 0;
+			index_flag = (flags_ & 1 << 3) > 0;
 		}
 		
 		/**
@@ -72,6 +73,7 @@ namespace pointcloud
 			point_flag = (flags_ & 1 << 0) > 0 ;
 			color_flag = (flags_ & 1 << 1) > 0;
 			normal_flag = (flags_ & 1 << 2) > 0;
+			index_flag = (flags_ & 1 << 3) > 0;
 		}
 
 		/**
@@ -356,6 +358,16 @@ namespace pointcloud
 			return normal_flag;
 		}
 
+		/**
+			Returns true if indices are set
+
+			@return True if indices are set 
+		*/
+		bool isIndex() const
+		{
+			return index_flag;
+		}
+
 	protected:
 		/**
 			Rows
@@ -381,6 +393,11 @@ namespace pointcloud
 			Flag for normals
 		*/
 		bool normal_flag;
+
+		/**
+			Flag for indices
+		*/
+		bool index_flag;
 	};
 		
 	template<typename ElementType> struct PointcloudNode 

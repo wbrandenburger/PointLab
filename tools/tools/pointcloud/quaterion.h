@@ -32,19 +32,13 @@
 #ifndef POINTCLOUD_QUATERION_H_
 #define POINTCLOUD_QUATERION_H_
 
-#include "eigen3/Eigen/Dense"
+#include "tools/math/angle.h"
 
 namespace pointcloud
 {
-	/**
-		Constant pi
-	*/
-	const double PI = 3.14159265359;
-
 	template<typename ElementType> class Quaterion
 	{
 	public:
-
 		/**
 			Constructor
 		*/
@@ -354,15 +348,9 @@ namespace pointcloud
 		*/
 		void setEulerAnglePrivate(ElementType x_, ElementType y_, ElementType z_)
 		{
-			while (x_ < -(ElementType)PI || x_ >(ElementType)PI) {
-				x_ += x_ < -(ElementType)PI ? (ElementType)PI : -(ElementType)PI;
-			}
-			while (y_ < -(ElementType)PI || y_ >(ElementType)PI) {
-				y_ += y_ < -(ElementType)PI ? (ElementType)PI : -(ElementType)PI;
-			}
-			while (z_ < -(ElementType)PI || z_ >(ElementType)PI) {
-				z_ += z_ < -(ElementType)PI ? (ElementType)PI : -(ElementType)PI;
-			}
+			x_ = math::inPI(x_);
+			y_ = math::inPI(y_);
+			z_ = math::inPI(z_);
 
 			ElementType cx = std::cos(x_ * (ElementType)0.5);
 			ElementType sx = std::sin(x_ * (ElementType)0.5);

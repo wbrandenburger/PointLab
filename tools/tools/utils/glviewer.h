@@ -39,6 +39,8 @@
 #include <GL/GL.h>
 #include <GL/freeglut.h>
 
+#include "tools/math/angle.h"
+
 #include "tools/utils/boundingbox.h"
 #include "tools/pointcloud/quaterion.h"
 #include "tools/utils/mouseposition.h"
@@ -49,7 +51,6 @@
 namespace utils
 {
 	/** 
-
 		Providing a class which allows to visualize pointclouds
 		This pointcloud can be a instance of:
 			- pointcloud::Pointcloud<ElementType>
@@ -86,29 +87,7 @@ namespace utils
 			viewer.setPointlcoud(pointcloud),
 		viewer.plot();
 		viewer.mainLoop();
-
 	*/
-
-	/**
-		Constant pi
-	*/
-	const double PI = 3.14159265359;
-
-	/**
-		Conversion radian to degree
-	*/
-	template<typename ElementType> inline ElementType toDeg(ElementType angle_)
-	{
-		return angle_ * (ElementType)180.0 / (ElementType)PI;
-	}
-
-	/**
-		Conversion degree to radian
-	*/
-	template<typename ElementType> inline ElementType toRad(ElementType angle_)
-	{
-		return angle_ / (ElementType)180.0 * (ElementType)PI;
-	}
 
 	template<typename ElementType> class ViewerInstance
 	{
@@ -369,9 +348,9 @@ namespace utils
 				*/
 				float gl_rot_x, gl_rot_y, gl_rot_z;
 				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotatef( -1.0f *toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotatef(  1.0f *toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotatef(  1.0f *toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+				glRotatef( -1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotatef(  1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotatef(  1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
 				/**
 					Determine the size of the points
@@ -469,9 +448,9 @@ namespace utils
 				*/
 				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
 				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotated(-1.0f *toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotated( 1.0f *toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotated( 1.0f *toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+				glRotated(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotated( 1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotated( 1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
 				/**
 					Determine the size of the points

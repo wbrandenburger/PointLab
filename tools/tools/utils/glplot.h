@@ -45,7 +45,6 @@
 namespace utils
 {
 	/** 
-
 		Providing a class which allows to plot the values of a array.
 		This array can be a instance of:
 			- std::vector<ElementType>
@@ -91,7 +90,6 @@ namespace utils
 			plot.setX(array_x);
 		plot.plot();
 		plot.mainLoop();
-
 	*/
 
 	template<typename ElementType> class PlotFunction
