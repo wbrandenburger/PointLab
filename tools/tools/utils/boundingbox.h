@@ -241,7 +241,7 @@ namespace utils
 		Operator << Prints the values of the bounding box
 
 		@param[in,out] out_ Outstream in which the bounding box will be printed
-		@param[in] bounding_box Bounding box which shall be printed
+		@param[in] bounding_box_ Bounding box which shall be printed
 	*/
 	template<typename ElementType>
 	std::ostream& operator<<(std::ostream& out_, const utils::BoundingBox<ElementType>& bounding_box_)

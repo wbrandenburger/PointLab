@@ -390,7 +390,7 @@ namespace pointcloud
 		Operator << Prints the values of the quaterion
 
 		@param[in,out] out_ Outstream in which the quaterion box will be printed
-		@param[in] quaterion Quaterion which shall be printed
+		@param[in] quaterion_ Quaterion which shall be printed
 	*/
 	template<typename ElementType>
 	std::ostream& operator<<(std::ostream& out_, const pointcloud::Quaterion<ElementType>& quaterion_)

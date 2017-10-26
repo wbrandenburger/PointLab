@@ -219,9 +219,6 @@ namespace utils
 			}
 
 			gl_zoom = 1.0;
-
-			gl_rot_x = 0.0;
-			gl_rot_y = 0.0;
 		}
 
 		/**
@@ -286,44 +283,37 @@ namespace utils
 			int width = glutGet(GLUT_WINDOW_WIDTH);
 			int height = glutGet(GLUT_WINDOW_HEIGHT);
 
-			ElementType x_old = (ElementType)x_old_ / (ElementType)width - gl_center_x;
-			ElementType y_old = (ElementType)y_old_ / (ElementType)height - gl_center_y;
-			ElementType x_new = (ElementType)x_new_ / (ElementType)width - gl_center_x;
-			ElementType y_new = (ElementType)y_new_ / (ElementType)height - gl_center_y;
+			if (x_new_ > 0 && x_new_ < width && y_new_ > 0 && y_new_ < height && 
+				!(x_new_ - x_old_ == 0 && y_new_ - y_old_ == 0) ) {
 
-			ElementType z_old = std::sqrt(radius_sqr - x_old*x_old - y_old*y_old);
-			ElementType z_new = std::sqrt(radius_sqr - x_new*x_new - y_new*y_new);
+				ElementType x_old = (ElementType)x_old_ / (ElementType)width - gl_center_x;
+				ElementType y_old = (ElementType)y_old_ / (ElementType)height - gl_center_y;
+				ElementType x_new = (ElementType)x_new_ / (ElementType)width - gl_center_x;
+				ElementType y_new = (ElementType)y_new_ / (ElementType)height - gl_center_y;
 
-			/**
-				Compute the rotation axis
-			*/
-			ElementType x = y_new*z_old - z_new*y_old;
-			ElementType y = z_new*x_old - x_new*z_old;
-			ElementType z = x_new*y_old - y_new*x_old;
+				ElementType z_old = std::sqrt(radius_sqr - x_old*x_old - y_old*y_old);
+				ElementType z_new = std::sqrt(radius_sqr - x_new*x_new - y_new*y_new);
+				/**
+					Compute the rotation axis
+				*/
+				ElementType x = y_new*z_old - z_new*y_old;
+				ElementType y = z_new*x_old - x_new*z_old;
+				ElementType z = x_new*y_old - y_new*x_old;
+				
+				/**
+					Normalie the axis
+				*/
+				ElementType n = std::sqrt(x*x + y*y + z*z);
+				x /= n; y /= n; z /= n;
 
-			ElementType n = std::sqrt(x*x + y*y + z*z);
-			x = x / n; y = y / n; z = z/n;
-			ElementType w = 0.1;
-			//std::cout << w << " " << x << " " << y << " " << z << std::endl;
-			/*
-			if (x_new_ > 0 && x_new_ < width && y_new_ > 0 && y_new_ < height) {
-			std::acos((x_new*x_old + y_new*y_old + z_new*z_old) /
-			(std::sqrt(x_new*x_new + y_new*y_new + z_new*z_new) * std::sqrt(x_old*x_old + y_old*y_old + z_old*z_old)));*/
-			pointcloud::Quaterion<ElementType> quaterion_new(w, x, y, z);
-			
-			quaterion *= quaterion_new;
+				/** 
+					Computation of rotation angle
+				*/
+				ElementType w = (ElementType)5.0 * std::acos((x_new*x_old + y_new*y_old + z_new*z_old) /
+				(std::sqrt(x_new*x_new + y_new*y_new + z_new*z_new) * std::sqrt(x_old*x_old + y_old*y_old + z_old*z_old)));
 
-			/**
-				Compute the radius of the imaginary sphere
-			*/
-
-			//pointcloud::Quaterion<ElementType> q(toRad<ElementType>((ElementType)(x_new_-x_old_)*(ElementType)0.5),
-			//	toRad<ElementType>((ElementType)(y_new_ - y_old_)*(ElementType)0.5), (ElementType) 0.0);
-
-			//quaterion *= q;
-
-			//gl_rot_x = gl_rot_x + (float)(x_new_ - x_old_)*0.5f;
-			//gl_rot_y = gl_rot_y + (float)(y_new_ - y_old_)*0.5f;
+				gl_quaterion *= pointcloud::Quaterion<ElementType>(w, x, y, z);
+			}
 		}
 
 		/**
@@ -369,20 +359,20 @@ namespace utils
 
 				glScalef(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
 				/**
-					Translate the pointlcoud by the chosen centerpoint
+					Translate the pointcloud by the chosen centerpoint
 				*/
 
 				glTranslatef(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+				
 				/**
 					Roatate the entire pointcloud around the x- and y-axis
 				*/
+				float gl_rot_x, gl_rot_y, gl_rot_z;
+				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+				glRotatef( -1.0f *toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotatef(  1.0f *toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotatef(  1.0f *toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
-				float gl_rot_x_, gl_rot_y_, gl_rot_z_;
-				quaterion.getEulerAngles(gl_rot_x_, gl_rot_y_, gl_rot_z_);
-				//std::cout << toDeg<ElementType>(gl_rot_x_) << " " << toDeg<ElementType>(gl_rot_y_) << " " << toDeg<ElementType>(gl_rot_z_) << std::endl;
-				glRotatef( -1.0f *toDeg<ElementType>(gl_rot_x_), 1.0f, 0.0, 0.0);
-				glRotatef( 1.0f *toDeg<ElementType>(gl_rot_y_), 0.0, 1.0f, 0.0);
-				glRotatef( 1.0f *toDeg<ElementType>(gl_rot_z_), 0.0, 0.0, 1.0f);
 				/**
 					Determine the size of the points
 				*/
@@ -473,16 +463,20 @@ namespace utils
 				*/
 
 				glTranslated(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+				
 				/**
 					Roatate the entire pointcloud around the x- and y-axis
 				*/
-				glRotated(-1.0*gl_rot_x, 0.0, 1.0, 0.0);
-				glRotated( 1.0*gl_rot_y, 0.0, 0.0, 1.0);
+				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
+				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+				glRotated(-1.0f *toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotated( 1.0f *toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotated( 1.0f *toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
 				/**
 					Determine the size of the points
 				*/
-				glPointSize((GLfloat)gl_pointsize);
+				glPointSize((GLdouble)gl_pointsize);
 
 								/**
 					Link the points, colors and normals for drawing
@@ -574,14 +568,9 @@ namespace utils
 		ElementType gl_center_z;
 		
 		/**
-			Rotation in x-direction
+			Quaterion
 		*/
-		ElementType gl_rot_x;
-		
-		/**
-			Rotation in x-direction
-		*/
-		ElementType gl_rot_y;
+		pointcloud::Quaterion<ElementType> gl_quaterion;
 		
 		/**
 			Point size
@@ -592,11 +581,6 @@ namespace utils
 			Zoom factor
 		*/
 		ElementType gl_zoom;
-
-
-
-		pointcloud::Quaterion<ElementType> quaterion;
-
 	};
 
 	/**
@@ -790,8 +774,6 @@ namespace utils
 				mouse_position.setPosition(x_, y_);
 			}
 			else {
-
-				std::cout << x_ << " " << y_ << std::endl;
 				mouse_button = NULL;
 			}
 
