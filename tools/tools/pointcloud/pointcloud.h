@@ -54,7 +54,7 @@ namespace pointcloud
 			
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(unsigned char flags_) : rows(0), cols(3)
+		Pointcloud(unsigned char flags_) : number_of_elements(0), cols(3)
 		{
 			point_flag = (flags_ & 1 << 0) > 0;
 			color_flag = (flags_ & 1 << 1) > 0;
@@ -65,10 +65,10 @@ namespace pointcloud
 		/**
 			Constructor
 
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(size_t rows_, unsigned char flags_) : rows(rows_), cols(3) 
+		Pointcloud(size_t number_of_elements_, unsigned char flags_) : number_of_elements(number_of_elements_), cols(3) 
 		{
 			point_flag = (flags_ & 1 << 0) > 0 ;
 			color_flag = (flags_ & 1 << 1) > 0;
@@ -84,12 +84,12 @@ namespace pointcloud
 		/**
 			Set dimension
 
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] cols_ Cols
 		*/
-		void setDimension(size_t rows_)
+		void setDimension(size_t number_of_elements_)
 		{
-			rows = rows_;
+			number_of_elements = number_of_elements_;
 		}
 		
 		/**
@@ -100,10 +100,10 @@ namespace pointcloud
 		/**
 			Set pointcloud
 
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] cols_ Cols
 		*/
-		virtual void setPointcloud(size_t rows_) = 0;
+		virtual void setPointcloud(size_t number_of_elements_) = 0;
 
 		/**
 			Clear
@@ -222,13 +222,13 @@ namespace pointcloud
 		virtual void setColor(uchar color_, size_t row_, size_t col_) = 0;
 
 		/**
-			Get Rows
+			Get Number of elements
 			
-			@return Rows
+			@return Number of elements
 		*/
-		size_t getRows() const
+		size_t getNumberOfElements() const
 		{
-			return rows;
+			return number_of_elements;
 		}
 		
 		/**
@@ -370,9 +370,9 @@ namespace pointcloud
 
 	protected:
 		/**
-			Rows
+			Number of elements
 		*/
-		size_t rows;
+		size_t number_of_elements;
 		
 		/**
 			Cols
@@ -629,25 +629,25 @@ namespace pointcloud
 		/**
 			Constructor
 
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS(size_t rows_, unsigned char flags_) : Pointcloud(rows_, flags_)
+		PointcloudAoS(size_t number_of_elements_, unsigned char flags_) : Pointcloud(number_of_elements_, flags_)
 		{
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 		}
 
 		/**
 			Constructor
 
 			@param[in] points_ Points
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS(ElementType* points_, size_t rows_, unsigned char flags_) 
-			: Pointcloud(rows_, flags_)
+		PointcloudAoS(ElementType* points_, size_t number_of_elements_, unsigned char flags_) 
+			: Pointcloud(number_of_elements_, flags_)
 		{
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 			setPoints(points_);
 		}
 
@@ -657,13 +657,13 @@ namespace pointcloud
 			@param[in] points_ Points
 			@param[in] normals_ Normals
 			@param[in] colors_ Colors
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, unsigned char flags_)
-			: Pointcloud(rows_, flags_) 
+		PointcloudAoS(ElementType* points_, ElementType* normals_, uchar* colors_, size_t number_of_elements_, unsigned char flags_)
+			: Pointcloud(number_of_elements_, flags_) 
 		{
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 			setPoints(points_);
 			setNormals(normals_);
 			setColors(colors_);
@@ -684,12 +684,12 @@ namespace pointcloud
 		*/
 		PointcloudAoS(const PointcloudAoS<ElementType>& pointcloud_)
 		{
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -703,12 +703,12 @@ namespace pointcloud
 		*/
 		PointcloudAoS(const PointcloudSoA<ElementType>& pointcloud_)
 		{
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -724,12 +724,12 @@ namespace pointcloud
 		{
 			clear();
 
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -747,12 +747,12 @@ namespace pointcloud
 		{
 			clear();
 
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -768,22 +768,22 @@ namespace pointcloud
 		{
 			clear();
 
-			pointcloud = new PointcloudNode<ElementType> [rows];
+			pointcloud = new PointcloudNode<ElementType> [number_of_elements];
 		}
 		
 		/**
 			Set pointcloud
 			
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] cols_ Cols
 		*/
-		void setPointcloud(size_t rows_)
+		void setPointcloud(size_t number_of_elements_)
 		{
 			clear();
 
-			rows = rows_;
+			number_of_elements = number_of_elements_;
 
-			pointcloud = new PointcloudNode<ElementType>[rows];
+			pointcloud = new PointcloudNode<ElementType>[number_of_elements];
 		}
 
 		/**
@@ -791,7 +791,7 @@ namespace pointcloud
 		*/
 		void clear()
 		{
-			rows = 0;
+			number_of_elements = 0;
 
 			if (pointcloud) delete[] pointcloud;
 		}
@@ -807,7 +807,7 @@ namespace pointcloud
 			subset_.setPointcloud(list_.size());
 			
 			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= rows) {
+				if (list_[i] >= number_of_elements) {
 					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 					std::exit(EXIT_FAILURE);
 				}				
@@ -828,7 +828,7 @@ namespace pointcloud
 			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= rows) {
+				if (list_[i] >= number_of_elements) {
 					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 					std::exit(EXIT_FAILURE);
 				}
@@ -877,7 +877,7 @@ namespace pointcloud
 		*/
 		void print(std::ostream& out_) const
 		{
-			size_t number = rows < 10 ? rows : 10;
+			size_t number = number_of_elements < 10 ? number_of_elements : 10;
 			for (size_t i = 0; i < number; i++) {
 				out_ << pointcloud[i].getPoint(0) << " "
 					<< pointcloud[i].getPoint(1) << " "
@@ -899,7 +899,7 @@ namespace pointcloud
 		*/
 		void setPointsPtr(ElementType* points_)
 		{
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				pointcloud[i].setPointPtr(&points_[i*cols]);
 			}
 		}
@@ -911,7 +911,7 @@ namespace pointcloud
 		*/
 		void setNormalsPtr(ElementType* normals_)
 		{
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				pointcloud[i].setNormalPtr(&normals_[i*cols]);
 			}
 		}
@@ -923,7 +923,7 @@ namespace pointcloud
 		*/
 		void setColorsPtr(uchar* colors_)
 		{
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				pointcloud[i].setColorPtr(&colors_[i*cols]);
 			}
 		}
@@ -1084,9 +1084,9 @@ namespace pointcloud
 		*/
 		ElementType* getPointsPtr() const
 		{
-			ElementType* new_points = new ElementType[rows*cols];
+			ElementType* new_points = new ElementType[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					new_points[i*cols + j] = getPoint(i, j);
 				}
@@ -1102,9 +1102,9 @@ namespace pointcloud
 		*/
 		ElementType* getNormalsPtr() const
 		{
-			ElementType* new_normals = new ElementType[rows*cols];
+			ElementType* new_normals = new ElementType[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					new_normals[i*cols + j] = getNormal(i, j);
 				}
@@ -1120,9 +1120,9 @@ namespace pointcloud
 		*/		
 		uchar* getColorsPtr() const
 		{
-			uchar* new_colors = new uchar[rows*cols];
+			uchar* new_colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					new_colors[i*cols + j] = getColor(i, j);
 				}
@@ -1138,15 +1138,17 @@ namespace pointcloud
 		*/
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
-			ElementType* data(new ElementType[rows*cols]);
-			for (size_t i = 0; i < rows; i++) {
+			ElementType* data(new ElementType[number_of_elements*cols]);
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					data[i*cols + j] = pointcloud[i][j];
 				}
 			}
 
-			matrix_.setMatrix(data, rows, cols);
+			matrix_.setMatrix(data, number_of_elements, cols);
 		}
+
+		private:
 
 		/**
 			Pointcloud
@@ -1174,29 +1176,29 @@ namespace pointcloud
 		/**
 			Constructor
 
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(size_t rows_, unsigned char flags_) : Pointcloud(rows_, flags_)
+		PointcloudSoA(size_t number_of_elements_, unsigned char flags_) : Pointcloud(number_of_elements_, flags_)
 		{
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 		}
 
 		/**
 			Constructor
 
 			@param[in] points_ Points
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, size_t rows_, unsigned char flags_) 
-			: Pointcloud(rows_, flags_)
+		PointcloudSoA(ElementType* points_, size_t number_of_elements_, unsigned char flags_) 
+			: Pointcloud(number_of_elements_, flags_)
 		{
 			setPoints(points_);
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 		}
 
 		/**
@@ -1205,11 +1207,11 @@ namespace pointcloud
 			@param[in] points_ Points
 			@param[in] normals_ Normals
 			@param[in] colors_ Colors
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t rows_, unsigned char flags_)
-			: Pointcloud(rows_, flags) 
+		PointcloudSoA(ElementType* points_, ElementType* normals_, uchar* colors_, size_t number_of_elements_, unsigned char flags_)
+			: Pointcloud(number_of_elements_, flags) 
 		{
 			setPoints(points_);
 			setNormals(normals_);
@@ -1231,14 +1233,14 @@ namespace pointcloud
 		*/
 		PointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_)
 		{
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -1252,14 +1254,14 @@ namespace pointcloud
 		*/
 		PointcloudSoA(const PointcloudAoS<ElementType>& pointcloud_)
 		{
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -1275,14 +1277,14 @@ namespace pointcloud
 		{
 			clear();
 
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -1300,14 +1302,14 @@ namespace pointcloud
 		{
 			clear();
 
-			rows = pointcloud_.rows;
+			number_of_elements = pointcloud_.number_of_elements;
 			cols = pointcloud_.cols;
 
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -1323,26 +1325,26 @@ namespace pointcloud
 		{
 			clear();
 
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 		}
 
 		/**
 			Set pointcloud
 
-			@param[in] rows_ Rows
+			@param[in] number_of_elements_ Number of elements
 			@param[in] cols_ Cols
 		*/
-		void setPointcloud(size_t rows_)
+		void setPointcloud(size_t number_of_elements_)
 		{
 			clear();
 
-			rows = rows_;
+			number_of_elements = number_of_elements_;
 
-			points = new ElementType[rows*cols];
-			normals = new ElementType[rows*cols];
-			colors = new uchar[rows*cols];
+			points = new ElementType[number_of_elements*cols];
+			normals = new ElementType[number_of_elements*cols];
+			colors = new uchar[number_of_elements*cols];
 		}
 
 		/**
@@ -1350,7 +1352,7 @@ namespace pointcloud
 		*/
 		void clear()
 		{
-			rows = 0;
+			number_of_elements = 0;
 
 			if (points) { delete[] points; }
 			if (normals) { delete[] normals; }
@@ -1368,7 +1370,7 @@ namespace pointcloud
 			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= rows) {
+				if (list_[i] >= number_of_elements) {
 					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 					std::exit(EXIT_FAILURE);
 				}
@@ -1389,7 +1391,7 @@ namespace pointcloud
 			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= rows) {
+				if (list_[i] >= number_of_elements) {
 					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 					std::exit(EXIT_FAILURE);
 				}
@@ -1438,7 +1440,7 @@ namespace pointcloud
 		*/
 		void print(std::ostream& out_) const
 		{
-			size_t number = rows < 10 ? rows : 10;
+			size_t number = number_of_elements < 10 ? number_of_elements : 10;
 			for (size_t i = 0; i < number; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					out_ << points[i*cols + j] << " ";
@@ -1460,9 +1462,9 @@ namespace pointcloud
 		*/
 		void setPointsPtr(ElementType* points_)
 		{
-			points = new ElementType[rows*cols];
+			points = new ElementType[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					points[i*cols + j] = points_[i*cols + j];
 				}
@@ -1476,9 +1478,9 @@ namespace pointcloud
 		*/
 		void setNormalsPtr(ElementType* normals_)
 		{
-			normals = new ElementType[rows*cols];
+			normals = new ElementType[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					normals[i*cols + j] = normals_[i*cols + j];
 				}
@@ -1492,9 +1494,9 @@ namespace pointcloud
 		*/
 		void setColorsPtr(uchar* colors_)
 		{
-			colors = new uchar[rows*cols];
+			colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					colors[i*cols + j] = colors_[i*cols + j];
 				}
@@ -1663,9 +1665,9 @@ namespace pointcloud
 		*/
 		ElementType* getPointsPtr() const
 		{
-			ElementType* new_points = new ElementType[rows*cols];
+			ElementType* new_points = new ElementType[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					new_points[i*cols + j] = points[i*cols + j];
 				}
@@ -1681,9 +1683,9 @@ namespace pointcloud
 		*/
 		ElementType* getNormalsPtr() const
 		{
-			ElementType* new_normals = new ElementType[rows*cols];
+			ElementType* new_normals = new ElementType[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					new_normals[i*cols + j] = normals[i*cols + j];
 				}
@@ -1699,9 +1701,9 @@ namespace pointcloud
 		*/		
 		uchar* getColorsPtr() const
 		{
-			uchar* new_colors = new uchar[rows*cols];
+			uchar* new_colors = new uchar[number_of_elements*cols];
 
-			for (size_t i = 0; i < rows; i++) {
+			for (size_t i = 0; i < number_of_elements; i++) {
 				for (size_t j = 0; j < cols; j++) {
 					new_colors[i*cols + j] = colors[i*cols + j];
 				}
@@ -1717,12 +1719,13 @@ namespace pointcloud
 		*/
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
-			ElementType* data(new ElementType[rows*cols]);
-			std::memcpy(data, points, sizeof(ElementType)*rows*cols);
+			ElementType* data(new ElementType[number_of_elements*cols]);
+			std::memcpy(data, points, sizeof(ElementType)*number_of_elements*cols);
 
-			matrix_.setMatrix(data, rows, cols);
+			matrix_.setMatrix(data, number_of_elements, cols);
 		}
 
+	private:
 		/**
 			Pointcloud
 		*/

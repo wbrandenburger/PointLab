@@ -384,6 +384,7 @@ namespace utils
 					glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
 				glEnd();
 
+				glColor4f(1.0, 1.0, 1.0, 0.0);
 			/**
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
@@ -447,7 +448,7 @@ namespace utils
 				/**
 					Determine the size of the points
 				*/
-				glPointSize((GLdouble)gl_pointsize);
+				glPointSize((GLfloat)gl_pointsize);
 
 								/**
 					Link the points, colors and normals for drawing
@@ -484,6 +485,7 @@ namespace utils
 					glVertex3d(0.0, 0.0, 0.25*gl_zoom);
 				glEnd();
 
+				glColor4f(1.0, 1.0, 1.0, 0.0);
 
 			/**
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
@@ -623,9 +625,8 @@ namespace utils
 		*/
 		void setPointcloud(ElementType* points_, size_t number_of_elements_) 
 		{
-			viewer_instances.getCurrentViewerInstance().setPointcloud(points_, number_of_elements);
+			viewer_instances.getCurrentViewerInstance().setPointcloud(points_, number_of_elements_);
 		}
-
 
 		/** 
 			Redrawing function 
@@ -677,7 +678,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Pointcloud %d", (int) viewer_instances.getNumberOfViewer() - 1);
+				sprintf(window_name_, "Viewer %d", (int) viewer_instances.getNumberOfViewer() - 1);
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);

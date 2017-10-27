@@ -34,6 +34,8 @@
 
 #include <Windows.h>
 
+#include "tools/parameters.h"
+
 #include "tools/utils/matrix.h"
 #include "tools/utils/windowspec.h"
 
@@ -247,12 +249,45 @@ namespace utils
 		*/
 		void setPointcloud(ElementType* points_, size_t number_of_elements_) 
 		{
-			if (current_instance == GLInstance::GLPLOT) {
+			if (current_instance != GLInstance::GLVIEWER) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
 
 			glviewer.setPointcloud(points_, number_of_elements_);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] pointcloud_ Pointcloud
+		*/
+		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		{
+			if (current_instance != GLInstance::GLPLOT3D) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot3d.setPointcloud(mode_, pointcloud_);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Pointcloud
+			@param[in] number_of_elements_ Number of elements
+		*/
+		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_elements_)
+		{
+			if (current_instance != GLInstance::GLPLOT3D) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot3d.setPointcloud(mode_, points_, number_of_elements_);
 		}
 
 		/**
@@ -266,6 +301,9 @@ namespace utils
 				break;
 			case GLInstance::GLPLOT:	
 				glplot.plot(); 
+				break;
+			case GLInstance::GLPLOT3D:
+				glplot3d.plot();
 				break;
 			default:	
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;	
@@ -300,6 +338,9 @@ namespace utils
 				break;
 			case GLInstance::GLPLOT:
 				glplot.plot(nullptr, window_spec);
+				break;
+			case GLInstance::GLPLOT3D:
+				glplot3d.plot(nullptr, window_spec);
 				break;
 			default:
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;

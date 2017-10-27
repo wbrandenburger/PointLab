@@ -565,7 +565,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Function %d", (int)plot_instances.getNumberOfPlots() - 1);
+				sprintf(window_name_, "Plot %d", (int)plot_instances.getNumberOfPlots() - 1);
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);

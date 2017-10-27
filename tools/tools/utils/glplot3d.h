@@ -39,6 +39,8 @@
 #include <GL/GL.h>
 #include <GL/freeglut.h>
 
+#include "tools/parameters.h"
+
 #include "tools/math/angle.h"
 
 #include "tools/utils/boundingbox.h"
@@ -95,9 +97,9 @@ namespace utils
 		/**
 			Constructor
 		*/
-		PlotContainer() :  mode(GL_POINTS), 
+		PlotContainer() :  mode(NULL), 
 			points(nullptr), color(nullptr), normals(nullptr), indices(nullptr),
-			number_of_elements(NULL), number_indices(NULL)
+			number_of_elements(NULL), number_of_indices(NULL)
 		{
 		}
 
@@ -107,10 +109,10 @@ namespace utils
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PlotContainer(GLenum mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) : mode(mode_),
-			points(nullptr), color(nullptr), normals(nullptr), indices(nullptr),
-			number_of_elements(NULL), number_of_indices(NULL)
+		PlotContainer(GLParams mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) : PlotContainer()
 		{
+			setMode(mode_);
+
 			if (pointcloud_.isPoints()) {
 				points = pointcloud_.getPointsPtr();
 			}
@@ -136,14 +138,14 @@ namespace utils
 			@param[in] points_ Points
 			@param[in] number_of_elements_ Number of elements
 		*/
-		PlotContainer(GLenum mode_, ElementType* points_, size_t number_of_elements_) : mode(mode_),
-			points(nullptr), color(nullptr), normals(nullptr), indices(nullptr),
-			number_of_elements(number_of_elements_), number_of_indices(NULL)
+		PlotContainer(GLParams mode_, ElementType* points_, size_t number_of_elements_) : PlotContainer() 
 		{
+			setMode(mode_);
+
 			number_of_elements = number_of_elements_;
 
-			points = new ElementType[number_of_elements];
-			std::memcpy(points, points_, sizeof(ElementType)*number_of_elements);
+			points = new ElementType[number_of_elements * 3];
+			std::memcpy(points, points_, sizeof(ElementType)*number_of_elements * 3);
 		}
 
 		/**
@@ -169,7 +171,7 @@ namespace utils
 			}
 			if (normals) {
 				delete[] normals;
-				nomrals = nullptr;
+				normals = nullptr;
 			}
 			if (indices) {
 				delete[] indices;
@@ -180,30 +182,74 @@ namespace utils
 		/**
 			Copy constructor
 	
-			@param[in] plot_container_ An instance of class Class
+			@param[in] plot_container_ An instance of class PlotContainer
 		*/
-		PlotContainer(PlotContainer <ElementType>& plot_container_) = delete;
+		PlotContainer(const PlotContainer <ElementType>& plot_container_) : PlotContainer()
+		{
+			copy(plot_container_);
+		}
 		
 		/**
 			Copy constructor
 	
-			@param[in] plot_container_ An instance of class Class
+			@param[in] plot_container_ An instance of class PlotContainer
 		*/
 
-		PlotContainer(PlotContainer <ElementType>&& plot_container_) = delete;		
+		PlotContainer(const PlotContainer <ElementType>&& plot_container_) : PlotContainer()
+		{
+			copy(plot_container_);
+		}
 		/**
 			Operator =
 	
-			@param[in] plot_container_ An instance of class Class
+			@param[in] plot_container_ An instance of class PlotContainer
 		*/
-		PlotContainer& operator=(const PlotContainer<ElementType>& plot_container_) = delete;
+		PlotContainer& operator=(const PlotContainer<ElementType>& plot_container_)
+		{
+			clear();
+
+			copy(plot_container_);
+		}
 	
 		/**
 			Operator =
 	
-			@param[in] plot_container_ An instance of class Class
+			@param[in] plot_container_ An instance of class PlotContainer
 		*/
-		PlotContainer& operator=(const PlotContainer<ElementType>&& plot_container_) = delete;
+		PlotContainer& operator=(const PlotContainer<ElementType>&& plot_container_)
+		{
+			clear();
+
+			copy(plot_container_);
+		}
+
+		/**
+			Copy data
+
+			@param[in] plot_container_ An instance of class PlotContainer
+		*/
+		void copy(const PlotContainer<ElementType>& plot_container_)
+		{
+			mode = plot_container_.getMode();
+			number_of_elements = plot_container_.getNumberOfElements();
+			number_of_indices = plot_container_.getNumberOfIndices();
+
+			points = new ElementType[number_of_elements * 3];
+			std::memcpy(points, plot_container_.getPoints(), sizeof(ElementType) * number_of_elements * 3);
+
+			if (plot_container_.isColor()) {
+				color = new unsigned char[number_of_elements * 3];
+				std::memcpy(color, plot_container_.getColor(), sizeof(unsigned char) * number_of_elements * 3);
+			}
+			if (plot_container_.isNormal()) {
+				normals = new ElementType[number_of_elements * 3];
+				std::memcpy(normals, plot_container_.getNormals(), sizeof(ElementType) * number_of_elements * 3);
+			}
+			if (plot_container_.isIndex()) {
+				indices = new unsigned int[number_of_indices * 3];
+				std::memcpy(indices, plot_container_.getIndices(), sizeof(unsigned int)*number_of_elements * 3);
+			}
+		}
 
 		/**
 			Set plot container
@@ -211,9 +257,9 @@ namespace utils
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPlotContainer(GLenum mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) 
+		void setPlotContainer(GLParams mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) 
 		{
-			mode = mode_;
+			setMode(mode_);
 
 			if (pointcloud_.isPoints()) {
 				points = pointcloud_.getPointsPtr();
@@ -234,15 +280,15 @@ namespace utils
 		}
 
 		/**
-			Constructor
+			Set plot container
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPlotContainer(GLenum mode_, ElementType* points_, size_t number_of_elements_)
+		void setPlotContainer(GLParams mode_, ElementType* points_, size_t number_of_elements_)
 		{
-			mode = mode_;
+			setMode(mode_);
 
 			number_of_elements = number_of_elements_;
 
@@ -250,6 +296,19 @@ namespace utils
 			std::memcpy(points, points_, sizeof(ElementType)*number_of_elements);
 		}
 	
+		/**
+			Get the OpenGl specifier for the mode what kind of primitives to render
+
+			@param[in] mode_ Specifies what kind of primitives to render
+		*/
+		void setMode(GLParams mode_)
+		{
+			switch (mode_) {
+			case GLParams::POINTS: mode = GL_POINTS; break;
+			case GLParams::TRIANGLES: mode = GL_TRIANGLES; break;
+			}
+		}
+
 		/**
 			Get the mode which specifies what kind of primitives to render
 		*/
@@ -331,7 +390,7 @@ namespace utils
 		*/
 		bool isColor() const
 		{
-			return (colors != nullptr);
+			return (color != nullptr);
 		}
 
 		/**
@@ -398,12 +457,16 @@ namespace utils
 		/**
 			Constructor
 		*/
-		Plot3DInstance() : number_of_clouds(0) {}
+		Plot3DInstance() : number_of_clouds(0) 
+		{
+		}
 
 		/**
 			Destructor
 		*/
-		~Plot3DInstance() {}
+		~Plot3DInstance() 
+		{
+		}
 
 		/**
 			Clear
@@ -415,26 +478,32 @@ namespace utils
 		/**
 			Set pointcloud
 
+			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(GLParams mode_,const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			plot_container.push_back(PlotContainer<ElementType>(GL_POINTS,pointcloud_));
+			plot_container.push_back(PlotContainer<ElementType>(mode_,pointcloud_));
 
 			number_of_clouds++;
+
+			setParameters();
 		}
 
 		/**
 			Set pointcloud
 
+			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPointcloud(ElementType* points_, size_t number_of_elements_)
+		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_elements_)
 		{
-			plot_container.push_back(PlotContainer<ElementType>(GL_POINTS, points_, number_of_elements_));
+			plot_container.push_back(PlotContainer<ElementType>(mode_, points_, number_of_elements_));
 
 			number_of_clouds++;
+
+			setParameters();
 
 		}
 
@@ -464,8 +533,8 @@ namespace utils
 			
 			for (size_t i = 0; i < number_of_clouds; i++) {
 				ElementType* points = plot_container[i].getPoints();
-				for (size_t i = 0; i <  plot_container[i].number_of_elements * 3; i++) {
-					points[i] = (points[i] - bounding_box.getMiddle(i % 3)) * (1 / gl_zoom);
+				for (size_t j = 0; j <  plot_container[i].getNumberOfElements() * 3; j++) {
+					points[j] = (points[j] - bounding_box.getMiddle(j % 3)) * (1 / gl_zoom);
 				}
 			}
 			gl_zoom = 1.0;
@@ -589,17 +658,18 @@ namespace utils
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 
-			/**
-				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
-			*/
-			glEnableClientState(GL_VERTEX_ARRAY);
-			if (color) {
-				glEnableClientState(GL_COLOR_ARRAY);
-			}
-			if (normals) {
-				glEnableClientState(GL_NORMAL_ARRAY);
-			}
-			//glEnableClientState(GL_INDEX_ARRAY);
+			for (size_t i = 0; i < number_of_clouds; i++) {
+				/**
+					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+				*/
+				glEnableClientState(GL_VERTEX_ARRAY);
+				if (plot_container[i].isColor()) {
+					glEnableClientState(GL_COLOR_ARRAY);
+				}
+				if (plot_container[i].isNormal()) {
+					glEnableClientState(GL_NORMAL_ARRAY);
+				}
+				//glEnableClientState(GL_INDEX_ARRAY);
 
 				glLoadIdentity();
 
@@ -613,74 +683,75 @@ namespace utils
 				*/
 
 				glTranslatef(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
-				
+
 				/**
 					Roatate the entire pointcloud around the x- and y-axis
 				*/
 				float gl_rot_x, gl_rot_y, gl_rot_z;
 				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotatef( -1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotatef(  1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotatef(  1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+				glRotatef(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
 				/**
 					Determine the size of the points
 				*/
-				glPointSize((GLfloat) gl_pointsize);
+				glPointSize((GLfloat)gl_pointsize);
 
 				/**
 					Link the points, colors and normals for drawing
 				*/
-				glVertexPointer(3, GL_FLOAT, 0, points);
-				if (color) {
-					glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+				glVertexPointer(3, GL_FLOAT, 0, plot_container[i].getPoints());
+				if (plot_container[i].isColor()) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, plot_container[i].getColor());
 				}
-				if (normals) {
-					glNormalPointer(GL_FLOAT, 0, normals);
+				if (plot_container[i].isNormal()) {
+					glNormalPointer(GL_FLOAT, 0, plot_container[i].getNormals());
 				}
-				glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
-				//////glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));
+				glDrawArrays(GL_POINTS, 0, (GLsizei)plot_container[i].getNumberOfElements());
+				//glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));*/
 
-			/**
-				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
-			*/
-			glDisableClientState(GL_VERTEX_ARRAY);
-			if (color) {
-				glDisableClientState(GL_COLOR_ARRAY);
-			}
-			if (normals) {
-				glDisableClientState(GL_NORMAL_ARRAY);
-			}
 				/**
-					Draw axis
-				*/				
-				glLineWidth(2.0f);
-				glBegin(GL_LINES);
-					glColor4f(1.0, 0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.25f*gl_zoom, 0.0, 0.0);
-				glEnd();
-				glBegin(GL_LINES);
-					glColor4f(0.0, 1.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.25f*gl_zoom, 0.0);
-				glEnd();
-				glBegin(GL_LINES);
-					glColor4f(0.0, 0.0, 1.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
-				glEnd();
+					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+				*/
+				glDisableClientState(GL_VERTEX_ARRAY);
+				if (plot_container[i].isColor()) {
+					glDisableClientState(GL_COLOR_ARRAY);
+				}
+				if (plot_container[i].isNormal()) {
+					glDisableClientState(GL_NORMAL_ARRAY);
+				}
+			}
+				///**
+				//	Draw axis
+				//*/				
+				//glLineWidth(2.0f);
+				//glBegin(GL_LINES);
+				//	glColor4f(1.0, 0.0, 0.0, 0.0);
+				//	glVertex3f(0.0, 0.0, 0.0);
+				//	glVertex3f(0.25f*gl_zoom, 0.0, 0.0);
+				//glEnd();
+				//glBegin(GL_LINES);
+				//	glColor4f(0.0, 1.0, 0.0, 0.0);
+				//	glVertex3f(0.0, 0.0, 0.0);
+				//	glVertex3f(0.0, 0.25f*gl_zoom, 0.0);
+				//glEnd();
+				//glBegin(GL_LINES);
+				//	glColor4f(0.0, 0.0, 1.0, 0.0);
+				//	glVertex3f(0.0, 0.0, 0.0);
+				//	glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
+				//glEnd();
 
 			glPopMatrix();
 
 			glutSwapBuffers();
 		}
 
-		///////**
-		//////	Draw the pointcloud with double accurancy
-		//////*/
-		//////void drawd() 
-		//////{
+		/**
+			Draw the pointcloud with double accurancy
+		*/
+		void drawd() 
+		{
 		//////	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		//////	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//////	glMatrixMode(GL_MODELVIEW);
@@ -776,7 +847,7 @@ namespace utils
 
 		//////	glutSwapBuffers();
 
-		//////}
+		}
 
 	private:
 
@@ -874,12 +945,25 @@ namespace utils
 
 		/**
 			Set pointlcoud
-
+			
+			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(pointcloud_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, pointcloud_);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Pointcloud
+			@param[in] number_of_elements_ Number of elements
+		*/
+		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_elements_)
+		{
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, number_of_elements_);
 		}
 
 		/** 
@@ -932,7 +1016,7 @@ namespace utils
 		{
 			if (!window_name_) {
 				window_name_ = new char[10];
-				sprintf(window_name_, "Pointcloud %d", (int) plot3d_instances.getNumberOfPlot3D() - 1);
+				sprintf(window_name_, "Plot3D %d", (int) plot3d_instances.getNumberOfPlot3D() - 1);
 			}
 
 
@@ -946,7 +1030,6 @@ namespace utils
 			plot3d_instances.setCurrentInstance(window_index);
 
 			plot3d_instances.getCurrentPlot3DInstance().setParameters();
-
 			/**
 				Register GLUT callbacks.
 			*/

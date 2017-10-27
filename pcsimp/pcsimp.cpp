@@ -43,6 +43,7 @@
 #include "tools/io.h"
 #include "tools/math.h"
 #include "tools/pointcloud.h"
+#include "tools/parameters.h"
 
 #include "trees/trees.hpp"
 #include "eigen3/Eigen/Dense"
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]) {
 	
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
-		std::cout << "File with " << pointcloud.getRows() << " point has been read in "
+		std::cout << "File with " << pointcloud.getNumberOfElements() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 	std::cout << pointcloud << std::endl;
@@ -128,7 +129,7 @@ int main(int argc, char* argv[]) {
 	utils::GLView<float> glview;
 
 	glview.setViewer();
-	glview.setPointcloud(pointcloud);
+	glview.setPointcloud(pointcloud.getPointsPtr(), pointcloud.getNumberOfElements());
 	glview.subPlot(2, 2, 0);
 
 	glview.setPlot(versuch);
@@ -144,6 +145,12 @@ int main(int argc, char* argv[]) {
 	glview.setX(array_x);
 	glview.subPlot(2, 2, 2);
 
+
+	glview.setPlot3D();
+	glview.setPointcloud(GLParams::POINTS, pointcloud.getPointsPtr(), pointcloud.getNumberOfElements());
+	glview.subPlot(2, 2, 3);
+
+
 	glview.mainLoop();
 	//if (plyIO.getDataType() == 1) {
 	//	/*program<float>(cores, plyIO);*/
@@ -152,9 +159,9 @@ int main(int argc, char* argv[]) {
 	//	/*program<double>(cores, plyIO);*/
 	//}
 
-	utils::Matrix<float> matrix;
-	pointcloud.getMatrix(matrix);
-	trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
+	//////////////////utils::Matrix<float> matrix;
+	//////////////////pointcloud.getMatrix(matrix);
+	//////////////////trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
 
 	std::cout << "NOCH NICHT" << std::endl;
 
