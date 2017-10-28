@@ -32,18 +32,29 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
-#include <stdint.h>
+#include <iostream>
+
+	/**
+		Exit the program if there is detected an error
+
+		@param[in] file_ String which specifies the file where the error is detected
+		@param[in] line_ Integer which specifies the line in the file where the error is detected
+	*/
+	void exitFailure(const char* file_, const int line_)
+	{
+		std::cout << "Exit in " << file_ << " in line " << line_ << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 
 	/**
 		Flags which specify the members of a pointcloud
 	*/
 	enum struct Vertex
 	{
-		POINTS = 0,
 		RGB = 1,
 		NORMALS = 2,
 		TRIANGLES = 3,
-		POINTSRGBNORMALS = 6,
+		RGBNORMALS = 6,
 		MESH = 7
 	};
 
@@ -55,12 +66,11 @@
 	uint8_t& operator|=(uint8_t& identifier_, const Vertex& vertex)
 	{
 		switch (vertex) {
-		case Vertex::POINTS: identifier_ |= 1 << 0;
-		case Vertex::RGB: identifier_ |= 1 << 1;
-		case Vertex::NORMALS: identifier_ |= 1 << 2;
-		case Vertex::TRIANGLES: identifier_ |= 1 << 3;
-		case Vertex::POINTSRGBNORMALS: identifier_ |= 1 << 6;
-		case Vertex::MESH: identifier_ |= 1 << 7;
+		case Vertex::RGB: identifier_ |= 1 << 1; break;
+		case Vertex::NORMALS: identifier_ |= 1 << 2; break;
+		case Vertex::TRIANGLES: identifier_ |= 1 << 3; break;
+		case Vertex::RGBNORMALS: identifier_ |= 1 << 6; break;
+		case Vertex::MESH: identifier_ |= 1 << 7; break;
 		}
 
 		return identifier_;

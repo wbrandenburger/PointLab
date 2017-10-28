@@ -33,10 +33,6 @@
 #include <string>
 #include <thread>
 
-//#define FLANN_USE_CUDA
-//#include "flann/flann.h"
-//#include "flann/flann.hpp"
-
 #include "pcsimp.hpp"
 
 #include "tools/gl.h"
@@ -65,9 +61,10 @@ int main(int argc, char* argv[]) {
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
 	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
-		
+	
 	io::PlyIO plyIO;
 	plyIO.initialze(file);
+
 	
 	/**
 		Read data
@@ -75,9 +72,6 @@ int main(int argc, char* argv[]) {
 	utils::Timer time;
 	
 	uint8_t flags = 0;
-	if (plyIO.isPoints()) {
-		flags |= Vertex::POINTS;
-	}
 	if (plyIO.isColor()) {
 		flags |= Vertex::RGB;
 	}
@@ -86,7 +80,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
-	
+	pointcloud.setPointcloud();
+
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
 		std::cout << "File with " << pointcloud.getNumberOfVertices() << " point has been read in "

@@ -34,6 +34,8 @@
 
 #include <stdint.h>
 
+#include "tools/parameters.h"
+
 #include "tools/utils/matrix.h"
 
 #include "tools/pointcloud/pointcloudnodes.h"
@@ -49,15 +51,21 @@ namespace pointcloud
 
 		/**
 			Constructor
+		*/
+		Pointcloud() : number_of_vertices(0), number_of_triangles(0), 
+			triangles(nullptr),
+			color_flag(false), normal_flag(false), triangle_flag(false)
+		{
+		}
+
+		/**
+			Constructor
 			
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(uint8_t flags_) : number_of_vertices(0), number_of_triangles(0)
+		Pointcloud(uint8_t flags_) : Pointcloud()
 		{
-			point_flag = (flags_ & 1 << 0) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
-			color_flag = (flags_ & 1 << 1) > 0 || (flags_ & 1 << 6) > 0  || (flags_ & 1 << 7) > 0;
-			normal_flag = (flags_ & 1 << 2) > 0 || (flags_ & 1 << 6) > 0  || (flags_ & 1 << 7) > 0;
-			triangle_flag = (flags_ & 1 << 3) > 0 || (flags_ & 1 << 7) > 0;
+			setFlags(flags_);
 		}
 		
 		/**
@@ -66,9 +74,23 @@ namespace pointcloud
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(size_t number_of_vertices_, uint8_t flags_) : Pointcloud(flags_)
+		Pointcloud(size_t number_of_vertices_, uint8_t flags_) : Pointcloud()
 		{
-			number_of_vertices = number_of_vertices_;
+			setFlags(flags_);
+			setNumberOfVertices(number_of_vertices_);
+		}
+
+		/**
+			Constructor
+
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_triangles_ Number of triangles
+			@param[in] flags_ The flags determine which fields has to be set
+		*/
+		Pointcloud(size_t number_of_vertices_, size_t number_of_triangles_, uint8_t flags_) : Pointcloud()
+		{
+			setFlags(flags_);
+			setNumberOfElements(number_of_vertices_, number_of_triangles_);
 		}
 
 		/**
@@ -77,15 +99,77 @@ namespace pointcloud
 		virtual ~Pointcloud() {}
 
 		/**
-			Set dimension
+			Set number of vertices
 
 			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setNumberOfElements(size_t number_of_vertices_)
+		void setNumberOfVertices(size_t number_of_vertices_)
 		{
+			if (number_of_vertices) {
+				exitFailure(__FILE__, __LINE__);
+			}
 			number_of_vertices = number_of_vertices_;
 		}
-		
+
+		/**
+			Set number of triangles
+
+			@param[in] number_of_triangles_ Number of triangles
+		*/
+		void setNumberOfTriangles(size_t number_of_triangles_)
+		{
+			if (number_of_triangles) {
+				exitFailure(__FILE__, __LINE__);
+			}
+			else {
+				isTriangle = true;
+			}
+
+			number_of_triangles = number_of_triangles_;
+		}	
+
+		/**
+			Set number of vertices and triangles
+
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_triangles_ Number of triangles
+		*/
+		void setNumberOfElements(size_t number_of_vertices_, size_t number_of_triangles_)
+		{
+			if (number_of_vertices || number_of_triangles) {
+				exitFailure(__FILE__, __LINE__);
+			}
+			else if(!isTriangle()) {
+				triangle_flag = true;
+			}
+
+			number_of_vertices = number_of_vertices_;
+			number_of_triangles = number_of_triangles_;
+		}
+	
+	protected:
+		/**
+			Set the flags
+		*/
+		void setFlags(uint8_t flags_)
+		{
+			color_flag = (flags_ & 1 << 1) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
+			normal_flag = (flags_ & 1 << 2) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
+			triangle_flag = (flags_ & 1 << 3) > 0 || (flags_ & 1 << 7) > 0;
+		}
+
+	protected:
+		/**
+			Allocte the meory for the triangles
+		*/
+		void allocateMemoryTriangles()
+		{
+			if (isTriangle()) {
+				triangles = new size_t[number_of_triangles * 3];
+			}
+		}
+	
+	public:
 		/**
 			Set pointcloud
 		*/
@@ -99,17 +183,46 @@ namespace pointcloud
 		virtual void setPointcloud(size_t number_of_vertices_) = 0;
 
 		/**
-			Clear
+			Set pointcloud
+
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_triangles_ Number of triangles
 		*/
-		virtual void clear() = 0;
+		virtual void setPointcloud(size_t number_of_vertices_, size_t number_of_triangles_) = 0;
 
 		/**
-			Prints the poincloud
+			Set triangles
 
-			@param[in,out] out_ Outstream
+			@param[in] number_of_triangles_ Number of triangles
 		*/
-		virtual void print(std::ostream& out_) const = 0;
+		void setTriangles(size_t number_of_triangles_)
+		{
+			setNumberOfTriangles(number_of_triangles_);
 
+			clearMemoryTriangles();
+
+			allocateMemoryTriangles();
+		}
+	
+	protected:
+		/**
+			Clear
+		*/
+		virtual void clearMemoryPointcloud() = 0;
+
+		/**
+			Clear triangles
+		*/
+		void clearMemoryTriangles()
+		{
+			std::cout << "4" << std::endl;
+			if (triangles) {
+				delete[] triangles;
+				triangles = nullptr;
+			}
+		}
+
+	public:
 		/**
 			Generate a subset of the pointcloud
 
@@ -225,6 +338,14 @@ namespace pointcloud
 		}
 
 		/**
+			Get Number of triangles
+		*/
+		size_t getNumberOfTriangles() const
+		{
+			return number_of_triangles;
+		}
+
+		/**
 			Get point data of specified index
 
 			@param[in] row_ Row
@@ -312,16 +433,6 @@ namespace pointcloud
 		virtual void getMatrix(utils::Matrix<ElementType>& matrix_) const = 0;
 
 		/**
-			Returns true if points are set
-
-			@return True if points are set
-		*/
-		bool isPoints() const
-		{
-			return point_flag;
-		}
-
-		/**
 			Returns true if colors are set
 
 			@return True if colors are set 
@@ -353,6 +464,31 @@ namespace pointcloud
 
 	protected:
 		/**
+			Set color flag
+		*/
+		void setColorFlag()
+		{
+			color_flag = true;
+		}
+
+		/**
+			Set normal flag 
+		*/
+		bool setNormalFlag()
+		{
+			normal_flag = true;
+		}
+
+		/**
+			Set triangle flag 
+		*/
+		bool setTriangleFlag()
+		{
+			triangle_flag = true;
+		}
+
+	protected:
+		/**
 			Number of vertices
 		*/
 		size_t number_of_vertices;
@@ -366,11 +502,6 @@ namespace pointcloud
 			Indices which specifiy triangles
 		*/
 		size_t* triangles;
-
-		/**
-			Flag for points
-		*/
-		bool point_flag;
 
 		/**
 			Flag for colors

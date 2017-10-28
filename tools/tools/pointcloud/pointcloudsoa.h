@@ -55,58 +55,47 @@ namespace pointcloud
 
 		/**
 			Constructor
+		*/
+		PointcloudSoA() : Pointcloud(), points(nullptr), colors(nullptr), normals(nullptr)
+		{
+		}
+
+		/**
+			Constructor
 
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA (unsigned char flags_) : Pointcloud(flags_) 
+		PointcloudSoA (uint8_t flags_) : 
+			PointcloudSoA()
 		{
-			points = nullptr;
-			normals = nullptr;
-			colors = nullptr;
+			setFlags(flags_);
 		}
+
 		/**
 			Constructor
 
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(size_t number_of_vertices_, unsigned char flags_) : Pointcloud(number_of_vertices_, flags_)
+		PointcloudSoA(size_t number_of_vertices_, uint8_t flags_) : 
+			PointcloudSoA()
 		{
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
+			setFlags(flags_);
+			setNumberOfVertices(number_of_vertices_);
 		}
 
 		/**
 			Constructor
 
-			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_triangles_ Number of triangles
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, size_t number_of_vertices_, unsigned char flags_) 
-			: Pointcloud(number_of_vertices_, flags_)
+		PointcloudSoA(size_t number_of_vertices_, size_t number_of_triangles_, uint8_t flags_) :
+			 PointcloudSoA()
 		{
-			setPoints(points_);
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
-		}
-
-		/**
-			Constructor
-
-			@param[in] points_ Points
-			@param[in] normals_ Normals
-			@param[in] colors_ Colors
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] flags_ The flags determine which fields has to be set
-		*/
-		PointcloudSoA(ElementType* points_, ElementType* normals_, uint8_t* colors_, size_t number_of_vertices_, unsigned char flags_)
-			: Pointcloud(number_of_vertices_, flags) 
-		{
-			setPoints(points_);
-			setNormals(normals_);
-			setColors(colors_);
+			setFlags(flags_);
+			setNumberOfElements(number_of_vertices_, number_of_triangles_);
 		}
 
 		/**
@@ -114,7 +103,7 @@ namespace pointcloud
 		*/
 		~PointcloudSoA()
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
@@ -122,19 +111,10 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_)
+		PointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_) :
+			PointcloudSoA()
 		{
-			number_of_vertices = pointcloud_.number_of_vertices;
-
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				setPointPtr(pointcloud_.getPointPtr(i), i);
-				setNormalPtr(pointcloud_.getNormalPtr(i), i);
-				setColorPtr(pointcloud_.getColorPtr(i), i);
-			}
+			copyPointcloud(pointcloud_);
 		}
 		
 		/**
@@ -142,19 +122,10 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA(const PointcloudAoS<ElementType>& pointcloud_)
+		PointcloudSoA(const PointcloudAoS<ElementType>&& pointcloud_) :
+			PointcloudSoA()
 		{
-			number_of_vertices = pointcloud_.number_of_vertices;
-
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				setPointPtr(pointcloud_.getPointPtr(i), i);
-				setNormalPtr(pointcloud_.getNormalPtr(i), i);
-				setColorPtr(pointcloud_.getColorPtr(i), i);
-			}
+			*this = pointcloud_;
 		}
 
 		/**
@@ -162,21 +133,11 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA& operator=(const PointcloudSoA<ElementType>& pointcloud_)
+		PointcloudSoA& operator=(const PointcloudSoA<ElementType>& pointcloud_) 
 		{
-			clear();
+			clearMemory();
 
-			number_of_vertices = pointcloud_.number_of_vertices;
-
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				setPointPtr(pointcloud_.getPointPtr(i), i);
-				setNormalPtr(pointcloud_.getNormalPtr(i), i);
-				setColorPtr(pointcloud_.getColorPtr(i), i);
-			}
+			copyPointcloud(pointcloud_);
 
 			return (*this);
 		}
@@ -186,35 +147,60 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA& operator=(const PointcloudAoS<ElementType>& pointcloud_)
+		PointcloudSoA& operator=(const PointcloudAoS<ElementType>&& pointcloud_)
 		{
-			clear();
+			clearMemory();
 
-			number_of_vertices = pointcloud_.number_of_vertices;
-
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				setPointPtr(pointcloud_.getPointPtr(i), i);
-				setNormalPtr(pointcloud_.getNormalPtr(i), i);
-				setColorPtr(pointcloud_.getColorPtr(i), i);
-			}
+			*this = pointcloud_;
 
 			return (*this);
 		}
 
+		/**
+			Copy the pointcloud
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		void copyPointcloud(const PointcloudAoS<ElementType>& pointcloud_)
+		{
+			setNumberOfVertices(pointcloud_.getNumberOfVertices());
+			setNumberOfTriangles(pointcloud_.getNumberOfTriangles());
+
+			if (pointcloud_.isColor()) { setColorFlag(); }
+			if (pointcloud_.isNormal()) { setNormalFlag(); }
+			if (pointcloud_.isTriangle()) { setTriangleFlag(); }
+
+			points = pointcloud_.getPointsPtr();
+			if (isColor()) { colors = pointcloud_.getColorsPtrsPtr(); }
+			if (isNormal()) { normals = pointcloud_.getNormalsPtr(); }
+			//if (isTriangle()) { points = pointcloud_.getPointsPtr(); }
+		}
+
+	private:
+		/**
+			Allocate the memory for the pointcloud
+		*/
+		void allocateMemoryPointcloud()
+		{
+			points = new ElementType[number_of_vertices * 3];
+			if (isColor()) {
+				colors = new uint8_t[number_of_vertices * 3];
+			}
+			if (isNormal()) {
+				normals = new ElementType[number_of_vertices * 3];
+			}
+		}
+
+	public:
 		/**
 			Set pointcloud
 		*/
 		void setPointcloud()
 		{
-			clear();
+			clearMemory();
 
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
+			allocateMemoryPointcloud();
+			allocateMemoryTriangles();
 		}
 
 		/**
@@ -224,27 +210,60 @@ namespace pointcloud
 		*/
 		void setPointcloud(size_t number_of_vertices_)
 		{
-			clear();
+			setNumberOfVertices(number_of_vertices_);
 
-			number_of_vertices = number_of_vertices_;
+			clearMemory();
 
-			points = new ElementType[number_of_vertices*3];
-			normals = new ElementType[number_of_vertices*3];
-			colors = new uint8_t[number_of_vertices*3];
+			allocateMemoryPointcloud();
+			allocateMemoryTriangles();
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_triangles_ Number of triangles
+		*/
+		void setPointcloud(size_t number_of_vertices_, size_t number_of_triangles_)
+		{
+			setNumberOfElements(number_of_vertices_, number_of_triangles);
+			
+			clearMemory();
+
+			allocateMemoryPointcloud();
+			allocateMemoryTriangles();
+		}
+
+	private:
+		/**
+			Clear
+		*/
+		void clearMemory()
+		{
+			clearMemoryPointcloud();
+			clearMemoryTriangles();
 		}
 
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemoryPointcloud()
 		{
-			number_of_vertices = 0;
-
-			if (points) { delete[] points; }
-			if (normals) { delete[] normals; }
-			if (colors) { delete[] colors; }
+			if (points) { 
+				delete[] points;
+				points = nullptr;
+			}
+			if (normals) { 
+				delete[] normals; 
+				normals = nullptr;
+			}
+			if (colors) { 
+				delete[] colors;
+				colors = nullptr;
+			}
 		}
-		
+
+	public:	
 		/**
 			Generate a subset of the pointcloud
 
@@ -316,28 +335,6 @@ namespace pointcloud
 				//	subset_[i][j] = getPoint(list_[i], j);
 				//}
 				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
-			}
-		}
-
-		/**
-			Prints the pointcloud
-
-			@param[in,out] out_ Outstream
-		*/
-		void print(std::ostream& out_) const
-		{
-			size_t number = number_of_vertices < 10 ? number_of_vertices : 10;
-			for (size_t i = 0; i < number; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					out_ << points[i*3 + j] << " ";
-				}
-				for (size_t j = 0; j < 3; j++) {
-					out_ << normals[i*3 + j] << " ";
-				}
-				for (size_t j = 0; j < 3; j++) {
-					out_ << (int) colors[i*3 + j] << " ";
-				}
-				out_ << std::endl;
 			}
 		}
 
@@ -616,16 +613,16 @@ namespace pointcloud
 			Pointcloud
 		*/
 		ElementType* points;
-		 
-		/**
-			Normals
-		*/
-		ElementType* normals;
 
 		/**
 			Colors
 		*/
 		uint8_t* colors;
+
+		/**
+			Normals
+		*/
+		ElementType* normals;
 	};
 }
 

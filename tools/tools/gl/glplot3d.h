@@ -115,9 +115,8 @@ namespace utils
 		{
 			setMode(mode_);
 
-			if (pointcloud_.isPoints()) {
-				points = pointcloud_.getPointsPtr();
-			}
+			points = pointcloud_.getPointsPtr();
+
 			if (pointcloud_.isColor()) {
 				color = pointcloud_.getColorsPtr();
 			}
@@ -263,9 +262,8 @@ namespace utils
 		{
 			setMode(mode_);
 
-			if (pointcloud_.isPoints()) {
-				points = pointcloud_.getPointsPtr();
-			}
+			points = pointcloud_.getPointsPtr();
+	
 			if (pointcloud_.isColor()) {
 				color = pointcloud_.getColorsPtr();
 			}
