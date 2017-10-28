@@ -67,29 +67,29 @@ namespace pointcloud
 		/**
 			Constructor
 
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(size_t number_of_elements_, unsigned char flags_) : Pointcloud(number_of_elements_, flags_)
+		PointcloudSoA(size_t number_of_vertices_, unsigned char flags_) : Pointcloud(number_of_vertices_, flags_)
 		{
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 		}
 
 		/**
 			Constructor
 
 			@param[in] points_ Points
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, size_t number_of_elements_, unsigned char flags_) 
-			: Pointcloud(number_of_elements_, flags_)
+		PointcloudSoA(ElementType* points_, size_t number_of_vertices_, unsigned char flags_) 
+			: Pointcloud(number_of_vertices_, flags_)
 		{
 			setPoints(points_);
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 		}
 
 		/**
@@ -98,11 +98,11 @@ namespace pointcloud
 			@param[in] points_ Points
 			@param[in] normals_ Normals
 			@param[in] colors_ Colors
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		PointcloudSoA(ElementType* points_, ElementType* normals_, uint8_t* colors_, size_t number_of_elements_, unsigned char flags_)
-			: Pointcloud(number_of_elements_, flags) 
+		PointcloudSoA(ElementType* points_, ElementType* normals_, uint8_t* colors_, size_t number_of_vertices_, unsigned char flags_)
+			: Pointcloud(number_of_vertices_, flags) 
 		{
 			setPoints(points_);
 			setNormals(normals_);
@@ -124,13 +124,13 @@ namespace pointcloud
 		*/
 		PointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_)
 		{
-			number_of_elements = pointcloud_.number_of_elements;
+			number_of_vertices = pointcloud_.number_of_vertices;
 
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -144,13 +144,13 @@ namespace pointcloud
 		*/
 		PointcloudSoA(const PointcloudAoS<ElementType>& pointcloud_)
 		{
-			number_of_elements = pointcloud_.number_of_elements;
+			number_of_vertices = pointcloud_.number_of_vertices;
 
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -166,13 +166,13 @@ namespace pointcloud
 		{
 			clear();
 
-			number_of_elements = pointcloud_.number_of_elements;
+			number_of_vertices = pointcloud_.number_of_vertices;
 
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -190,13 +190,13 @@ namespace pointcloud
 		{
 			clear();
 
-			number_of_elements = pointcloud_.number_of_elements;
+			number_of_vertices = pointcloud_.number_of_vertices;
 
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				setPointPtr(pointcloud_.getPointPtr(i), i);
 				setNormalPtr(pointcloud_.getNormalPtr(i), i);
 				setColorPtr(pointcloud_.getColorPtr(i), i);
@@ -212,25 +212,25 @@ namespace pointcloud
 		{
 			clear();
 
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 		}
 
 		/**
 			Set pointcloud
 
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setPointcloud(size_t number_of_elements_)
+		void setPointcloud(size_t number_of_vertices_)
 		{
 			clear();
 
-			number_of_elements = number_of_elements_;
+			number_of_vertices = number_of_vertices_;
 
-			points = new ElementType[number_of_elements*3];
-			normals = new ElementType[number_of_elements*3];
-			colors = new uint8_t[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
+			normals = new ElementType[number_of_vertices*3];
+			colors = new uint8_t[number_of_vertices*3];
 		}
 
 		/**
@@ -238,7 +238,7 @@ namespace pointcloud
 		*/
 		void clear()
 		{
-			number_of_elements = 0;
+			number_of_vertices = 0;
 
 			if (points) { delete[] points; }
 			if (normals) { delete[] normals; }
@@ -256,7 +256,7 @@ namespace pointcloud
 			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= number_of_elements) {
+				if (list_[i] >= number_of_vertices) {
 					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 					std::exit(EXIT_FAILURE);
 				}
@@ -277,7 +277,7 @@ namespace pointcloud
 			subset_.setPointcloud(list_.size());
 
 			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= number_of_elements) {
+				if (list_[i] >= number_of_vertices) {
 					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 					std::exit(EXIT_FAILURE);
 				}
@@ -326,7 +326,7 @@ namespace pointcloud
 		*/
 		void print(std::ostream& out_) const
 		{
-			size_t number = number_of_elements < 10 ? number_of_elements : 10;
+			size_t number = number_of_vertices < 10 ? number_of_vertices : 10;
 			for (size_t i = 0; i < number; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					out_ << points[i*3 + j] << " ";
@@ -348,9 +348,9 @@ namespace pointcloud
 		*/
 		void setPointsPtr(ElementType* points_)
 		{
-			points = new ElementType[number_of_elements*3];
+			points = new ElementType[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					points[i*3 + j] = points_[i*3 + j];
 				}
@@ -364,9 +364,9 @@ namespace pointcloud
 		*/
 		void setNormalsPtr(ElementType* normals_)
 		{
-			normals = new ElementType[number_of_elements*3];
+			normals = new ElementType[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					normals[i*3 + j] = normals_[i*3 + j];
 				}
@@ -380,9 +380,9 @@ namespace pointcloud
 		*/
 		void setColorsPtr(uint8_t* colors_)
 		{
-			colors = new uint8_t[number_of_elements*3];
+			colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					colors[i*3 + j] = colors_[i*3 + j];
 				}
@@ -551,9 +551,9 @@ namespace pointcloud
 		*/
 		ElementType* getPointsPtr() const
 		{
-			ElementType* new_points = new ElementType[number_of_elements*3];
+			ElementType* new_points = new ElementType[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					new_points[i*3 + j] = points[i*3 + j];
 				}
@@ -569,9 +569,9 @@ namespace pointcloud
 		*/
 		ElementType* getNormalsPtr() const
 		{
-			ElementType* new_normals = new ElementType[number_of_elements*3];
+			ElementType* new_normals = new ElementType[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					new_normals[i*3 + j] = normals[i*3 + j];
 				}
@@ -587,9 +587,9 @@ namespace pointcloud
 		*/		
 		uint8_t* getColorsPtr() const
 		{
-			uint8_t* new_colors = new uint8_t[number_of_elements*3];
+			uint8_t* new_colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_elements; i++) {
+			for (size_t i = 0; i < number_of_vertices; i++) {
 				for (size_t j = 0; j < 3; j++) {
 					new_colors[i*3 + j] = colors[i*3 + j];
 				}
@@ -605,10 +605,10 @@ namespace pointcloud
 		*/
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
-			ElementType* data(new ElementType[number_of_elements*3]);
-			std::memcpy(data, points, sizeof(ElementType)*number_of_elements*3);
+			ElementType* data(new ElementType[number_of_vertices*3]);
+			std::memcpy(data, points, sizeof(ElementType)*number_of_vertices*3);
 
-			matrix_.setMatrix(data, number_of_elements, 3);
+			matrix_.setMatrix(data, number_of_vertices, 3);
 		}
 
 	private:

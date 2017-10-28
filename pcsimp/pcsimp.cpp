@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 	
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
-		std::cout << "File with " << pointcloud.getNumberOfElements() << " point has been read in "
+		std::cout << "File with " << pointcloud.getNumberOfVertices() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 	std::cout << pointcloud << std::endl;
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
 	utils::GLView<float> glview;
 
 	glview.setViewer();
-	glview.setPointcloud(pointcloud.getPointsPtr(), pointcloud.getNumberOfElements());
+	glview.setPointcloud(pointcloud.getPointsPtr(), pointcloud.getNumberOfVertices());
 	glview.subPlot(2, 2, 0);
 
 	glview.setPlot(versuch);
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
 	float* points = pointcloud.getPointsPtr();
 	glview.setPlot3D();
-	glview.setPointcloud(GLParams::POINTS, points, pointcloud.getNumberOfElements());
+	glview.setPointcloud(GLParams::POINTS, points, pointcloud.getNumberOfVertices());
 	glview.subPlot(2, 2, 3);
 	delete[] points;
 

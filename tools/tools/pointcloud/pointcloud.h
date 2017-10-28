@@ -52,7 +52,7 @@ namespace pointcloud
 			
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(uint8_t flags_) : number_of_elements(0)
+		Pointcloud(uint8_t flags_) : number_of_vertices(0), number_of_triangles(0)
 		{
 			point_flag = (flags_ & 1 << 0) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
 			color_flag = (flags_ & 1 << 1) > 0 || (flags_ & 1 << 6) > 0  || (flags_ & 1 << 7) > 0;
@@ -63,15 +63,12 @@ namespace pointcloud
 		/**
 			Constructor
 
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 			@param[in] flags_ The flags determine which fields has to be set
 		*/
-		Pointcloud(size_t number_of_elements_, uint8_t flags_) : number_of_elements(number_of_elements_)
+		Pointcloud(size_t number_of_vertices_, uint8_t flags_) : Pointcloud(flags_)
 		{
-			point_flag = (flags_ & 1 << 0) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
-			color_flag = (flags_ & 1 << 1) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
-			normal_flag = (flags_ & 1 << 2) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
-			triangle_flag = (flags_ & 1 << 3) > 0 || (flags_ & 1 << 7) > 0;
+			number_of_vertices = number_of_vertices_;
 		}
 
 		/**
@@ -82,11 +79,11 @@ namespace pointcloud
 		/**
 			Set dimension
 
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setNumberOfElements(size_t number_of_elements_)
+		void setNumberOfElements(size_t number_of_vertices_)
 		{
-			number_of_elements = number_of_elements_;
+			number_of_vertices = number_of_vertices_;
 		}
 		
 		/**
@@ -97,9 +94,9 @@ namespace pointcloud
 		/**
 			Set pointcloud
 
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 		*/
-		virtual void setPointcloud(size_t number_of_elements_) = 0;
+		virtual void setPointcloud(size_t number_of_vertices_) = 0;
 
 		/**
 			Clear
@@ -218,13 +215,13 @@ namespace pointcloud
 		virtual void setColor(uint8_t color_, size_t row_, size_t col_) = 0;
 
 		/**
-			Get Number of elements
+			Get Number of vertices
 			
-			@return Number of elements
+			@return Number of vertices
 		*/
-		size_t getNumberOfElements() const
+		size_t getNumberOfVertices() const
 		{
-			return number_of_elements;
+			return number_of_vertices;
 		}
 
 		/**
@@ -356,9 +353,19 @@ namespace pointcloud
 
 	protected:
 		/**
-			Number of elements
+			Number of vertices
 		*/
-		size_t number_of_elements;
+		size_t number_of_vertices;
+
+		/**
+			Number of triangles
+		*/
+		size_t number_of_triangles;
+
+		/**
+			Indices which specifiy triangles
+		*/
+		size_t* triangles;
 
 		/**
 			Flag for points
@@ -380,10 +387,6 @@ namespace pointcloud
 		*/
 		bool triangle_flag;
 
-		/**
-			Indices which specifiy triangles
-		*/
-		size_t* triangles;
 	};
 
 	
@@ -396,7 +399,7 @@ namespace pointcloud
 	template<typename ElementType>
 	std::ostream& operator<<(std::ostream& out_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
 	{
-		size_t number = pointcloud_.getNumberOfElements() > 10 ? 10 : pointcloud_.getNumberOfElements();
+		size_t number = pointcloud_.getNumberOfVertices() > 10 ? 10 : pointcloud_.getNumberOfVertices();
 
 		out_ << number << std::endl;
 
