@@ -33,6 +33,7 @@
 #include "math/adjustment.h"
 #include "math/angle.h"
 #include "math/function.h"
+#include "math/pca.h"
 #include "math/zero.h"
 
 #endif /* INCLUDE_MATH_H_ */

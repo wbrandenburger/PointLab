@@ -39,11 +39,12 @@
 
 #include "pcsimp.hpp"
 
-#include "tools/utils.h"
+#include "tools/gl.h"
 #include "tools/io.h"
 #include "tools/math.h"
 #include "tools/pointcloud.h"
 #include "tools/parameters.h"
+#include "tools/utils.h"
 
 #include "trees/trees.hpp"
 #include "eigen3/Eigen/Dense"
@@ -73,15 +74,15 @@ int main(int argc, char* argv[]) {
 	*/
 	utils::Timer time;
 	
-	unsigned char flags = 0;
+	uint8_t flags = 0;
 	if (plyIO.isPoints()) {
-		flags |= pointcloud::POINTCLOUD_POINTS;
+		flags |= Vertex::POINTS;
 	}
 	if (plyIO.isColor()) {
-		flags |= pointcloud::POINTCLOUD_COLORS;
+		flags |= Vertex::RGB;
 	}
 	if (plyIO.isNormal()) {
-		flags |= pointcloud::POINTCLOUD_NORMALS;
+		flags |= Vertex::NORMALS;
 	}
 
 	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
@@ -145,10 +146,16 @@ int main(int argc, char* argv[]) {
 	glview.setX(array_x);
 	glview.subPlot(2, 2, 2);
 
-
+	float* points = pointcloud.getPointsPtr();
 	glview.setPlot3D();
-	glview.setPointcloud(GLParams::POINTS, pointcloud.getPointsPtr(), pointcloud.getNumberOfElements());
+	glview.setPointcloud(GLParams::POINTS, points, pointcloud.getNumberOfElements());
 	glview.subPlot(2, 2, 3);
+	delete[] points;
+
+	bool a = 0 || 0;
+	bool b = 1 || 0;
+	bool c = 0 || 1;
+	std::cout << a << " " << b << " " << c << std::endl;
 
 
 	glview.mainLoop();

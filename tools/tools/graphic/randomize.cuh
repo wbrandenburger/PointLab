@@ -1,7 +1,9 @@
 /***********************************************************************
 * Software License Agreement (BSD License)
 *
-* Copyright 2017  Wolfgang Brandenburger. All rights reserved.
+* Copyright 2017	Wolfgang Brandenburger
+*					(w.brandenburger@unibw.de).
+*					All rights reserved.
 *
 * THE BSD LICENSE
 *
@@ -26,7 +28,6 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
-
 
 #ifndef GRAPHIC_RANDOMIZE_CUH_
 #define GRAPHIC_RANDOMIZE_CUH_

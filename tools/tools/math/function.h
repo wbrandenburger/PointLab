@@ -1,7 +1,9 @@
 /***********************************************************************
 * Software License Agreement (BSD License)
 *
-* Copyright 2017  Wolfgang Brandenburger (w.brandenburger@unibw.de). All rights reserved.
+* Copyright 2017	Wolfgang Brandenburger
+*					(w.brandenburger@unibw.de).
+*					All rights reserved.
 *
 * THE BSD LICENSE
 *
