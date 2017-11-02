@@ -114,15 +114,26 @@ namespace pointcloud
 		PointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_) :
 			PointcloudSoA()
 		{
-			copyPointcloud(pointcloud_);
+			copyPointcloudSoA(pointcloud_);
 		}
-		
+			
 		/**
 			Copy constructor
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA(const PointcloudAoS<ElementType>&& pointcloud_) = delete;
+		PointcloudSoA(const PointcloudAoS<ElementType>& pointcloud_) :
+			PointcloudSoA()
+		{
+			copyPointcloudAoS(pointcloud_);
+		}	
+
+		/**
+			Copy constructor
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudSoA(const PointcloudSoA<ElementType>&& pointcloud_) = delete;
 
 		/**
 			Operator =
@@ -133,24 +144,39 @@ namespace pointcloud
 		{
 			clearMemory();
 
-			copyPointcloud(pointcloud_);
+			copyPointcloudSoA(pointcloud_);
 
 			return (*this);
 		}
-		
+
 		/**
 			Operator =
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA& operator=(const PointcloudAoS<ElementType>&& pointcloud_) = delete;
+		PointcloudSoA& operator=(const PointcloudAoS<ElementType>& pointcloud_) 
+		{
+			clearMemory();
 
+			copyPointcloudAoS(pointcloud_);
+
+			return (*this);
+		}	
+
+		/**
+			Operator =
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudSoA& operator=(const PointcloudSoA<ElementType>&& pointcloud_) = delete;
+
+	private:
 		/**
 			Copy the pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void copyPointcloud(const PointcloudAoS<ElementType>& pointcloud_)
+		void copyPointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_)
 		{
 			setNumberOfVertices(pointcloud_.getNumberOfVertices());
 			setNumberOfTriangles(pointcloud_.getNumberOfTriangles());
@@ -162,10 +188,30 @@ namespace pointcloud
 			points = pointcloud_.getPointsPtr();
 			if (isColor()) { colors = pointcloud_.getColorsPtrsPtr(); }
 			if (isNormal()) { normals = pointcloud_.getNormalsPtr(); }
-			//if (isTriangle()) { points = pointcloud_.getPointsPtr(); }
+			if (isTriangle()) { triangle = pointcloud_.getTrianglesPtr(); }
 		}
 
-	private:
+		/**
+			Copy the pointcloud
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		void copyPointcloudAoS(const PointcloudAoS<ElementType>& pointcloud_)
+		{
+			setNumberOfVertices(pointcloud_.getNumberOfVertices());
+			setNumberOfTriangles(pointcloud_.getNumberOfTriangles());
+
+			if (pointcloud_.isColor()) { setColorFlag(); }
+			if (pointcloud_.isNormal()) { setNormalFlag(); }
+			if (pointcloud_.isTriangle()) { setTriangleFlag(); }
+
+			points = pointcloud_.getPointsPtr();
+			if (isColor()) { colors = pointcloud_.getColorsPtrsPtr(); }
+			if (isNormal()) { normals = pointcloud_.getNormalsPtr(); }
+			if (isTriangle()) { triangle = pointcloud_.getTrianglesPtr(); }
+		}
+
+
 		/**
 			Allocate the memory for the pointcloud
 		*/
@@ -521,7 +567,7 @@ namespace pointcloud
 		*/
 		ElementType* endPoint() const
 		{
-			return  &points[getNumberOfVertices() * 3 + 2] + 1;
+			return  &points[(getNumberOfVertices() - 1) * 3 + 2] + 1;
 		}
 		/**
 			Returns a pointer to the last entry + 1 of colors
@@ -530,7 +576,7 @@ namespace pointcloud
 		*/
 		uint8_t* endColor() const
 		{
-			return  &colors[getNumberOfVertices() * 3 + 2] + 1;
+			return  &colors[(getNumberOfVertices() - 1) * 3 + 2] + 1;
 		}
 		/**
 			Returns a pointer to the last entry + 1 of normals
@@ -539,7 +585,7 @@ namespace pointcloud
 		*/
 		ElementType* endNormal() const
 		{
-			return  &normals[getNumberOfVertices() * 3 + 2] + 1;
+			return  &normals[(getNumberOfVertices() - 1) * 3 + 2] + 1;
 		}
 	
 		/**
@@ -549,7 +595,7 @@ namespace pointcloud
 		*/
 		size_t* endTriangle() const
 		{
-			return &triangles[getNumberOfTriangles() * 3 + 2] + 1;
+			return &triangles[(getNumberOfTriangles() - 1) * 3 + 2] + 1;
 		}
 
 		/**
@@ -557,7 +603,6 @@ namespace pointcloud
 		*/
 		template<typename IteratorType> struct Iterator
 		{
-
 			/**
 				Constructor
 			*/
@@ -567,9 +612,12 @@ namespace pointcloud
 
 			/**
 				Constructor
+
+				@param[in] begin Pointer to an element
 			*/
-			Iterator(IteratorType* begin) : iterator_(begin)
+			Iterator(IteratorType* begin) : Iterator()
 			{
+				iterator_ = begin;
 			}
 
 			/**
@@ -618,6 +666,17 @@ namespace pointcloud
 			Iterator& operator=(IteratorType* iterator)
 			{
 				iterator_ = iterator;
+			}
+
+			/**
+				Operator = 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator!=(IteratorType* iterator)
+			{
+				return iterator_ != iterator;
 			}
 
 			/**

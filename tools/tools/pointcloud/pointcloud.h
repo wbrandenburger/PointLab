@@ -137,9 +137,6 @@ namespace pointcloud
 			if (number_of_triangles) {
 				exitFailure(__FILE__, __LINE__);
 			}
-			else {
-				isTriangle = true;
-			}
 
 			number_of_triangles = number_of_triangles_;
 		}	
@@ -154,9 +151,6 @@ namespace pointcloud
 		{
 			if (number_of_vertices || number_of_triangles) {
 				exitFailure(__FILE__, __LINE__);
-			}
-			else if(!isTriangle()) {
-				triangle_flag = true;
 			}
 
 			number_of_vertices = number_of_vertices_;
@@ -212,6 +206,8 @@ namespace pointcloud
 		*/
 		void setTriangles(size_t number_of_triangles_)
 		{
+			triangle_flag = true;
+
 			setNumberOfTriangles(number_of_triangles_);
 
 			clearMemoryTriangles();
@@ -643,7 +639,7 @@ namespace pointcloud
 		*/
 		size_t* endTriangle() const
 		{
-			return &triangles[getNumberOfTriangles() * 3 + 2] + 1;
+			return &triangles[(getNumberOfTriangles() - 1) * 3 + 2] + 1;
 		}
 
 	protected:
@@ -658,7 +654,7 @@ namespace pointcloud
 		/**
 			Set normal flag 
 		*/
-		bool setNormalFlag()
+		void setNormalFlag()
 		{
 			normal_flag = true;
 		}
@@ -666,7 +662,7 @@ namespace pointcloud
 		/**
 			Set triangle flag 
 		*/
-		bool setTriangleFlag()
+		void setTriangleFlag()
 		{
 			triangle_flag = true;
 		}

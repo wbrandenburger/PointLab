@@ -46,7 +46,6 @@ namespace pointcloud
 		*/
 		PointcloudNode()
 		{
-			clear();
 		}
 
 		/**
@@ -68,11 +67,11 @@ namespace pointcloud
 			@param[in] normal_ Normal
 			@param[in] color_ Color
 		*/
-		PointcloudNode(ElementType* point_, ElementType* normal_, uint8_t* color_)
+		PointcloudNode(ElementType* point_, uint8_t* color_, ElementType* normal_)
 		{
 			setPoint(point_);
-			setNormal(normal_);
 			setColor(color_);
+			setNormal(normal_);
 		}
 
 		/**
@@ -84,16 +83,6 @@ namespace pointcloud
 		{
 			std::memcpy(&point[0], point_, sizeof(ElementType) * 3);
 		}
-
-		/**
-			Set normal
-
-			@param[in] normal_ Normal
-		*/
-		void setNormalPtr(ElementType* normal_)
-		{
-			std::memcpy(&normal[0], normal_, sizeof(ElementType) * 3);
-		}
 		
 		/**
 			Set color
@@ -103,6 +92,16 @@ namespace pointcloud
 		void setColorPtr(uint8_t* color_)
 		{
 			std::memcpy(&color[0], color_, sizeof(uint8_t) * 3);
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+		*/
+		void setNormalPtr(ElementType* normal_)
+		{
+			std::memcpy(&normal[0], normal_, sizeof(ElementType) * 3);
 		}
 
 		/**
@@ -117,17 +116,6 @@ namespace pointcloud
 		}
 
 		/**
-			Set normal
-
-			@param[in] normal_ Normal
-			@parma[in] index_ Index
-		*/
-		void setNormal(ElementType normal_, size_t index_)
-		{
-			normal[index_] = normal_;
-		}
-		
-		/**
 			Set color
 
 			@param[in] color_ Color
@@ -137,11 +125,16 @@ namespace pointcloud
 		{
 			color[index_] = color_;
 		}
+
 		/**
-			Clear
+			Set normal
+
+			@param[in] normal_ Normal
+			@parma[in] index_ Index
 		*/
-		void clear()
+		void setNormal(ElementType normal_, size_t index_)
 		{
+			normal[index_] = normal_;
 		}
 
 		/**
@@ -167,17 +160,6 @@ namespace pointcloud
 		}
 
 		/**
-			Get normal information of specified index
-
-			@param[in] index_ Dimension
-			@return Return normal information of specified index
-		*/
-		ElementType getNormal(size_t index_)
-		{
-			return normal[index_];
-		}
-	
-		/**
 			Get color information of specified index
 
 			@param[in] index_ Dimension
@@ -189,6 +171,17 @@ namespace pointcloud
 		}
 
 		/**
+			Get normal information of specified index
+
+			@param[in] index_ Dimension
+			@return Return normal information of specified index
+		*/
+		ElementType getNormal(size_t index_)
+		{
+			return normal[index_];
+		}
+
+		/**
 			Get pointer to point data
 
 			@return Return pointer to point data
@@ -196,16 +189,6 @@ namespace pointcloud
 		ElementType* getPointPtr()
 		{
 			return &point[0];
-		}
-
-		/**
-			Get pointer to the normal
-
-			@return Return pointer to the normal
-		*/
-		ElementType* getNormalPtr()
-		{
-			return &normal[0];
 		}
 	
 		/**
@@ -218,19 +201,29 @@ namespace pointcloud
 			return &color[0];
 		}
 		/**
+			Get pointer to the normal
+
+			@return Return pointer to the normal
+		*/
+		ElementType* getNormalPtr()
+		{
+			return &normal[0];
+		}
+
+		/**
 			Point
 		*/
 		ElementType point[3];
 
 		/**
+			Color
+		*/
+		uint8_t color[4];
+
+		/**
 			Normal
 		*/
 		ElementType normal[3];
-
-		/**
-			Color
-		*/
-		uint8_t color[3];
 	};
 }
 

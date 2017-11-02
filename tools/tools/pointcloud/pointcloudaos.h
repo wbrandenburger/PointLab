@@ -114,7 +114,18 @@ namespace pointcloud
 		PointcloudAoS(const PointcloudAoS<ElementType>& pointcloud_) :
 			PointcloudAoS()
 		{
-			copyPointcloud(pointcloud_);
+			copyPointcloudAoS(pointcloud_);
+		}
+
+		/**
+			Copy constructor
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudAoS(const PointcloudSoA<ElementType>& pointcloud_) :
+			PointcloudAoS()
+		{
+			copyPointcloudSoA(pointcloud_);
 		}
 		
 		/**
@@ -122,7 +133,7 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudAoS(const PointcloudSoA<ElementType>&& pointcloud_) = delete;
+		PointcloudAoS(const PointcloudAoS<ElementType>&& pointcloud_) = delete;
 
 		/**
 			Operator =
@@ -143,14 +154,29 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudAoS& operator=(const PointcloudSoA<ElementType>&& pointcloud_) = delete;
+		PointcloudAoS& operator=(const PointcloudSoA<ElementType>& pointcloud_) 
+		{
+			clearMemory();
 
+			copyPointcloudSoA(pointcloud_);
+
+			return (*this);
+		}
+
+		/**
+			Operator =
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		PointcloudAoS& operator=(const PointcloudAoS<ElementType>&& pointcloud_) = delete;
+
+	private:
 		/**
 			Copy the pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void copyPointcloud(const PointcloudAoS<ElementType>& pointcloud_)
+		void copyPointcloudAoS(const PointcloudAoS<ElementType>& pointcloud_)
 		{
 			setNumberOfVertices(pointcloud_.getNumberOfVertices());
 			setNumberOfTriangles(pointcloud_.getNumberOfTriangles());
@@ -160,10 +186,51 @@ namespace pointcloud
 			if (pointcloud_.isTriangle()) { setTriangleFlag(); }
 
 			pointcloud = pointcloud_.getPointcloud();
-			//if (isTriangle()) { points = pointcloud_.getPointsPtr(); }
+			if (isTriangle()) { triangles = pointcloud_.getTrianglesPtr(); }
 		}
 
-	private:
+		/**
+			Copy the pointcloud
+
+			@param[in] pointcloud_ Pointcloud
+		*/
+		void copyPointcloudSoA(const PointcloudSoA<ElementType>& pointcloud_)
+		{
+			setNumberOfVertices(pointcloud_.getNumberOfVertices());
+			setNumberOfTriangles(pointcloud_.getNumberOfTriangles());
+
+			if (pointcloud_.isColor()) { setColorFlag(); }
+			if (pointcloud_.isNormal()) { setNormalFlag(); }
+			if (pointcloud_.isTriangle()) { setTriangleFlag(); }
+
+			allocateMemoryPointcloud();
+			size_t counter = 0;
+			for (PointcloudSoA<ElementType>::Iterator<ElementType> it = pointcloud_.beginPoint();
+				it != pointcloud_.endPoint(); it++) {
+				setPoint(*it, std::floor(counter / 3), counter % 3);
+				counter++;
+			}
+			if (isColor()) { 
+				counter = 0;
+				for (PointcloudSoA<ElementType>::Iterator<uint8_t> it = pointcloud_.beginColor();
+					it != pointcloud_.endColor(); it++) {
+					setColor(*it, std::floor(counter / 3), counter % 3);
+					counter++;
+				}
+			}
+			if (isNormal()) { 
+				counter = 0;
+				for (PointcloudSoA<ElementType>::Iterator<ElementType> it = pointcloud_.beginNormal();
+					it != pointcloud_.endNormal(); it++) {
+					setNormal(*it, std::floor(counter / 3), counter % 3);
+					counter++;
+				}
+			}
+
+			if (isTriangle()) { triangles = pointcloud_.getTrianglesPtr(); }
+		}
+
+	
 		/**
 			Allocate the memory for the pointcloud
 		*/
@@ -507,36 +574,6 @@ namespace pointcloud
 		}
 
 		/**
-			Get stride for points
-
-			return Stride for points
-		*/
-		size_t getStridePoint() const
-		{
-			return sizeof(ElementType) * 3 + sizeof(uint8_t) * 3;
-		}
-
-		/**
-			Get stride for color
-
-			return Stride for color
-		*/
-		size_t getStrideColor() const
-		{
-			return sizeof(ElementType) * 6;
-		}
-
-		/**
-			Get stride for normals
-
-			return Stride for normals
-		*/
-		size_t getStrideNormal() const
-		{
-			return sizeof(ElementType) * 3 + sizeof(uint8_t) * 3;
-		}
-		
-		/**
 			Get stride for triangles
 
 			return Stride for triangles
@@ -553,7 +590,7 @@ namespace pointcloud
 		*/
 		ElementType* beginPoint() const
 		{
-			return static_cast<ElementType*>((char*)&pointcloud[0] + 0);
+			return reinterpret_cast<ElementType*>((char*)&pointcloud[0] + 0);
 		}
 
 		/**
@@ -563,7 +600,7 @@ namespace pointcloud
 		*/
 		uint8_t* beginColor() const
 		{
-			return static_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3);
+			return reinterpret_cast<uint8_t*>((char*)&pointcloud[0] + sizeof(ElementType) * 3);
 		}
 				
 		/**
@@ -573,7 +610,7 @@ namespace pointcloud
 		*/
 		ElementType* beginNormal() const
 		{
-			return static_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + sizeof(uint8_t) * 3);
+			return reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + 4);
 		}
 
 		/**
@@ -583,7 +620,7 @@ namespace pointcloud
 		*/
 		ElementType* endPoint() const
 		{
-			return static_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices()] + sizeof(PointcloudNode<ElementType>) + 0);
+			return reinterpret_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices() - 1]  + sizeof(PointcloudNode<ElementType>));
 		}
 		/**
 			Returns a pointer to the last entry + 1 of colors
@@ -592,7 +629,7 @@ namespace pointcloud
 		*/
 		uint8_t* endColor() const
 		{
-			return static_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices()] + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3);
+			return reinterpret_cast<uint8_t*>((char*)&pointcloud[getNumberOfVertices() - 1]  + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3 );
 		}
 		/**
 			Returns a pointer to the last entry + 1 of normals
@@ -601,7 +638,7 @@ namespace pointcloud
 		*/
 		ElementType* endNormal() const
 		{
-			return static_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices()] + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3 + sizeof(uint8_t) * 3);
+			return reinterpret_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices() - 1] + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3 + 4);
 		}
 	
 		/**
@@ -609,26 +646,27 @@ namespace pointcloud
 		*/
 		template<typename IteratorType> struct Iterator
 		{
-
 			/**
 				Constructor
 			*/
 			Iterator() : iterator_(nullptr), stride_(0), index_(0)
 			{
+				if (sizeof(IteratorType) == 1) {
+					stride_ = sizeof(ElementType) * 6 + 2;
+				}
+				else {
+					stride_ = sizeof(ElementType) * 4 + 4;
+				}
 			}
-
+			
 			/**
 				Constructor
-			*/
-			Iterator(IteratorType* begin, size_t stride) : iterator_(begin), stride_(stride), index_(0)
-			{
-			}
 
-			/**
-				Constructor
+				@param[in] begin Pointer to an element
 			*/
-			Iterator(size_t stride) : iterator_(nullptr), stride_(stride), index_(0)
+			Iterator(IteratorType* begin) : Iterator()
 			{
+				iterator_ = begin;
 			}
 
 			/**
@@ -680,6 +718,17 @@ namespace pointcloud
 			}
 
 			/**
+				Operator = 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator!=(IteratorType* iterator)
+			{
+				return iterator_ != iterator;
+			}
+
+			/**
 				Operator ++
 
 				@param[in] Increment
@@ -688,7 +737,7 @@ namespace pointcloud
 			Iterator& operator++(int)
 			{
 				if (index_ % 3 == 2){
-					iterator_ = static_cast<IteratorType*>((char*)iterator_ + stride_);
+					iterator_ = reinterpret_cast<IteratorType*>((char*)iterator_ + stride_);
 					index_ = 0;
 				}
 				else {

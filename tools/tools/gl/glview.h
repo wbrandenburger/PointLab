@@ -112,7 +112,7 @@ namespace utils
 		GLView()
 		{
 			int argc = 0;
-			char** argv;
+			char** argv = nullptr;
 			
 			glutInit(&argc, argv);
 
