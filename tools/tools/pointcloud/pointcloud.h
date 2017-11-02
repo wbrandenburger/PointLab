@@ -146,8 +146,7 @@ namespace pointcloud
 			number_of_vertices = number_of_vertices_;
 			number_of_triangles = number_of_triangles_;
 		}
-	
-	protected:
+
 		/**
 			Set the flags
 		*/
@@ -215,7 +214,6 @@ namespace pointcloud
 		*/
 		void clearMemoryTriangles()
 		{
-			std::cout << "4" << std::endl;
 			if (triangles) {
 				delete[] triangles;
 				triangles = nullptr;
@@ -229,32 +227,71 @@ namespace pointcloud
 			@param[in] list_ List with indices to elements of the subset
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		virtual void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const = 0;
+		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
+		{
+			getSubset(list_.data(), list_.size(), subset_);
+		}
 
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@param[in] number_of_elements_in_list_ Number of elements in list
+			@param[in,out] subset_ Reference to the pointcloud with the subset
+		*/
+		void getSubset(size_t* list_,size_t number_of_elements_in_list_, Pointcloud<ElementType>& subset_) const
+		{
+			uint8_t flags;
+			if (isColor()) {
+				flags |= Vertex::RGB;
+			}
+			if (isNormal()) {
+				flags |= Vertex::NORMALS;
+			}
+			subset_.setFlags(flags);
+			subset_.setPointcloud(list_.number_of_elements_in_list_);
+
+			for (size_t i = 0; i < number_of_elements_in_list_; i++) {
+				if (list_[i] >= number_of_vertices) {
+					exitFailure(__FILE__, __LINE__);
+				}
+				subset_.setPointPtr(getPointPtr(list_[i]),i);
+				if (isColor()) {
+					subset_.setNormalPtr(getNormalPtr(list_[i]), i);
+				}
+				if (isNormal()) {
+					subset_.setColorPtr(getColorPtr(list_[i]), i);
+				}
+			}
+		}
 		/**
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		virtual void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const  = 0;
-		
-		/**
-			Generate a subset of the pointcloud
-
-			@param[in] list_ List with indices to elements of the subset
-			@param[in,out] subset_ Reference to the pointcloud with the subset
-		*/
-		virtual void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const = 0;
+		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
+		{
+			getSubset(list_.data(), list_.size(), subset_);
+		}
 
 		/**
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
+			@param[in] number_of_elements_in_list_ Number of elements in list
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		virtual void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const  = 0;
-		
+		void getSubset(size_t* list_,size_t number_of_elements_in_list_, utils::Matrix<ElementType>& subset_) const
+		{
+			for (size_t i = 0; i <  number_of_elements_in_list_; i++) {
+				if (list_[i] >= number_of_vertices) {
+					exitFailure(__FILE__, __LINE__);
+				}
+				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
+			}
+		}
+
 		/**
 			Set points
 
@@ -554,6 +591,25 @@ namespace pointcloud
 		bool setTriangleFlag()
 		{
 			triangle_flag = true;
+		}
+
+		/**
+			Get flag
+		*/
+		uint8_t getFlags() const
+		{
+			uint8_t flags = 0;
+			if (isColor()) {
+				flags |= Vertex::RGB;
+			}
+			if (isNormal()) {
+				flags |= Vertex::NORMALS;
+			}
+			if (isTriangle()) {
+				flags |= Vertex::TRIANGLES;
+			}
+
+			return flags;
 		}
 
 	protected:

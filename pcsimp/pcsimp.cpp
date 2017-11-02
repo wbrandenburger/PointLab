@@ -161,8 +161,6 @@ int main(int argc, char* argv[]) {
 	//////////////////pointcloud.getMatrix(matrix);
 	//////////////////trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
 
-	std::cout << "NOCH NICHT" << std::endl;
-
 	//utils::Timer time;
 	//
 	//io::PlyIO plyIO;

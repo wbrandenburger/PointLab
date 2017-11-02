@@ -217,7 +217,7 @@ namespace pointcloud
 
 	private:
 		/**
-			Clear
+			Clear memory of the pointcloud and triangles
 		*/
 		void clearMemory()
 		{
@@ -226,7 +226,7 @@ namespace pointcloud
 		}
 
 		/**
-			Clear
+			Clear memory of pointcloud
 		*/
 		void clearMemoryPointcloud()
 		{
@@ -237,80 +237,6 @@ namespace pointcloud
 		}
 
 	public:
-		/**
-			Generate a subset of the pointcloud
-
-			@param[in] list_ List with indices to elements of the subset
-			@param[in,out] subset_ Reference to the pointcloud with the subset
-		*/
-		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
-		{
-			subset_.setPointcloud(list_.size());
-			
-			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= number_of_vertices) {
-					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-					std::exit(EXIT_FAILURE);
-				}				
-				subset_.setPointPtr(getPointPtr(list_[i]), i);
-				subset_.setNormalPtr(getNormalPtr(list_[i]), i);
-				subset_.setColorPtr(getColorPtr(list_[i]), i);
-			}
-		}
-
-		/**
-			Generate a subset of the pointcloud
-
-			@param[in] list_ List with indices to elements of the subset
-			@param[in,out] subset_ Reference to the pointcloud with the subset
-		*/
-		void getSubset(std::vector<int> list_, Pointcloud<ElementType>& subset_) const
-		{
-			subset_.setPointcloud(list_.size());
-
-			for (size_t i = 0; i < list_.size(); i++) {
-				if (list_[i] >= number_of_vertices) {
-					std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-					std::exit(EXIT_FAILURE);
-				}
-				subset_.setPointPtr(getPointPtr(list_[i]), i);
-				subset_.setNormalPtr(getNormalPtr(list_[i]), i);
-				subset_.setColorPtr(getColorPtr(list_[i]), i);
-			}
-		}
-
-		/**
-			Generate a subset of the pointcloud
-
-			@param[in] list_ List with indices to elements of the subset
-			@param[in,out] subset_ Reference to the pointcloud with the subset
-		*/
-		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
-		{
-			for (size_t i = 0; i < list_.size(); i++) {
-				//for (size_t j = 0; j < 3; j++) {
-				//	subset_[i][j] = getPoint(list_[i], j);
-				//}
-				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
-			}
-		}
-
-		/**
-			Generate a subset of the pointcloud
-
-			@param[in] list_ List with indices to elements of the subset
-			@param[in,out] subset_ Reference to the pointcloud with the subset
-		*/
-		void getSubset(std::vector<int> list_, utils::Matrix<ElementType>& subset_) const
-		{
-			for (size_t i = 0; i < list_.size(); i++) {
-				//for (size_t j = 0; j < 3; j++) {
-				//	subset_[i][j] = getPoint(list_[i], j);
-				//}
-				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
-			}
-		}
-
 		/**
 			Set points
 
