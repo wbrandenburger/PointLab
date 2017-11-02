@@ -122,11 +122,7 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudAoS(const PointcloudSoA<ElementType>&& pointcloud_) :
-			PointcloudAoS()
-		{
-			*this = pointcloud_;
-		}
+		PointcloudAoS(const PointcloudSoA<ElementType>&& pointcloud_) = delete;
 
 		/**
 			Operator =
@@ -147,15 +143,7 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudAoS& operator=(const PointcloudSoA<ElementType>&& pointcloud_) 
-		{
-			clearMemory();
-
-			*this = pointcloud_;
-
-			return (*this);
-		}
-
+		PointcloudAoS& operator=(const PointcloudSoA<ElementType>&& pointcloud_) = delete;
 
 		/**
 			Copy the pointcloud

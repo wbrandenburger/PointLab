@@ -122,11 +122,7 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA(const PointcloudAoS<ElementType>&& pointcloud_) :
-			PointcloudSoA()
-		{
-			*this = pointcloud_;
-		}
+		PointcloudSoA(const PointcloudAoS<ElementType>&& pointcloud_) = delete;
 
 		/**
 			Operator =
@@ -147,14 +143,7 @@ namespace pointcloud
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PointcloudSoA& operator=(const PointcloudAoS<ElementType>&& pointcloud_)
-		{
-			clearMemory();
-
-			*this = pointcloud_;
-
-			return (*this);
-		}
+		PointcloudSoA& operator=(const PointcloudAoS<ElementType>&& pointcloud_) = delete;
 
 		/**
 			Copy the pointcloud
@@ -345,13 +334,7 @@ namespace pointcloud
 		*/
 		void setPointsPtr(ElementType* points_)
 		{
-			points = new ElementType[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					points[i*3 + j] = points_[i*3 + j];
-				}
-			}
+			std::memcpy(points, points_, sizeof(ElementType) * getNumberOfVertices() * 3);
 		}
 
 		/**
@@ -361,13 +344,7 @@ namespace pointcloud
 		*/
 		void setNormalsPtr(ElementType* normals_)
 		{
-			normals = new ElementType[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					normals[i*3 + j] = normals_[i*3 + j];
-				}
-			}
+			std::memcpy(normals, normals_, sizeof(ElementType) * getNumberOfVertices() * 3);
 		}
 
 		/**
@@ -377,13 +354,7 @@ namespace pointcloud
 		*/
 		void setColorsPtr(uint8_t* colors_)
 		{
-			colors = new uint8_t[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					colors[i*3 + j] = colors_[i*3 + j];
-				}
-			}
+			std::memcpy(colors, colors_, sizeof(uint8_t) * getNumberOfVertices() * 3);
 		}
 
 		/**
@@ -394,9 +365,7 @@ namespace pointcloud
 		*/
 		void setPointPtr(ElementType* point_, size_t row_)
 		{
-			for (size_t i = 0; i < 3; i++) {
-				points[row_*3 + i] = point_[i];
-			}
+			std::memcpy(&points[row_ * 3], point_, sizeof(ElementType) * 3);
 		}
 
 		/**
@@ -407,9 +376,7 @@ namespace pointcloud
 		*/
 		void setNormalPtr(ElementType* normal_, size_t row_)
 		{
-			for (size_t i = 0; i < 3; i++) {
-				normals[row_*3 + i] = normal_[i];
-			}
+			std::memcpy(&normals[row_ * 3], normal_, sizeof(ElementType) * 3);
 		}
 
 		/**
@@ -420,9 +387,7 @@ namespace pointcloud
 		*/
 		void setColorPtr(uint8_t* color_, size_t row_)
 		{
-			for (size_t i = 0; i < 3; i++) {
-				colors[row_*3 + i] = color_[i];
-			}
+			std::memcpy(&colors[row_ * 3], color_, sizeof(uint8_t) * 3);
 		}
 
 		/**
@@ -434,7 +399,7 @@ namespace pointcloud
 		*/
 		void setPoint(ElementType point_, size_t row_, size_t col_)
 		{
-			points[row_*3 + col_] = point_;
+			points[row_ * 3 + col_] = point_;
 		}
 
 		/**
@@ -446,7 +411,7 @@ namespace pointcloud
 		*/
 		void setNormal(ElementType normal_, size_t row_, size_t col_)
 		{
-			normals[row_*3 + col_] = normal_;
+			normals[row_ * 3 + col_] = normal_;
 		}
 
 		/**
@@ -458,7 +423,7 @@ namespace pointcloud
 		*/
 		void setColor(uint8_t color_, size_t row_, size_t col_)
 		{
-			colors[row_*3 + col_] = color_;
+			colors[row_ * 3 + col_] = color_;
 		}
 
 		/**
@@ -470,7 +435,7 @@ namespace pointcloud
 		*/
 		ElementType getPoint(size_t row_, size_t col_) const
 		{
-			return points[row_*3 + col_];
+			return points[row_ * 3 + col_];
 		}
 
 		/**
@@ -482,7 +447,7 @@ namespace pointcloud
 		*/
 		ElementType getNormal(size_t row_, size_t col_) const
 		{
-			return normals[row_*3 + col_];
+			return normals[row_ * 3 + col_];
 		}
 
 		/**
@@ -494,7 +459,7 @@ namespace pointcloud
 		*/
 		uint8_t getColor(size_t row_, size_t col_) const
 		{
-			return colors[row_*3 + col_];
+			return colors[row_ * 3 + col_];
 		}
 
 		/**
@@ -505,7 +470,7 @@ namespace pointcloud
 		*/
 		ElementType* operator[](size_t index_) const
 		{
-			return &points[index_*3];
+			return &points[index_ * 3];
 		}
 
 		/**
@@ -516,7 +481,7 @@ namespace pointcloud
 		*/
 		ElementType* getPointPtr(size_t row_) const
 		{
-			return &points[row_*3];
+			return &points[row_ * 3];
 		}
 
 		/**
@@ -527,7 +492,7 @@ namespace pointcloud
 		*/
 		ElementType* getNormalPtr(size_t row_) const
 		{
-			return &normals[row_*3];
+			return &normals[row_ * 3];
 		}
 
 		/**
@@ -538,7 +503,7 @@ namespace pointcloud
 		*/		
 		uint8_t* getColorPtr(size_t row_) const
 		{
-			return &colors[row_*3];
+			return &colors[row_ * 3];
 		}
 
 		/**
@@ -548,13 +513,8 @@ namespace pointcloud
 		*/
 		ElementType* getPointsPtr() const
 		{
-			ElementType* new_points = new ElementType[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					new_points[i*3 + j] = points[i*3 + j];
-				}
-			}
+			ElementType* new_points = new ElementType[number_of_vertices * 3];
+			std::memcpy(new_points, points, sizeof(ElementType) * getNumberOfVertices() * 3);
 
 			return new_points;
 		}
@@ -566,13 +526,8 @@ namespace pointcloud
 		*/
 		ElementType* getNormalsPtr() const
 		{
-			ElementType* new_normals = new ElementType[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					new_normals[i*3 + j] = normals[i*3 + j];
-				}
-			}
+			ElementType* new_normals = new ElementType[number_of_vertices * 3];
+			std::memcpy(new_normals, normals, sizeof(ElementType) * getNumberOfVertices() * 3);
 
 			return new_normals;
 		}
@@ -584,13 +539,8 @@ namespace pointcloud
 		*/		
 		uint8_t* getColorsPtr() const
 		{
-			uint8_t* new_colors = new uint8_t[number_of_vertices*3];
-
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					new_colors[i*3 + j] = colors[i*3 + j];
-				}
-			}
+			uint8_t* new_colors = new uint8_t[number_of_vertices * 3];
+			std::memcpy(new_colors, colors, sizeof(ElementType) * getNumberOfVertices() * 3);
 
 			return new_colors;
 		}
@@ -603,7 +553,7 @@ namespace pointcloud
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
 			ElementType* data(new ElementType[number_of_vertices*3]);
-			std::memcpy(data, points, sizeof(ElementType)*number_of_vertices*3);
+			std::memcpy(data, points, sizeof(ElementType) * getNumberOfVertices() * 3);
 
 			matrix_.setMatrix(data, number_of_vertices, 3);
 		}

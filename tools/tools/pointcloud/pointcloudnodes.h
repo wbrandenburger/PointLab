@@ -82,9 +82,7 @@ namespace pointcloud
 		*/
 		void setPointPtr(ElementType* point_)
 		{
-			for (size_t i = 0; i < 3; i++) {
-				point[i] = point_[i];
-			}
+			std::memcpy(&point[0], point_, sizeof(ElementType) * 3);
 		}
 
 		/**
@@ -94,9 +92,7 @@ namespace pointcloud
 		*/
 		void setNormalPtr(ElementType* normal_)
 		{
-			for (size_t i = 0; i < 3; i++) {
-				normal[i] = normal_[i];
-			}
+			std::memcpy(&normal[0], normal_, sizeof(ElementType) * 3);
 		}
 		
 		/**
@@ -106,9 +102,7 @@ namespace pointcloud
 		*/
 		void setColorPtr(uint8_t* color_)
 		{
-			for (size_t i = 0; i < 3; i++) {
-				color[i] = color_[i];
-			}
+			std::memcpy(&color[0], color_, sizeof(uint8_t) * 3);
 		}
 
 		/**
@@ -148,11 +142,6 @@ namespace pointcloud
 		*/
 		void clear()
 		{
-			for (size_t i = 0; i < 3; i++){
-				point[i] = NULL;
-				normal[i] = NULL;
-				color[i] = NULL;
-			}
 		}
 
 		/**

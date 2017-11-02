@@ -147,10 +147,6 @@ int main(int argc, char* argv[]) {
 	glview.subPlot(2, 2, 3);
 	delete[] points;
 
-	bool a = 0 || 0;
-	bool b = 1 || 0;
-	bool c = 0 || 1;
-	std::cout << a << " " << b << " " << c << std::endl;
 
 
 	glview.mainLoop();

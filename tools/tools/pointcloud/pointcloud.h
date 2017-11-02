@@ -277,6 +277,16 @@ namespace pointcloud
 		virtual void setColorsPtr(uint8_t* colors_) = 0;
 		
 		/**
+			Set triangles
+
+			@param[in] triangles_ Triangles
+		*/
+		void setTrianglesPtr(size_t* triangles_)
+		{
+			std::memcpy(triangles, triangles_, sizeof(size_t) * getNumberOfTriangles() * 3);
+		}
+
+		/**
 			Set point
 
 			@param[in] point_ Point
@@ -299,6 +309,17 @@ namespace pointcloud
 			@param[in] row_ Row
 		*/
 		virtual void setColorPtr(uint8_t* color_, size_t row_) = 0;
+
+		/**
+			Set triangle
+
+			@param[in] triangle_ Triangle
+			@param[in] row_ Row
+		*/
+		void setTrianglePtr(size_t* triangle_, size_t row_)
+		{
+			std::memcpy(&triangles[row_ * 3], triangle_, sizeof(size_t) * 3);
+		}
 
 		/**
 			Set point
@@ -326,6 +347,18 @@ namespace pointcloud
 			@param[in] col_ Col
 		*/
 		virtual void setColor(uint8_t color_, size_t row_, size_t col_) = 0;
+	
+		/**
+			Set triangle
+
+			@param[in] triangle_ Triangle
+			@param[in] row_ Row
+			@param[in] col_ Col
+		*/
+		void setTriangle(size_t triangle, size_t row_, size_t col_)
+		{
+			triangles[row_ * 3 + col_] = triangle;
+		}
 
 		/**
 			Get Number of vertices
@@ -373,6 +406,18 @@ namespace pointcloud
 		virtual uint8_t getColor(size_t row_, size_t col_) const = 0;
 
 		/**
+			Get triangle data of specified index
+
+			@param[in] row_ Row
+			@param[in] col_ Col
+			@return Return triangle data of specified index
+		*/
+		size_t getTriangle(size_t row_, size_t col_) const
+		{
+			return triangles[row_ * 3 + col_];
+		}
+
+		/**
 			Operator [] Access on point information
 
 			@param[in] index_ Dimension
@@ -405,6 +450,17 @@ namespace pointcloud
 		virtual uint8_t* getColorPtr(size_t row_) const = 0;
 
 		/**
+			Get Pointer to triangle
+
+			@param[in] row_ Row
+			@return Return pointer to triangle
+		*/	
+		size_t* getTrianglePtr(size_t row_) const
+		{
+			return &triangles[row_ * 3]
+		}
+
+		/**
 			Get Pointer to point data
 
 			@return Return pointer to point data
@@ -424,6 +480,19 @@ namespace pointcloud
 			@return Return pointer to color information
 		*/		
 		virtual uint8_t* getColorsPtr() const = 0;
+
+		/**
+			Get Pointer to triangles
+
+			@return Return pointer to the triangles
+		*/
+		size_t* getTrianglesPtr() const
+		{
+			size_t* new_triangles = new size_t[getNumberOfTriangles() * 3];
+			std::memcpy(new_triangles, triangles, sizeof(size_t) * getNumberOfVertices() * 3);
+
+			return new_triangles;
+		}
 
 		/**
 			Get Matrix to points
@@ -532,7 +601,19 @@ namespace pointcloud
 	{
 		size_t number = pointcloud_.getNumberOfVertices() > 10 ? 10 : pointcloud_.getNumberOfVertices();
 
-		out_ << number << std::endl;
+		for (size_t i = 0; i < number; i++) {
+			out_ << pointcloud_.getPoint(i, 0) << " " << pointcloud_.getPoint(i, 1) << " " << pointcloud_.getPoint(i, 2) << " ";
+
+			if (pointcloud_.isColor()) {
+				out_ << (int)pointcloud_.getColor(i, 0) << " " << (int)pointcloud_.getColor(i, 1) << " " << (int)pointcloud_.getColor(i, 2) << " ";
+			}
+
+			if (pointcloud_.isNormal()) {
+				out_ << (int)pointcloud_.getNormal(i, 0) << " " << (int)pointcloud_.getNormal(i, 1) << " " << (int)pointcloud_.getNormal(i, 2) << " ";
+			} 
+			
+			out_ << std::endl;
+		}
 
 		return out_;
 	}
