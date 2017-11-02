@@ -38,7 +38,7 @@ namespace math
 	/**
 		Constant pi
 	*/
-	const double PI = 3.14159265359;
+	template<typename ElementType> ElementType const PI = static_cast<ElementType>(3.14159265359);
 
 	/**
 		Conversion radian to degree
@@ -47,7 +47,7 @@ namespace math
 	*/
 	template<typename ElementType> inline ElementType toDeg(ElementType angle_)
 	{
-		return angle_ * (ElementType)180.0 / (ElementType)PI;
+		return angle_ * (ElementType)180.0 / PI<ElementType>;
 	}
 
 	/**
@@ -57,7 +57,7 @@ namespace math
 	*/
 	template<typename ElementType> inline ElementType toRad(ElementType angle_)
 	{
-		return angle_ / (ElementType)180.0 * (ElementType)PI;
+		return angle_ / (ElementType)180.0 * PI<ElementType>;
 	}
 
 	/**
@@ -67,7 +67,7 @@ namespace math
 	*/
 	template<typename ElementType> inline ElementType inPI(ElementType angle_)
 	{
-		ElementType pi = (ElementType)PI;
+		ElementType pi = PI<ElementType>;
 		while (angle_ < -pi || angle_ > pi) {
 			angle_ += angle_ < -pi ? pi : -pi;
 		}
