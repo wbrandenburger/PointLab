@@ -54,45 +54,6 @@
 
 namespace utils
 {
-	/** 
-		Providing a class which allows to visualize pointclouds
-		This pointcloud can be a instance of:
-			- pointcloud::Pointcloud<ElementType>
-			- ElementType* 
-
-		A instance of a plotting object can be called with
-			- utils::GLPlot3D<ElementType> plot3d
-
-		This instance hold several plots which can be separate visualized.
-		To set a plot3d call
-			- plot3d.setPlot3D()
-		The setPlot3D() has to be called otherwise the pointclouds
-		cant be assigned.
-
-		To set the pointcloud call
-			- plot3d.setPointcloud(<container>)
-
-		With the function plot()
-			- plot3d.plot()
-		the data will be visualized.
-
-		To keep up a window with the results call mainLoop()
-			- plot3d.mainLoop()
-		When there a other programs called which use OpenGL you have to
-		call mainLoop() once.
-
-		Example:
-		utils::GLPlot3D<ElementType> plot3d;
-		plot3d.setPlot3D();
-			pointcloud::Pointcloud<ElementType> pointcloud;
-			*
-			* Assigning values to pointcloud
-			*
-			plot3d.setPointlcoud(pointcloud),
-		plot3d.plot();
-		plot3d.mainLoop();
-	*/
-
 	template<typename ElementType> class PlotContainer 
 	{
 	public:
@@ -124,12 +85,12 @@ namespace utils
 				normals = pointcloud_.getNormalsPtr();
 			}
 
-			number_of_elements = pointcloud_.getRows();
+			number_of_elements = pointcloud_.setNumberOfElements();
 
-			//if (pointcloud_.isTriangle()) {
-			//	number_of_triangles = pointcloud.getNumberOfIndices();
-			//	triangles = pointcloud.getTrianglesPtr();
-			//}
+			if (pointcloud_.isTriangle()) {
+				number_of_triangles = pointcloud.getNumberOfTriangles();
+				triangles = pointcloud.getTrianglesPtr();
+			}
 		}
 
 		/**
@@ -273,10 +234,10 @@ namespace utils
 
 			number_of_elements = pointcloud_.getRows();
 
-			//if (pointcloud_.isTriangle()) {
-			//	number_of_triangles = pointcloud.getNumberOfIndices();
-			//	triangles = pointcloud.getTrianglesPtr();
-			//}
+			if (pointcloud_.isTriangle()) {
+				number_of_triangles = pointcloud.getNumberOfTriangles();
+				triangles = pointcloud.getTrianglesPtr();
+			}
 		}
 
 		/**

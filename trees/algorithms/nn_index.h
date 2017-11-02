@@ -36,8 +36,8 @@
 
 #include "tools/utils.h"
 
-#include "utils/result_set.h"
-#include "utils/params.h"
+#include "trees/utils/result_set.h"
+#include "trees/utils/params.h"
 
 namespace trees
 {

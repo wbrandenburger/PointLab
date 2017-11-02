@@ -35,7 +35,7 @@
 #include <map>
 #include <assert.h>
 
-#include "defines.h"
+#include "trees/defines.h"
 
 #include "tools/utils.h"
 

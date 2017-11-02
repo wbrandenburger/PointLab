@@ -52,45 +52,6 @@
 
 namespace utils
 {
-	/** 
-		Providing a class which allows to visualize pointclouds
-		This pointcloud can be a instance of:
-			- pointcloud::Pointcloud<ElementType>
-			- ElementType* 
-
-		A instance of a plotting object can be called with
-			- utils::GLViewer<ElementType> viewer
-
-		This instance hold several plots which can be separate visualized.
-		To set a viewer call
-			- viewer.setViewer()
-		The setViewer() has to be called otherwise the pointclouds
-		cant be assigned.
-
-		To set the pointcloud call
-			- viewer.setPointcloud(<container>)
-
-		With the function plot()
-			- viewer.plot()
-		the data will be visualized.
-
-		To keep up a window with the results call mainLoop()
-			- viewer.mainLoop()
-		When there a other programs called which use OpenGL you have to
-		call mainLoop() once.
-
-		Example:
-		utils::GLViewer<ElementType> viewer;
-		viewer.setViewer();
-			pointcloud::Pointcloud<ElementType> pointcloud;
-			*
-			* Assigning values to pointcloud
-			*
-			viewer.setPointlcoud(pointcloud),
-		viewer.plot();
-		viewer.mainLoop();
-	*/
-
 	template<typename ElementType> class ViewerInstance
 	{
 	public: 

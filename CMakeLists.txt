@@ -84,18 +84,13 @@ foreach (FORTARGETS ${GCPTARGETS})
 	set_target_properties(${FORTARGETS} PROPERTIES FOLDER "gcp")
 endforeach()
 
-foreach(FORSTANDARDTARGETS ${STANDARD_TARGETS})
-	target_include_directories(${FORSTANDARDTARGETS} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-endforeach()
-
-
-
 set(TARGETS ${STANDARD_TARGETS} ${LIBRARY_TARGETS} )
 
 #------------------------------ Include ------------------------------ 
 foreach(FORTARGETS ${TARGETS})
-	target_include_directories(${FORTARGETS} PUBLIC "${FORTARGETS}")
+	#target_include_directories(${FORTARGETS} PUBLIC "${FORTARGETS}")
 	target_include_directories(${FORTARGETS} PUBLIC "tools")
+	target_include_directories(${FORTARGETS} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach()
 
 # ------------------------------ Libraries ------------------------------

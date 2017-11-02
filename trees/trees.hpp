@@ -32,13 +32,13 @@
 #ifndef TREES_HPP_
 #define TREES_HPP_
 
-#include "defines.h"
+#include "trees/defines.h"
 
-#include "algorithms/all_indices.h"
+#include "trees/algorithms/all_indices.h"
+
+#include "trees/utils/params.h"
 
 #include "tools/utils.h"
-
-#include "utils/params.h"
 
 namespace trees
 {

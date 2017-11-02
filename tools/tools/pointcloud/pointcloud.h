@@ -44,6 +44,22 @@
 
 namespace pointcloud
 {
+	/** 
+		Providing a class which stores pointclouds:
+		-	point information
+		-	color information
+		-	normal information
+		-	triangles
+		
+		There are two derived classes of the abstract class pointcloud
+		-	PointcloudAoS, which stores the information as an array of structures
+		-	PointcloudSoA, which stores the information as several arrays of structures
+		The triangles are stored separately.
+
+
+	*/
+
+
 	template<typename ElementType> class Pointcloud 
 	{
 
@@ -566,6 +582,68 @@ namespace pointcloud
 		bool isTriangle() const
 		{
 			return triangle_flag;
+		}
+
+		/**
+			Returns a pointer to the first entry of the points
+
+			@return Pointer to the first entry of the points
+		*/
+		virtual ElementType* beginPoint() const = 0;
+
+		/**
+			Returns a pointer to the first entry of colors
+
+			@return Pointer to the first entry of colors
+		*/
+		virtual uint8_t* beginColor() const = 0;
+				
+		/**
+			Returns a pointer to the first entry of normals
+
+			@return Pointer to the first entry of normals
+		*/
+		virtual ElementType* beginNormal() const = 0;
+
+		/**
+			Returns a pointer to the first entry of triangles
+
+			@return Pointer to the first entry of triangles
+		*/
+		size_t* beginTriangle() const
+		{
+			return triangles;
+		};
+
+		/**
+			Returns a pointer to the last entry + 1 of the points
+
+			@return Pointer to the last entry + 1 of the points
+		*/
+		virtual ElementType* endPoint() const = 0;
+
+		/**
+			Returns a pointer to the last entry + 1 of colors
+
+			@return Pointer to the last entry + 1 of colors
+		*/
+		virtual uint8_t* endColor() const = 0;
+
+		/**
+			Returns a pointer to the last entry + 1 of normals
+
+			@return Pointer to the last entry + 1 of normals
+		*/
+		virtual ElementType* endNormal() const = 0;
+	
+		/**
+			Returns a pointer to the last entry + 1 of triangles
+
+			@return Pointer to the last entry + 1 of triangles
+		*/
+		size_t* endTriangle() const
+		{
+			return &triangles[getNumberOfTriangles() * 3 + 2] + 1;
 		}
 
 	protected:

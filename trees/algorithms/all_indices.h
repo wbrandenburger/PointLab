@@ -32,8 +32,8 @@
 #ifndef TREES_ALL_INDICES_H_
 #define TREES_ALL_INDICES_H_
 
-#include "algorithms/nn_index.h"
-#include "algorithms/kdtree_index.h"
+#include "trees/algorithms/nn_index.h"
+#include "trees/algorithms/kdtree_index.h"
 
 #include "tools/utils.h"
 

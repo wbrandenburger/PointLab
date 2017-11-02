@@ -34,13 +34,13 @@
 
 #include <vector>
 
-#include "defines.h"
-#include "algorithms/nn_index.h"
+#include "trees/defines.h"
+#include "trees/algorithms/nn_index.h"
 
 #include "tools/utils.h"
 
-#include "utils/params.h"
-#include "utils/result_set.h"
+#include "trees/utils/params.h"
+#include "trees/utils/result_set.h"
 
 namespace trees
 {

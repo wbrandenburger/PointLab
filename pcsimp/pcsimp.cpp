@@ -33,7 +33,7 @@
 #include <string>
 #include <thread>
 
-#include "pcsimp.hpp"
+#include "pcsimp/pcsimp.hpp"
 
 #include "tools/gl.h"
 #include "tools/io.h"

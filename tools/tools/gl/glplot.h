@@ -44,54 +44,6 @@
 
 namespace utils
 {
-	/** 
-		Providing a class which allows to plot the values of a array.
-		This array can be a instance of:
-			- std::vector<ElementType>
-			- utils::Matrix<ElementType>
-			- ElementType* 
-
-		A instance of a plotting object can be called with
-			- utils::GLPlot<ElementType> plot
-
-		This instance hold several plots which can be separate visualized.
-		To set a plot call
-			- plot.setPlot(<number_of_elements>)
-		The setPlot(<number_of_elements>) has to be called otherwise the arrays 
-		cant be assigned.
-
-		To set the values in x- and in y-direction call setX(), respectively
-		setY() call
-			- plot.setX(<container>)
-			- plot.setY(<container>)
-		Keep in  mind that the container have the same size. It is possible to
-		assign several container in y-direction. If there is no data for x the 
-		void function set(X) can be called. There will be a container with suitable
-		values for x set. 
-
-		With the function plot()
-			- plot.plot()
-		the data will be visualized.
-
-		To keep up a window with the results call mainLoop()
-			- plot.mainLoop()
-		When there a other programs called which use OpenGL you have to
-		call mainLoop() once.
-
-		Example:
-		utils::GLPlot<ElementType> plot;
-		plot.setPlot(n);
-			std::vector<float> array_x(n);
-			std::vector<float> array_y(n);
-			*
-			* Assigning values to container
-			*
-			plot.setY(array_y);
-			plot.setX(array_x);
-		plot.plot();
-		plot.mainLoop();
-	*/
-
 	template<typename ElementType> class PlotFunction
 	{
 	public:

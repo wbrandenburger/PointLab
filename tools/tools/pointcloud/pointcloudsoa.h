@@ -484,6 +484,171 @@ namespace pointcloud
 			matrix_.setMatrix(data, number_of_vertices, 3);
 		}
 
+		/**
+			Returns a pointer to the first entry of the points
+
+			@return Pointer to the first entry of the points
+		*/
+		ElementType* beginPoint() const
+		{
+			return points;
+		};
+
+		/**
+			Returns a pointer to the first entry of colors
+
+			@return Pointer to the first entry of colors
+		*/
+		uint8_t* beginColor() const 
+		{
+			return colors;
+		};
+				
+		/**
+			Returns a pointer to the first entry of normals
+
+			@return Pointer to the first entry of normals
+		*/
+		ElementType* beginNormal() const 
+		{
+			return normals;
+		};
+
+		/**
+			Returns a pointer to the last entry + 1 of the points
+
+			@return Pointer to the last entry + 1 of the points
+		*/
+		ElementType* endPoint() const
+		{
+			return  &points[getNumberOfVertices() * 3 + 2] + 1;
+		}
+		/**
+			Returns a pointer to the last entry + 1 of colors
+
+			@return Pointer to the last entry + 1 of colors
+		*/
+		uint8_t* endColor() const
+		{
+			return  &colors[getNumberOfVertices() * 3 + 2] + 1;
+		}
+		/**
+			Returns a pointer to the last entry + 1 of normals
+
+			@return Pointer to the last entry + 1 of normals
+		*/
+		ElementType* endNormal() const
+		{
+			return  &normals[getNumberOfVertices() * 3 + 2] + 1;
+		}
+	
+		/**
+			Returns a pointer to the last entry + 1 of triangles
+
+			@return Pointer to the last entry + 1 of triangles
+		*/
+		size_t* endTriangle() const
+		{
+			return &triangles[getNumberOfTriangles() * 3 + 2] + 1;
+		}
+
+		/**
+			Structure of a iterator for points, colors, normals and triangles
+		*/
+		template<typename IteratorType> struct Iterator
+		{
+
+			/**
+				Constructor
+			*/
+			Iterator() : iterator_(nullptr)
+			{
+			}
+
+			/**
+				Constructor
+			*/
+			Iterator(IteratorType* begin) : iterator_(begin)
+			{
+			}
+
+			/**
+				Destructor
+			*/
+			~Iterator()
+			{
+			}
+			
+			/**
+				Copy Constructor
+
+				@param[in] An instance of class Iterator
+			*/
+			Iterator(const Iterator& iterator) = delete;
+
+			/**
+				Operator = 
+
+				@param[in] An instance of class Iterator
+			*/
+			Iterator(const Iterator&& iterator) = delete;
+
+			/**
+				Operator = 
+
+				@param[in] An instance of class Iterator
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(const Iterator& iterator) = delete;
+
+			/**
+				Operator = 
+
+				@param[in] iterator An instance of class Iterator
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(const Iterator&& iterator) = delete;	
+			
+			/**
+				Operator = 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(IteratorType* iterator)
+			{
+				iterator_ = iterator;
+			}
+
+			/**
+				Operator ++
+
+				@param[in] Increment
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator++(int)
+			{
+				iterator_++;
+
+				return *this;
+			}
+
+			/**
+				Operator *
+
+				@return Content of current location of iterator
+			*/
+			IteratorType operator*()
+			{
+				return *iterator_;
+			}
+
+			/**
+				Pointer to the current element
+			*/
+			IteratorType* iterator_;
+		};
+
 	private:
 		/**
 			Pointcloud

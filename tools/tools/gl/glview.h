@@ -53,6 +53,56 @@ namespace utils
 		GLPLOT3D = 3
 	};
 
+	/** 
+		Providing a class which allows to visualize 2d-functions, 3d-function 
+		and pointclouds
+		
+		The arrays for the function-plots can be an instance of:
+			- std::vector<ElementType>
+			- utils::Matrix<ElementType>
+			- ElementType*
+		
+		The pointcloud can be an instance of:
+			- pointcloud::Pointcloud<ElementType>
+			- ElementType*
+
+		An instance of a plotting object can be called with
+			- utils::GLView<ElementType> glview
+
+		This instance hold several plots which can be separate visualized.
+		To set a viewer call
+			- glview.setPlot(<number_of_elements>) : sets container for the function-plotter
+			- glview.setPlot3D() : sets container for 3d-function-plotter
+			- glview.setViewer() : sets container for the pointcloud viewer
+		These functions have to be called otherwise the pointclouds and functions
+		wont be assigned.
+
+		To set the data call
+			- glview.setX(<container>) : assign the functions to the plotter
+			- glview.setY(<container>) : assign the functions to the plotter
+			- glview.setPointcloud(<container>) : assign the data to the visualizer
+
+		With the function plot()
+			- glview.plot()
+		the data will be visualized.
+
+		To keep up a window with the results call mainLoop()
+			- glview.mainLoop()
+		When there a other programs called which use OpenGL you have to
+		call mainLoop() once.
+
+		Example for visualization of a pointcloud:
+		utils::GLView<ElementType> glview;
+		glview.setViewer();
+			pointcloud::Pointcloud<ElementType> pointcloud;
+			*
+			* Assigning values to pointcloud
+			*
+			glview.setPointlcoud(pointcloud),
+		glview.plot();
+		glview.mainLoop();
+	*/
+
 	template<typename ElementType> class GLView
 	{
 	public:

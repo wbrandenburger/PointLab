@@ -33,7 +33,7 @@
 #include <string>
 #include <thread>
 
-#include "trees.hpp"
+#include "trees/trees.hpp"
 
 ////#include "tools/utils.h"
 ////#include "tools/io.h"

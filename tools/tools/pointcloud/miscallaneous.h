@@ -34,6 +34,8 @@
 
 #include "tools/pointcloud/pointcloud.h"
 
+#include "tools/parameters.h"
+
 namespace pointcloud
 {
 	/**
@@ -47,27 +49,30 @@ namespace pointcloud
 		@param[in] quant_ Difference between two adjacent points
 		@param[in] indices_ True if a trinagulated meshgrid should be created
 	*/
-	template<typename ElementType> void meshGrid(pointcloud::Pointcloud<ElementType>& pointcloud_,
-		ElementType x_left_,ElementType x_right_, ElementType y_left_, ElementType y_right_, 
-		ElementType quant_, bool indices = true)
+	template<typename ElementType> void meshGrid(pointcloud::Pointcloud<ElementType>& pointcloud,
+		ElementType x_left,ElementType x_right, ElementType y_left, ElementType y_right, 
+		ElementType quant, bool indices = true)
 	{
+		pointcloud.setFlags(Vertex::TRIANGLES);
+
 		/** 
 			Computation of the number of resulting elements and set the pointcloud
 		*/
-		size_t number_x = std::ceil((x_right_ - x_left_) / quant_);
-		size_t number_y = std::ceil((y_right_ - y_left_) / quant_);
+		size_t number_x = std::ceil((x_right - x_left) / quant);
+		size_t number_y = std::ceil((y_right - y_left) / quant);
 
 		size_t number_of_elements = number_x * number_y;
-		pointcloud_.setPointcloud(number_of_elements);
+		size_t number_of_triangles = (number_x - 1)*(number_y - 1) * 2;
+		pointcloud.setPointcloud(number_of_elements, number_of_triangles);
 
 		/**
 			Set the meshgrid
 		*/
 		size_t index = 0;
-		for (ElementType x = x_left_; x <= x_right; x += quant_) {
-			for (ElementType y = y_left; y <= y_left; y += quant) {
-				pointcloud_.setPoint(x_left, index, 0);
-				pointcloud_.setPoint(y_left, index, 1);
+		for (ElementType x = x_left; x <= x_right; x += quant) {
+			for (ElementType y = y_left; y <= y_right; y += quant) {
+				pointcloud_.setPoint(x, index, 0);
+				pointcloud_.setPoint(y, index, 1);
 				index++;
 			}
 		}

@@ -32,8 +32,8 @@
 #ifndef PCSIMP_ALL_INDICES_H_
 #define PCSIMP_ALL_INDICES_H_
 
-#include "algorithms/nn_index.h"
-#include "algorithms/mls_index.h"
+#include "pcsimp/algorithms/nn_index.h"
+#include "pcsimp/algorithms/mls_index.h"
 
 #include "tools/utils/matrix.h"
 

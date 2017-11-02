@@ -32,10 +32,10 @@
 #ifndef PCSIMP_HPP_
 #define PCSIMP_HPP_
 
-#include "defines.h"
+#include "pcsimp/defines.h"
 
-#include "util/params.h"
-#include "algorithms/all_indices.h"
+#include "pcsimp/util/params.h"
+#include "pcsimp/algorithms/all_indices.h"
 
 namespace pcsimp
 {
