@@ -207,14 +207,14 @@ namespace pointcloud
 			size_t counter = 0;
 			for (PointcloudSoA<ElementType>::Iterator<ElementType> it = pointcloud_.beginPoint();
 				it != pointcloud_.endPoint(); it++) {
-				setPoint(*it, std::floor(counter / 3), counter % 3);
+				setPoint(*it, counter / 3, counter % 3);
 				counter++;
 			}
 			if (isColor()) { 
 				counter = 0;
 				for (PointcloudSoA<ElementType>::Iterator<uint8_t> it = pointcloud_.beginColor();
 					it != pointcloud_.endColor(); it++) {
-					setColor(*it, std::floor(counter / 3), counter % 3);
+					setColor(*it, counter / 3, counter % 3);
 					counter++;
 				}
 			}
@@ -222,7 +222,7 @@ namespace pointcloud
 				counter = 0;
 				for (PointcloudSoA<ElementType>::Iterator<ElementType> it = pointcloud_.beginNormal();
 					it != pointcloud_.endNormal(); it++) {
-					setNormal(*it, std::floor(counter / 3), counter % 3);
+					setNormal(*it, counter / 3, counter % 3);
 					counter++;
 				}
 			}

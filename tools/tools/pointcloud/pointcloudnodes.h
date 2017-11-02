@@ -44,20 +44,11 @@ namespace pointcloud
 		/**
 			Constructor
 		*/
-		PointcloudNode()
+		PointcloudNode() 
 		{
-		}
-
-		/**
-			Constructor
-
-			@param[in] point_ Point
-		*/
-		PointcloudNode(ElementType* point_) 
-		{
-			for (size_t i = 0; i < 3; i++) {
-				point[i] = point_[i];
-			}
+			memset(&point, 0.0, sizeof(ElementType)*3);
+			memset(&color, 0, sizeof(uint8_t)*4);
+			memset(&normal, 0.0, sizeof(ElementType)*3);
 		}
 
 		/**
