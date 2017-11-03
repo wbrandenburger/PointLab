@@ -697,7 +697,7 @@ namespace pointcloud
 
 				@return Content of current location of iterator
 			*/
-			IteratorType operator*()
+			IteratorType& operator*()
 			{
 				return *iterator_;
 			}

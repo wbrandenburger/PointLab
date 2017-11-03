@@ -56,9 +56,25 @@ namespace pointcloud
 		-	PointcloudSoA, which stores the information as several arrays of structures
 		The triangles are stored separately.
 
+		An instance of a pointcloud can be called with
+			- pointcloud::Pointcloud<ElementType> pointcloud()
+			- pointcloud::Pointcloud<ElementType> pointcloud(flags)
+			- pointcloud::Pointcloud<ElementType> pointcloud(number_of_vertices, flags)
+			- pointcloud::Pointcloud<ElementType> pointcloud(number_of_vertices, number_of_triangles, flags)
+		The flags specify which information has to be stored in the pointcloud instance:
+			- Vertex::RGB
+			- Vertex::NORMALS
+			- Vertex::TRIANGLES
+			- Vertex::RGBNORMALS
+			- Vertex::MESH
+		It is assumed that points are always stored in the pointcloud.
 
-	*/
-
+		To set the arrays in the pointlcoud you have to call
+			- pointcloud.setPointcloud()
+			- pointcloud.setPointcloud(number_of_vertices)
+			- pointcloud.setPointcloud(number_of_vertices, number_of_triangles)
+			
+		*/
 
 	template<typename ElementType> class Pointcloud 
 	{

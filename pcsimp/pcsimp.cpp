@@ -93,19 +93,6 @@ int main(int argc, char* argv[]) {
 
 	std::cout << pointcloudAoS << std::endl;
 
-	pointcloud::PointcloudAoS<float>::Iterator<uint8_t> it = pointcloudAoS.beginColor();
-	
-	std::cout << sizeof(pointcloud::PointcloudNode<float>) << std::endl;
-	std::cout << sizeof(pointcloud::PointcloudNode<float>::point) << std::endl;
-	std::cout << sizeof(pointcloud::PointcloudNode<float>::color) << std::endl;
-	std::cout << std::alignment_of<pointcloud::PointcloudNode<float>>::value << std::endl;
-	size_t counter = 0;
-	for (it; it != pointcloudAoS.endColor(); it++) {
-		//std::cout << (int) *iterator << std::endl;
-		counter++;
-	}
-	std::cout << counter/3 << std::endl;
-
 	//utils::GLViewer<float> viewer;
 	//viewer.setViewer();
 	//viewer.setPointcloud(pointcloud);

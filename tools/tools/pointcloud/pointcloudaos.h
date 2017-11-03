@@ -204,26 +204,30 @@ namespace pointcloud
 			if (pointcloud_.isTriangle()) { setTriangleFlag(); }
 
 			allocateMemoryPointcloud();
-			size_t counter = 0;
-			for (PointcloudSoA<ElementType>::Iterator<ElementType> it = pointcloud_.beginPoint();
-				it != pointcloud_.endPoint(); it++) {
-				setPoint(*it, counter / 3, counter % 3);
-				counter++;
+
+			PointcloudSoA<ElementType>::Iterator<ElementType> it_copy = pointcloud_.beginPoint();
+			PointcloudAoS<ElementType>::Iterator<ElementType> it_new = beginPoint();
+			while (it_copy != pointcloud_.endPoint()) {
+				*it_new = *it_copy;
+				it_new++;
+				it_copy++;
 			}
 			if (isColor()) { 
-				counter = 0;
-				for (PointcloudSoA<ElementType>::Iterator<uint8_t> it = pointcloud_.beginColor();
-					it != pointcloud_.endColor(); it++) {
-					setColor(*it, counter / 3, counter % 3);
-					counter++;
+				PointcloudSoA<ElementType>::Iterator<uint8_t> it_copy = pointcloud_.beginColor();
+				PointcloudAoS<ElementType>::Iterator<uint8_t> it_new = beginColor();
+				while (it_copy != pointcloud_.endColor()) {
+					*it_new = *it_copy;
+					it_new++;
+					it_copy++;
 				}
 			}
 			if (isNormal()) { 
-				counter = 0;
-				for (PointcloudSoA<ElementType>::Iterator<ElementType> it = pointcloud_.beginNormal();
-					it != pointcloud_.endNormal(); it++) {
-					setNormal(*it, counter / 3, counter % 3);
-					counter++;
+				PointcloudSoA<ElementType>::Iterator<ElementType> it_copy = pointcloud_.beginNormal();
+				PointcloudAoS<ElementType>::Iterator<ElementType> it_new = beginNormal();
+				while (it_copy != pointcloud_.endNormal()) {
+					*it_new = *it_copy;
+					it_new++;
+					it_copy++;
 				}
 			}
 
@@ -511,10 +515,10 @@ namespace pointcloud
 		{
 			ElementType* new_points = new ElementType[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					new_points[i*3 + j] = getPoint(i, j);
-				}
+			size_t index = 0;
+			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginPoint();
+				it != endPoint(); it++) {
+				new_points[index++] = *it;
 			}
 
 			return new_points;
@@ -529,10 +533,10 @@ namespace pointcloud
 		{
 			ElementType* new_normals = new ElementType[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					new_normals[i*3 + j] = getNormal(i, j);
-				}
+			size_t index = 0;
+			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginNormal();
+				it != endNormal(); it++) {
+				new_normals[index++] = *it;
 			}
 
 			return new_normals;
@@ -547,10 +551,10 @@ namespace pointcloud
 		{
 			uint8_t* new_colors = new uint8_t[number_of_vertices*3];
 
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					new_colors[i*3 + j] = getColor(i, j);
-				}
+			size_t index = 0;
+			for (PointcloudAoS<ElementType>::Iterator<uint8_t> it = beginColor();
+				it != endColor(); it++) {
+				new_colors[index++] = *it;
 			}
 
 			return new_colors;
@@ -563,11 +567,12 @@ namespace pointcloud
 		*/
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
-			ElementType* data(new ElementType[number_of_vertices*3]);
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				for (size_t j = 0; j < 3; j++) {
-					data[i*3 + j] = pointcloud[i][j];
-				}
+			ElementType* data = new ElementType[number_of_vertices*3];
+			
+			size_t index = 0;
+			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginPoint();
+				it != endPoint(); it++) {
+				data[index++] = *it;
 			}
 
 			matrix_.setMatrix(data, number_of_vertices, 3);
@@ -753,7 +758,7 @@ namespace pointcloud
 
 				@return Content of current location of iterator
 			*/
-			IteratorType operator*()
+			IteratorType& operator*()
 			{
 				return *iterator_;
 			}

@@ -38,8 +38,6 @@
 
 namespace io
 {
-	typedef unsigned char uchar;
-
 	/**
 		Static counter for reading points
 	*/
@@ -246,13 +244,13 @@ namespace io
 				if (point_break == 6) { counter++;}
 				break;
 			case 7:
-				(*pointcloud).setColor((uchar)ply_get_argument_value(argument_), counter, 0);
+				(*pointcloud).setColor((uint8_t)ply_get_argument_value(argument_), counter, 0);
 				break;
 			case 8:
-				(*pointcloud).setColor((uchar)ply_get_argument_value(argument_), counter, 1);
+				(*pointcloud).setColor((uint8_t)ply_get_argument_value(argument_), counter, 1);
 				break;
 			case 9:
-				(*pointcloud).setColor((uchar)ply_get_argument_value(argument_), counter, 2);
+				(*pointcloud).setColor((uint8_t)ply_get_argument_value(argument_), counter, 2);
 				if (point_break == 9) { counter++; }
 				break;
 			default:
@@ -378,7 +376,7 @@ namespace io
 				}
 
 				if (colors) {
-					uchar* color = pointcloud_.getColorPtr(i);
+					uint8_t* color = pointcloud_.getColorPtr(i);
 					ply_write(ply, color[0]);
 					ply_write(ply, color[1]);
 					ply_write(ply, color[2]);
