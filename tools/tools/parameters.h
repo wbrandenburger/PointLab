@@ -1,4 +1,4 @@
-/***********************************************************************
+/**********************	*************************************************
 * Software License Agreement (BSD License)
 *
 * Copyright 2017	Wolfgang Brandenburger
@@ -40,9 +40,9 @@
 		@param[in] file_ String which specifies the file where the error is detected
 		@param[in] line_ Integer which specifies the line in the file where the error is detected
 	*/
-	void exitFailure(const char* file_, const int line_)
+	void exitFailure(const char* file, const int line)
 	{
-		std::cout << "Exit in " << file_ << " in line " << line_ << std::endl;
+		std::cout << "Exit in " << file << " in line " << line << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -51,29 +51,45 @@
 	*/
 	enum struct Vertex
 	{
+		/**
+			RGB is used if the pointcloud contains colors
+		*/
 		RGB = 1,
+		/**
+			NORMALS is used if the pointcloud contains normals
+		*/
 		NORMALS = 2,
+		/**
+			TRIANGLES is used if the pointcloud contains triangles
+		*/
 		TRIANGLES = 3,
+		/**
+			RGBNORMALS is used if the pointcloud contains colors and normals
+		*/
 		RGBNORMALS = 6,
+		/**
+			MESH is used if the pointcloud contains color, normals and triangles
+		*/
 		MESH = 7
 	};
 
 	/**
 		Operator |= for Vertex
 
+		@param[in] identifier_
 		@param[in] vertex_ An instance of struct Vertex
 	*/
-	uint8_t& operator|=(uint8_t& identifier_, const Vertex& vertex)
+	uint8_t& operator|=(uint8_t& flag, const Vertex& vertex)
 	{
 		switch (vertex) {
-		case Vertex::RGB: identifier_ |= 1 << 1; break;
-		case Vertex::NORMALS: identifier_ |= 1 << 2; break;
-		case Vertex::TRIANGLES: identifier_ |= 1 << 3; break;
-		case Vertex::RGBNORMALS: identifier_ |= 1 << 6; break;
-		case Vertex::MESH: identifier_ |= 1 << 7; break;
+		case Vertex::RGB: flag |= 1 << 1; break;
+		case Vertex::NORMALS: flag |= 1 << 2; break;
+		case Vertex::TRIANGLES: flag |= 1 << 3; break;
+		case Vertex::RGBNORMALS: flag |= 1 << 6; break;
+		case Vertex::MESH: flag |= 1 << 7; break;
 		}
 
-		return identifier_;
+		return flag;
 	}
 
 	/**
@@ -81,7 +97,13 @@
 	*/
 	enum struct GLParams
 	{
+		/**
+			Points are rendered
+		*/
 		POINTS = 0,
+		/**
+			Triangles are rendered
+		*/
 		TRIANGLES = 1
 	};
 
