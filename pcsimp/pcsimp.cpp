@@ -91,9 +91,6 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << pointcloud << std::endl;
 
-	io::PointcloudIterators<pointcloud::PointcloudSoA<float>> iteratotors(pointcloud);
-	iteratotors.versuch();
-
 	pointcloud::PointcloudAoS<float> pointcloudAoS = pointcloud;
 
 	std::cout << pointcloudAoS << std::endl;

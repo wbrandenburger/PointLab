@@ -92,16 +92,24 @@
 		return flag;
 	}
 
-	/**
-		Specifies the type of pointcloud
-	*/
-	enum struct PointcloudIdentifier
+	enum struct PointcloudType
 	{
+		/**
+			PointcloudAoS, which stores the information as an array of structures
+		*/
 		AoS = 0,
+		/**
+			PointcloudSoA, which stores the information as several arrays of structures
+		*/
 		SoA = 1
 	};
 
-	//struct PointcloudType
+	/**
+		Get the type of the derived class
+	*/
+	template<PointcloudType> struct GetPointcloudType { typedef int Type; };
+	template<> struct GetPointcloudType<PointcloudType::AoS> { typedef unsigned char Type; };
+	template<> struct GetPointcloudType<PointcloudType::SoA> { typedef unsigned short Type; };
 
 	/**
 		Flags which specify what kind of primitives to render

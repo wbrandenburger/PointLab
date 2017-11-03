@@ -53,12 +53,14 @@ namespace io
 	template<typename PointcloudType> struct PointcloudIterators
 	{
 	public:
-		/**
-			Constructor
-		*/
-		PointcloudIterators()
-		{
-		}
+
+		typedef typename PointcloudType::ElementType ElementType;
+
+		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
+		
+		typedef typename PointcloudType::template Iterator<uint8_t> Iteratoruint8_t;
+		
+		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
 
 		/**
 			Constructor 
@@ -134,22 +136,62 @@ namespace io
 			}
 		}
 
-		void versuch() {
-			for (size_t i = 0; i < 9; i++) {
-				std::cout << *iterator_point_ << std::endl;
-				iterator_point_++;
-			}
+		/**
+			Set a point and increment pointer
+		*/
+		void setPoint(ElementType point) 
+		{
+			*iterator_point_ = point;
+			iterator_point_++;
 		}
+
+		/**
+			Set color and increment pointer
+		*/
+		void setColor(uint8_t color) 
+		{
+			*iterator_color_ = color;
+			iterator_color_++;
+		}
+
+		/**
+			Set a normal and increment pointer
+		*/
+		void setNormal(ElementType normal) 
+		{
+			*iterator_normal_ = normal;
+			iterator_normal_++;
+		}
+
+		/**
+			Set a triangle and increment pointer
+		*/
+		void setTriangle(size_t triangle) 
+		{
+			*iterator_point_ = point;
+			iterator_point_++;
+		}
+
 	private:
-		typedef typename PointcloudType::ElementType ElementType;
 
-		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
-		typedef typename PointcloudType::template Iterator<uint8_t> Iteratoruint8_t;
-		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
-
+		/**
+			Point iterator
+		*/
 		IteratorElementType iterator_point_;
+
+		/**
+			Color iterator
+		*/
 		Iteratoruint8_t iterator_color_;
+
+		/**
+			Normal iterator
+		*/
 		IteratorElementType iterator_normal_;
+
+		/**
+			Triangle iterator
+		*/
 		Iteratorsize_t iterator_triangle_;
 	};
 
@@ -364,8 +406,118 @@ namespace io
 		
 			return 1;
 		}
-	
+		/**
+			Callback function which inserts the elements in the pointcloud
+
+			@param[in] argument Argument which contains the structure in which the elements will be inserted
+			@return Returns true if insertion was successful
+		*/
+		template <typename PointcloudType> static int callbackPointcloudIterator(p_ply_argument argument_)
+		{
+			typedef PointcloudType::ElementType ElementType;
+
+			long index;
+			PointcloudIterators<PointcloudType>* iterator;
+
+			ply_get_argument_user_data(argument_, (void**)&iterator, &index);
+		
+			switch (index) {
+			case 1:
+				iterator->setPoint((ElementType)ply_get_argument_value(argument_));
+				break;
+			case 2:
+				iterator->setPoint((ElementType)ply_get_argument_value(argument_));
+				break;
+			case 3:
+				iterator->setPoint((ElementType)ply_get_argument_value(argument_));
+				break;
+			case 4:
+				iterator->setNormal((ElementType)ply_get_argument_value(argument_));
+				break;
+			case 5:
+				iterator->setNormal((ElementType)ply_get_argument_value(argument_));
+				break;
+			case 6:
+				iterator->setNormal((ElementType)ply_get_argument_value(argument_));
+				break;
+			case 7:
+				iterator->setColor((uint8_t)ply_get_argument_value(argument_));
+				break;
+			case 8:
+				iterator->setColor((uint8_t)ply_get_argument_value(argument_));
+				break;
+			case 9:
+				iterator->setColor((uint8_t)ply_get_argument_value(argument_));
+				break;
+			default:
+				break;
+			}
+		
+			return 1;
+		}	
 	public:
+
+		///**
+		//	Read the file and inserts the data in the structure
+
+		//	@param[in,out] pointcloud Structure in which the elements will be inserted
+		//	@return Returns true if the reading was successful
+		//*/
+		//template <typename PointcloudType> bool readPly(PointcloudType& pointcloud_)
+		//{
+		//	typedef PointcloudType::ElementType ElementType;
+
+		//	if (!header) {
+		//		exitFailure(__FILE__, __LINE__);
+		//	}
+
+		//	p_ply ply = ply_open(file, NULL, 0, NULL);
+
+		//	if (!ply) {
+		//		exitFailure(__FILE__, __LINE__);
+		//	}
+		//	
+		//	if (!ply_read_header(ply)) {
+		//		exitFailure(__FILE__, __LINE__);
+		//	}
+
+		//	PointcloudIterators<PointcloudType> iterators(pointcloud_);
+
+		//	if (point_flag) {
+		//		ply_set_read_cb(ply, "vertex", "x", callbackPointcloud<ElementType>, &pointcloud_, 1);
+		//		ply_set_read_cb(ply, "vertex", "y", callbackPointcloud<ElementType>, &pointcloud_, 2);
+		//		ply_set_read_cb(ply, "vertex", "z", callbackPointcloud<ElementType>, &pointcloud_, 3);
+		//	}
+		//	else{
+		//		exitFailure(__FILE__, __LINE__);
+		//	}
+
+		//	if (normal_flag) {
+		//		ply_set_read_cb(ply, "vertex", "nx", callbackPointcloud<ElementType>, &pointcloud_, 4);
+		//		ply_set_read_cb(ply, "vertex", "ny", callbackPointcloud<ElementType>, &pointcloud_, 5);
+		//		ply_set_read_cb(ply, "vertex", "nz", callbackPointcloud<ElementType>, &pointcloud_, 6);
+		//	}
+		//
+		//	if (color_flag== 1) {
+		//		ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloud<ElementType>, &pointcloud_, 7);
+		//		ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloud<ElementType>, &pointcloud_, 8);
+		//		ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloud<ElementType>, &pointcloud_, 9);
+		//	}
+		//	
+		//	if (color_flag == 2) {
+		//		ply_set_read_cb(ply, "vertex", "red", callbackPointcloud<ElementType>, &pointcloud_, 7);
+		//		ply_set_read_cb(ply, "vertex", "green", callbackPointcloud<ElementType>, &pointcloud_, 8);
+		//		ply_set_read_cb(ply, "vertex", "blue", callbackPointcloud<ElementType>, &pointcloud_, 9);
+		//	}
+		//
+		//	if (!ply_read(ply)) {
+		//		return 0;
+		//	}
+		//
+		//	ply_close(ply);
+		//
+		//	return true;
+		//}
 
 		/**
 			Read the file and inserts the data in the structure
@@ -373,8 +525,10 @@ namespace io
 			@param[in,out] pointcloud Structure in which the elements will be inserted
 			@return Returns true if the reading was successful
 		*/
-		template <typename ElementType> bool readPly(pointcloud::Pointcloud<ElementType>& pointcloud_)
+		template <typename PointcloudType> bool readPly(PointcloudType& pointcloud_)
 		{
+			typedef PointcloudType::ElementType ElementType;
+
 			if (!header) {
 				exitFailure(__FILE__, __LINE__);
 			}
@@ -389,33 +543,33 @@ namespace io
 				exitFailure(__FILE__, __LINE__);
 			}
 
-			//PointcloudIterators< iterators(pointcloud_)
+			PointcloudIterators<PointcloudType> iterators(pointcloud_);
 
 			if (point_flag) {
-				ply_set_read_cb(ply, "vertex", "x", callbackPointcloud<ElementType>, &pointcloud_, 1);
-				ply_set_read_cb(ply, "vertex", "y", callbackPointcloud<ElementType>, &pointcloud_, 2);
-				ply_set_read_cb(ply, "vertex", "z", callbackPointcloud<ElementType>, &pointcloud_, 3);
+				ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
+				ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
+				ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 			}
 			else{
 				exitFailure(__FILE__, __LINE__);
 			}
 
 			if (normal_flag) {
-				ply_set_read_cb(ply, "vertex", "nx", callbackPointcloud<ElementType>, &pointcloud_, 4);
-				ply_set_read_cb(ply, "vertex", "ny", callbackPointcloud<ElementType>, &pointcloud_, 5);
-				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloud<ElementType>, &pointcloud_, 6);
+				ply_set_read_cb(ply, "vertex", "nx", callbackPointcloudIterator<PointcloudType>, &iterators, 4);
+				ply_set_read_cb(ply, "vertex", "ny", callbackPointcloudIterator<PointcloudType>, &iterators, 5);
+				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 6);
 			}
 		
 			if (color_flag== 1) {
-				ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloud<ElementType>, &pointcloud_, 7);
-				ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloud<ElementType>, &pointcloud_, 8);
-				ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloud<ElementType>, &pointcloud_, 9);
+				ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloudIterator<PointcloudType>, &iterators, 7);
+				ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloudIterator<PointcloudType>, &iterators, 8);
+				ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloudIterator<PointcloudType>, &iterators, 9);
 			}
 			
 			if (color_flag == 2) {
-				ply_set_read_cb(ply, "vertex", "red", callbackPointcloud<ElementType>, &pointcloud_, 7);
-				ply_set_read_cb(ply, "vertex", "green", callbackPointcloud<ElementType>, &pointcloud_, 8);
-				ply_set_read_cb(ply, "vertex", "blue", callbackPointcloud<ElementType>, &pointcloud_, 9);
+				ply_set_read_cb(ply, "vertex", "red", callbackPointcloudIterator<PointcloudType>, &iterators, 7);
+				ply_set_read_cb(ply, "vertex", "green", callbackPointcloudIterator<PointcloudType>, &iterators, 8);
+				ply_set_read_cb(ply, "vertex", "blue", callbackPointcloudIterator<PointcloudType>, &iterators, 9);
 			}
 		
 			if (!ply_read(ply)) {
@@ -426,6 +580,7 @@ namespace io
 		
 			return true;
 		}
+
 		/**
 			Write ply file with given structure
 

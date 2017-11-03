@@ -702,13 +702,6 @@ namespace pointcloud
 			return flags;
 		}
 
-		/**
-			Get type of derived class
-
-			@return Type of derived class
-		*/
-		virtual PointcloudIdentifier getPointcloudType() = 0;
-
 	protected:
 		/**
 			Number of vertices

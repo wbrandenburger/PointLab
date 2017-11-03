@@ -51,7 +51,7 @@ namespace pointcloud
 	
 	public:
 
-		typedef ElementType ElementType;
+		typedef PointcloudAoS<ElementType> ClassType;
 
 		/**
 			Constructor
@@ -710,16 +710,6 @@ namespace pointcloud
 			*/
 			IteratorType* iterator_;
 		};
-
-		/**
-			Get type of derived class
-
-			@return Type of derived class
-		*/
-		PointcloudIdentifier getPointcloudType()
-		{
-			return PointcloudIdentifier::SoA;
-		}
 
 	private:
 		/**

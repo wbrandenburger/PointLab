@@ -40,11 +40,6 @@
 
 namespace pointcloud
 {
-	///**
-	//	Forward declaration of class Pointcloud
-	//*/
-	//template<typename ElementType> class Pointcloud;
-
 	/**
 		Forward declaration of class PointcloudAoS
 	*/
@@ -54,6 +49,8 @@ namespace pointcloud
 	{
 	
 	public:
+
+		typedef PointcloudAoS<ElementType> ClassType;
 
 		/**
 			Constructor
@@ -428,6 +425,7 @@ namespace pointcloud
 		}
 
 	public:
+
 		/**
 			Get point data of specified index
 
@@ -783,16 +781,6 @@ namespace pointcloud
 			*/
 			size_t index_;
 		};
-
-		/**
-			Get type of derived class
-
-			@return Type of derived class
-		*/
-		PointcloudIdentifier getPointcloudType()
-		{
-			return PointcloudIdentifier::AoS;
-		}
 
 		private:
 
