@@ -82,6 +82,8 @@ int main(int argc, char* argv[]) {
 	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
 	pointcloud.setPointcloud();
 
+	io::PointcloudIterators<float> iteratotors(pointcloud);
+
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
 		std::cout << "File with " << pointcloud.getNumberOfVertices() << " point has been read in "

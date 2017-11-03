@@ -601,12 +601,13 @@ namespace pointcloud
 		/**
 			Structure of a iterator for points, colors, normals and triangles
 		*/
-		template<typename IteratorType> struct Iterator
+		template<typename IteratorType> struct IteratorSoA
 		{
+		public:
 			/**
 				Constructor
 			*/
-			Iterator() : iterator_(nullptr)
+			IteratorSoA() : iterator_(nullptr)
 			{
 			}
 
@@ -615,7 +616,7 @@ namespace pointcloud
 
 				@param[in] begin Pointer to an element
 			*/
-			Iterator(IteratorType* begin) : Iterator()
+			IteratorSoA(IteratorType* begin) : IteratorSoA()
 			{
 				iterator_ = begin;
 			}
@@ -623,7 +624,7 @@ namespace pointcloud
 			/**
 				Destructor
 			*/
-			~Iterator()
+			~IteratorSoA()
 			{
 			}
 			
@@ -632,14 +633,14 @@ namespace pointcloud
 
 				@param[in] An instance of class Iterator
 			*/
-			Iterator(const Iterator& iterator) = delete;
+			IteratorSoA(const IteratorSoA& iterator) = delete;
 
 			/**
 				Operator = 
 
 				@param[in] An instance of class Iterator
 			*/
-			Iterator(const Iterator&& iterator) = delete;
+			IteratorSoA(const IteratorSoA&& iterator) = delete;
 
 			/**
 				Operator = 
@@ -647,7 +648,7 @@ namespace pointcloud
 				@param[in] An instance of class Iterator
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator=(const Iterator& iterator) = delete;
+			IteratorSoA& operator=(const IteratorSoA& iterator) = delete;
 
 			/**
 				Operator = 
@@ -655,7 +656,7 @@ namespace pointcloud
 				@param[in] iterator An instance of class Iterator
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator=(const Iterator&& iterator) = delete;	
+			IteratorSoA& operator=(const IteratorSoA&& iterator) = delete;
 			
 			/**
 				Operator = 
@@ -663,7 +664,7 @@ namespace pointcloud
 				@param[in] iterator Pointer to an element
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator=(IteratorType* iterator)
+			IteratorSoA& operator=(IteratorType* iterator)
 			{
 				iterator_ = iterator;
 			}
@@ -685,7 +686,7 @@ namespace pointcloud
 				@param[in] Increment
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator++(int)
+			IteratorSoA& operator++(int)
 			{
 				iterator_++;
 
@@ -702,6 +703,7 @@ namespace pointcloud
 				return *iterator_;
 			}
 
+		private:
 			/**
 				Pointer to the current element
 			*/

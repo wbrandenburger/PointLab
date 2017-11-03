@@ -205,16 +205,16 @@ namespace pointcloud
 
 			allocateMemoryPointcloud();
 
-			PointcloudSoA<ElementType>::Iterator<ElementType> it_copy = pointcloud_.beginPoint();
-			PointcloudAoS<ElementType>::Iterator<ElementType> it_new = beginPoint();
+			PointcloudSoA<ElementType>::IteratorSoA<ElementType> it_copy = pointcloud_.beginPoint();
+			PointcloudAoS<ElementType>::IteratorAoS<ElementType> it_new = beginPoint();
 			while (it_copy != pointcloud_.endPoint()) {
 				*it_new = *it_copy;
 				it_new++;
 				it_copy++;
 			}
 			if (isColor()) { 
-				PointcloudSoA<ElementType>::Iterator<uint8_t> it_copy = pointcloud_.beginColor();
-				PointcloudAoS<ElementType>::Iterator<uint8_t> it_new = beginColor();
+				PointcloudSoA<ElementType>::IteratorSoA<uint8_t> it_copy = pointcloud_.beginColor();
+				PointcloudAoS<ElementType>::IteratorAoS<uint8_t> it_new = beginColor();
 				while (it_copy != pointcloud_.endColor()) {
 					*it_new = *it_copy;
 					it_new++;
@@ -222,8 +222,8 @@ namespace pointcloud
 				}
 			}
 			if (isNormal()) { 
-				PointcloudSoA<ElementType>::Iterator<ElementType> it_copy = pointcloud_.beginNormal();
-				PointcloudAoS<ElementType>::Iterator<ElementType> it_new = beginNormal();
+				PointcloudSoA<ElementType>::IteratorSoA<ElementType> it_copy = pointcloud_.beginNormal();
+				PointcloudAoS<ElementType>::IteratorAoS<ElementType> it_new = beginNormal();
 				while (it_copy != pointcloud_.endNormal()) {
 					*it_new = *it_copy;
 					it_new++;
@@ -516,7 +516,7 @@ namespace pointcloud
 			ElementType* new_points = new ElementType[number_of_vertices*3];
 
 			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginPoint();
+			for (PointcloudAoS<ElementType>::IteratorAoS<ElementType> it = beginPoint();
 				it != endPoint(); it++) {
 				new_points[index++] = *it;
 			}
@@ -534,7 +534,7 @@ namespace pointcloud
 			ElementType* new_normals = new ElementType[number_of_vertices*3];
 
 			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginNormal();
+			for (PointcloudAoS<ElementType>::IteratorAoS<ElementType> it = beginNormal();
 				it != endNormal(); it++) {
 				new_normals[index++] = *it;
 			}
@@ -552,7 +552,7 @@ namespace pointcloud
 			uint8_t* new_colors = new uint8_t[number_of_vertices*3];
 
 			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<uint8_t> it = beginColor();
+			for (PointcloudAoS<ElementType>::IteratorAoS<uint8_t> it = beginColor();
 				it != endColor(); it++) {
 				new_colors[index++] = *it;
 			}
@@ -570,7 +570,7 @@ namespace pointcloud
 			ElementType* data = new ElementType[number_of_vertices*3];
 			
 			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginPoint();
+			for (PointcloudAoS<ElementType>::IteratorAoS<ElementType> it = beginPoint();
 				it != endPoint(); it++) {
 				data[index++] = *it;
 			}
@@ -649,12 +649,13 @@ namespace pointcloud
 		/**
 			Structure of a iterator for points, colors, normals and triangles
 		*/
-		template<typename IteratorType> struct Iterator
+		template<typename IteratorType> struct IteratorAoS
 		{
+		public:
 			/**
 				Constructor
 			*/
-			Iterator() : iterator_(nullptr), stride_(0), index_(0)
+			IteratorAoS() : iterator_(nullptr), stride_(0), index_(0)
 			{
 				if (sizeof(IteratorType) == 1) {
 					stride_ = sizeof(ElementType) * 6 + 2;
@@ -669,7 +670,7 @@ namespace pointcloud
 
 				@param[in] begin Pointer to an element
 			*/
-			Iterator(IteratorType* begin) : Iterator()
+			IteratorAoS(IteratorType* begin) : IteratorAoS()
 			{
 				iterator_ = begin;
 			}
@@ -677,7 +678,7 @@ namespace pointcloud
 			/**
 				Destructor
 			*/
-			~Iterator()
+			~IteratorAoS()
 			{
 			}
 			
@@ -686,14 +687,14 @@ namespace pointcloud
 
 				@param[in] An instance of class Iterator
 			*/
-			Iterator(const Iterator& iterator) = delete;
+			IteratorAoS(const IteratorAoS& iterator) = delete;
 
 			/**
 				Operator = 
 
 				@param[in] An instance of class Iterator
 			*/
-			Iterator(const Iterator&& iterator) = delete;
+			IteratorAoS(const IteratorAoS&& iterator) = delete;
 
 			/**
 				Operator = 
@@ -701,7 +702,7 @@ namespace pointcloud
 				@param[in] An instance of class Iterator
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator=(const Iterator& iterator) = delete;
+			IteratorAoS& operator=(const IteratorAoS& iterator) = delete;
 
 			/**
 				Operator = 
@@ -709,7 +710,7 @@ namespace pointcloud
 				@param[in] iterator An instance of class Iterator
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator=(const Iterator&& iterator) = delete;	
+			IteratorAoS& operator=(const IteratorAoS&& iterator) = delete;
 			
 			/**
 				Operator = 
@@ -717,7 +718,7 @@ namespace pointcloud
 				@param[in] iterator Pointer to an element
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator=(IteratorType* iterator)
+			IteratorAoS& operator=(IteratorType* iterator)
 			{
 				iterator_ = iterator;
 			}
@@ -739,7 +740,7 @@ namespace pointcloud
 				@param[in] Increment
 				@return Returns reference to the current instance
 			*/
-			Iterator& operator++(int)
+			IteratorAoS& operator++(int)
 			{
 				if (index_ % 3 == 2){
 					iterator_ = reinterpret_cast<IteratorType*>((char*)iterator_ + stride_);
@@ -762,6 +763,8 @@ namespace pointcloud
 			{
 				return *iterator_;
 			}
+
+		private:
 
 			/**
 				Pointer to the current element

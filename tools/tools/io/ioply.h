@@ -48,6 +48,79 @@ namespace io
 	*/
 	static size_t point_break;
 
+	template<typename ElementType> struct PointcloudIterators
+	{
+	public:
+		/**
+			Constructor
+		*/
+		PointcloudIterators()
+		{
+		}
+
+		/**
+			Constructor 
+		*/
+		PointcloudIterators(const pointcloud::Pointcloud<ElementType>& pointcloud)
+		{
+			//*iterator_point_ = pointcloud.beginPoint();
+			//*iterator_color_ = pointcloud.beginColor();
+			//*iterator_normal_ = pointcloud.beginNormal() ;
+			//*iterator_triangle_ = pointcloud.beginTriangle();
+		}
+
+		/**
+			Destructor
+		*/
+		~PointcloudIterators()
+		{
+		}
+		/**
+			Copy constructor
+
+			@param[in] class_ An instance of class PointcloudIterators
+		*/
+		PointcloudIterators(const PointcloudIterators<ElementType>& pointcloud_iterators) = delete;
+
+		/**
+			Copy constructor
+	
+			@param[in] class_ An instance of class PointcloudIterators
+		*/
+		PointcloudIterators(const PointcloudIterators<ElementType>&& pointcloud_iterators) = delete;
+	
+		/**
+			Operator =
+	
+			@param[in] class_ An instance of class PointcloudIterators
+			@return Returns reference to the current instance
+		*/
+		PointcloudIterators& operator=(const PointcloudIterators<ElementType>& pointcloud_iterators) = delete;
+	
+		/**
+			Operator =
+		
+			@param[in] glview_ An instance of class PointcloudIterators
+			@return Returns reference to the current instance
+		*/
+		PointcloudIterators& operator=(const PointcloudIterators<ElementType>&& pointcloud_iterators) = delete;
+
+		/**
+			Set iterators
+		*/
+		void setIterators(const pointcloud::Pointcloud<ElementType>& pointcloud)
+		{
+
+		}
+
+	private:
+
+		//pointcloud::Pointcloud<ElementType>::Iterator<ElementType>* iterator_point_;
+		//pointcloud::Pointcloud<ElementType>::Iterator<uint8_t>* iterator_color_;
+		//pointcloud::Pointcloud<ElementType>::Iterator<ElementType>* iterator_normal_;
+		//pointcloud::Pointcloud<ElementType>::Iterator<size_t>* iterator_triangle_;
+	};
+
 	class PlyIO 
 	{
 
