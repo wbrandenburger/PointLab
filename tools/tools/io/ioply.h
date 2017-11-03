@@ -474,6 +474,8 @@ namespace io
 
 			ply_write_header(ply);
 		
+			PointcloudIterators<PointcloudType> iterators(pointcloud_);
+
 			for (int i = 0; i < pointcloud_.rows; i++) {
 				ElementType* point = pointcloud_.getPointPtr(i);
 				ply_write(ply, point[0]);
