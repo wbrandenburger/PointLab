@@ -745,7 +745,7 @@ namespace pointcloud
 			}
 
 			/**
-				Operator = 
+				Operator != 
 
 				@param[in] iterator Pointer to an element
 				@return Returns reference to the current instance
@@ -753,6 +753,17 @@ namespace pointcloud
 			bool operator!=(IteratorType* iterator)
 			{
 				return iterator_ != iterator;
+			}
+
+			/**
+				Operator == 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator==(IteratorType* iterator)
+			{
+				return iterator_ == iterator;
 			}
 
 			/**

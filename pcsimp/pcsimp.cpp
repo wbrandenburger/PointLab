@@ -91,6 +91,8 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << pointcloud << std::endl;
 
+	plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
+
 	pointcloud::PointcloudAoS<float> pointcloudAoS = pointcloud;
 
 	std::cout << pointcloudAoS << std::endl;

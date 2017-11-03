@@ -69,6 +69,8 @@ namespace io
 			if (pointcloud.isTriangle()) {
 				iterator_triangle_ = pointcloud.beginTriangle();
 			}
+
+			end_ = pointcloud.endPoint();
 		}
 
 		/**
@@ -158,10 +160,61 @@ namespace io
 		*/
 		void setTriangle(size_t triangle) 
 		{
-			*iterator_point_ = point;
-			iterator_point_++;
+			*iterator_triangle_ = triangle;
+			iterator_triangle_++;
 		}
 
+		/**
+			Get point and increment pointer
+		*/
+		ElementType getPoint() 
+		{
+			ElementType point_temp = *iterator_point_;
+			iterator_point_++;
+
+			return point_temp;
+		}
+
+		/**
+			Get color and increment pointer
+		*/
+		uint8_t getColor() 
+		{
+			uint8_t color_temp = *iterator_color_;
+			iterator_color_++;
+
+			return color_temp;
+		}
+
+		/**
+			Get normal and increment pointer
+		*/
+		ElementType getNormal() 
+		{
+			ElementType normal_temp = *iterator_normal_;
+			iterator_normal_++;
+
+			return normal_temp;
+		}
+
+		/**
+			Get triangle and increment pointer
+		*/
+		size_t getTriangle() 
+		{
+			size_t triangle_temp = *iterator_triangle_;
+			iterator_triangle_++;
+
+			return triangle_temp;
+		}
+
+		/**
+			Checks whether the end is reached
+		*/
+		bool end()
+		{
+			return iterator_point_ == end_;
+		}
 	private:
 
 		/**
@@ -183,6 +236,11 @@ namespace io
 			Triangle iterator
 		*/
 		Iteratorsize_t iterator_triangle_;
+
+		/**
+			End of data
+		*/
+		ElementType* end_;
 	};
 
 	class PlyIO 
@@ -399,7 +457,7 @@ namespace io
 
 			PointcloudIterators<PointcloudType> iterators(pointcloud_);
 
-			if (point_flag) {
+			if (isPoints()) {
 				ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
 				ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
 				ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
@@ -420,7 +478,7 @@ namespace io
 				ply_set_read_cb(ply, "vertex", "blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 			}
 
-			if (normal_flag) {
+			if (isNormal()) {
 				ply_set_read_cb(ply, "vertex", "nx", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 				ply_set_read_cb(ply, "vertex", "ny", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
@@ -443,14 +501,14 @@ namespace io
 			@param pointcloud_ Structure which elements will be written in the file
 			@return Returns true if writing was successful
 		*/
-		template <typename ElementType> bool writePly(char *file_, pointcloud::Pointcloud<ElementType>& pointcloud_)
+		template <typename PointcloudType> bool writePly(char *file_, const PointcloudType& pointcloud_)
 		{
 			p_ply ply = ply_create(file_, PLY_DEFAULT, NULL, 0, NULL);
 		
-			ply_add_element(ply, "vertex", (long)pointcloud_.rows);
+			ply_add_element(ply, "vertex", (long)pointcloud_.getNumberOfVertices());
 		
 			e_ply_type ply_data_type = type == PLY_TYPE_FLOAT ? PLY_FLOAT32 : PLY_FLOAT64;
-			if (point_flag) {
+			if (isPoints()) {
 				ply_add_property(ply, "x", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "y", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
@@ -459,41 +517,38 @@ namespace io
 				exitFailure(__FILE__, __LINE__);
 			}
 
-			if (normal_flag) {
-				ply_add_property(ply, "nx", ply_data_type, ply_data_type, ply_data_type);
-				ply_add_property(ply, "ny", ply_data_type, ply_data_type, ply_data_type);
-				ply_add_property(ply, "nz", ply_data_type, ply_data_type, ply_data_type);
-			}
-		
-			if (color_flag) {
+
+			if (isColor()) {
 				e_ply_type ply_color_type = PLY_UCHAR;
 				ply_add_property(ply, "red", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "green", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "blue", ply_color_type, ply_color_type, ply_color_type);
 			}
 
+			if (isNormal()) {
+				ply_add_property(ply, "nx", ply_data_type, ply_data_type, ply_data_type);
+				ply_add_property(ply, "ny", ply_data_type, ply_data_type, ply_data_type);
+				ply_add_property(ply, "nz", ply_data_type, ply_data_type, ply_data_type);
+			}
+
 			ply_write_header(ply);
 		
 			PointcloudIterators<PointcloudType> iterators(pointcloud_);
 
-			for (int i = 0; i < pointcloud_.rows; i++) {
-				ElementType* point = pointcloud_.getPointPtr(i);
-				ply_write(ply, point[0]);
-				ply_write(ply, point[1]);
-				ply_write(ply, point[2]);
-				
-				if (normals) {
-					ElementType* normal = pointcloud_.getNormalPtr(i);
-					ply_write(ply, normal[0]);
-					ply_write(ply, normal[1]);
-					ply_write(ply, normal[2]);
-				}
+			while (!iterators.end()) {
+				ply_write(ply, iterators.getPoint());
+				ply_write(ply, iterators.getPoint());
+				ply_write(ply, iterators.getPoint());
 
-				if (colors) {
-					uint8_t* color = pointcloud_.getColorPtr(i);
-					ply_write(ply, color[0]);
-					ply_write(ply, color[1]);
-					ply_write(ply, color[2]);
+				if (isColor()) {
+					ply_write(ply, iterators.getColor());
+					ply_write(ply, iterators.getColor());
+					ply_write(ply, iterators.getColor());
+				}
+				if (isNormal()) {
+					ply_write(ply, iterators.getNormal());
+					ply_write(ply, iterators.getNormal());
+					ply_write(ply, iterators.getNormal());
 				}
 			}
 		
