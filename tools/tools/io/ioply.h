@@ -251,7 +251,7 @@ namespace io
 		/**
 			Constructor
 		*/
-		PlyIO() : file(nullptr), header(false), instances(0), point_flag(false), normal_flag(false), color_flag(0)
+		PlyIO() : file(nullptr), header(false), number_of_vertices(0), number_of_triangles(0), point_flag(false), normal_flag(false), color_flag(0)
 		{
 		}
 
@@ -282,7 +282,8 @@ namespace io
 		{
 			file = nullptr;
 			header = false;
-			instances = 0;
+			number_of_vertices = 0;
+			number_of_triangles = 0;
 			point_flag = false;
 			normal_flag = false;
 			color_flag = 0;
@@ -303,11 +304,19 @@ namespace io
 		}
 
 		/**
-			Get number of instances
+			Get number of vertices
 		*/
-		size_t getInstances() const
+		size_t getNumberOfVertices() const
 		{
-			return instances;
+			return number_of_vertices;
+		}
+
+		/**
+			Get number of vertices
+		*/
+		size_t getNumberOfTriangles() const
+		{
+			return number_of_vertices;
 		}
 
 	private:
@@ -360,24 +369,35 @@ namespace io
 		{
 			p_ply ply = ply_open(file, NULL, 0, NULL);
 			if (!ply) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 			
 			if (!ply_read_header(ply)) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 
+			/**
+				Get the next element in the header
+			*/
 			p_ply_element elem = NULL;
 			elem = ply_get_next_element(ply, elem);
 
+			/**
+				Iterate over all elements in the header
+			*/
 			while (elem) {
+				/**
+					Get name and instances of the element
+				*/
 				const char *elem_name;
 				long elem_instances;
 				ply_get_element_info(elem, &elem_name, &elem_instances);
-				if (!std::strcmp("vertex", elem_name)) {
-					instances = (size_t) elem_instances;
+				
+				/**
+					Process the vertices
+				*/
+				if (std::strcmp("vertex", elem_name) == 0) {
+					number_of_vertices = (size_t) elem_instances;
 					p_ply_property prop = NULL;
 					prop = ply_get_next_property(elem, prop);
 					while (prop) {
@@ -390,6 +410,18 @@ namespace io
 						prop = ply_get_next_property(elem, prop);
 					}
 				}
+				/**
+					Process the faces
+				*/
+				if (std::strcmp("face", elem_name) == 0) {
+					number_of_triangles = (size_t)elem_instances;
+					p_ply_property prop = NULL;
+					prop = ply_get_next_property(elem, prop);
+				}
+
+				/**
+					Get the next element in the header
+				*/
 				elem = ply_get_next_element(ply, elem);
 			}
 
@@ -604,9 +636,14 @@ namespace io
 		DataType type;
 
 		/** 
-			Instances of vertex
+			Number of vertices
 		*/
-		size_t instances;
+		size_t number_of_vertices;
+
+		/**
+			Number of triangles
+		*/
+		size_t number_of_triangles;
 
 		/**
 			Flag whether points are contained in file

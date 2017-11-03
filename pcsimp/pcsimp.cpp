@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 		flags |= Vertex::NORMALS;
 	}
 
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
+	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getNumberOfVertices(),flags);
 	pointcloud.setPointcloud();
 
 
