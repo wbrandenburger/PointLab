@@ -93,6 +93,17 @@
 	}
 
 	/**
+		Specifies the type of pointcloud
+	*/
+	enum struct PointcloudIdentifier
+	{
+		AoS = 0,
+		SoA = 1
+	};
+
+	//struct PointcloudType
+
+	/**
 		Flags which specify what kind of primitives to render
 	*/
 	enum struct GLParams

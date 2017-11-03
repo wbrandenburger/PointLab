@@ -36,13 +36,11 @@
 
 #include "tools/utils/matrix.h"
 
+
+#include "tools/pointcloud/pointcloud.h"
+
 namespace pointcloud
 {
-	/**
-		Forward declaration of class Pointcloud
-	*/
-	template<typename ElementType> class Pointcloud;
-
 	/**
 		Forward declaration of class PointcloudAoS
 	*/
@@ -52,6 +50,8 @@ namespace pointcloud
 	{
 	
 	public:
+
+		typedef ElementType ElementType;
 
 		/**
 			Constructor
@@ -601,13 +601,13 @@ namespace pointcloud
 		/**
 			Structure of a iterator for points, colors, normals and triangles
 		*/
-		template<typename IteratorType> struct IteratorSoA
+		template<typename IteratorType> class Iterator
 		{
 		public:
 			/**
 				Constructor
 			*/
-			IteratorSoA() : iterator_(nullptr)
+			Iterator() : iterator_(nullptr)
 			{
 			}
 
@@ -616,7 +616,7 @@ namespace pointcloud
 
 				@param[in] begin Pointer to an element
 			*/
-			IteratorSoA(IteratorType* begin) : IteratorSoA()
+			Iterator(IteratorType* begin) : Iterator()
 			{
 				iterator_ = begin;
 			}
@@ -624,7 +624,7 @@ namespace pointcloud
 			/**
 				Destructor
 			*/
-			~IteratorSoA()
+			~Iterator()
 			{
 			}
 			
@@ -633,14 +633,14 @@ namespace pointcloud
 
 				@param[in] An instance of class Iterator
 			*/
-			IteratorSoA(const IteratorSoA& iterator) = delete;
+			Iterator(const Iterator& iterator) = delete;
 
 			/**
 				Operator = 
 
 				@param[in] An instance of class Iterator
 			*/
-			IteratorSoA(const IteratorSoA&& iterator) = delete;
+			Iterator(const Iterator&& iterator) = delete;
 
 			/**
 				Operator = 
@@ -648,7 +648,7 @@ namespace pointcloud
 				@param[in] An instance of class Iterator
 				@return Returns reference to the current instance
 			*/
-			IteratorSoA& operator=(const IteratorSoA& iterator) = delete;
+			Iterator& operator=(const Iterator& iterator) = delete;
 
 			/**
 				Operator = 
@@ -656,17 +656,32 @@ namespace pointcloud
 				@param[in] iterator An instance of class Iterator
 				@return Returns reference to the current instance
 			*/
-			IteratorSoA& operator=(const IteratorSoA&& iterator) = delete;
-			
+			Iterator& operator=(const Iterator&& iterator) = delete;
+
 			/**
+				Operator ++
+
+				@param[in] Increment
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator++(int)
+			{
+				iterator_++;
+
+				return *this;
+			}
+
+						/**
 				Operator = 
 
 				@param[in] iterator Pointer to an element
 				@return Returns reference to the current instance
 			*/
-			IteratorSoA& operator=(IteratorType* iterator)
+			Iterator& operator=(IteratorType* iterator)
 			{
 				iterator_ = iterator;
+
+				return *this;
 			}
 
 			/**
@@ -681,19 +696,6 @@ namespace pointcloud
 			}
 
 			/**
-				Operator ++
-
-				@param[in] Increment
-				@return Returns reference to the current instance
-			*/
-			IteratorSoA& operator++(int)
-			{
-				iterator_++;
-
-				return *this;
-			}
-
-			/**
 				Operator *
 
 				@return Content of current location of iterator
@@ -702,13 +704,22 @@ namespace pointcloud
 			{
 				return *iterator_;
 			}
-
-		private:
+			
 			/**
 				Pointer to the current element
 			*/
 			IteratorType* iterator_;
 		};
+
+		/**
+			Get type of derived class
+
+			@return Type of derived class
+		*/
+		PointcloudIdentifier getPointcloudType()
+		{
+			return PointcloudIdentifier::SoA;
+		}
 
 	private:
 		/**

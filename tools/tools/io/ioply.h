@@ -34,6 +34,8 @@
 
 #include <rply.h>
 
+#include "tools/parameters.h"
+
 #include "pointcloud/pointcloud.h"
 
 namespace io
@@ -48,7 +50,7 @@ namespace io
 	*/
 	static size_t point_break;
 
-	template<typename ElementType> struct PointcloudIterators
+	template<typename PointcloudType> struct PointcloudIterators
 	{
 	public:
 		/**
@@ -60,13 +62,21 @@ namespace io
 
 		/**
 			Constructor 
+
+			@param[in] pointcloud Pointcloud
 		*/
-		PointcloudIterators(const pointcloud::Pointcloud<ElementType>& pointcloud)
+		PointcloudIterators(const PointcloudType& pointcloud)
 		{
-			//*iterator_point_ = pointcloud.beginPoint();
-			//*iterator_color_ = pointcloud.beginColor();
-			//*iterator_normal_ = pointcloud.beginNormal() ;
-			//*iterator_triangle_ = pointcloud.beginTriangle();
+			iterator_point_ = pointcloud.beginPoint();
+			if (pointcloud.isColor()) {
+				iterator_color_ = pointcloud.beginColor();
+			}
+			if (pointcloud.isNormal()) {
+				iterator_normal_ = pointcloud.beginNormal();
+			}
+			if (pointcloud.isTriangle()) {
+				iterator_triangle_ = pointcloud.beginTriangle();
+			}
 		}
 
 		/**
@@ -80,14 +90,14 @@ namespace io
 
 			@param[in] class_ An instance of class PointcloudIterators
 		*/
-		PointcloudIterators(const PointcloudIterators<ElementType>& pointcloud_iterators) = delete;
+		PointcloudIterators(const PointcloudIterators<PointcloudType>& pointcloud_iterators) = delete;
 
 		/**
 			Copy constructor
 	
 			@param[in] class_ An instance of class PointcloudIterators
 		*/
-		PointcloudIterators(const PointcloudIterators<ElementType>&& pointcloud_iterators) = delete;
+		PointcloudIterators(const PointcloudIterators<PointcloudType>&& pointcloud_iterators) = delete;
 	
 		/**
 			Operator =
@@ -95,7 +105,7 @@ namespace io
 			@param[in] class_ An instance of class PointcloudIterators
 			@return Returns reference to the current instance
 		*/
-		PointcloudIterators& operator=(const PointcloudIterators<ElementType>& pointcloud_iterators) = delete;
+		PointcloudIterators& operator=(const PointcloudIterators<PointcloudType>& pointcloud_iterators) = delete;
 	
 		/**
 			Operator =
@@ -103,22 +113,44 @@ namespace io
 			@param[in] glview_ An instance of class PointcloudIterators
 			@return Returns reference to the current instance
 		*/
-		PointcloudIterators& operator=(const PointcloudIterators<ElementType>&& pointcloud_iterators) = delete;
+		PointcloudIterators& operator=(const PointcloudIterators<PointcloudType>&& pointcloud_iterators) = delete;
 
 		/**
 			Set iterators
-		*/
-		void setIterators(const pointcloud::Pointcloud<ElementType>& pointcloud)
-		{
 
+			@param[in] pointcloud Pointcloud
+		*/
+		void setIterators(const PointcloudType& pointcloud)
+		{
+			iterator_point_ = pointcloud.beginPoint();
+			if (pointcloud.isColor()) {
+				iterator_color_ = pointcloud.beginColor();
+			}
+			if (pointcloud.isNormal()) {
+				iterator_normal_ = pointcloud.beginNormal();
+			}
+			if (pointcloud.isTriangle()) {
+				iterator_triangle_ = pointcloud.beginTriangle();
+			}
 		}
 
+		void versuch() {
+			for (size_t i = 0; i < 9; i++) {
+				std::cout << *iterator_point_ << std::endl;
+				iterator_point_++;
+			}
+		}
 	private:
+		typedef typename PointcloudType::ElementType ElementType;
 
-		//pointcloud::Pointcloud<ElementType>::Iterator<ElementType>* iterator_point_;
-		//pointcloud::Pointcloud<ElementType>::Iterator<uint8_t>* iterator_color_;
-		//pointcloud::Pointcloud<ElementType>::Iterator<ElementType>* iterator_normal_;
-		//pointcloud::Pointcloud<ElementType>::Iterator<size_t>* iterator_triangle_;
+		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
+		typedef typename PointcloudType::template Iterator<uint8_t> Iteratoruint8_t;
+		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
+
+		IteratorElementType iterator_point_;
+		Iteratoruint8_t iterator_color_;
+		IteratorElementType iterator_normal_;
+		Iteratorsize_t iterator_triangle_;
 	};
 
 	class PlyIO 
@@ -344,30 +376,28 @@ namespace io
 		template <typename ElementType> bool readPly(pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
 			if (!header) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 
 			p_ply ply = ply_open(file, NULL, 0, NULL);
 
 			if (!ply) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 			
 			if (!ply_read_header(ply)) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
-		
+
+			//PointcloudIterators< iterators(pointcloud_)
+
 			if (point_flag) {
 				ply_set_read_cb(ply, "vertex", "x", callbackPointcloud<ElementType>, &pointcloud_, 1);
 				ply_set_read_cb(ply, "vertex", "y", callbackPointcloud<ElementType>, &pointcloud_, 2);
 				ply_set_read_cb(ply, "vertex", "z", callbackPointcloud<ElementType>, &pointcloud_, 3);
 			}
 			else{
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 
 			if (normal_flag) {
@@ -416,8 +446,7 @@ namespace io
 				ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
 			}
 			else {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 
 			if (normal_flag) {

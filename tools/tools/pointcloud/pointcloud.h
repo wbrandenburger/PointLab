@@ -39,8 +39,6 @@
 #include "tools/utils/matrix.h"
 
 #include "tools/pointcloud/pointcloudnodes.h"
-#include "tools/pointcloud/pointcloudsoa.h"
-#include "tools/pointcloud/pointcloudaos.h"
 
 namespace pointcloud
 {
@@ -78,8 +76,10 @@ namespace pointcloud
 
 	template<typename ElementType> class Pointcloud 
 	{
-
+	
 	public:
+
+		typedef ElementType ElementType;
 
 		/**
 			Constructor
@@ -701,6 +701,13 @@ namespace pointcloud
 
 			return flags;
 		}
+
+		/**
+			Get type of derived class
+
+			@return Type of derived class
+		*/
+		virtual PointcloudIdentifier getPointcloudType() = 0;
 
 	protected:
 		/**

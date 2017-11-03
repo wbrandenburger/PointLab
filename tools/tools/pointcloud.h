@@ -34,6 +34,9 @@
 #include "pointcloud/miscallaneous.h"
 #include "pointcloud/normal.h"
 #include "pointcloud/pointcloud.h"
+#include "pointcloud/pointcloudaos.h"
+#include "pointcloud/pointcloudsoa.h"
+#include "pointcloud/pointcloudnodes.h"
 #include "pointcloud/quaterion.h"
 
 #endif /* INCLUDE_POINTCLOUD_H_ */

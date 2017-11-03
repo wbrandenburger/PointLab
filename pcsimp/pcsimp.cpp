@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances(),flags);
 	pointcloud.setPointcloud();
 
-	io::PointcloudIterators<float> iteratotors(pointcloud);
+
 
 	time.start();
 	if (plyIO.readPly(pointcloud)) {
@@ -90,6 +90,9 @@ int main(int argc, char* argv[]) {
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
 	std::cout << pointcloud << std::endl;
+
+	io::PointcloudIterators<pointcloud::PointcloudSoA<float>> iteratotors(pointcloud);
+	iteratotors.versuch();
 
 	pointcloud::PointcloudAoS<float> pointcloudAoS = pointcloud;
 
