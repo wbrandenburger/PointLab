@@ -92,24 +92,24 @@
 		return flag;
 	}
 
-	enum struct PointcloudType
-	{
-		/**
-			PointcloudAoS, which stores the information as an array of structures
-		*/
-		AoS = 0,
-		/**
-			PointcloudSoA, which stores the information as several arrays of structures
-		*/
-		SoA = 1
-	};
-
 	/**
-		Get the type of the derived class
+		Operator |= for Vertex
+
+		@param[in] identifier_
+		@param[in] vertex_ An instance of struct Vertex
 	*/
-	template<PointcloudType> struct GetPointcloudType { typedef int Type; };
-	template<> struct GetPointcloudType<PointcloudType::AoS> { typedef unsigned char Type; };
-	template<> struct GetPointcloudType<PointcloudType::SoA> { typedef unsigned short Type; };
+	uint8_t operator &(const uint8_t& flag, const PointcloudFlag& vertex)
+	{
+		switch (vertex) {
+		case PointcloudFlag::RGB: return flag & 1 << 1; break;
+		case PointcloudFlag::NORMALS: return flag & 1 << 2; break;
+		case PointcloudFlag::TRIANGLES: return flag & 1 << 3; break;
+		case PointcloudFlag::RGBNORMALS: return flag & 1 << 6; break;
+		case PointcloudFlag::MESH: return flag & 1 << 7; break;
+		}
+
+		return 0;
+	}
 
 	/**
 		Flags which specify what kind of primitives to render

@@ -252,7 +252,7 @@ namespace io
 			Constructor
 		*/
 		PlyIO() : file_(nullptr), number_of_vertices_(0), number_of_triangles_(0), 
-			normal_flag_(false), color_flag_(0), triangle_flag_(false)
+			normal_flag_(false), color_flag_(0), triangle_flag_(false), pointcloud_flag_(0)
 		{
 		}
 
@@ -358,7 +358,7 @@ namespace io
 		*/
 		void readHeader() 
 		{
-			uint8_t pointcloud_flags = 0;
+			
 
 			p_ply ply = ply_open(file_, NULL, 0, NULL);
 			if (!ply) {
@@ -395,7 +395,7 @@ namespace io
 				}
 				if (std::strcmp("face", elem_name) == 0) {
 					number_of_triangles_ = (size_t)elem_instances;
-					triangle_flag_ = true;
+					triangle_flag_ = true; pointcloud_flag_ |= PointcloudFlag::TRIANGLES;
 				}
 				/**
 					Get the next property
@@ -415,9 +415,9 @@ namespace io
 					ply_get_property_info(prop, &prop_name, &type, &length_type, &value_type);
 					
 					if (!strcmp(prop_name, "x")) { type_ = getDataType(type); }
-					if (!strcmp(prop_name, "nx")) { normal_flag_ = true; }
-					if (!strcmp(prop_name, "diffuse_red")) { color_flag_ = 1; }
-					if (!strcmp(prop_name, "red")) { color_flag_ = 2; }
+					if (!strcmp(prop_name, "nx")) { normal_flag_ = true; pointcloud_flag_ |= PointcloudFlag::NORMALS; }
+					if (!strcmp(prop_name, "diffuse_red")) { color_flag_ = 1; pointcloud_flag_ |= PointcloudFlag::RGB; }
+					if (!strcmp(prop_name, "red")) { color_flag_ = 2; pointcloud_flag_ |= PointcloudFlag::RGB; }
 
 					prop = ply_get_next_property(elem, prop);
 				}
@@ -517,19 +517,19 @@ namespace io
 			ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
 			
 
-			if (color_flag_ == 1) {
+			if ( (pointcloud_flag_ & PointcloudFlag::RGB) > 0 && color_flag_ == 1) {
 				ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 			}
 
-			if (color_flag_ == 2) {
+			if ((pointcloud_flag_ & PointcloudFlag::RGB) > 0  && color_flag_ == 2) {
 				ply_set_read_cb(ply, "vertex", "red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "green", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 			}
 
-			if (normal_flag_) {
+			if ((pointcloud_flag_ & PointcloudFlag::NORMALS) > 0) {
 				ply_set_read_cb(ply, "vertex", "nx", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 				ply_set_read_cb(ply, "vertex", "ny", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
@@ -567,14 +567,14 @@ namespace io
 			ply_add_property(ply, "y", ply_data_type, ply_data_type, ply_data_type);
 			ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
 
-			if (color_flag_) {
+			if ((pointcloud_flag_ & PointcloudFlag::RGB) > 0) {
 				e_ply_type ply_color_type = PLY_UCHAR;
 				ply_add_property(ply, "red", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "green", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "blue", ply_color_type, ply_color_type, ply_color_type);
 			}
 
-			if (normal_flag_) {
+			if ((pointcloud_flag_ & PointcloudFlag::NORMALS) > 0) {
 				ply_add_property(ply, "nx", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "ny", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "nz", ply_data_type, ply_data_type, ply_data_type);
@@ -589,12 +589,12 @@ namespace io
 				ply_write(ply, iterators.getPoint());
 				ply_write(ply, iterators.getPoint());
 
-				if (color_flag_) {
+				if ((pointcloud_flag_ & PointcloudFlag::RGB) > 0) {
 					ply_write(ply, iterators.getColor());
 					ply_write(ply, iterators.getColor());
 					ply_write(ply, iterators.getColor());
 				}
-				if (normal_flag_) {
+				if ((pointcloud_flag_ & PointcloudFlag::NORMALS) > 0) {
 					ply_write(ply, iterators.getNormal());
 					ply_write(ply, iterators.getNormal());
 					ply_write(ply, iterators.getNormal());
@@ -641,6 +641,8 @@ namespace io
 			Flag whether triangles are inside the file
 		*/
 		bool triangle_flag_;
+
+		uint8_t pointcloud_flag_;
 	};
 }
 
