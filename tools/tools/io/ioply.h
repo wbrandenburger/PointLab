@@ -70,7 +70,9 @@ namespace io
 				iterator_triangle_ = pointcloud.beginTriangle();
 			}
 
-			end_ = pointcloud.endPoint();
+			end_vertices_ = pointcloud.endPoint();
+
+			end_triangles_ = pointcloud.endTriangle();
 		}
 
 		/**
@@ -131,7 +133,7 @@ namespace io
 		/**
 			Set a point and increment pointer
 		*/
-		void setPoint(ElementType point) 
+		void setPoint(const ElementType& point) 
 		{
 			*iterator_point_ = point;
 			iterator_point_++;
@@ -140,7 +142,7 @@ namespace io
 		/**
 			Set color and increment pointer
 		*/
-		void setColor(uint8_t color) 
+		void setColor(const uint8_t& color) 
 		{
 			*iterator_color_ = color;
 			iterator_color_++;
@@ -149,7 +151,7 @@ namespace io
 		/**
 			Set a normal and increment pointer
 		*/
-		void setNormal(ElementType normal) 
+		void setNormal(const ElementType& normal) 
 		{
 			*iterator_normal_ = normal;
 			iterator_normal_++;
@@ -158,7 +160,7 @@ namespace io
 		/**
 			Set a triangle and increment pointer
 		*/
-		void setTriangle(size_t triangle) 
+		void setTriangle(const size_t& triangle) 
 		{
 			*iterator_triangle_ = triangle;
 			iterator_triangle_++;
@@ -209,12 +211,21 @@ namespace io
 		}
 
 		/**
-			Checks whether the end is reached
+			Checks whether the end of vertices is reached
 		*/
-		bool end()
+		bool endVertices()
 		{
-			return iterator_point_ == end_;
+			return iterator_point_ == end_vertices_;
 		}
+
+		/**
+			Checks whether the end of triangles is reached
+		*/
+		bool endTriangles()
+		{
+			return iterator_triangle_ == end_triangles_;
+		}
+
 	private:
 
 		/**
@@ -238,9 +249,14 @@ namespace io
 		Iteratorsize_t iterator_triangle_;
 
 		/**
-			End of data
+			End of vertices
 		*/
-		ElementType* end_;
+		ElementType* end_vertices_;
+
+		/**
+			End of triangles
+		*/
+		size_t* end_triangles_;
 	};
 
 
@@ -418,9 +434,9 @@ namespace io
 			ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 		}
 
-		//if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
-		//	ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
-		//}
+		if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
+			ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
+		}
 
 		/**
 			Read the file 
@@ -438,7 +454,7 @@ namespace io
 		Write ply file with given structure
 
 		@param[in] file Name of file
-		@param pointcloud_ Structure which elements will be written in the file
+		@param pointcloud Structure which elements will be written in the file
 		@return Returns true if writing was successful
 	*/
 	template <typename PointcloudType> bool writePly(char *file, const PointcloudType& pointcloud)
@@ -448,7 +464,7 @@ namespace io
 		/**
 			Create the file
 		*/
-		p_ply ply = ply_create(file, PLY_DEFAULT, NULL, 0, NULL);
+		p_ply ply = ply_create(file, PLY_ASCII, NULL, 0, NULL);
 	
 		/**
 			Define the type of the points
@@ -457,12 +473,9 @@ namespace io
 		
 		uint8_t pointcloud_flag = pointcloud.getPointcloudFlag();
 		ply_add_element(ply, "vertex", (long)pointcloud.getNumberOfVertices());
-		//if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
-		//	ply_add_element(ply, "face", (long) pointcloud.getNumberOfTriangles());
-		//}
 
 		/**
-			Set the elements to write
+			Set vertex elements to write
 		*/
 		ply_add_property(ply, "x", ply_type, ply_type, ply_type);
 		ply_add_property(ply, "y", ply_type, ply_type, ply_type);
@@ -480,9 +493,13 @@ namespace io
 			ply_add_property(ply, "nz", ply_type, ply_type, ply_type);
 		}
 
-		//if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
-		//	ply_add_list_property(ply, "vertex_indices", PLY_UCHAR, PLY_INT);
-		//}
+		/**
+			Set face elements to write
+		*/
+		if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
+			ply_add_element(ply, "face", (long) pointcloud.getNumberOfTriangles());
+			ply_add_list_property(ply, "vertex_indices", PLY_UCHAR, PLY_INT);
+		}
 
 		/**
 			Write the header
@@ -495,9 +512,11 @@ namespace io
 		PointcloudIterators<PointcloudType> iterators(pointcloud);
 
 		/**
-			Write the vertex elements
+			Write vertex elements
+
+			Rply counts the elements which are written and sets automatically a line break
 		*/
-		while (!iterators.end()) {
+		while (!iterators.endVertices()) {
 			ply_write(ply, iterators.getPoint());
 			ply_write(ply, iterators.getPoint());
 			ply_write(ply, iterators.getPoint());
@@ -512,6 +531,18 @@ namespace io
 				ply_write(ply, iterators.getNormal());
 				ply_write(ply, iterators.getNormal());
 			}
+		}
+
+		/**
+			Write face elements
+
+			Rply counts the elements which are written and sets automatically a line break
+		*/
+		while (!iterators.endTriangles()) {
+			ply_write(ply, 3);
+			ply_write(ply, iterators.getTriangle());
+			ply_write(ply, iterators.getTriangle());
+			ply_write(ply, iterators.getTriangle());
 		}
 		
 		ply_close(ply);

@@ -772,7 +772,7 @@ namespace pointcloud
 				case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
 				case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
 				case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
-				case PointcloudFlag::TRIANGLES: stride_ = 0;
+				case PointcloudFlag::TRIANGLES: stride_ = sizeof(size_t);
 				}
 			}
 
