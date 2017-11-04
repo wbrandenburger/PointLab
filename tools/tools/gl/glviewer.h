@@ -98,17 +98,15 @@ namespace utils
 		*/
 		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			if (pointcloud_.isPoints()) {
-				points = pointcloud_.getPointsPtr();
-			}
+			points = pointcloud_.getPointsPtr();
+
 			if (pointcloud_.isColor()) {
 				color = pointcloud_.getColorsPtr();
 			}
 			if (pointcloud_.isNormal()) {
 				normals = pointcloud_.getNormalsPtr();
 			}
-
-			number_of_elements = pointcloud_.getRows();
+			number_of_elements = pointcloud_.getNumberOfVertices();
 			
 			setParameters();
 		}

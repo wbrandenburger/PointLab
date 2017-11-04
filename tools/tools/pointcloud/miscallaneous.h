@@ -49,32 +49,70 @@ namespace pointcloud
 		@param[in] quant_ Difference between two adjacent points
 		@param[in] indices_ True if a trinagulated meshgrid should be created
 	*/
-	template<typename ElementType> void meshGrid(pointcloud::Pointcloud<ElementType>& pointcloud,
+	template<typename ElementType, typename PointcloudType> void meshGrid(PointcloudType& pointcloud,
 		ElementType x_left,ElementType x_right, ElementType y_left, ElementType y_right, 
-		ElementType quant, bool indices = true)
+		ElementType quant)
 	{
-		pointcloud.setFlags(Vertex::TRIANGLES);
-
 		/** 
 			Computation of the number of resulting elements and set the pointcloud
 		*/
-		size_t number_x = std::ceil((x_right - x_left) / quant);
-		size_t number_y = std::ceil((y_right - y_left) / quant);
+		size_t number_x = std::floor((x_right - x_left) / quant) + 1;
+		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
 
 		size_t number_of_elements = number_x * number_y;
 		size_t number_of_triangles = (number_x - 1)*(number_y - 1) * 2;
-		pointcloud.setPointcloud(number_of_elements, number_of_triangles);
+		
+		/**
+			Set pointcloud and allocate memory 
+		*/
+		pointcloud.setNumberOfElements(number_of_elements, number_of_triangles);
+		pointcloud.setTriangles();
+
+		pointcloud.setPointcloud();
 
 		/**
-			Set the meshgrid
+			Set the pointcloud
 		*/
-		size_t index = 0;
+		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
+		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
+		IteratorElementType iterator_points = pointcloud.beginPoint();
+		Iteratorsize_t iterator_triangles = pointcloud.beginTriangle();
+
 		for (ElementType x = x_left; x <= x_right; x += quant) {
 			for (ElementType y = y_left; y <= y_right; y += quant) {
-				pointcloud_.setPoint(x, index, 0);
-				pointcloud_.setPoint(y, index, 1);
+				/**
+					Assign the x- and y-values
+				*/
+				*iterator_points = x; iterator_points++;
+				*iterator_points = y; iterator_points++;
+				/**
+					Skip z-value
+				*/
+				iterator_points++;
+			}
+		}
+
+		size_t index = 0;
+		for (size_t i = 0; i < number_of_triangles / 2; i++) {
+			
+			if ((index + 1) % number_x == 0){
 				index++;
 			}
+
+			/**
+				Top	left, top right and bottom left corner
+			*/
+			*iterator_triangles = index; iterator_triangles++;
+			*iterator_triangles = index + 1; iterator_triangles++;
+			*iterator_triangles = index + number_x; iterator_triangles++;
+			/**
+				Top	left, top right and bottom left corner
+			*/
+			*iterator_triangles = index + 1; iterator_triangles++;
+			*iterator_triangles = index + number_x + 1; iterator_triangles++;
+			*iterator_triangles = index + number_x; iterator_triangles++;
+
+			index++;
 		}
 	}
 }

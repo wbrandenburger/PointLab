@@ -76,7 +76,12 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << pointcloud_buny << std::endl;
 
-	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_buny);
+	pointcloud::PointcloudSoA<float> pointcloud_meshgrid;
+	pointcloud::meshGrid<float>(pointcloud_meshgrid, 0, 3, 0, 3, 1);
+
+	std::cout << pointcloud_meshgrid << std::endl;
+
+	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_meshgrid);
 
 	int versuch = 2048;
 	int shift =  versuch / 3;
@@ -98,7 +103,8 @@ int main(int argc, char* argv[]) {
 	utils::GLView<float> glview;
 
 	glview.setViewer();
-	glview.setPointcloud(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
+	//glview.setPointcloud(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
+	glview.setPointcloud(pointcloud_buny);
 	glview.subPlot(2, 2, 0);
 
 	glview.setPlot(versuch);
@@ -116,7 +122,8 @@ int main(int argc, char* argv[]) {
 
 	float* points = pointcloud_buny.getPointsPtr();
 	glview.setPlot3D();
-	glview.setPointcloud(GLParams::POINTS, points, pointcloud_buny.getNumberOfVertices());
+	//glview.setPointcloud(GLParams::POINTS, points, pointcloud_buny.getNumberOfVertices());
+	glview.setPointcloud(GLParams::POINTS, pointcloud_meshgrid);
 	glview.subPlot(2, 2, 3);
 	delete[] points;
 

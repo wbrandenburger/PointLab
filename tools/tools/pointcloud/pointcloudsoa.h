@@ -218,11 +218,14 @@ namespace pointcloud
 		void allocateMemoryPointcloud()
 		{
 			points = new ElementType[number_of_vertices * 3];
+			memset(points, (ElementType) 0.0, sizeof(ElementType) * number_of_vertices * 3);
 			if (isColor()) {
 				colors = new uint8_t[number_of_vertices * 3];
+				memset(colors, (uint8_t) 0, sizeof(uint8_t) * number_of_vertices * 3);
 			}
 			if (isNormal()) {
 				normals = new ElementType[number_of_vertices * 3];
+				memset(normals, (ElementType) 0.0, sizeof(ElementType) * number_of_vertices * 3);
 			}
 		}
 
@@ -251,6 +254,7 @@ namespace pointcloud
 			}
 
 			colors = new uint8_t[number_of_vertices * 3];
+			memset(colors, (uint8_t)0, sizeof(uint8_t) * number_of_vertices * 3);
 		}
 
 		/**
@@ -266,6 +270,7 @@ namespace pointcloud
 			}
 
 			normals = new ElementType[number_of_vertices * 3];
+			memset(normals, (ElementType) 0.0, sizeof(ElementType) * number_of_vertices * 3);
 		}
 
 	private:
@@ -485,7 +490,7 @@ namespace pointcloud
 		ElementType* getPointsPtr() const
 		{
 			ElementType* new_points = new ElementType[number_of_vertices * 3];
-			std::memcpy(new_points, points, sizeof(ElementType) * getNumberOfVertices() * 3);
+			std::memcpy(new_points, points, sizeof(ElementType) * number_of_vertices * 3);
 
 			return new_points;
 		}
@@ -498,7 +503,7 @@ namespace pointcloud
 		ElementType* getNormalsPtr() const
 		{
 			ElementType* new_normals = new ElementType[number_of_vertices * 3];
-			std::memcpy(new_normals, normals, sizeof(ElementType) * getNumberOfVertices() * 3);
+			std::memcpy(new_normals, normals, sizeof(ElementType) * number_of_vertices * 3);
 
 			return new_normals;
 		}
@@ -511,7 +516,7 @@ namespace pointcloud
 		uint8_t* getColorsPtr() const
 		{
 			uint8_t* new_colors = new uint8_t[number_of_vertices * 3];
-			std::memcpy(new_colors, colors, sizeof(ElementType) * getNumberOfVertices() * 3);
+			std::memcpy(new_colors, colors, sizeof(uint8_t) * number_of_vertices * 3);
 
 			return new_colors;
 		}
@@ -524,7 +529,7 @@ namespace pointcloud
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
 			ElementType* data(new ElementType[number_of_vertices*3]);
-			std::memcpy(data, points, sizeof(ElementType) * getNumberOfVertices() * 3);
+			std::memcpy(data, points, sizeof(ElementType) * number_of_vertices * 3);
 
 			matrix_.setMatrix(data, number_of_vertices, 3);
 		}

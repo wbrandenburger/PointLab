@@ -72,7 +72,7 @@ namespace utils
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		PlotContainer(GLParams mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) : PlotContainer()
+		PlotContainer(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_ ) : PlotContainer()
 		{
 			setMode(mode_);
 
@@ -85,12 +85,17 @@ namespace utils
 				normals = pointcloud_.getNormalsPtr();
 			}
 
-			number_of_elements = pointcloud_.setNumberOfElements();
+			number_of_elements = pointcloud_.getNumberOfVertices();
 
 			if (pointcloud_.isTriangle()) {
-				number_of_triangles = pointcloud.getNumberOfTriangles();
-				triangles = pointcloud.getTrianglesPtr();
+				number_of_triangles = pointcloud_.getNumberOfTriangles();
+				//triangles = pointcloud_.getTrianglesPtr<unsigned int>();
 			}
+
+			//for (size_t i = 0; i < number_of_triangles; i++) {
+			//	std::cout << triangles[i * 3] << " " << triangles[i * 3 + 1] << " " << triangles[i * 3 + 2] << std::endl;
+			//}
+
 		}
 
 		/**
@@ -232,7 +237,7 @@ namespace utils
 				normals = pointcloud_.getNormalsPtr();
 			}
 
-			number_of_elements = pointcloud_.getRows();
+			number_of_elements = pointcloud_.getNumberOfVertices();
 
 			if (pointcloud_.isTriangle()) {
 				number_of_triangles = pointcloud.getNumberOfTriangles();
@@ -442,7 +447,7 @@ namespace utils
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(GLParams mode_,const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
 			plot_container.push_back(PlotContainer<ElementType>(mode_,pointcloud_));
 

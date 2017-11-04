@@ -191,6 +191,7 @@ namespace pointcloud
 		{
 			if (isTriangle()) {
 				triangles = new size_t[number_of_triangles * 3];
+				memset(triangles, (size_t) 0, sizeof(size_t) * number_of_triangles * 3);
 			}
 		}
 	
@@ -210,6 +211,18 @@ namespace pointcloud
 			Set normal flag and allocate memory
 		*/
 		virtual void setNormals() = 0;
+		
+		/**
+			Set triangles
+		*/
+		void setTriangles()
+		{
+			triangle_flag = true;
+
+			clearMemoryTriangles();
+
+			allocateMemoryTriangles();
+		}
 
 		/**
 			Set triangles
@@ -549,12 +562,12 @@ namespace pointcloud
 		*/
 		size_t* getTrianglesPtr() const
 		{
-			size_t* new_triangles = new size_t[getNumberOfTriangles() * 3];
-			std::memcpy(new_triangles, triangles, sizeof(size_t) * getNumberOfVertices() * 3);
+			size_t* new_triangles = new size_t[number_of_triangles * 3];
+			std::memcpy(new_triangles, triangles, sizeof(size_t) * number_of_triangles * 3);
 
 			return new_triangles;
 		}
-
+	
 		/**
 			Get Matrix to points
 
