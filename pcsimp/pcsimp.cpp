@@ -72,12 +72,12 @@ int main(int argc, char* argv[]) {
 	utils::Timer time;
 	
 	uint8_t flags = 0;
-	if (plyIO.isColor()) {
+	//if (plyIO.isColor()) {
 		flags |= PointcloudFlag::RGB;
-	}
-	if (plyIO.isNormal()) {
-		flags |= PointcloudFlag::NORMALS;
-	}
+	//}
+	//if (plyIO.isNormal()) {
+		////flags |= PointcloudFlag::NORMALS;
+	//}
 
 	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getNumberOfVertices(),flags);
 	pointcloud.setPointcloud();

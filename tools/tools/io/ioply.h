@@ -251,8 +251,8 @@ namespace io
 		/**
 			Constructor
 		*/
-		PlyIO() : file_(nullptr), number_of_vertices(0), number_of_triangles(0), 
-			point_flag(false), normal_flag(false), color_flag(0), triangle_flag(false)
+		PlyIO() : file_(nullptr), number_of_vertices_(0), number_of_triangles_(0), 
+			point_flag_(false), normal_flag_(false), color_flag_(0), triangle_flag_(false)
 		{
 		}
 
@@ -268,7 +268,7 @@ namespace io
 		*/
 		void initialze(char* file)
 		{
-			clear();
+			reset();
 			file_ = file;
 
 			readHeader();
@@ -277,23 +277,25 @@ namespace io
 		/**
 			Clear
 		*/
-		void clear()
+		void reset()
 		{
 			file_ = nullptr;
-			number_of_vertices = 0;
-			number_of_triangles = 0;
-			point_flag = false;
-			normal_flag = false;
-			color_flag = 0;
-			triangle_flag = false;
+			number_of_vertices_ = 0;
+			number_of_triangles_ = 0;
+			point_flag_ = false;
+			normal_flag_ = false;
+			color_flag_ = 0;
+			triangle_flag_ = false;
 		}
 
 		/**
-			Get the data type of the points 
+			Get the data type of the pointcloud 
+
+			@return Type of the pointcloud
 		*/
 		size_t getDataType() const
 		{
-			switch (type) {
+			switch (type_) {
 			case PLY_TYPE_NULL : return 0; break;
 			case PLY_TYPE_FLOAT : return 1; break;
 			case PLY_TYPE_DOUBLE : return 2; break;
@@ -304,18 +306,22 @@ namespace io
 
 		/**
 			Get number of vertices
+
+			@return Number of vertices
 		*/
 		size_t getNumberOfVertices() const
 		{
-			return number_of_vertices;
+			return number_of_vertices_;
 		}
 
 		/**
-			Get number of vertices
+			Get number of Triangles
+
+			@return Number of triangles
 		*/
 		size_t getNumberOfTriangles() const
 		{
-			return number_of_vertices;
+			return number_of_vertices_;
 		}
 
 	private:
@@ -333,12 +339,12 @@ namespace io
 		/**
 			Get the data type of the pointcloud
 
-			@param[in] type_ Type in rply
+			@param[in] type Type in rply
 			@return Type in this class
 		*/
-		DataType getDataType(e_ply_type type_) const
+		DataType getDataType(e_ply_type type) const
 		{
-			switch (type_) {
+			switch (type) {
 			case PLY_FLOAT32 : return PLY_TYPE_FLOAT; break;
 			case PLY_FLOAT64 : return PLY_TYPE_DOUBLE; break;
 			case PLY_FLOAT : return PLY_TYPE_FLOAT; break;
@@ -346,19 +352,6 @@ namespace io
 			}
 
 			return PLY_TYPE_NULL;
-		}
-
-		/**
-			Sets the meta information
-
-			@param[in] prop_name String of the property
-		*/
-		void setMetaInformation(const char *prop_name_, DataType type_)
-		{
-			if (!strcmp(prop_name_, "x")) { type = type_; point_flag = true;}
-			if (!strcmp(prop_name_, "nx")) { normal_flag = true;}
-			if (!strcmp(prop_name_, "diffuse_red")) { color_flag = 1;}
-			if (!strcmp(prop_name_, "red")) { color_flag = 2;}
 		}
 
 		/**
@@ -396,12 +389,12 @@ namespace io
 					Process the vertices
 				*/
 				if (std::strcmp("vertex", elem_name) == 0) {
-					number_of_vertices = (size_t) elem_instances;
+					number_of_vertices_ = (size_t) elem_instances;
 
 				}
 				if (std::strcmp("face", elem_name) == 0) {
-					number_of_triangles = (size_t)elem_instances;
-					triangle_flag = true;
+					number_of_triangles_ = (size_t)elem_instances;
+					triangle_flag_ = true;
 				}
 				/**
 					Get the next property
@@ -420,7 +413,10 @@ namespace io
 					e_ply_type type, length_type, value_type;
 					ply_get_property_info(prop, &prop_name, &type, &length_type, &value_type);
 					
-					setMetaInformation(prop_name,getDataType(type));
+					if (!strcmp(prop_name, "x")) { type_ = getDataType(type); point_flag_ = true; }
+					if (!strcmp(prop_name, "nx")) { normal_flag_ = true; }
+					if (!strcmp(prop_name, "diffuse_red")) { color_flag_ = 1; }
+					if (!strcmp(prop_name, "red")) { color_flag_ = 2; }
 
 					prop = ply_get_next_property(elem, prop);
 				}
@@ -514,7 +510,7 @@ namespace io
 
 			PointcloudIterators<PointcloudType> iterators(pointcloud_);
 
-			if (isPoints()) {
+			if (point_flag_) {
 				ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
 				ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
 				ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
@@ -523,25 +519,25 @@ namespace io
 				exitFailure(__FILE__, __LINE__);
 			}
 
-			if (color_flag == 1) {
+			if (color_flag_ == 1) {
 				ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 			}
 
-			if (color_flag == 2) {
+			if (color_flag_ == 2) {
 				ply_set_read_cb(ply, "vertex", "red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "green", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 				ply_set_read_cb(ply, "vertex", "blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
 			}
 
-			if (isNormal()) {
+			if (normal_flag_) {
 				ply_set_read_cb(ply, "vertex", "nx", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 				ply_set_read_cb(ply, "vertex", "ny", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 			}
 
-			//if (isTriangle()) {
+			//if (triangle_flag_) {
 			//	ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
 			//}
 
@@ -567,8 +563,8 @@ namespace io
 		
 			ply_add_element(ply, "vertex", (long)pointcloud_.getNumberOfVertices());
 		
-			e_ply_type ply_data_type = type == PLY_TYPE_FLOAT ? PLY_FLOAT32 : PLY_FLOAT64;
-			if (isPoints()) {
+			e_ply_type ply_data_type = type_ == PLY_TYPE_FLOAT ? PLY_FLOAT32 : PLY_FLOAT64;
+			if (point_flag_) {
 				ply_add_property(ply, "x", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "y", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
@@ -578,14 +574,14 @@ namespace io
 			}
 
 
-			if (isColor()) {
+			if (color_flag_) {
 				e_ply_type ply_color_type = PLY_UCHAR;
 				ply_add_property(ply, "red", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "green", ply_color_type, ply_color_type, ply_color_type);
 				ply_add_property(ply, "blue", ply_color_type, ply_color_type, ply_color_type);
 			}
 
-			if (isNormal()) {
+			if (normal_flag_) {
 				ply_add_property(ply, "nx", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "ny", ply_data_type, ply_data_type, ply_data_type);
 				ply_add_property(ply, "nz", ply_data_type, ply_data_type, ply_data_type);
@@ -600,12 +596,12 @@ namespace io
 				ply_write(ply, iterators.getPoint());
 				ply_write(ply, iterators.getPoint());
 
-				if (isColor()) {
+				if (color_flag_) {
 					ply_write(ply, iterators.getColor());
 					ply_write(ply, iterators.getColor());
 					ply_write(ply, iterators.getColor());
 				}
-				if (isNormal()) {
+				if (normal_flag_) {
 					ply_write(ply, iterators.getNormal());
 					ply_write(ply, iterators.getNormal());
 					ply_write(ply, iterators.getNormal());
@@ -617,46 +613,6 @@ namespace io
 			return true;
 		}
 
-		/**
-			Returns true if points are inside the file
-
-			@return True if points are inside the file
-		*/
-		bool isPoints() const
-		{
-			return point_flag;
-		}
-
-		/**
-			Returns true if colors are inside the file
-
-			@return True if colors are inside the file 
-		*/
-		bool isColor() const
-		{
-			return (bool)color_flag;
-		}
-
-		/**
-			Returns true if normals are inside the file
-
-			@return True if normals are inside the file 
-		*/
-		bool isNormal() const
-		{
-			return normal_flag;
-		}
-		
-		/**
-			Returns true if triangles are inside the file
-
-			@return True if triangles are inside the file
-		*/
-		bool isTriangle() const
-		{
-			return triangle_flag;
-		}
-
 	private:
 		/**
 			Filename
@@ -666,37 +622,37 @@ namespace io
 		/**
 			Data type of the pointcloud
 		*/
-		DataType type;
+		DataType type_;
 
 		/** 
 			Number of vertices
 		*/
-		size_t number_of_vertices;
+		size_t number_of_vertices_;
 
 		/**
 			Number of triangles
 		*/
-		size_t number_of_triangles;
+		size_t number_of_triangles_;
 
 		/**
 			Flag whether points are inside the file
 		*/
-		bool point_flag;
+		bool point_flag_;
 
 		/**
 			Flag whether normals are inside the file
 		*/
-		bool normal_flag;
+		bool normal_flag_;
 		
 		/**
 			Flag whether colors are inside the file
 		*/
-		size_t color_flag;
+		size_t color_flag_;
 
 		/**
 			Flag whether triangles are inside the file
 		*/
-		bool triangle_flag;
+		bool triangle_flag_;
 	};
 }
 
