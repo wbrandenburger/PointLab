@@ -731,7 +731,9 @@ namespace pointcloud
 	
 	public:
 		/**
-			Get flag
+			Get Pointcloud flag
+
+			@return Pointcloud flag
 		*/
 		uint8_t getPointcloudFlag() const
 		{
@@ -781,7 +783,6 @@ namespace pointcloud
 		bool triangle_flag;
 
 	};
-
 	
 	/**
 		Operator << Prints the values of the quaterion
