@@ -52,6 +52,10 @@
 	enum struct PointcloudFlag
 	{
 		/**
+			POINTS is used if the pointlcoud contains points
+		*/
+		POINTS = 0,
+		/**
 			RGB is used if the pointcloud contains colors
 		*/
 		RGB = 1,

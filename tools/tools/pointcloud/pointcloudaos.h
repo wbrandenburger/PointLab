@@ -253,37 +253,6 @@ namespace pointcloud
 			allocateMemoryPointcloud();
 			allocateMemoryTriangles();
 		}
-		
-		/**
-			Set pointcloud
-			
-			@param[in] number_of_vertices_ Number of vertices
-		*/
-		void setPointcloud(size_t number_of_vertices_)
-		{
-			setNumberOfVertices(number_of_vertices_);
-
-			clearMemory();
-
-			allocateMemoryPointcloud();
-			allocateMemoryTriangles();
-		}
-
-		/**
-			Set pointcloud
-			
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_triangles Number of triangles
-		*/
-		void setPointcloud(size_t number_of_vertices_, size_t number_of_triangles_)
-		{
-			setNumberOfElements(number_of_vertices_, number_of_triangles);
-
-			clearMemory();
-
-			allocateMemoryPointcloud();
-			allocateMemoryTriangles();
-		}
 
 	private:
 		/**
@@ -593,9 +562,11 @@ namespace pointcloud
 
 			@return Pointer to the first entry of the points
 		*/
-		ElementType* beginPoint() const
+		IteratorInitializer<ElementType> beginPoint() const
 		{
-			return reinterpret_cast<ElementType*>((char*)&pointcloud[0] + 0);
+			return IteratorInitializer<ElementType>(
+				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + 0), 
+				PointcloudFlag::POINTS);
 		}
 
 		/**
@@ -603,9 +574,11 @@ namespace pointcloud
 
 			@return Pointer to the first entry of colors
 		*/
-		uint8_t* beginColor() const
+		IteratorInitializer<uint8_t> beginColor() const
 		{
-			return reinterpret_cast<uint8_t*>((char*)&pointcloud[0] + sizeof(ElementType) * 3);
+			return IteratorInitializer<uint8_t>(
+				reinterpret_cast<uint8_t*>((char*)&pointcloud[0] + sizeof(ElementType) * 3),
+				PointcloudFlag::RGB);
 		}
 				
 		/**
@@ -613,8 +586,11 @@ namespace pointcloud
 
 			@return Pointer to the first entry of normals
 		*/
-		ElementType* beginNormal() const
+		IteratorInitializer<ElementType> beginNormal() const
 		{
+			return IteratorInitializer<ElementType>(
+				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + 0),
+				PointcloudFlag::POINTS);
 			return reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + 4);
 		}
 
@@ -645,6 +621,63 @@ namespace pointcloud
 		{
 			return reinterpret_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices() - 1] + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3 + 4);
 		}
+
+		/**
+			Structure for initialization of the iterators
+		*/
+		template<typename IteratorType> class IteratorInitializer
+		{
+		public:
+			/**
+				Constructor
+
+				@param[in] begin Pointer to the first element
+				@param[in] pointcloud_flag Specifier which defines the element to be iterated
+			*/
+			IteratorInitializer(IteratorType* begin, PointcloudFlag pointcloud_flag) :
+				begin_(begin), pointcloud_flag_(pointcloud_flag)
+			{
+			}
+
+			/**
+				Destructor
+			*/
+			~IteratorInitializer()
+			{
+			}
+
+			/**
+				Get the pointer to the first element
+
+				@return Pointer to the first element
+			*/
+			IteratorType* getBegin()
+			{
+				return begin;
+			}
+
+			/**
+				Get the element specifier
+
+				@return the element specifier
+			*/
+			PointcloudFlag getPointcloudFlag()
+			{
+				return pointcloud_flag_;
+			}
+
+		private:
+			/**
+				Pointer to the first element of the array
+			*/
+			IteratorType* begin_;
+
+			/**
+				Specifies the element to be iterated 
+			*/
+			PointcloudFlag pointcloud_flag_;
+
+		};
 
 		/**
 			Structure of a iterator for points, colors, normals and triangles

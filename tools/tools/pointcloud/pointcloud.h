@@ -178,9 +178,9 @@ namespace pointcloud
 		*/
 		void setFlags(uint8_t flags_)
 		{
-			color_flag = (flags_ & 1 << 1) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
-			normal_flag = (flags_ & 1 << 2) > 0 || (flags_ & 1 << 6) > 0 || (flags_ & 1 << 7) > 0;
-			triangle_flag = (flags_ & 1 << 3) > 0 || (flags_ & 1 << 7) > 0;
+			color_flag = (flags_ & PointcloudFlag::RGB) > 0 || (flags_ & PointcloudFlag::RGBNORMALS) > 0 || (flags_ & PointcloudFlag::MESH) > 0;
+			normal_flag = (flags_ & PointcloudFlag::NORMALS) > 0 || (flags_ & PointcloudFlag::RGBNORMALS) > 0 || (flags_ & PointcloudFlag::MESH) > 0;
+			triangle_flag = (flags_ & PointcloudFlag::TRIANGLES) > 0 || (flags_ & PointcloudFlag::MESH) > 0;
 		}
 
 	protected:
@@ -200,20 +200,6 @@ namespace pointcloud
 		*/
 
 		virtual void setPointcloud() = 0;
-		/**
-			Set pointcloud
-
-			@param[in] number_of_vertices_ Number of vertices
-		*/
-		virtual void setPointcloud(size_t number_of_vertices_) = 0;
-
-		/**
-			Set pointcloud
-
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_triangles_ Number of triangles
-		*/
-		virtual void setPointcloud(size_t number_of_vertices_, size_t number_of_triangles_) = 0;
 
 		/**
 			Set triangles
@@ -682,21 +668,22 @@ namespace pointcloud
 		{
 			triangle_flag = true;
 		}
-
+	
+	public:
 		/**
 			Get flag
 		*/
-		uint8_t getFlags() const
+		uint8_t getPointcloudFlag() const
 		{
 			uint8_t flags = 0;
 			if (isColor()) {
-				flags |= Vertex::RGB;
+				flags |= PointcloudFlag::RGB;
 			}
 			if (isNormal()) {
-				flags |= Vertex::NORMALS;
+				flags |= PointcloudFlag::NORMALS;
 			}
 			if (isTriangle()) {
-				flags |= Vertex::TRIANGLES;
+				flags |= PointcloudFlag::TRIANGLES;
 			}
 
 			return flags;

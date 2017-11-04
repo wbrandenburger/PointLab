@@ -62,46 +62,20 @@ int main(int argc, char* argv[]) {
 	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 	
-	io::PlyIO plyIO;
-	plyIO.initialze(file);
-
-	
 	/**
 		Read data
 	*/
 	utils::Timer time;
-	
-	uint8_t flags = 0;
-	//if (plyIO.isColor()) {
-		flags |= PointcloudFlag::RGB;
-	//}
-	//if (plyIO.isNormal()) {
-		////flags |= PointcloudFlag::NORMALS;
-	//}
-
-	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getNumberOfVertices(),flags);
-	pointcloud.setPointcloud();
-
-
+	pointcloud::PointcloudSoA<float> pointcloud_buny;
 
 	time.start();
-	if (plyIO.readPly(pointcloud)) {
-		std::cout << "File with " << pointcloud.getNumberOfVertices() << " point has been read in "
+	if (io::readPly(file, pointcloud_buny)) {
+		std::cout << "File with " << pointcloud_buny.getNumberOfVertices() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
-	std::cout << pointcloud << std::endl;
+	std::cout << pointcloud_buny << std::endl;
 
-	plyIO.writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
-
-	pointcloud::PointcloudAoS<float> pointcloudAoS = pointcloud;
-
-	std::cout << pointcloudAoS << std::endl;
-
-	//utils::GLViewer<float> viewer;
-	//viewer.setViewer();
-	//viewer.setPointcloud(pointcloud);
-	//viewer.plot();
-	//viewer.mainLoop();
+	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_buny);
 
 	int versuch = 2048;
 	int shift =  versuch / 3;
@@ -120,20 +94,10 @@ int main(int argc, char* argv[]) {
 	pointcloud::Quaterion<float> quat1;
 	pointcloud::Quaterion<float> quat2(1.2f, 0.12f, 0.45f);
 
-
-	//double x_, y_, z_;
-	//quat1.getEulerAngles(x_,y_,z_);
-	//std::cout << x_ << " " << y_ << " " << z_ << std::endl;
-	//double* matrixrot = new double[9];
-	//quat.getRotationMatrix(matrixrot);
-
-	/*
-	std::cout << q1.lengthsqr() << std::endl;*/
-
 	utils::GLView<float> glview;
 
 	glview.setViewer();
-	glview.setPointcloud(pointcloud.getPointsPtr(), pointcloud.getNumberOfVertices());
+	glview.setPointcloud(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
 	glview.subPlot(2, 2, 0);
 
 	glview.setPlot(versuch);
@@ -149,55 +113,15 @@ int main(int argc, char* argv[]) {
 	glview.setX(array_x);
 	glview.subPlot(2, 2, 2);
 
-	float* points = pointcloud.getPointsPtr();
+	float* points = pointcloud_buny.getPointsPtr();
 	glview.setPlot3D();
-	glview.setPointcloud(GLParams::POINTS, points, pointcloud.getNumberOfVertices());
+	glview.setPointcloud(GLParams::POINTS, points, pointcloud_buny.getNumberOfVertices());
 	glview.subPlot(2, 2, 3);
 	delete[] points;
 
 
 
 	glview.mainLoop();
-	//if (plyIO.getDataType() == 1) {
-	//	/*program<float>(cores, plyIO);*/
-	//}
-	//else {
-	//	/*program<double>(cores, plyIO);*/
-	//}
-
-	//////////////////utils::Matrix<float> matrix;
-	//////////////////pointcloud.getMatrix(matrix);
-	//////////////////trees::Index<float> index(matrix, trees::KDTreeIndexParams(20));
-
-	//utils::Timer time;
-	//
-	//io::PlyIO plyIO;
-	//plyIO.initialze(file);
-
-	//pointcloud::PointcloudSoA<float> pointcloud(plyIO.getInstances());
-
-	//time.start();
-	//if (plyIO.readPly(pointcloud)) {
-	//	std::cout << "File with " << pointcloud.getRows() << " point has been read in "
-	//		<< time.stop() << " s into Pointcloud" << std::endl;
-	//}
-
-	//pcsimp::Matrix<float> pointcloudsimp(pointcloud.getPointsPtr(), pointcloud.getRows(), 3);
-	//
-	///**
-	//	Build index
-	//*/
-	//time.start();
-	//pcsimp::Index<float> index(pointcloudsimp, pcsimp::MLSIndexParams(30,0.05f));
-
-	//std::cout << "Simplification-index has been built in " << time.stop() << " s" << std::endl;
-
-	///**
-	//Destroy the structures
-	//*/
-	//pointcloud.clear();
-	//pointcloudsimp.clear();
-
 
 	return(0);
 }
