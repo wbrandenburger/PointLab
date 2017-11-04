@@ -252,7 +252,7 @@ namespace io
 			Constructor
 		*/
 		PlyIO() : file_(nullptr), number_of_vertices_(0), number_of_triangles_(0), 
-			point_flag_(false), normal_flag_(false), color_flag_(0), triangle_flag_(false)
+			normal_flag_(false), color_flag_(0), triangle_flag_(false)
 		{
 		}
 
@@ -282,7 +282,6 @@ namespace io
 			file_ = nullptr;
 			number_of_vertices_ = 0;
 			number_of_triangles_ = 0;
-			point_flag_ = false;
 			normal_flag_ = false;
 			color_flag_ = 0;
 			triangle_flag_ = false;
@@ -359,6 +358,8 @@ namespace io
 		*/
 		void readHeader() 
 		{
+			uint8_t pointcloud_flags = 0;
+
 			p_ply ply = ply_open(file_, NULL, 0, NULL);
 			if (!ply) {
 				exitFailure(__FILE__, __LINE__);
@@ -413,7 +414,7 @@ namespace io
 					e_ply_type type, length_type, value_type;
 					ply_get_property_info(prop, &prop_name, &type, &length_type, &value_type);
 					
-					if (!strcmp(prop_name, "x")) { type_ = getDataType(type); point_flag_ = true; }
+					if (!strcmp(prop_name, "x")) { type_ = getDataType(type); }
 					if (!strcmp(prop_name, "nx")) { normal_flag_ = true; }
 					if (!strcmp(prop_name, "diffuse_red")) { color_flag_ = 1; }
 					if (!strcmp(prop_name, "red")) { color_flag_ = 2; }
@@ -510,14 +511,11 @@ namespace io
 
 			PointcloudIterators<PointcloudType> iterators(pointcloud_);
 
-			if (point_flag_) {
-				ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
-				ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
-				ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
-			}
-			else{
-				exitFailure(__FILE__, __LINE__);
-			}
+			
+			ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
+			ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
+			ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
+			
 
 			if (color_flag_ == 1) {
 				ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
@@ -564,15 +562,10 @@ namespace io
 			ply_add_element(ply, "vertex", (long)pointcloud_.getNumberOfVertices());
 		
 			e_ply_type ply_data_type = type_ == PLY_TYPE_FLOAT ? PLY_FLOAT32 : PLY_FLOAT64;
-			if (point_flag_) {
-				ply_add_property(ply, "x", ply_data_type, ply_data_type, ply_data_type);
-				ply_add_property(ply, "y", ply_data_type, ply_data_type, ply_data_type);
-				ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
-			}
-			else {
-				exitFailure(__FILE__, __LINE__);
-			}
-
+			
+			ply_add_property(ply, "x", ply_data_type, ply_data_type, ply_data_type);
+			ply_add_property(ply, "y", ply_data_type, ply_data_type, ply_data_type);
+			ply_add_property(ply, "z", ply_data_type, ply_data_type, ply_data_type);
 
 			if (color_flag_) {
 				e_ply_type ply_color_type = PLY_UCHAR;
@@ -633,11 +626,6 @@ namespace io
 			Number of triangles
 		*/
 		size_t number_of_triangles_;
-
-		/**
-			Flag whether points are inside the file
-		*/
-		bool point_flag_;
 
 		/**
 			Flag whether normals are inside the file
