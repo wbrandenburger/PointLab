@@ -582,35 +582,94 @@ namespace pointcloud
 			return triangle_flag;
 		}
 
+	protected:
+		/**
+			Structure for initialization of the iterators
+		*/
+		template<typename IteratorType> class IteratorInitializer
+		{
+		public:
+			/**
+				Constructor
+
+				@param[in] begin Pointer to the first element
+				@param[in] pointcloud_flag Specifier which defines the element to be iterated
+			*/
+			IteratorInitializer(IteratorType* begin, PointcloudFlag pointcloud_flag) :
+				begin_(begin), pointcloud_flag_(pointcloud_flag)
+			{
+			}
+
+			/**
+				Destructor
+			*/
+			~IteratorInitializer()
+			{
+			}
+
+			/**
+				Get the pointer to the first element
+
+				@return Pointer to the first element
+			*/
+			IteratorType* getBegin() const 
+			{ 
+				return begin_;
+			}
+
+			/**
+				Get the element specifier
+
+				@return the element specifier
+			*/
+			PointcloudFlag getPointcloudFlag() const
+			{
+				return pointcloud_flag_;
+			}
+
+		private:
+			/**
+				Pointer to the first element of the array
+			*/
+			IteratorType* begin_;
+
+			/**
+				Specifies the element to be iterated 
+			*/
+			PointcloudFlag pointcloud_flag_;
+
+		};
+
+	public:
 		/**
 			Returns a pointer to the first entry of the points
 
 			@return Pointer to the first entry of the points
 		*/
-		virtual ElementType* beginPoint() const = 0;
+		virtual IteratorInitializer<ElementType> beginPoint() const = 0;
 
 		/**
 			Returns a pointer to the first entry of colors
 
 			@return Pointer to the first entry of colors
 		*/
-		virtual uint8_t* beginColor() const = 0;
+		virtual IteratorInitializer<uint8_t> beginColor() const = 0;
 				
 		/**
 			Returns a pointer to the first entry of normals
 
 			@return Pointer to the first entry of normals
 		*/
-		virtual ElementType* beginNormal() const = 0;
+		virtual IteratorInitializer<ElementType> beginNormal() const = 0;
 
 		/**
 			Returns a pointer to the first entry of triangles
 
 			@return Pointer to the first entry of triangles
 		*/
-		size_t* beginTriangle() const
+		IteratorInitializer<size_t> beginTriangle() const
 		{
-			return triangles;
+			return IteratorInitializer<size_t>(triangles,PointcloudFlag::TRIANGLES);
 		};
 
 		/**
@@ -645,6 +704,7 @@ namespace pointcloud
 		}
 
 	protected:
+
 		/**
 			Set color flag
 		*/

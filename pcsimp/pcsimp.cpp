@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 		Read data
 	*/
 	utils::Timer time;
-	pointcloud::PointcloudSoA<float> pointcloud_buny;
+	pointcloud::PointcloudAoS<float> pointcloud_buny;
 
 	time.start();
 	if (io::readPly(file, pointcloud_buny)) {

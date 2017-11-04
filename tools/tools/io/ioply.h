@@ -418,9 +418,9 @@ namespace io
 			ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 		}
 
-		if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
-			ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
-		}
+		//if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
+		//	ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
+		//}
 
 		/**
 			Read the file 

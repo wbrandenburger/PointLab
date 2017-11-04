@@ -589,9 +589,8 @@ namespace pointcloud
 		IteratorInitializer<ElementType> beginNormal() const
 		{
 			return IteratorInitializer<ElementType>(
-				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + 0),
-				PointcloudFlag::POINTS);
-			return reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + 4);
+				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + 4),
+				PointcloudFlag::NORMALS);
 		}
 
 		/**
@@ -623,63 +622,6 @@ namespace pointcloud
 		}
 
 		/**
-			Structure for initialization of the iterators
-		*/
-		template<typename IteratorType> class IteratorInitializer
-		{
-		public:
-			/**
-				Constructor
-
-				@param[in] begin Pointer to the first element
-				@param[in] pointcloud_flag Specifier which defines the element to be iterated
-			*/
-			IteratorInitializer(IteratorType* begin, PointcloudFlag pointcloud_flag) :
-				begin_(begin), pointcloud_flag_(pointcloud_flag)
-			{
-			}
-
-			/**
-				Destructor
-			*/
-			~IteratorInitializer()
-			{
-			}
-
-			/**
-				Get the pointer to the first element
-
-				@return Pointer to the first element
-			*/
-			IteratorType* getBegin()
-			{
-				return begin;
-			}
-
-			/**
-				Get the element specifier
-
-				@return the element specifier
-			*/
-			PointcloudFlag getPointcloudFlag()
-			{
-				return pointcloud_flag_;
-			}
-
-		private:
-			/**
-				Pointer to the first element of the array
-			*/
-			IteratorType* begin_;
-
-			/**
-				Specifies the element to be iterated 
-			*/
-			PointcloudFlag pointcloud_flag_;
-
-		};
-
-		/**
 			Structure of a iterator for points, colors, normals and triangles
 		*/
 		template<typename IteratorType> class Iterator
@@ -690,22 +632,18 @@ namespace pointcloud
 			*/
 			Iterator() : iterator_(nullptr), stride_(0), index_(0)
 			{
-				if (sizeof(IteratorType) == 1) {
-					stride_ = sizeof(ElementType) * 6 + 2;
-				}
-				else {
-					stride_ = sizeof(ElementType) * 4 + 4;
-				}
 			}
 			
 			/**
 				Constructor
 
-				@param[in] begin Pointer to an element
+				@param[in] iterator_initializer Structure for initialization of the iterators
 			*/
-			Iterator(IteratorType* begin) : Iterator()
+			Iterator(const IteratorInitializer<IteratorType>& iterator_initializer) : Iterator()
 			{
-				iterator_ = begin;
+				iterator_ = iterator_initializer.getBegin();
+
+				setStride(iterator_initializer.getPointcloudFlag());
 			}
 
 			/**
@@ -728,6 +666,20 @@ namespace pointcloud
 				@param[in] An instance of class Iterator
 			*/
 			Iterator(const Iterator&& iterator) = delete;
+
+			/**
+				Operator =
+				
+				@param[in] iterator_initializer Structure for initialization of the iterators
+			*/
+			Iterator& operator=(const IteratorInitializer<IteratorType>& iterator_initializer)
+			{
+				iterator_ = iterator_initializer.getBegin();
+
+				setStride(iterator_initializer.getPointcloudFlag());
+				
+				return *this;
+			}
 
 			/**
 				Operator = 
@@ -807,6 +759,21 @@ namespace pointcloud
 			IteratorType& operator*()
 			{
 				return *iterator_;
+			}
+
+			/**
+				Set stride
+
+				@param[in] pointcloud_flag Specifies the element to be iterated 
+			*/
+			void setStride(const PointcloudFlag& pointcloud_flag)
+			{
+				switch (pointcloud_flag) {
+				case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
+				case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
+				case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
+				case PointcloudFlag::TRIANGLES: stride_ = 0;
+				}
 			}
 
 		private:		
