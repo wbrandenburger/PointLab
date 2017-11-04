@@ -49,7 +49,7 @@
 	/**
 		Flags which specify the members of a pointcloud
 	*/
-	enum struct Vertex
+	enum struct PointcloudFlag
 	{
 		/**
 			RGB is used if the pointcloud contains colors
@@ -79,14 +79,14 @@
 		@param[in] identifier_
 		@param[in] vertex_ An instance of struct Vertex
 	*/
-	uint8_t& operator|=(uint8_t& flag, const Vertex& vertex)
+	uint8_t& operator|=(uint8_t& flag, const PointcloudFlag& vertex)
 	{
 		switch (vertex) {
-		case Vertex::RGB: flag |= 1 << 1; break;
-		case Vertex::NORMALS: flag |= 1 << 2; break;
-		case Vertex::TRIANGLES: flag |= 1 << 3; break;
-		case Vertex::RGBNORMALS: flag |= 1 << 6; break;
-		case Vertex::MESH: flag |= 1 << 7; break;
+		case PointcloudFlag::RGB: flag |= 1 << 1; break;
+		case PointcloudFlag::NORMALS: flag |= 1 << 2; break;
+		case PointcloudFlag::TRIANGLES: flag |= 1 << 3; break;
+		case PointcloudFlag::RGBNORMALS: flag |= 1 << 6; break;
+		case PointcloudFlag::MESH: flag |= 1 << 7; break;
 		}
 
 		return flag;

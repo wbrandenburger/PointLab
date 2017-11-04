@@ -251,7 +251,8 @@ namespace io
 		/**
 			Constructor
 		*/
-		PlyIO() : file(nullptr), header(false), number_of_vertices(0), number_of_triangles(0), point_flag(false), normal_flag(false), color_flag(0)
+		PlyIO() : file_(nullptr), number_of_vertices(0), number_of_triangles(0), 
+			point_flag(false), normal_flag(false), color_flag(0), triangle_flag(false)
 		{
 		}
 
@@ -263,16 +264,14 @@ namespace io
 		/**
 			Initialize instance
 			
-			@param[in] file_ Name of file
+			@param[in] file Name of file
 		*/
-		void initialze(char* file_)
+		void initialze(char* file)
 		{
 			clear();
-			file = file_;
+			file_ = file;
 
 			readHeader();
-
-			header = true;
 		}
 
 		/**
@@ -280,13 +279,13 @@ namespace io
 		*/
 		void clear()
 		{
-			file = nullptr;
-			header = false;
+			file_ = nullptr;
 			number_of_vertices = 0;
 			number_of_triangles = 0;
 			point_flag = false;
 			normal_flag = false;
 			color_flag = 0;
+			triangle_flag = false;
 		}
 
 		/**
@@ -367,7 +366,7 @@ namespace io
 		*/
 		void readHeader() 
 		{
-			p_ply ply = ply_open(file, NULL, 0, NULL);
+			p_ply ply = ply_open(file_, NULL, 0, NULL);
 			if (!ply) {
 				exitFailure(__FILE__, __LINE__);
 			}
@@ -387,7 +386,7 @@ namespace io
 			*/
 			while (elem) {
 				/**
-					Get name and instances of the element
+					Get information of the current element
 				*/
 				const char *elem_name;
 				long elem_instances;
@@ -398,24 +397,31 @@ namespace io
 				*/
 				if (std::strcmp("vertex", elem_name) == 0) {
 					number_of_vertices = (size_t) elem_instances;
-					p_ply_property prop = NULL;
-					prop = ply_get_next_property(elem, prop);
-					while (prop) {
-						const char *prop_name;
-						e_ply_type type, length_type, value_type;
-						ply_get_property_info(prop, &prop_name, &type, &length_type, &value_type);
-						
-						setMetaInformation(prop_name,getDataType(type));
 
-						prop = ply_get_next_property(elem, prop);
-					}
 				}
-				/**
-					Process the faces
-				*/
 				if (std::strcmp("face", elem_name) == 0) {
 					number_of_triangles = (size_t)elem_instances;
-					p_ply_property prop = NULL;
+					triangle_flag = true;
+				}
+				/**
+					Get the next property
+				*/
+				p_ply_property prop = NULL;
+				prop = ply_get_next_property(elem, prop);
+				
+				/**
+					Iterate over all properties of the current element
+				*/
+				while (prop) {
+					/**
+						Get information of the current property
+					*/
+					const char *prop_name;
+					e_ply_type type, length_type, value_type;
+					ply_get_property_info(prop, &prop_name, &type, &length_type, &value_type);
+					
+					setMetaInformation(prop_name,getDataType(type));
+
 					prop = ply_get_next_property(elem, prop);
 				}
 
@@ -431,7 +437,7 @@ namespace io
 	private:
 
 		/**
-			Callback function which inserts the elements in the pointcloud
+			Callback function which inserts points, color and normals in the pointcloud
 
 			@param[in] argument Argument which contains the structure in which the elements will be inserted
 			@return Returns true if insertion was successful
@@ -461,6 +467,29 @@ namespace io
 		
 			return 1;
 		}	
+
+		/**
+			Callback function which inserts triangles in the pointcloud
+
+			@param[in] argument Argument which contains the structure in which the elements will be inserted
+			@return Returns true if insertion was successful
+		*/
+		template <typename PointcloudType> static int callbackFaceIterator(p_ply_argument argument_)
+		{
+			long length, value_index, index;
+			ply_get_argument_property(argument_, NULL, &length, &value_index);
+		
+
+			PointcloudIterators<PointcloudType>* iterator;
+			ply_get_argument_user_data(argument_, (void**)&iterator, &index);
+
+			if (value_index != -1) {
+				iterator->setTriangle((size_t)ply_get_argument_value(argument_));
+			}
+
+			return 1;
+		}	
+
 	public:
 
 		/**
@@ -473,11 +502,7 @@ namespace io
 		{
 			typedef PointcloudType::ElementType ElementType;
 
-			if (!header) {
-				exitFailure(__FILE__, __LINE__);
-			}
-
-			p_ply ply = ply_open(file, NULL, 0, NULL);
+			p_ply ply = ply_open(file_, NULL, 0, NULL);
 
 			if (!ply) {
 				exitFailure(__FILE__, __LINE__);
@@ -516,7 +541,10 @@ namespace io
 				ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
 			}
 
-		
+			//if (isTriangle()) {
+			//	ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
+			//}
+
 			if (!ply_read(ply)) {
 				return 0;
 			}
@@ -529,13 +557,13 @@ namespace io
 		/**
 			Write ply file with given structure
 
-			@param[in] file_ Name of file
+			@param[in] file Name of file
 			@param pointcloud_ Structure which elements will be written in the file
 			@return Returns true if writing was successful
 		*/
-		template <typename PointcloudType> bool writePly(char *file_, const PointcloudType& pointcloud_)
+		template <typename PointcloudType> bool writePly(char *file, const PointcloudType& pointcloud_)
 		{
-			p_ply ply = ply_create(file_, PLY_DEFAULT, NULL, 0, NULL);
+			p_ply ply = ply_create(file, PLY_DEFAULT, NULL, 0, NULL);
 		
 			ply_add_element(ply, "vertex", (long)pointcloud_.getNumberOfVertices());
 		
@@ -590,9 +618,9 @@ namespace io
 		}
 
 		/**
-			Returns true if points are set
+			Returns true if points are inside the file
 
-			@return True if points are set
+			@return True if points are inside the file
 		*/
 		bool isPoints() const
 		{
@@ -600,9 +628,9 @@ namespace io
 		}
 
 		/**
-			Returns true if colors are set
+			Returns true if colors are inside the file
 
-			@return True if colors are set 
+			@return True if colors are inside the file 
 		*/
 		bool isColor() const
 		{
@@ -610,25 +638,30 @@ namespace io
 		}
 
 		/**
-			Returns true if normals are set
+			Returns true if normals are inside the file
 
-			@return True if normals are set 
+			@return True if normals are inside the file 
 		*/
 		bool isNormal() const
 		{
 			return normal_flag;
+		}
+		
+		/**
+			Returns true if triangles are inside the file
+
+			@return True if triangles are inside the file
+		*/
+		bool isTriangle() const
+		{
+			return triangle_flag;
 		}
 
 	private:
 		/**
 			Filename
 		*/
-		char* file;
-
-		/**
-			Flag which determines whether the header was read
-		*/
-		bool header;
+		char* file_;
 
 		/**
 			Data type of the pointcloud
@@ -646,19 +679,24 @@ namespace io
 		size_t number_of_triangles;
 
 		/**
-			Flag whether points are contained in file
+			Flag whether points are inside the file
 		*/
 		bool point_flag;
 
 		/**
-			Flag whether normals are contained in file
+			Flag whether normals are inside the file
 		*/
 		bool normal_flag;
 		
 		/**
-			Flag whether colors are contained in file
+			Flag whether colors are inside the file
 		*/
 		size_t color_flag;
+
+		/**
+			Flag whether triangles are inside the file
+		*/
+		bool triangle_flag;
 	};
 }
 

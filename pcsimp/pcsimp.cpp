@@ -73,10 +73,10 @@ int main(int argc, char* argv[]) {
 	
 	uint8_t flags = 0;
 	if (plyIO.isColor()) {
-		flags |= Vertex::RGB;
+		flags |= PointcloudFlag::RGB;
 	}
 	if (plyIO.isNormal()) {
-		flags |= Vertex::NORMALS;
+		flags |= PointcloudFlag::NORMALS;
 	}
 
 	pointcloud::PointcloudSoA<float> pointcloud(plyIO.getNumberOfVertices(),flags);

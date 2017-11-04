@@ -46,9 +46,9 @@ namespace pointcloud
 		*/
 		PointcloudNode() 
 		{
-			memset(&point, 0.0, sizeof(ElementType)*3);
-			memset(&color, 0, sizeof(uint8_t)*4);
-			memset(&normal, 0.0, sizeof(ElementType)*3);
+			memset(&point, (ElementType) 0.0, sizeof(ElementType)*3);
+			memset(&color, (uint8_t) 0, sizeof(uint8_t)*4);
+			memset(&normal, (ElementType) 0.0, sizeof(ElementType)*3);
 		}
 
 		/**
