@@ -238,6 +238,36 @@ namespace pointcloud
 			allocateMemoryTriangles();
 		}
 
+		/**
+			Set color flag and allocate memory
+		*/
+		void setColors()
+		{
+			color_flag = true;
+
+			if (colors) {
+				delete[] colors;
+				colors = nullptr;
+			}
+
+			colors = new uint8_t[number_of_vertices * 3];
+		}
+
+		/**
+			Set normal flag and allocate memory
+		*/
+		void setNormals()
+		{
+			normal_flag = true;
+
+			if (normals) {
+				delete[] normals;
+				normals = nullptr;
+			}
+
+			normals = new ElementType[number_of_vertices * 3];
+		}
+
 	private:
 		/**
 			Clear memory of the pointcloud and triangles

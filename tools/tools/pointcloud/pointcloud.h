@@ -200,6 +200,16 @@ namespace pointcloud
 		*/
 
 		virtual void setPointcloud() = 0;
+		
+		/**
+			Set color flag and allocate memory
+		*/
+		virtual void setColors() = 0;
+
+		/**
+			Set normal flag and allocate memory
+		*/
+		virtual void setNormals() = 0;
 
 		/**
 			Set triangles

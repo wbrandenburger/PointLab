@@ -254,6 +254,22 @@ namespace pointcloud
 			allocateMemoryTriangles();
 		}
 
+		/**
+			Set color flag and allocate memory
+		*/
+		void setColors()
+		{
+			color_flag = true;
+		}
+
+		/**
+			Set normal flag and allocate memory
+		*/
+		void setNormals()
+		{
+			normal_flag = true;
+		}
+
 	private:
 		/**
 			Clear memory of the pointcloud and triangles

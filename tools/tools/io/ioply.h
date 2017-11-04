@@ -46,10 +46,19 @@ namespace io
 
 		typedef typename PointcloudType::ElementType ElementType;
 
+		/**
+			Iteratortype for the points and normals
+		*/
 		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
 		
+		/**
+			Iteratortype for color
+		*/
 		typedef typename PointcloudType::template Iterator<uint8_t> Iteratoruint8_t;
 		
+		/**
+			Iteratortype for the triangles
+		*/
 		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
 
 		/**
