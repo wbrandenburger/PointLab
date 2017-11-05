@@ -676,7 +676,7 @@ namespace pointcloud
 		*/
 		IteratorInitializer<ElementType> beginPoint() const
 		{
-			return IteratorInitializer<ElementType>(points, PointcloudFlag::POINTS);
+			return IteratorInitializer<ElementType>(points, PointcloudFlag::POINTS, PointcloudType::SOA);
 		};
 
 		/**
@@ -686,7 +686,7 @@ namespace pointcloud
 		*/
 		IteratorInitializer<uint8_t> beginColor() const
 		{
-			return IteratorInitializer<uint8_t>(colors, PointcloudFlag::RGB);;
+			return IteratorInitializer<uint8_t>(colors, PointcloudFlag::RGB, PointcloudType::SOA);;
 		};
 				
 		/**
@@ -696,7 +696,7 @@ namespace pointcloud
 		*/
 		IteratorInitializer<ElementType> beginNormal() const
 		{
-			return IteratorInitializer<ElementType>(normals, PointcloudFlag::NORMALS);
+			return IteratorInitializer<ElementType>(normals, PointcloudFlag::NORMALS, PointcloudType::SOA);
 		};
 
 		/**

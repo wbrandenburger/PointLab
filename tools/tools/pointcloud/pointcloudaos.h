@@ -706,7 +706,7 @@ namespace pointcloud
 		{
 			return IteratorInitializer<ElementType>(
 				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + 0), 
-				PointcloudFlag::POINTS);
+				PointcloudFlag::POINTS, PointcloudType::AOS);
 		}
 
 		/**
@@ -718,7 +718,7 @@ namespace pointcloud
 		{
 			return IteratorInitializer<uint8_t>(
 				reinterpret_cast<uint8_t*>((char*)&pointcloud[0] + sizeof(ElementType) * 3),
-				PointcloudFlag::RGB);
+				PointcloudFlag::RGB, PointcloudType::AOS);
 		}
 				
 		/**
@@ -730,7 +730,7 @@ namespace pointcloud
 		{
 			return IteratorInitializer<ElementType>(
 				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + 4),
-				PointcloudFlag::NORMALS);
+				PointcloudFlag::NORMALS, PointcloudType::AOS);
 		}
 
 		/**
@@ -926,11 +926,6 @@ namespace pointcloud
 				Stride which defines the bytes between two points
 			*/
 			size_t stride_;
-
-			/**
-				Current index
-			*/
-			size_t index_;
 		};
 
 		private:

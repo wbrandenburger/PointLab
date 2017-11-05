@@ -91,10 +91,6 @@ namespace utils
 				number_of_triangles = pointcloud_.getNumberOfTriangles();
 				pointcloud_.getTrianglesPtr(&triangles);
 			}
-
-			for (size_t i = 0; i < number_of_triangles; i++) {
-				std::cout << triangles[i * 3] << " " << triangles[i * 3 + 1] << " " << triangles[i * 3 + 2] << std::endl;
-			}
 		}
 
 		/**
@@ -636,8 +632,11 @@ namespace utils
 				}
 				if (plot_container[i].isTriangle()) {
 					glEnableClientState(GL_INDEX_ARRAY);
+					glEnable(GL_CULL_FACE);
+
+					glCullFace(GL_FRONT);
 				}
-				//glEnableClientState(GL_INDEX_ARRAY);
+
 				glColor4f(1.0, 1.0, 1.0, 0.0);
 
 				glLoadIdentity();
@@ -678,11 +677,11 @@ namespace utils
 					glNormalPointer(GL_FLOAT, 0, plot_container[i].getNormals());
 				}
 				if (!plot_container[i].isTriangle()) {
-					glDrawArrays(GL_POINTS, 0, (GLsizei)plot_container[i].getNumberOfVertices());
+					glDrawArrays(GL_POINTS, 0, plot_container[i].getNumberOfVertices());
 				}
 				else {
-					glDrawElements(GL_TRIANGLES, (GLsizei)plot_container[i].getNumberOfTriangles() * 3, 
-						GL_UNSIGNED_INT, reinterpret_cast<void*>(plot_container[i].getTriangles()));
+					glDrawElements(GL_TRIANGLES, plot_container[i].getNumberOfTriangles() * 3, 
+						GL_UNSIGNED_INT, plot_container[i].getTriangles());
 				}
 
 
@@ -698,6 +697,7 @@ namespace utils
 				}
 				if (plot_container[i].isTriangle()) {
 					glDisableClientState(GL_INDEX_ARRAY);
+					glDisable(GL_CULL_FACE);
 				}
 			}
 				
@@ -796,11 +796,11 @@ namespace utils
 					glNormalPointer(GL_DOUBLE, 0, plot_container[i].getNormals());
 				}
 				if (!plot_container[i].isTriangle()) {
-					glDrawArrays(GL_POINTS, 0, (GLsizei)plot_container[i].getNumberOfVertices());
+					glDrawArrays(GL_POINTS, 0, plot_container[i].getNumberOfVertices());
 				}
 				else {
-					glDrawElements(GL_TRIANGLES, (GLsizei)plot_container[i].getNumberOfTriangles() * 3, 
-						GL_UNSIGNED_INT, reinterpret_cast<void*>(plot_container[i].getTriangles()));
+					glDrawElements(GL_TRIANGLES, plot_container[i].getNumberOfTriangles() * 3, 
+						GL_UNSIGNED_INT, plot_container[i].getTriangles());
 				}
 
 

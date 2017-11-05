@@ -116,6 +116,22 @@
 	}
 
 	/**
+		Specify the type of pointcloud container
+	*/
+	enum struct PointcloudType
+	{
+		NONE =0,
+		/**
+			PointcloudAoS, which stores the information as an array of structures
+		*/
+		AOS = 1,
+		/**
+			PointcloudSoA, which stores the information as several arrays of structures
+		*/
+		SOA = 2
+	};
+
+	/**
 		Flags which specify what kind of primitives to render
 	*/
 	enum struct GLParams

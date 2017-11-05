@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
 	float* points = pointcloud_buny.getPointsPtr();
 	glview.setPlot3D();
 	//glview.setPointcloud(GLParams::POINTS, points, pointcloud_buny.getNumberOfVertices());
-	glview.setPointcloud(GLParams::POINTS, pointcloud_meshgrid);
+	glview.setPointcloud(GLParams::POINTS, pointcloud_buny);
 	glview.subPlot(2, 2, 3);
 	delete[] points;
 

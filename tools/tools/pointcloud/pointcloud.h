@@ -657,8 +657,8 @@ namespace pointcloud
 				@param[in] begin Pointer to the first element
 				@param[in] pointcloud_flag Specifier which defines the element to be iterated
 			*/
-			IteratorInitializer(IteratorType* begin, PointcloudFlag pointcloud_flag) :
-				begin_(begin), pointcloud_flag_(pointcloud_flag)
+			IteratorInitializer(IteratorType* begin, PointcloudFlag pointcloud_flag, PointcloudType pointcloud_type) :
+				begin_(begin), pointcloud_flag_(pointcloud_flag), pointcloud_type_(pointcloud_type)
 			{
 			}
 
@@ -689,6 +689,14 @@ namespace pointcloud
 				return pointcloud_flag_;
 			}
 
+			/**
+				Get the type of pointcloud container
+			*/
+			PointcloudType getPointcloudType() const
+			{
+				return pointcloud_type_;
+			}
+
 		private:
 			/**
 				Pointer to the first element of the array
@@ -700,6 +708,10 @@ namespace pointcloud
 			*/
 			PointcloudFlag pointcloud_flag_;
 
+			/**
+				Specify the type of pointcloud container
+			*/
+			PointcloudType pointcloud_type_;
 		};
 
 	public:
@@ -731,7 +743,7 @@ namespace pointcloud
 		*/
 		IteratorInitializer<size_t> beginTriangle() const
 		{
-			return IteratorInitializer<size_t>(triangles,PointcloudFlag::TRIANGLES);
+			return IteratorInitializer<size_t>(triangles,PointcloudFlag::TRIANGLES, PointcloudType::NONE);
 		};
 
 		/**
