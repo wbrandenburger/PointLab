@@ -40,33 +40,15 @@
 
 namespace io
 {
-	template<typename PointcloudType> struct PointcloudIterators
+	template<typename ElementType> struct PointcloudIterators
 	{
 	public:
-
-		typedef typename PointcloudType::ElementType ElementType;
-
-		/**
-			Iteratortype for the points and normals
-		*/
-		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
-		
-		/**
-			Iteratortype for color
-		*/
-		typedef typename PointcloudType::template Iterator<uint8_t> Iteratoruint8_t;
-		
-		/**
-			Iteratortype for the triangles
-		*/
-		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
-
 		/**
 			Constructor 
 
 			@param[in] pointcloud Pointcloud
 		*/
-		PointcloudIterators(const PointcloudType& pointcloud)
+		PointcloudIterators(const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
 			iterator_point_ = pointcloud.beginPoint();
 			if (pointcloud.isColor()) {
@@ -95,14 +77,14 @@ namespace io
 
 			@param[in] class_ An instance of class PointcloudIterators
 		*/
-		PointcloudIterators(const PointcloudIterators<PointcloudType>& pointcloud_iterators) = delete;
+		PointcloudIterators(const PointcloudIterators<ElementType>& pointcloud_iterators) = delete;
 
 		/**
 			Copy constructor
 	
 			@param[in] class_ An instance of class PointcloudIterators
 		*/
-		PointcloudIterators(const PointcloudIterators<PointcloudType>&& pointcloud_iterators) = delete;
+		PointcloudIterators(const PointcloudIterators<ElementType>&& pointcloud_iterators) = delete;
 	
 		/**
 			Operator =
@@ -110,7 +92,7 @@ namespace io
 			@param[in] class_ An instance of class PointcloudIterators
 			@return Returns reference to the current instance
 		*/
-		PointcloudIterators& operator=(const PointcloudIterators<PointcloudType>& pointcloud_iterators) = delete;
+		PointcloudIterators& operator=(const PointcloudIterators<ElementType>& pointcloud_iterators) = delete;
 	
 		/**
 			Operator =
@@ -118,14 +100,14 @@ namespace io
 			@param[in] glview_ An instance of class PointcloudIterators
 			@return Returns reference to the current instance
 		*/
-		PointcloudIterators& operator=(const PointcloudIterators<PointcloudType>&& pointcloud_iterators) = delete;
+		PointcloudIterators& operator=(const PointcloudIterators<ElementType>&& pointcloud_iterators) = delete;
 
 		/**
 			Set iterators
 
 			@param[in] pointcloud Pointcloud
 		*/
-		void setIterators(const PointcloudType& pointcloud)
+		void setIterators(const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
 			iterator_point_ = pointcloud.beginPoint();
 			if (pointcloud.isColor()) {
@@ -237,25 +219,27 @@ namespace io
 
 	private:
 
+		typedef pointcloud::Pointcloud<ElementType> Pointcloud;
+
 		/**
 			Point iterator
 		*/
-		IteratorElementType iterator_point_;
+		Pointcloud::Iterator<ElementType> iterator_point_;
 
 		/**
 			Color iterator
 		*/
-		Iteratoruint8_t iterator_color_;
+		Pointcloud::Iterator<uint8_t> iterator_color_;
 
 		/**
 			Normal iterator
 		*/
-		IteratorElementType iterator_normal_;
+		Pointcloud::Iterator<ElementType> iterator_normal_;
 
 		/**
 			Triangle iterator
 		*/
-		Iteratorsize_t iterator_triangle_;
+		Pointcloud::Iterator<size_t> iterator_triangle_;
 
 		/**
 			End of vertices
@@ -275,12 +259,10 @@ namespace io
 		@param[in] argument Argument which contains the structure in which the elements will be inserted
 		@return Returns true if insertion was successful
 	*/
-	template <typename PointcloudType> static int callbackPointcloudIterator(p_ply_argument argument)
+	template <typename ElementType> static int callbackPointcloudIterator(p_ply_argument argument)
 	{
-		typedef PointcloudType::ElementType ElementType;
-
 		long index;
-		PointcloudIterators<PointcloudType>* iterator;
+		PointcloudIterators<ElementType>* iterator;
 
 		ply_get_argument_user_data(argument, (void**)&iterator, &index);
 		
@@ -307,12 +289,12 @@ namespace io
 		@param[in] argument Argument which contains the structure in which the elements will be inserted
 		@return Returns true if insertion was successful
 	*/
-	template <typename PointcloudType> static int callbackFaceIterator(p_ply_argument argument)
+	template <typename ElementType> static int callbackFaceIterator(p_ply_argument argument)
 	{
 		long length, value_index, index;
 		ply_get_argument_property(argument, NULL, &length, &value_index);
 		
-		PointcloudIterators<PointcloudType>* iterator;
+		PointcloudIterators<ElementType>* iterator;
 		ply_get_argument_user_data(argument, (void**)&iterator, &index);
 
 		if (value_index != -1) {
@@ -328,10 +310,9 @@ namespace io
 		@param[in,out] pointcloud Structure in which the elements will be inserted			
 		@return Returns true if the reading was successful
 	*/
-	template <typename PointcloudType> bool readPly(char* file, PointcloudType& pointcloud)
+	template <typename ElementType> bool readPly(char* file, 
+		pointcloud::Pointcloud<ElementType>& pointcloud)
 	{
-		typedef PointcloudType::ElementType ElementType;
-
 		p_ply ply = ply_open(file, NULL, 0, NULL);
 		if (!ply) {
 			exitFailure(__FILE__, __LINE__);
@@ -416,35 +397,35 @@ namespace io
 		/**
 			Set the itertors of the pointcloud
 		*/
-		PointcloudIterators<PointcloudType> iterators(pointcloud);
+		PointcloudIterators<ElementType> iterators(pointcloud);
 
 		/**
 			Set the callback functions
 		*/
-		ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
-		ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
-		ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<PointcloudType>, &iterators, 1);
+		ply_set_read_cb(ply, "vertex", "x", callbackPointcloudIterator<ElementType>, &iterators, 1);
+		ply_set_read_cb(ply, "vertex", "y", callbackPointcloudIterator<ElementType>, &iterators, 1);
+		ply_set_read_cb(ply, "vertex", "z", callbackPointcloudIterator<ElementType>, &iterators, 1);
 			
 		if ( color_spec == 1) {
-			ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
-			ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
-			ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
+			ply_set_read_cb(ply, "vertex", "diffuse_red", callbackPointcloudIterator<ElementType>, &iterators, 2);
+			ply_set_read_cb(ply, "vertex", "diffuse_green", callbackPointcloudIterator<ElementType>, &iterators, 2);
+			ply_set_read_cb(ply, "vertex", "diffuse_blue", callbackPointcloudIterator<ElementType>, &iterators, 2);
 		}
 
 		if ( color_spec == 2) {
-			ply_set_read_cb(ply, "vertex", "red", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
-			ply_set_read_cb(ply, "vertex", "green", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
-			ply_set_read_cb(ply, "vertex", "blue", callbackPointcloudIterator<PointcloudType>, &iterators, 2);
+			ply_set_read_cb(ply, "vertex", "red", callbackPointcloudIterator<ElementType>, &iterators, 2);
+			ply_set_read_cb(ply, "vertex", "green", callbackPointcloudIterator<ElementType>, &iterators, 2);
+			ply_set_read_cb(ply, "vertex", "blue", callbackPointcloudIterator<ElementType>, &iterators, 2);
 		}
 
 		if ((pointcloud_flag & PointcloudFlag::NORMALS) > 0) {
-			ply_set_read_cb(ply, "vertex", "nx", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
-			ply_set_read_cb(ply, "vertex", "ny", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
-			ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<PointcloudType>, &iterators, 3);
+			ply_set_read_cb(ply, "vertex", "nx", callbackPointcloudIterator<ElementType>, &iterators, 3);
+			ply_set_read_cb(ply, "vertex", "ny", callbackPointcloudIterator<ElementType>, &iterators, 3);
+			ply_set_read_cb(ply, "vertex", "nz", callbackPointcloudIterator<ElementType>, &iterators, 3);
 		}
 
 		if ((pointcloud_flag & PointcloudFlag::TRIANGLES) > 0) {
-			ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<PointcloudType>, &iterators, 0);
+			ply_set_read_cb(ply, "face", "vertex_indices", callbackFaceIterator<ElementType>, &iterators, 0);
 		}
 
 		/**
@@ -466,10 +447,9 @@ namespace io
 		@param pointcloud Structure which elements will be written in the file
 		@return Returns true if writing was successful
 	*/
-	template <typename PointcloudType> bool writePly(char *file, const PointcloudType& pointcloud)
+	template <typename ElementType> bool writePly(char *file, 
+		const pointcloud::Pointcloud<ElementType>& pointcloud)
 	{
-		typedef PointcloudType::ElementType ElementType;
-
 		/**
 			Create the file
 		*/
@@ -518,7 +498,7 @@ namespace io
 		/**
 			Set the itertors of the pointcloud
 		*/
-		PointcloudIterators<PointcloudType> iterators(pointcloud);
+		PointcloudIterators<ElementType> iterators(pointcloud);
 
 		/**
 			Write vertex elements
