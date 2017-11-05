@@ -334,42 +334,75 @@ namespace pointcloud
 
 			@param[in] points_ Points
 		*/
-		virtual void setPointsPtr(ElementType* points_) = 0;
+		void setPointsPtr(ElementType* points_)
+		{
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				*it = *points_;
+				points_++;
+			}
+		}
 
 		/**
 			Set normals
 
 			@param[in] normals_ Normals
 		*/
-		virtual void setNormalsPtr(ElementType* normals_) = 0;
+		void setNormalsPtr(ElementType* normals_)
+		{
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*it = *normals_;
+				normals_++;
+			}
+		}
 
 		/**
-			Set color information
+			Set colors
 
 			@param[in] colors_ Colors
 		*/
-		virtual void setColorsPtr(uint8_t* colors_) = 0;
-	
+		void setColorsPtr(uint8_t* colors_)
+		{
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*it = *colors_;
+				colors_++;
+			}
+		}
+
 		/**
-			Set color information
+			Set colors
 
 			@param[in] colors_ Colors
 		*/
-		virtual void setColorsPtr(float* colors_) = 0;
+		void setColorsPtr(float* colors_)
+		{
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*it = (uint8_t) std::floor(*colors_ * 255);
+				colors_++;
+			}
+		}	
 
 		/**
 			Set triangles
 
 			@param[in] triangles_ Triangles
 		*/
-		virtual void setTrianglesPtr(size_t* triangles_) = 0;
-		
+		void setTrianglesPtr(size_t* triangles_)
+		{
+			std::memcpy(triangles, triangles_, sizeof(size_t) * getNumberOfTriangles() * 3);
+		}
+
 		/**
 			Set triangles
 
 			@param[in] triangles_ Triangles
 		*/
-		virtual void setTrianglesPtr(unsigned int* triangles_) = 0;
+		void setTrianglesPtr(unsigned int* triangles_)
+		{
+			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
+				*it = (size_t) triangles_;
+				triangles_++;
+			}
+		}
 
 		/**
 			Set point
@@ -542,70 +575,165 @@ namespace pointcloud
 
 			@return Return pointer to point data
 		*/
-		virtual ElementType* getPointsPtr() const = 0;
-		
+		ElementType* getPointsPtr() const
+		{
+			ElementType* new_points = new ElementType[number_of_vertices*3];
+			ElementType* new_points_ptr = new_points;
+
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				*new_points_ptr = *it;
+				new_points_ptr++;
+			}
+
+			return new_points;
+		}
+
 		/**
 			Get Pointer to point data
 
 			@param[in] new_points Pointer to point data
 		*/
-		virtual void getPointsPtr(float** new_points) const = 0;
+		void getPointsPtr(float** new_points) const
+		{
+			*new_points = new float[number_of_vertices * 3];
+			float* new_points_ptr = *new_points;
+
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++){
+				*new_points_ptr = (float)*it;
+				new_points_ptr++;
+			}
+		}
 
 		/**
 			Get Pointer to point data
 
 			@param[in] new_points Pointer to point data
 		*/
-		virtual void getPointsPtr(double** new_points) const = 0;
+		void getPointsPtr(double** new_points) const
+		{
+			*new_points = new double[number_of_vertices * 3];
+			double* new_points_ptr = *new_points;
+
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				*new_points_ptr = (double)*it;
+				new_points_ptr++;
+			}
+		}
+
 
 		/**
 			Get Pointer to the normal
 
 			@return Return pointer to the normal
 		*/
-		virtual ElementType* getNormalsPtr() const = 0;
+		ElementType* getNormalsPtr() const
+		{
+			ElementType* new_normals = new ElementType[number_of_vertices*3];
+			ElementType* new_normals_ptr = new_normals;
+
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*new_normals_ptr = *it;
+				new_normals_ptr++;
+			}
+
+			return new_normals;
+		}
 
 		/**
 			Get Pointer to the normal
 
 			@param[in] new_normals Pointer to the normal
 		*/
-		virtual void getNormalsPtr(float** new_normals) const = 0;
+		void getNormalsPtr(float** new_normals) const
+		{
+			*new_normals = new float[number_of_vertices * 3];
+			float* new_normals_ptr = *new_normals;
+
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*new_normals_ptr = (float)*it;
+				new_normals_ptr++;
+			}
+		}
 
 		/**
 			Get Pointer to the normal
 
 			@param[in] new_normals Pointer to the normal
 		*/
-		virtual void getNormalsPtr(double** new_normals) const = 0;
+		void getNormalsPtr(double** new_normals) const
+		{
+			*new_normals = new double[number_of_vertices * 3];
+			double* new_normals_ptr = *new_normals;
+
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*new_normals_ptr = (double)*it;
+				new_normals_ptr++;
+			}
+		}
 
 		/**
 			Get Pointer to color information
 
 			@return Return pointer to color information
 		*/		
-		virtual uint8_t* getColorsPtr() const = 0;
+		uint8_t* getColorsPtr() const
+		{
+			uint8_t* new_colors = new uint8_t[number_of_vertices*3];
+			uint8_t* new_colors_ptr = new_colors;
+
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*new_colors_ptr = *it;
+				new_colors_ptr++;
+			}
+
+			return new_colors;
+		}
 		
 		/**
 			Get Pointer to color information
 
 			@param[in] new_colors Pointer to color information
 		*/		
-		virtual void getColorsPtr(float** new_colors) const = 0;
+		void getColorsPtr(float** new_colors) const
+		{
+			*new_colors = new float[number_of_vertices * 3];
+			float* new_colors_ptr = *new_colors;
 
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*new_colors_ptr = (float)*it / 255.0f;
+				new_colors_ptr++;
+			}
+		}
+		
 		/**
 			Get Pointer to triangles
 
 			@return Return pointer to the triangles
 		*/
-		virtual size_t* getTrianglesPtr() const = 0;
+		size_t* getTrianglesPtr() const
+		{
+			size_t* new_triangles = new size_t[number_of_triangles * 3];
+			std::memcpy(new_triangles, triangles, sizeof(size_t) * number_of_triangles * 3);
+
+			return new_triangles;
+		}
 
 		/**
 			Get Pointer to triangles
 
 			@param[in] new_triangles Pointer to the triangles
 		*/
-		virtual void getTrianglesPtr(unsigned int** new_triangles) const = 0;
+
+		void getTrianglesPtr(unsigned int** new_triangles) const
+		{
+			*new_triangles = new unsigned int[number_of_triangles * 3];
+			unsigned int* new_triangles_ptr = *new_triangles;
+
+			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
+				*new_triangles_ptr = (unsigned int)*it;
+				new_triangles_ptr++;
+			}
+		}
 
 		/**
 			Get Matrix to points
@@ -776,6 +904,189 @@ namespace pointcloud
 		{
 			return &triangles[(getNumberOfTriangles() - 1) * 3 + 2] + 1;
 		}
+		/**
+			Structure of a iterator for points, colors, normals and triangles
+		*/
+		template<typename IteratorType> class Iterator
+		{
+		public:
+			/**
+				Constructor
+			*/
+			Iterator() : iterator_(nullptr), stride_(0), index_(0), 
+				pointcloud_type_(PointcloudType::NONE)
+			{
+			}
+			
+			/**
+				Constructor
+
+				@param[in] iterator_initializer Structure for initialization of the iterators
+			*/
+			Iterator(const IteratorInitializer<IteratorType>& iterator_initializer) : Iterator()
+			{
+				iterator_ = iterator_initializer.getBegin();
+
+				pointcloud_type_ = iterator_initializer.getPointcloudType();
+
+				setStride(iterator_initializer.getPointcloudFlag());
+			}
+
+			/**
+				Destructor
+			*/
+			~Iterator()
+			{
+			}
+			
+			/**
+				Copy Constructor
+
+				@param[in] An instance of class Iterator
+			*/
+			Iterator(const Iterator& iterator) = delete;
+
+			/**
+				Operator = 
+
+				@param[in] An instance of class Iterator
+			*/
+			Iterator(const Iterator&& iterator) = delete;
+
+			/**
+				Operator =
+				
+				@param[in] iterator_initializer Structure for initialization of the iterators
+			*/
+			Iterator& operator=(const IteratorInitializer<IteratorType>& iterator_initializer)
+			{
+				iterator_ = iterator_initializer.getBegin();
+
+				pointcloud_type_ = iterator_initializer.getPointcloudType();
+				
+				setStride(iterator_initializer.getPointcloudFlag());
+
+				return *this;
+			}
+
+			/**
+				Operator = 
+
+				@param[in] An instance of class Iterator
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(const Iterator& iterator) = delete;
+
+			/**
+				Operator = 
+
+				@param[in] iterator An instance of class Iterator
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(const Iterator&& iterator) = delete;
+	
+			/**
+				Operator ++
+
+				@param[in] Increment
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator++(int)
+			{
+				if (pointcloud_type_ == PointcloudType::AOS && index_ == 2) {
+					iterator_ = reinterpret_cast<IteratorType*>((char*)iterator_ + stride_);
+					index_ = 0;
+				}
+				else {
+					iterator_++; 
+					index_++;
+				}
+
+				return *this;
+			}
+
+			/**
+				Operator = 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(IteratorType* iterator)
+			{
+				iterator_ = iterator;
+
+				return *this;
+			}
+
+			/**
+				Operator != 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator!=(IteratorType* iterator)
+			{
+				return iterator_ != iterator;
+			}
+
+			/**
+				Operator == 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator==(IteratorType* iterator)
+			{
+				return iterator_ == iterator;
+			}
+
+			/**
+				Operator *
+
+				@return Content of current location of iterator
+			*/
+			IteratorType& operator*()
+			{
+				return *iterator_;
+			}
+
+			/**
+				Set stride
+
+				@param[in] pointcloud_flag Specifies the element to be iterated 
+			*/
+			void setStride(const PointcloudFlag& pointcloud_flag)
+			{
+				if (pointcloud_type_ == PointcloudType::AOS) {
+					switch (pointcloud_flag) {
+					case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
+					case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					}
+				}
+			}
+
+		private:		
+			/**
+				Pointer to the current element
+			*/
+			IteratorType* iterator_;
+
+			/**
+				Stride which defines the bytes between two points
+			*/
+			size_t stride_;
+
+			/**
+				Current column
+			*/
+			size_t index_;
+
+			/**
+				Specify the type of pointcloud container
+			*/
+			PointcloudType pointcloud_type_;
+		};
 
 	protected:
 
