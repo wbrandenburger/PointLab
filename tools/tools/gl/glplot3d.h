@@ -62,7 +62,7 @@ namespace utils
 		*/
 		PlotContainer() :  mode(NULL), 
 			points(nullptr), color(nullptr), normals(nullptr), triangles(nullptr),
-			number_of_elements(NULL), number_of_triangles(NULL)
+			number_of_vertices(NULL), number_of_triangles(NULL)
 		{
 		}
 
@@ -85,17 +85,16 @@ namespace utils
 				normals = pointcloud_.getNormalsPtr();
 			}
 
-			number_of_elements = pointcloud_.getNumberOfVertices();
+			number_of_vertices = pointcloud_.getNumberOfVertices();
 
 			if (pointcloud_.isTriangle()) {
 				number_of_triangles = pointcloud_.getNumberOfTriangles();
-				//triangles = pointcloud_.getTrianglesPtr<unsigned int>();
+				pointcloud_.getTrianglesPtr(&triangles);
 			}
 
-			//for (size_t i = 0; i < number_of_triangles; i++) {
-			//	std::cout << triangles[i * 3] << " " << triangles[i * 3 + 1] << " " << triangles[i * 3 + 2] << std::endl;
-			//}
-
+			for (size_t i = 0; i < number_of_triangles; i++) {
+				std::cout << triangles[i * 3] << " " << triangles[i * 3 + 1] << " " << triangles[i * 3 + 2] << std::endl;
+			}
 		}
 
 		/**
@@ -103,16 +102,16 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of elements
 		*/
-		PlotContainer(GLParams mode_, ElementType* points_, size_t number_of_elements_) : PlotContainer() 
+		PlotContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_) : PlotContainer() 
 		{
 			setMode(mode_);
 
-			number_of_elements = number_of_elements_;
+			number_of_vertices = number_of_vertices_;
 
-			points = new ElementType[number_of_elements * 3];
-			std::memcpy(points, points_, sizeof(ElementType)*number_of_elements * 3);
+			points = new ElementType[number_of_vertices * 3];
+			std::memcpy(points, points_, sizeof(ElementType)*number_of_vertices * 3);
 		}
 
 		/**
@@ -198,19 +197,19 @@ namespace utils
 		void copy(const PlotContainer<ElementType>& plot_container_)
 		{
 			mode = plot_container_.getMode();
-			number_of_elements = plot_container_.getNumberOfElements();
+			number_of_vertices = plot_container_.getNumberOfVertices();
 			number_of_triangles = plot_container_.getNumberOfTriangles();
 
-			points = new ElementType[number_of_elements * 3];
-			std::memcpy(points, plot_container_.getPoints(), sizeof(ElementType) * number_of_elements * 3);
+			points = new ElementType[number_of_vertices * 3];
+			std::memcpy(points, plot_container_.getPoints(), sizeof(ElementType) * number_of_vertices * 3);
 
 			if (plot_container_.isColor()) {
-				color = new uint8_t[number_of_elements * 3];
-				std::memcpy(color, plot_container_.getColor(), sizeof(uint8_t) * number_of_elements * 3);
+				color = new uint8_t[number_of_vertices * 3];
+				std::memcpy(color, plot_container_.getColor(), sizeof(uint8_t) * number_of_vertices * 3);
 			}
 			if (plot_container_.isNormal()) {
-				normals = new ElementType[number_of_elements * 3];
-				std::memcpy(normals, plot_container_.getNormals(), sizeof(ElementType) * number_of_elements * 3);
+				normals = new ElementType[number_of_vertices * 3];
+				std::memcpy(normals, plot_container_.getNormals(), sizeof(ElementType) * number_of_vertices * 3);
 			}
 			if (plot_container_.isTriangle()) {
 				triangles = new unsigned int[number_of_triangles * 3];
@@ -237,7 +236,7 @@ namespace utils
 				normals = pointcloud_.getNormalsPtr();
 			}
 
-			number_of_elements = pointcloud_.getNumberOfVertices();
+			number_of_vertices = pointcloud_.getNumberOfVertices();
 
 			if (pointcloud_.isTriangle()) {
 				number_of_triangles = pointcloud.getNumberOfTriangles();
@@ -250,16 +249,16 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of elements
 		*/
-		void setPlotContainer(GLParams mode_, ElementType* points_, size_t number_of_elements_)
+		void setPlotContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
 			setMode(mode_);
 
-			number_of_elements = number_of_elements_;
+			number_of_vertices = number_of_vertices_;
 
-			points = new ElementType[number_of_elements];
-			std::memcpy(points, points_, sizeof(ElementType)*number_of_elements);
+			points = new ElementType[number_of_vertices];
+			std::memcpy(points, points_, sizeof(ElementType)*number_of_vertices);
 		}
 	
 		/**
@@ -326,9 +325,9 @@ namespace utils
 		/**
 			Get number of elements
 		*/
-		size_t getNumberOfElements() const
+		size_t getNumberOfVertices() const
 		{
-			return number_of_elements;
+			return number_of_vertices;
 		}
 
 		/**
@@ -409,7 +408,7 @@ namespace utils
 		/**
 			Number of elements
 		*/
-		size_t number_of_elements;
+		size_t number_of_vertices;
 
 		/**
 			Number of indices
@@ -461,11 +460,11 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of elements
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_elements_)
+		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
-			plot_container.push_back(PlotContainer<ElementType>(mode_, points_, number_of_elements_));
+			plot_container.push_back(PlotContainer<ElementType>(mode_, points_, number_of_vertices_));
 
 			number_of_clouds++;
 
@@ -483,7 +482,7 @@ namespace utils
 			*/
 			utils::BoundingBox<ElementType> bounding_box;
 			for (size_t i = 0; i < number_of_clouds; i++){
-				bounding_box.setBoundingBox(plot_container[i].getPoints(), plot_container[i].getNumberOfElements(), 3);
+				bounding_box.setBoundingBox(plot_container[i].getPoints(), plot_container[i].getNumberOfVertices(), 3);
 			}
 
 			gl_pointsize = 1;
@@ -499,7 +498,7 @@ namespace utils
 			
 			for (size_t i = 0; i < number_of_clouds; i++) {
 				ElementType* points = plot_container[i].getPoints();
-				for (size_t j = 0; j <  plot_container[i].getNumberOfElements() * 3; j++) {
+				for (size_t j = 0; j <  plot_container[i].getNumberOfVertices() * 3; j++) {
 					points[j] = (points[j] - bounding_box.getMiddle(j % 3)) * (1 / gl_zoom);
 				}
 			}
@@ -635,6 +634,9 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
+				if (plot_container[i].isTriangle()) {
+					glEnableClientState(GL_INDEX_ARRAY);
+				}
 				//glEnableClientState(GL_INDEX_ARRAY);
 				glColor4f(1.0, 1.0, 1.0, 0.0);
 
@@ -654,7 +656,7 @@ namespace utils
 				/**
 					Roatate the entire pointcloud around the x- and y-axis
 				*/
-				float gl_rot_x, gl_rot_y, gl_rot_z;
+				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
 				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
 				glRotatef(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
 				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
@@ -675,8 +677,14 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glNormalPointer(GL_FLOAT, 0, plot_container[i].getNormals());
 				}
-				glDrawArrays(GL_POINTS, 0, (GLsizei)plot_container[i].getNumberOfElements());
-				//glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));*/
+				if (!plot_container[i].isTriangle()) {
+					glDrawArrays(GL_POINTS, 0, (GLsizei)plot_container[i].getNumberOfVertices());
+				}
+				else {
+					glDrawElements(GL_TRIANGLES, (GLsizei)plot_container[i].getNumberOfTriangles() * 3, 
+						GL_UNSIGNED_INT, reinterpret_cast<void*>(plot_container[i].getTriangles()));
+				}
+
 
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
@@ -688,6 +696,9 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glDisableClientState(GL_NORMAL_ARRAY);
 				}
+				if (plot_container[i].isTriangle()) {
+					glDisableClientState(GL_INDEX_ARRAY);
+				}
 			}
 				
 			/**
@@ -698,17 +709,17 @@ namespace utils
 			glEnableClientState(GL_COLOR_ARRAY);
 				glLineWidth(2.0f);
 				glBegin(GL_LINES);
-					glColor4f(1.0, 0.0, 0.0, 0.0);
+					glColor4f(1.0f, 0.0, 0.0, 0.0);
 					glVertex3f(0.0, 0.0, 0.0);
 					glVertex3f(0.25f*gl_zoom, 0.0, 0.0);
 				glEnd();
 				glBegin(GL_LINES);
-					glColor4f(0.0, 1.0, 0.0, 0.0);
+					glColor4f(0.0, 1.0f, 0.0, 0.0);
 					glVertex3f(0.0, 0.0, 0.0);
 					glVertex3f(0.0, 0.25f*gl_zoom, 0.0);
 				glEnd();
 				glBegin(GL_LINES);
-					glColor4f(0.0, 0.0, 1.0, 0.0);
+					glColor4f(0.0, 0.0, 1.0f, 0.0);
 					glVertex3f(0.0, 0.0, 0.0);
 					glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
 				glEnd();
@@ -725,101 +736,116 @@ namespace utils
 		*/
 		void drawd() 
 		{
-		//////	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		//////	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//////	glMatrixMode(GL_MODELVIEW);
-		//////	glPushMatrix();
-		//////	
-		//////	/**
-		//////		Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
-		//////	*/
-		//////	glEnableClientState(GL_VERTEX_ARRAY);
-		//////	if (color) {
-		//////		glEnableClientState(GL_COLOR_ARRAY);
-		//////	}
-		//////	if (normals) {
-		//////		glEnableClientState(GL_NORMAL_ARRAY);
-		//////	}
-		//////	//glEnableClientState(GL_INDEX_ARRAY);	
-		//////		
-		//////		glLoadIdentity();
-		//////		
-		//////		/**
-		//////			Increase or decrease the entire pointcloud by the factor gl_zoom
-		//////		*/
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
 
-		//////		glScaled(1.0 / gl_zoom, 1.0 / gl_zoom, 1.0 / gl_zoom);
-		//////		/**
-		//////			Translate the pointlcoud by the chosen centerpoint
-		//////		*/
+			for (size_t i = 0; i < number_of_clouds; i++) {
+				/**
+					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+				*/
+				glEnableClientState(GL_VERTEX_ARRAY);
+				if (plot_container[i].isColor()) {
+					glEnableClientState(GL_COLOR_ARRAY);
+				}
+				if (plot_container[i].isNormal()) {
+					glEnableClientState(GL_NORMAL_ARRAY);
+				}
+				if (plot_container[i].isTriangle()) {
+					glEnableClientState(GL_INDEX_ARRAY);
+				}
+				//glEnableClientState(GL_INDEX_ARRAY);
+				glColor4f(1.0, 1.0, 1.0, 0.0);
 
-		//////		glTranslated(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
-		//////		
-		//////		/**
-		//////			Roatate the entire pointcloud around the x- and y-axis
-		//////		*/
-		//////		ElementType gl_rot_x, gl_rot_y, gl_rot_z;
-		//////		gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-		//////		glRotated(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-		//////		glRotated( 1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-		//////		glRotated( 1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+				glLoadIdentity();
 
-		//////		/**
-		//////			Determine the size of the points
-		//////		*/
-		//////		glPointSize((GLdouble)gl_pointsize);
+				/**
+					Increase or decrease the entire pointcloud by the factor gl_zoom
+				*/
 
-		//////						/**
-		//////			Link the points, colors and normals for drawing
-		//////		*/
-		//////		glVertexPointer(3, GL_DOUBLE, 0, points);
-		//////		if (color) {
-		//////			glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
-		//////		}
-		//////		if (normals) {
-		//////			glNormalPointer(GL_DOUBLE, 0, normals);
-		//////		}
-		//////		glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
-		//////		//////std::vector<GLuint> indices;
-		//////		//////// populate vertices
-		//////		//////glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));
+				glScaled(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
+				/**
+					Translate the pointcloud by the chosen centerpoint
+				*/
 
-		//////		/**
-		//////			Draw axis
-		//////		*/				
-		//////		glLineWidth(2.0f);
-		//////		glBegin(GL_LINES);
-		//////			glColor4f(1.0, 0.0, 0.0, 0.0);
-		//////			glVertex3d(0.0, 0.0, 0.0);
-		//////			glVertex3d(0.25*gl_zoom, 0.0, 0.0);
-		//////		glEnd();
-		//////		glBegin(GL_LINES);
-		//////			glColor4f(0.0, 1.0, 0.0, 0.0);
-		//////			glVertex3d(0.0, 0.0, 0.0);
-		//////			glVertex3d(0.0, 0.25*gl_zoom, 0.0);
-		//////		glEnd();
-		//////		glBegin(GL_LINES);
-		//////			glColor4f(0.0, 0.0, 1.0, 0.0);
-		//////			glVertex3d(0.0, 0.0, 0.0);
-		//////			glVertex3d(0.0, 0.0, 0.25*gl_zoom);
-		//////		glEnd();
+				glTranslated(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+
+				/**
+					Roatate the entire pointcloud around the x- and y-axis
+				*/
+				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
+				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+				glRotated(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotated(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotated(1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+
+				/**
+					Determine the size of the points
+				*/
+				glPointSize((GLfloat)gl_pointsize);
+
+				/**
+					Link the points, colors and normals for drawing
+				*/
+				glVertexPointer(3, GL_DOUBLE, 0, plot_container[i].getPoints());
+				if (plot_container[i].isColor()) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, plot_container[i].getColor());
+				}
+				if (plot_container[i].isNormal()) {
+					glNormalPointer(GL_DOUBLE, 0, plot_container[i].getNormals());
+				}
+				if (!plot_container[i].isTriangle()) {
+					glDrawArrays(GL_POINTS, 0, (GLsizei)plot_container[i].getNumberOfVertices());
+				}
+				else {
+					glDrawElements(GL_TRIANGLES, (GLsizei)plot_container[i].getNumberOfTriangles() * 3, 
+						GL_UNSIGNED_INT, reinterpret_cast<void*>(plot_container[i].getTriangles()));
+				}
 
 
-		//////	/**
-		//////		Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
-		//////	*/
-		//////	glDisableClientState(GL_VERTEX_ARRAY);
-		//////	if (color) {
-		//////		glDisableClientState(GL_COLOR_ARRAY);
-		//////	}
-		//////	if (normals) {
-		//////		glDisableClientState(GL_NORMAL_ARRAY);
-		//////	}
+				/**
+					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+				*/
+				glDisableClientState(GL_VERTEX_ARRAY);
+				if (plot_container[i].isColor()) {
+					glDisableClientState(GL_COLOR_ARRAY);
+				}
+				if (plot_container[i].isNormal()) {
+					glDisableClientState(GL_NORMAL_ARRAY);
+				}
+				if (plot_container[i].isTriangle()) {
+					glDisableClientState(GL_INDEX_ARRAY);
+				}
+			}
+				
+			/**
+				Draw axis
+			*/
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+				glLineWidth(2.0f);
+				glBegin(GL_LINES);
+					glColor4f(1.0f, 0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.25*gl_zoom, 0.0, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0, 1.0f, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.25*gl_zoom, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0, 0.0, 1.0f, 0.0);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.25*gl_zoom);
+				glEnd();
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
 
-		//////	glPopMatrix();
+			glPopMatrix();
 
-		//////	glutSwapBuffers();
-
+			glutSwapBuffers();
 		}
 
 	private:
@@ -932,11 +958,11 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Pointcloud
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of elements
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_elements_)
+		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, number_of_elements_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, number_of_vertices_);
 		}
 
 		/** 

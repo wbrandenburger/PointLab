@@ -299,8 +299,9 @@ namespace pointcloud
 		*/
 		void setPointsPtr(ElementType* points_)
 		{
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				pointcloud[i].setPointPtr(&points_[i*3]);
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				*it = *points_;
+				points_++;
 			}
 		}
 
@@ -311,21 +312,46 @@ namespace pointcloud
 		*/
 		void setNormalsPtr(ElementType* normals_)
 		{
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				pointcloud[i].setNormalPtr(&normals_[i*3]);
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*it = *normals_;
+				normals_++;
 			}
 		}
 
 		/**
-			Set normals
+			Set colors
 
 			@param[in] colors_ Colors
 		*/
 		void setColorsPtr(uint8_t* colors_)
 		{
-			for (size_t i = 0; i < number_of_vertices; i++) {
-				pointcloud[i].setColorPtr(&colors_[i*3]);
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*it = *colors_;
+				colors_++;
 			}
+		}
+
+		/**
+			Set colors
+
+			@param[in] colors_ Colors
+		*/
+		void setColorsPtr(float* colors_)
+		{
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*it = (uint8_t) std::floor(*colors_ * 255);
+				colors_++;
+			}
+		}	
+
+		/**
+			Set triangles
+
+			@param[in] triangles_ Triangles
+		*/
+		void setTrianglesPtr(size_t* triangles_)
+		{
+			std::memcpy(triangles, triangles_, sizeof(size_t) * getNumberOfTriangles() * 3);
 		}
 
 		/**

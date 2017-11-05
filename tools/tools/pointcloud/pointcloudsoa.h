@@ -324,13 +324,49 @@ namespace pointcloud
 		}
 
 		/**
-			Set normals
+			Set colors
 
 			@param[in] colors_ Colors
 		*/
 		void setColorsPtr(uint8_t* colors_)
 		{
 			std::memcpy(colors, colors_, sizeof(uint8_t) * getNumberOfVertices() * 3);
+		}
+
+		/**
+			Set colors
+
+			@param[in] colors_ Colors
+		*/
+		void setColorsPtr(float* colors_)
+		{
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*it = (uint8_t) std::floor(*colors_ * 255);
+				colors_++;
+			}
+		}	
+
+		/**
+			Set triangles
+
+			@param[in] triangles_ Triangles
+		*/
+		void setTrianglesPtr(size_t* triangles_)
+		{
+			std::memcpy(triangles, triangles_, sizeof(size_t) * getNumberOfTriangles() * 3);
+		}
+
+		/**
+			Set triangles
+
+			@param[in] triangles_ Triangles
+		*/
+		void setTrianglesPtr(unsigned int* triangles_)
+		{
+			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
+				*it = (size_t)*triangles_;
+				triangles_++;
+			}
 		}
 
 		/**

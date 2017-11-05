@@ -72,7 +72,7 @@ namespace pointcloud
 			- pointcloud.setPointcloud(number_of_vertices)
 			- pointcloud.setPointcloud(number_of_vertices, number_of_triangles)
 			
-		*/
+	*/
 
 	template<typename ElementType> class Pointcloud 
 	{
@@ -349,16 +349,27 @@ namespace pointcloud
 			@param[in] colors_ Colors
 		*/
 		virtual void setColorsPtr(uint8_t* colors_) = 0;
+	
+		/**
+			Set color information
+
+			@param[in] colors_ Colors
+		*/
+		virtual void setColorsPtr(float* colors_) = 0;
+
+		/**
+			Set triangles
+
+			@param[in] triangles_ Triangles
+		*/
+		virtual void setTrianglesPtr(size_t* triangles_) = 0;
 		
 		/**
 			Set triangles
 
 			@param[in] triangles_ Triangles
 		*/
-		void setTrianglesPtr(size_t* triangles_)
-		{
-			std::memcpy(triangles, triangles_, sizeof(size_t) * getNumberOfTriangles() * 3);
-		}
+		virtual void setTrianglesPtr(unsigned int* triangles_) = 0;
 
 		/**
 			Set point
