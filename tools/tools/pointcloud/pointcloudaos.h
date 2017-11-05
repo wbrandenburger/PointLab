@@ -448,17 +448,6 @@ namespace pointcloud
 		}
 
 		/**
-			Operator [] Access on point information
-
-			@param[in] index_ Dimension
-			@return Return pointer to point data
-		*/
-		ElementType* operator[](size_t index_) const
-		{
-			return pointcloud[index_].getPointPtr();
-		}
-
-		/**
 			Get Pointer to point data
 
 			@param[in] row_ Row
@@ -499,14 +488,46 @@ namespace pointcloud
 		ElementType* getPointsPtr() const
 		{
 			ElementType* new_points = new ElementType[number_of_vertices*3];
+			ElementType* nwe_points_ptr = new_points;
 
-			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginPoint();
-				it != endPoint(); it++) {
-				new_points[index++] = *it;
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				*new_points_ptr = *it;
+				new_points_ptr++;
 			}
 
 			return new_points;
+		}
+
+		/**
+			Get Pointer to point data
+
+			@param[in] new_points Pointer to point data
+		*/
+		void getPointsPtr(float** new_points) const
+		{
+			*new_points = new float[number_of_vertices * 3];
+			float* new_points_ptr = *new_points;
+
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++){
+				*new_points_ptr = (float)*it;
+				new_points_ptr++;
+			}
+		}
+
+		/**
+			Get Pointer to point data
+
+			@param[in] new_points Pointer to point data
+		*/
+		void getPointsPtr(double** new_points) const
+		{
+			*new_points = new double[number_of_vertices * 3];
+			double* new_points_ptr = *new_points;
+
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				*new_points_ptr = (double)*it;
+				new_points_ptr++;
+			}
 		}
 
 		/**
@@ -517,14 +538,46 @@ namespace pointcloud
 		ElementType* getNormalsPtr() const
 		{
 			ElementType* new_normals = new ElementType[number_of_vertices*3];
+			ElementType* new_normals_ptr = new_normals;
 
-			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginNormal();
-				it != endNormal(); it++) {
-				new_normals[index++] = *it;
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*new_normals_ptr = *it;
+				new_normals_ptr++;
 			}
 
 			return new_normals;
+		}
+
+		/**
+			Get Pointer to the normal
+
+			@param[in] new_normals Pointer to the normal
+		*/
+		void getNormalsPtr(float** new_normals) const
+		{
+			*new_normals = new float[number_of_vertices * 3];
+			float* new_normals_ptr = *new_normals;
+
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*new_normals_ptr = (float)*it;
+				new_normals_ptr++;
+			}
+		}
+
+		/**
+			Get Pointer to the normal
+
+			@param[in] new_normals Pointer to the normal
+		*/
+		void getNormalsPtr(double** new_normals) const
+		{
+			*new_normals = new double[number_of_vertices * 3];
+			double* new_normals_ptr = *new_normals;
+
+			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
+				*new_normals_ptr = (double)*it;
+				new_normals_ptr++;
+			}
 		}
 
 		/**
@@ -535,16 +588,62 @@ namespace pointcloud
 		uint8_t* getColorsPtr() const
 		{
 			uint8_t* new_colors = new uint8_t[number_of_vertices*3];
+			uint8_t* new_colors_ptr = new_colors;
 
-			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<uint8_t> it = beginColor();
-				it != endColor(); it++) {
-				new_colors[index++] = *it;
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*new_colors_ptr = *it;
+				new_colors_ptr++;
 			}
 
 			return new_colors;
 		}
-				
+
+		/**
+			Get Pointer to color information
+
+			@param[in] new_colors Pointer to color information
+		*/		
+		void getColorsPtr(float** new_colors) const
+		{
+			*new_colors = new float[number_of_vertices * 3];
+			float* new_colors_ptr = *new_colors;
+
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*new_colors_ptr = (float)*it / 255.0f;
+				new_colors_ptr++;
+			}
+		}
+
+		/**
+			Get Pointer to triangles
+
+			@return Return pointer to the triangles
+		*/
+		size_t* getTrianglesPtr() const
+		{
+			size_t* new_triangles = new size_t[number_of_triangles * 3];
+			std::memcpy(new_triangles, triangles, sizeof(size_t) * number_of_triangles * 3);
+
+			return new_triangles;
+		}
+
+		/**
+			Get Pointer to triangles
+
+			@param[in] new_triangles Pointer to the triangles
+		*/
+
+		void getTrianglesPtr(unsigned int** new_triangles) const
+		{
+			*new_triangles = new unsigned int[number_of_triangles * 3];
+			unsigned int* new_triangles_ptr = *new_triangles;
+
+			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
+				*new_triangles_ptr = (unsigned int)*it;
+				new_triangles_ptr++;
+			}
+		}
+
 		/**
 			Get Matrix to points
 
@@ -555,8 +654,7 @@ namespace pointcloud
 			ElementType* data = new ElementType[number_of_vertices*3];
 			
 			size_t index = 0;
-			for (PointcloudAoS<ElementType>::Iterator<ElementType> it = beginPoint();
-				it != endPoint(); it++) {
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
 				data[index++] = *it;
 			}
 

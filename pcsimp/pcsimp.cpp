@@ -79,8 +79,16 @@ int main(int argc, char* argv[]) {
 	pointcloud::PointcloudSoA<float> pointcloud_meshgrid;
 	pointcloud::meshGrid<float>(pointcloud_meshgrid, 0, 3, 0, 3, 1);
 
-	std::cout << pointcloud_meshgrid << std::endl;
+	unsigned int* ptr;
+	pointcloud_meshgrid.getTrianglesPtr(&ptr);
+	for (size_t i = 0; i < pointcloud_meshgrid.getNumberOfTriangles(); i++) {
+		std::cout << ptr[i * 3 + 0] << " " << ptr[i * 3 + 1] << " " << ptr[i * 3 + 2] << std::endl;
+	}
 
+	size_t* ptr1 = pointcloud_meshgrid.getTrianglesPtr();
+	for (size_t i = 0; i < pointcloud_meshgrid.getNumberOfTriangles(); i++) {
+		std::cout << ptr1[i * 3 + 0] << " " << ptr1[i * 3 + 1] << " " << ptr1[i * 3 + 2] << std::endl;
+	}
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_meshgrid);
 
 	int versuch = 2048;

@@ -492,14 +492,6 @@ namespace pointcloud
 		}
 
 		/**
-			Operator [] Access on point information
-
-			@param[in] index_ Dimension
-			@return Return pointer to point data
-		*/
-		virtual ElementType* operator[](size_t index_) const = 0;
-
-		/**
 			Get Pointer to point data
 
 			@param[in] row_ Row
@@ -540,6 +532,20 @@ namespace pointcloud
 			@return Return pointer to point data
 		*/
 		virtual ElementType* getPointsPtr() const = 0;
+		
+		/**
+			Get Pointer to point data
+
+			@param[in] new_points Pointer to point data
+		*/
+		virtual void getPointsPtr(float** new_points) const = 0;
+
+		/**
+			Get Pointer to point data
+
+			@param[in] new_points Pointer to point data
+		*/
+		virtual void getPointsPtr(double** new_points) const = 0;
 
 		/**
 			Get Pointer to the normal
@@ -549,25 +555,47 @@ namespace pointcloud
 		virtual ElementType* getNormalsPtr() const = 0;
 
 		/**
+			Get Pointer to the normal
+
+			@param[in] new_normals Pointer to the normal
+		*/
+		virtual void getNormalsPtr(float** new_normals) const = 0;
+
+		/**
+			Get Pointer to the normal
+
+			@param[in] new_normals Pointer to the normal
+		*/
+		virtual void getNormalsPtr(double** new_normals) const = 0;
+
+		/**
 			Get Pointer to color information
 
 			@return Return pointer to color information
 		*/		
 		virtual uint8_t* getColorsPtr() const = 0;
+		
+		/**
+			Get Pointer to color information
+
+			@param[in] new_colors Pointer to color information
+		*/		
+		virtual void getColorsPtr(float** new_colors) const = 0;
 
 		/**
 			Get Pointer to triangles
 
 			@return Return pointer to the triangles
 		*/
-		size_t* getTrianglesPtr() const
-		{
-			size_t* new_triangles = new size_t[number_of_triangles * 3];
-			std::memcpy(new_triangles, triangles, sizeof(size_t) * number_of_triangles * 3);
+		virtual size_t* getTrianglesPtr() const = 0;
 
-			return new_triangles;
-		}
-	
+		/**
+			Get Pointer to triangles
+
+			@param[in] new_triangles Pointer to the triangles
+		*/
+		virtual void getTrianglesPtr(unsigned int** new_triangles) const = 0;
+
 		/**
 			Get Matrix to points
 
