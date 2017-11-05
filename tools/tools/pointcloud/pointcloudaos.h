@@ -355,6 +355,19 @@ namespace pointcloud
 		}
 
 		/**
+			Set triangles
+
+			@param[in] triangles_ Triangles
+		*/
+		void setTrianglesPtr(unsigned int* triangles_)
+		{
+			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
+				*it = (size_t) triangles_;
+				triangles_++;
+			}
+		}
+
+		/**
 			Set point
 
 			@param[in] point_ Point
@@ -514,7 +527,7 @@ namespace pointcloud
 		ElementType* getPointsPtr() const
 		{
 			ElementType* new_points = new ElementType[number_of_vertices*3];
-			ElementType* nwe_points_ptr = new_points;
+			ElementType* new_points_ptr = new_points;
 
 			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
 				*new_points_ptr = *it;
@@ -770,7 +783,8 @@ namespace pointcloud
 			/**
 				Constructor
 			*/
-			Iterator() : iterator_(nullptr), stride_(0), index_(0)
+			Iterator() : iterator_(nullptr), stride_(0), index_(0), 
+				pointcloud_type_(PointcloudType::NONE)
 			{
 			}
 			
@@ -782,6 +796,8 @@ namespace pointcloud
 			Iterator(const IteratorInitializer<IteratorType>& iterator_initializer) : Iterator()
 			{
 				iterator_ = iterator_initializer.getBegin();
+
+				pointcloud_type_ = iterator_initializer.getPointcloudType();
 
 				setStride(iterator_initializer.getPointcloudFlag());
 			}
@@ -816,8 +832,10 @@ namespace pointcloud
 			{
 				iterator_ = iterator_initializer.getBegin();
 
-				setStride(iterator_initializer.getPointcloudFlag());
+				pointcloud_type_ = iterator_initializer.getPointcloudType();
 				
+				setStride(iterator_initializer.getPointcloudFlag());
+
 				return *this;
 			}
 
@@ -845,18 +863,19 @@ namespace pointcloud
 			*/
 			Iterator& operator++(int)
 			{
-				if (index_ % 3 == 2){
+				if (pointcloud_type_ == PointcloudType::AOS && index_ == 2) {
 					iterator_ = reinterpret_cast<IteratorType*>((char*)iterator_ + stride_);
 					index_ = 0;
 				}
 				else {
-					iterator_++;
+					iterator_++; 
 					index_++;
 				}
 
 				return *this;
 			}
-						/**
+
+			/**
 				Operator = 
 
 				@param[in] iterator Pointer to an element
@@ -908,11 +927,12 @@ namespace pointcloud
 			*/
 			void setStride(const PointcloudFlag& pointcloud_flag)
 			{
-				switch (pointcloud_flag) {
-				case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
-				case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
-				case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
-				case PointcloudFlag::TRIANGLES: stride_ = sizeof(size_t);
+				if (pointcloud_type_ == PointcloudType::AOS) {
+					switch (pointcloud_flag) {
+					case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
+					case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					}
 				}
 			}
 
@@ -926,6 +946,16 @@ namespace pointcloud
 				Stride which defines the bytes between two points
 			*/
 			size_t stride_;
+
+			/**
+				Current column
+			*/
+			size_t index_;
+
+			/**
+				Specify the type of pointcloud container
+			*/
+			PointcloudType pointcloud_type_;
 		};
 
 		private:

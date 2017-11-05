@@ -746,10 +746,11 @@ namespace pointcloud
 			/**
 				Constructor
 			*/
-			Iterator() : iterator_(nullptr)
+			Iterator() : iterator_(nullptr), stride_(0), index_(0), 
+				pointcloud_type_(PointcloudType::NONE)
 			{
 			}
-
+			
 			/**
 				Constructor
 
@@ -758,6 +759,10 @@ namespace pointcloud
 			Iterator(const IteratorInitializer<IteratorType>& iterator_initializer) : Iterator()
 			{
 				iterator_ = iterator_initializer.getBegin();
+
+				pointcloud_type_ = iterator_initializer.getPointcloudType();
+
+				setStride(iterator_initializer.getPointcloudFlag());
 			}
 
 			/**
@@ -775,20 +780,24 @@ namespace pointcloud
 			Iterator(const Iterator& iterator) = delete;
 
 			/**
-				Copy Constructor 
+				Operator = 
 
 				@param[in] An instance of class Iterator
 			*/
 			Iterator(const Iterator&& iterator) = delete;
-			
-			/**
-				Operator = 
 
+			/**
+				Operator =
+				
 				@param[in] iterator_initializer Structure for initialization of the iterators
 			*/
 			Iterator& operator=(const IteratorInitializer<IteratorType>& iterator_initializer)
 			{
 				iterator_ = iterator_initializer.getBegin();
+
+				pointcloud_type_ = iterator_initializer.getPointcloudType();
+				
+				setStride(iterator_initializer.getPointcloudFlag());
 
 				return *this;
 			}
@@ -808,7 +817,7 @@ namespace pointcloud
 				@return Returns reference to the current instance
 			*/
 			Iterator& operator=(const Iterator&& iterator) = delete;
-
+	
 			/**
 				Operator ++
 
@@ -817,12 +826,19 @@ namespace pointcloud
 			*/
 			Iterator& operator++(int)
 			{
-				iterator_++;
+				if (pointcloud_type_ == PointcloudType::AOS && index_ == 2) {
+					iterator_ = reinterpret_cast<IteratorType*>((char*)iterator_ + stride_);
+					index_ = 0;
+				}
+				else {
+					iterator_++; 
+					index_++;
+				}
 
 				return *this;
 			}
 
-						/**
+			/**
 				Operator = 
 
 				@param[in] iterator Pointer to an element
@@ -856,6 +872,7 @@ namespace pointcloud
 			{
 				return iterator_ == iterator;
 			}
+
 			/**
 				Operator *
 
@@ -865,11 +882,43 @@ namespace pointcloud
 			{
 				return *iterator_;
 			}
-			
+
+			/**
+				Set stride
+
+				@param[in] pointcloud_flag Specifies the element to be iterated 
+			*/
+			void setStride(const PointcloudFlag& pointcloud_flag)
+			{
+				if (pointcloud_type_ == PointcloudType::AOS) {
+					switch (pointcloud_flag) {
+					case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
+					case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					}
+				}
+			}
+
+		private:		
 			/**
 				Pointer to the current element
 			*/
 			IteratorType* iterator_;
+
+			/**
+				Stride which defines the bytes between two points
+			*/
+			size_t stride_;
+
+			/**
+				Current column
+			*/
+			size_t index_;
+
+			/**
+				Specify the type of pointcloud container
+			*/
+			PointcloudType pointcloud_type_;
 		};
 
 	private:
