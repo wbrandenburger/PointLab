@@ -632,9 +632,6 @@ namespace utils
 				}
 				if (plot_container[i].isTriangle()) {
 					glEnableClientState(GL_INDEX_ARRAY);
-					glEnable(GL_CULL_FACE);
-
-					glCullFace(GL_FRONT);
 				}
 
 				glColor4f(1.0, 1.0, 1.0, 0.0);
@@ -697,7 +694,6 @@ namespace utils
 				}
 				if (plot_container[i].isTriangle()) {
 					glDisableClientState(GL_INDEX_ARRAY);
-					glDisable(GL_CULL_FACE);
 				}
 			}
 				

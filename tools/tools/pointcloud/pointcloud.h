@@ -33,6 +33,7 @@
 #define POINTCLOUD_POINTCLOUD_H_
 
 #include <stdint.h>
+#include <vector>
 
 #include "tools/parameters.h"
 
@@ -264,7 +265,7 @@ namespace pointcloud
 			@param[in] list_ List with indices to elements of the subset
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubset(std::vector<size_t> list_, Pointcloud<ElementType>& subset_) const
+		void getSubset(const std::vector<size_t>& list_, Pointcloud<ElementType>& subset_) const
 		{
 			getSubset(list_.data(), list_.size(), subset_);
 		}
@@ -278,7 +279,7 @@ namespace pointcloud
 		*/
 		void getSubset(size_t* list_,size_t number_of_elements_in_list_, Pointcloud<ElementType>& subset_) const
 		{
-			uint8_t flags;
+			uint8_t flags = 0;
 			if (isColor()) {
 				flags |= Vertex::RGB;
 			}
@@ -301,13 +302,14 @@ namespace pointcloud
 				}
 			}
 		}
+
 		/**
 			Generate a subset of the pointcloud
 
 			@param[in] list_ List with indices to elements of the subset
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubset(std::vector<size_t> list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(const std::vector<size_t>& list_, utils::Matrix<ElementType>& subset_) const
 		{
 			getSubset(list_.data(), list_.size(), subset_);
 		}
@@ -326,6 +328,34 @@ namespace pointcloud
 					exitFailure(__FILE__, __LINE__);
 				}
 				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
+			}
+		}
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@param[in,out] subset_ Reference to the pointcloud with the subset
+		*/
+		void getSubset(const std::vector<size_t>& list_, ElementType* subset_) const
+		{
+			getSubset(list_.data(), list_.size(), subset_);
+		}
+
+		/**
+			Generate a subset of the pointcloud
+
+			@param[in] list_ List with indices to elements of the subset
+			@param[in] number_of_elements_in_list_ Number of elements in list
+			@param[in,out] subset_ Reference to the pointcloud with the subset
+		*/
+		void getSubset(size_t* list_,size_t number_of_elements_in_list_, ElementType* subset_) const
+		{
+			for (size_t i = 0; i <  number_of_elements_in_list_; i++) {
+				if (list_[i] >= number_of_vertices) {
+					exitFailure(__FILE__, __LINE__);
+				}
+				std::memcpy(subset_[i*3],getPointPtr(list_[i]), sizeof(ElementType)*3);
 			}
 		}
 
@@ -740,7 +770,17 @@ namespace pointcloud
 
 			@param[in] matrix_ Matrix which shall contain the points
 		*/
-		virtual void getMatrix(utils::Matrix<ElementType>& matrix_) const = 0;
+		void getMatrix(utils::Matrix<ElementType>& matrix_) const
+		{
+			ElementType* data = new ElementType[number_of_vertices*3];
+			
+			size_t index = 0;
+			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
+				data[index++] = *it;
+			}
+
+			matrix_.setMatrix(data, number_of_vertices, 3);
+		}
 
 		/**
 			Returns true if colors are set

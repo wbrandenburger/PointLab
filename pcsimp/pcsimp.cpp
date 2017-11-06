@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 	std::cout << pointcloud_buny << std::endl;
 
 	pointcloud::PointcloudSoA<float> pointcloud_meshgrid;
-	pointcloud::meshGrid<float>(pointcloud_meshgrid, 0, 3, 0, 3, 1);
+	pointcloud::meshGrid<float>(pointcloud_meshgrid, 0, 9, 0, 9, 10);
 
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_meshgrid);
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
 	float* points = pointcloud_buny.getPointsPtr();
 	glview.setPlot3D();
 	//glview.setPointcloud(GLParams::POINTS, points, pointcloud_buny.getNumberOfVertices());
-	glview.setPointcloud(GLParams::POINTS, pointcloud_buny);
+	glview.setPointcloud(GLParams::POINTS, pointcloud_meshgrid);
 	glview.subPlot(2, 2, 3);
 	delete[] points;
 

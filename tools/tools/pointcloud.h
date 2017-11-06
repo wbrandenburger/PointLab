@@ -31,7 +31,7 @@
 #define INCLUDE_POINTCLOUD_H_
 
 #include "pointcloud/features.h"
-#include "pointcloud/miscallaneous.h"
+#include "pointcloud/meshgrid.h"
 #include "pointcloud/normal.h"
 #include "pointcloud/pointcloud.h"
 #include "pointcloud/pointcloudaos.h"

@@ -34,9 +34,6 @@
 
 #include <stdint.h>
 
-#include "tools/utils/matrix.h"
-
-
 #include "tools/pointcloud/pointcloud.h"
 
 namespace pointcloud
@@ -439,19 +436,6 @@ namespace pointcloud
 		uint8_t* getColorPtr(size_t row_) const
 		{
 			return &colors[row_ * 3];
-		}
-
-		/**
-			Get Matrix to points
-
-			@param[in] matrix_ Matrix which shall contain the points
-		*/
-		void getMatrix(utils::Matrix<ElementType>& matrix_) const
-		{
-			ElementType* data(new ElementType[number_of_vertices*3]);
-			std::memcpy(data, points, sizeof(ElementType) * number_of_vertices * 3);
-
-			matrix_.setMatrix(data, number_of_vertices, 3);
 		}
 
 		/**
