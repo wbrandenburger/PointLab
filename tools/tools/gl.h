@@ -36,5 +36,6 @@
 #include "gl/glplot3d.h"
 #include "gl/glview.h"
 #include "gl/glviewer.h"
+#include "gl/meshgrid.h"
 
 #endif /* INCLUDE_GL_H_ */

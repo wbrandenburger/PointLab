@@ -143,7 +143,11 @@
 		/**
 			Triangles are rendered
 		*/
-		TRIANGLES = 1
+		LINES = 1,
+		/**
+			Triangles are rendered
+		*/
+		TRIANGLES = 2
 	};
 
 #endif /* PARAMETERS_H_ */

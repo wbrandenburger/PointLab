@@ -60,9 +60,9 @@ namespace utils
 		/**
 			Constructor
 		*/
-		PlotContainer() :  mode(NULL), 
-			points(nullptr), color(nullptr), normals(nullptr), triangles(nullptr),
-			number_of_vertices(NULL), number_of_triangles(NULL)
+		PlotContainer() : mode(NULL),
+			points(nullptr), color(nullptr), normals(nullptr), triangles(nullptr), lines(nullptr),
+			number_of_vertices(NULL), number_of_triangles(NULL), number_of_lines(NULL)
 		{
 		}
 
@@ -107,8 +107,27 @@ namespace utils
 			number_of_vertices = number_of_vertices_;
 
 			points = points_;
-			//points = new ElementType[number_of_vertices * 3];
-			//std::memcpy(points, points_, sizeof(ElementType)*number_of_vertices * 3);
+		}
+
+		/**
+			Constructor
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Points
+			@param[in] lines_ Lines
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_lines_ Number of indices
+		*/
+		PlotContainer(GLParams mode_, ElementType* points_, unsigned int* lines_,
+			size_t number_of_vertices_, size_t number_of_lines_)
+		{
+			setMode(mode_);
+
+			number_of_vertices = number_of_vertices_;
+			number_of_lines = number_of_lines_;
+
+			points = points_;
+			lines = lines_;
 		}
 
 		/**
@@ -139,6 +158,10 @@ namespace utils
 			if (triangles) {
 				delete[] triangles;
 				triangles = nullptr;
+			}
+			if (lines) {
+				delete[] lines;
+				lines = nullptr;
 			}
 		}
 
@@ -196,6 +219,7 @@ namespace utils
 			mode = plot_container_.getMode();
 			number_of_vertices = plot_container_.getNumberOfVertices();
 			number_of_triangles = plot_container_.getNumberOfTriangles();
+			number_of_lines = plot_container_.getNumberOfLines();
 
 			points = new ElementType[number_of_vertices * 3];
 			std::memcpy(points, plot_container_.getPoints(), sizeof(ElementType) * number_of_vertices * 3);
@@ -211,6 +235,10 @@ namespace utils
 			if (plot_container_.isTriangle()) {
 				triangles = new unsigned int[number_of_triangles * 3];
 				std::memcpy(triangles, plot_container_.getTriangles(), sizeof(unsigned int)*number_of_triangles * 3);
+			}
+			if (plot_container_.isLine()) {
+				lines = new unsigned int[number_of_lines * 2];
+				std::memcpy(lines, plot_container_.getLines(), sizeof(unsigned int)*number_of_lines * 2);
 			}
 		}
 
@@ -246,7 +274,7 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
-			@param[in] number_of_vertices_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 		*/
 		void setPlotContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
@@ -254,10 +282,30 @@ namespace utils
 
 			number_of_vertices = number_of_vertices_;
 
-			points = new ElementType[number_of_vertices];
-			std::memcpy(points, points_, sizeof(ElementType)*number_of_vertices);
+			points = points_;
 		}
-	
+		
+		/**
+			Set plot container
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Points
+			@param[in] lines_ Indices
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_lines_ Number of indices
+		*/
+		void setPlotContainer(GLParams mode_, ElementType* points_, unsigned int* lines_,
+			size_t number_of_vertices_, size_t number_of_lines_)
+		{
+			setMode(mode_);
+
+			number_of_vertices = number_of_vertices_;
+			number_of_lines = number_of_lines_;
+
+			points = points_;
+			lines = lines_;
+		}
+
 		/**
 			Get the OpenGl specifier for the mode what kind of primitives to render
 
@@ -267,6 +315,7 @@ namespace utils
 		{
 			switch (mode_) {
 			case GLParams::POINTS: mode = GL_POINTS; break;
+			case GLParams::LINES: mode = GL_LINES; break;
 			case GLParams::TRIANGLES: mode = GL_TRIANGLES; break;
 			}
 		}
@@ -310,9 +359,9 @@ namespace utils
 		}
 
 		/**
-			Get indices
+			Get Triangles
 			
-			@return Indices
+			@return triangles
 		*/
 		unsigned int* getTriangles() const
 		{
@@ -320,7 +369,19 @@ namespace utils
 		}
 
 		/**
-			Get number of elements
+			Get indices
+			
+			@return indices
+		*/
+		unsigned int* getLines() const
+		{
+			return lines;
+		}
+
+		/**
+			Get number of vertices
+
+			@return Number of vertices
 		*/
 		size_t getNumberOfVertices() const
 		{
@@ -328,11 +389,23 @@ namespace utils
 		}
 
 		/**
-			Get number of indices
+			Get number of triangles
+
+			@return Number of triangles
 		*/
 		size_t getNumberOfTriangles() const
 		{
 			return number_of_triangles;
+		}
+
+		/**
+			Get Number of indices
+
+			@return Number of indices
+		*/
+		size_t getNumberOfLines() const
+		{
+			return number_of_lines;
 		}
 
 		/**
@@ -356,7 +429,7 @@ namespace utils
 		}
 
 		/**
-			Returns true if normalss are set
+			Returns true if normals are set
 
 			@return True if normals are set
 		*/
@@ -366,13 +439,23 @@ namespace utils
 		}
 
 		/**
-			Returns true if normalss are set
+			Returns true if triangles are set
 
-			@return True if normals are set
+			@return True if triangles are set
 		*/
 		bool isTriangle() const
 		{
 			return (triangles != nullptr);
+		}
+
+		/**
+			Returns true if lines are set
+
+			@return True if lines are set
+		*/
+		bool isLine() const
+		{
+			return (lines != nullptr);
 		}
 
 	private:
@@ -398,19 +481,29 @@ namespace utils
 		ElementType* normals;
 
 		/**
-			Indices
+			Triangles
 		*/
 		unsigned int* triangles;
 
 		/**
-			Number of elements
+			Lines
+		*/
+		unsigned int* lines;
+
+		/**
+			Number of vertices
 		*/
 		size_t number_of_vertices;
 
 		/**
-			Number of indices
+			Number of triangles
 		*/
 		size_t number_of_triangles;
+
+		/**
+			Number of lines
+		*/
+		size_t number_of_lines;
 	};
 
 	template<typename ElementType> class Plot3DInstance
@@ -467,6 +560,26 @@ namespace utils
 
 			setParameters();
 
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Points
+			@param[in] lines_ Lines
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_lines_ Number of indices
+		*/
+		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines_,
+			size_t number_of_vertices_, size_t number_of_lines_)
+		{
+			plot_container.push_back(PlotContainer<ElementType>(mode_, points_, lines_,
+				number_of_vertices_, number_of_lines_));
+			
+			number_of_clouds++;
+
+			setParameters();
 		}
 
 		/**
@@ -631,9 +744,11 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].isTriangle()) {
+				if (plot_container[i].getMode() != GL_POINTS) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
+				glColor4f(1.0, 1.0, 1.0, 0.0);
+
 				glLoadIdentity();
 
 				/**
@@ -672,14 +787,18 @@ namespace utils
 					glNormalPointer(GL_FLOAT, 0, plot_container[i].getNormals());
 				}
 				
-				if (!plot_container[i].isTriangle()) {
-					glColor4f(1.0, 0.0, 0.0, 0.0);
-					glDrawArrays(GL_POINTS, 0, plot_container[i].getNumberOfVertices());
+				if (plot_container[i].getMode() == GL_POINTS) {
+					glDrawArrays(plot_container[i].getMode(), 0, plot_container[i].getNumberOfVertices());
 				}
 				else{
-					glColor4f(0.0, 1.0, 0.0, 0.0);
-					glDrawElements(GL_LINES, plot_container[i].getNumberOfTriangles() * 3, 
-						GL_UNSIGNED_INT, plot_container[i].getTriangles());
+					//if (plot_container[i].getMode() == GL_LINES) {
+					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfLines() * 2,
+						GL_UNSIGNED_INT, plot_container[i].getLines());
+					//}
+					//else {
+					//	glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfTriangles() * 3,
+					//		GL_UNSIGNED_INT, plot_container[i].getTriangles());
+					//}
 				}
 
 				/**
@@ -692,7 +811,7 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glDisableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].isTriangle()) {
+				if (plot_container[i].getMode() != GL_POINTS) {
 					glDisableClientState(GL_INDEX_ARRAY);
 				}
 			}
@@ -751,7 +870,6 @@ namespace utils
 				if (plot_container[i].isTriangle()) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
-				//glEnableClientState(GL_INDEX_ARRAY);
 				glColor4f(1.0, 1.0, 1.0, 0.0);
 
 				glLoadIdentity();
@@ -953,12 +1071,27 @@ namespace utils
 			Set pointcloud
 
 			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Pointcloud
+			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of elements
 		*/
 		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
 			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, number_of_vertices_);
+		}
+				
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Points
+			@param[in] lines_ Lines
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_lines_ Number of indices
+		*/
+		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines_, 
+			size_t number_of_vertices_, size_t number_of_lines_)
+		{
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, lines_, number_of_vertices_, number_of_lines_);
 		}
 
 		/** 

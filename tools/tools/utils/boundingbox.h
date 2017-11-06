@@ -64,8 +64,7 @@ namespace utils
 			std::memcpy(max, dataset_, sizeof(ElementType)*dim);
 
 			ElementType* dataset_ptr = dataset_;
-			for (size_t i = 0; i < number_of_elements * dim; i++)
-			{
+			for (size_t i = 0; i < number_of_elements * dim; i++){
 				setCompareValue(*dataset_ptr, i % dim);
 				dataset_ptr++;
 			}

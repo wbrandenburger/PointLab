@@ -328,16 +328,36 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Pointcloud
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_elements_)
+		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
 			if (current_instance != GLInstance::GLPLOT3D) {
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
 
-			glplot3d.setPointcloud(mode_, points_, number_of_elements_);
+			glplot3d.setPointcloud(mode_, points_, number_of_vertices_);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Pointcloud
+			@param[in] lines_ Lines
+			@param[in] number_of_vertices_ Number of vertices
+			@param[in] number_of_lines_ Number of indices
+		*/
+		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines,
+			size_t number_of_vertices_, size_t number_of_lines)
+		{
+			if (current_instance != GLInstance::GLPLOT3D) {
+				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			glplot3d.setPointcloud(mode_, points_, lines, number_of_vertices_, number_of_lines);
 		}
 
 		/**
