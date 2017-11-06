@@ -128,6 +128,12 @@ namespace utils
 
 			points = points_;
 			lines = lines_;
+
+			//for (int i = 0; i < number_of_lines_; i++) {
+			//	std::cout << i << " " << lines_[i * 2 + 0] << " " << lines_[i * 2 + 1] << std::endl;
+			//}
+
+
 		}
 
 		/**
@@ -792,7 +798,7 @@ namespace utils
 				}
 				else{
 					//if (plot_container[i].getMode() == GL_LINES) {
-					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfLines() * 2,
+					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfLines() * 2 ,
 						GL_UNSIGNED_INT, plot_container[i].getLines());
 					//}
 					//else {
