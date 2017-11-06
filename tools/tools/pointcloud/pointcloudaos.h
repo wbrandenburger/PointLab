@@ -462,16 +462,6 @@ namespace pointcloud
 		}
 
 		/**
-			Get stride for triangles
-
-			return Stride for triangles
-		*/
-		size_t getStrideTriangle() const
-		{
-			return 0;
-		}
-
-		/**
 			Returns a pointer to the first entry of the points
 
 			@return Pointer to the first entry of the points

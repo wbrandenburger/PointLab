@@ -49,7 +49,7 @@ namespace pointcloud
 		@param[in] quant_ Difference between two adjacent points
 		@param[in] indices_ True if a trinagulated meshgrid should be created
 	*/
-	template<typename ElementType, typename PointcloudType> void meshGrid(PointcloudType& pointcloud,
+	template<typename ElementType> void meshGrid(pointcloud::Pointcloud<ElementType>& pointcloud,
 		ElementType x_left,ElementType x_right, ElementType y_left, ElementType y_right, 
 		ElementType quant)
 	{
@@ -73,10 +73,10 @@ namespace pointcloud
 		/**
 			Set the pointcloud
 		*/
-		typedef typename PointcloudType::template Iterator<ElementType> IteratorElementType;
-		typedef typename PointcloudType::template Iterator<size_t> Iteratorsize_t;
-		IteratorElementType iterator_points = pointcloud.beginPoint();
-		Iteratorsize_t iterator_triangles = pointcloud.beginTriangle();
+		typedef pointcloud::Pointcloud<ElementType> Pointcloud;
+
+		Pointcloud::Iterator<ElementType> iterator_points = pointcloud.beginPoint();
+		Pointcloud::Iterator<size_t> iterator_triangles = pointcloud.beginTriangle();
 
 		for (ElementType x = x_left; x <= x_right; x += quant) {
 			for (ElementType y = y_left; y <= y_right; y += quant) {
@@ -95,6 +95,9 @@ namespace pointcloud
 		size_t index = 0;
 		for (size_t i = 0; i < number_of_triangles / 2; i++) {
 			
+			/**
+				Line break
+			*/
 			if ((index + 1) % number_x == 0){
 				index++;
 			}
