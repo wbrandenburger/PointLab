@@ -106,8 +106,9 @@ namespace utils
 
 			number_of_vertices = number_of_vertices_;
 
-			points = new ElementType[number_of_vertices * 3];
-			std::memcpy(points, points_, sizeof(ElementType)*number_of_vertices * 3);
+			points = points_;
+			//points = new ElementType[number_of_vertices * 3];
+			//std::memcpy(points, points_, sizeof(ElementType)*number_of_vertices * 3);
 		}
 
 		/**
@@ -633,9 +634,6 @@ namespace utils
 				if (plot_container[i].isTriangle()) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
-
-				glColor4f(1.0, 1.0, 1.0, 0.0);
-
 				glLoadIdentity();
 
 				/**
@@ -673,14 +671,16 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glNormalPointer(GL_FLOAT, 0, plot_container[i].getNormals());
 				}
+				
 				if (!plot_container[i].isTriangle()) {
+					glColor4f(1.0, 0.0, 0.0, 0.0);
 					glDrawArrays(GL_POINTS, 0, plot_container[i].getNumberOfVertices());
 				}
-				else {
-					glDrawElements(GL_TRIANGLES, plot_container[i].getNumberOfTriangles() * 3, 
+				else{
+					glColor4f(0.0, 1.0, 0.0, 0.0);
+					glDrawElements(GL_LINES, plot_container[i].getNumberOfTriangles() * 3, 
 						GL_UNSIGNED_INT, plot_container[i].getTriangles());
 				}
-
 
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/

@@ -607,7 +607,7 @@ namespace pointcloud
 		*/
 		ElementType* getPointsPtr() const
 		{
-			ElementType* new_points = new ElementType[number_of_vertices*3];
+			ElementType* new_points = new ElementType[number_of_vertices * 3];
 			ElementType* new_points_ptr = new_points;
 
 			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {

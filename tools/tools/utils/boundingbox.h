@@ -76,7 +76,7 @@ namespace utils
 		*/
 		~BoundingBox()
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
@@ -118,7 +118,7 @@ namespace utils
 		*/
 		BoundingBox& operator=(const BoundingBox<ElementType>& bounding_box_)
 		{
-			clear();
+			clearMemory();
 
 			dim = bounding_box_.getDim();
 
@@ -138,7 +138,7 @@ namespace utils
 		*/
 		BoundingBox& operator=(const BoundingBox<ElementType>&& bounding_box_)
 		{
-			clear();
+			clearMemory();
 
 			dim = bounding_box_.getDim();
 
@@ -154,7 +154,7 @@ namespace utils
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
 			if (min) {
 				delete[] min;
