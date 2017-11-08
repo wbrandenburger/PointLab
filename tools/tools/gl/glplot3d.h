@@ -122,7 +122,7 @@ namespace gl
 			@param[in] number_of_indices_ Number of indices
 		*/
 		PlotContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_)
+			size_t number_of_vertices_, size_t number_of_indices_) : PlotContainer()
 		{
 			setMode(mode_);
 
@@ -219,8 +219,6 @@ namespace gl
 		*/
 		void copy(const PlotContainer<ElementType>& plot_container_)
 		{
-			
-
 			mode = plot_container_.getMode();
 			number_of_vertices = plot_container_.getNumberOfVertices();
 			number_of_indices = plot_container_.getNumberOfIndices();
@@ -502,9 +500,7 @@ namespace gl
 		void setPointcloud(PlotContainer<ElementType>& plot_container_)
 		{
 			plot_container.push_back(plot_container_);
-
 			number_of_clouds++;
-
 			setParameters();
 		}
 
@@ -523,14 +519,10 @@ namespace gl
 
 			gl_pointsize = 1;
 
-			gl_center_x = 0.5;
-			gl_center_y = 0.5;
-			gl_center_z = 0.5;
-
 			/**
 				Center and normalize the pointlcoud
 			*/
-			gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
+			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
 			
 			for (size_t i = 0; i < number_of_clouds; i++) {
 				ElementType* points = plot_container[i].getPoints();
@@ -538,7 +530,6 @@ namespace gl
 					points[j] = (points[j] - bounding_box.getMiddle(j % 3)) * (1 / gl_zoom);
 				}
 			}
-			gl_zoom = 1.0;
 		}
 
 		/**
@@ -562,78 +553,36 @@ namespace gl
 		}
 
 		/**
-			Zoom in
-		*/
-		void zoomIn() {
-			gl_zoom = gl_zoom * (ElementType) 1.1;
-		}
+			Zoom
 
-		/**
-			Zoom in
+			@param[in] direction_ Direction in which the wheel is turned: 1 for up and -1 for down
 		*/
-		void zoomOut() {
-			gl_zoom = gl_zoom / (ElementType) 1.1;
+		void zoom(int direction) {
+			gl_mouse_movement_.setZoom(direction);
 		}
 
 		/**
 			Translate
+
+			@param[in] x Mouse position in x-direction
+			@param[in] y Mouse position in y-direction
 		*/
-		void translate(int x_, int y_)
+		void translate(int x, int y)
 		{
-			gl_center_x = gl_center_x + (float)x_/500.0f;
-			gl_center_y = gl_center_y - (float)y_/500.0f;
+			gl_mouse_movement_.setTranslation(x, y);
 		}
 
 		/**
 			Rotate
+
+			@param[in] x_old Old mouse position in x-direction
+			@param[in] y_old Old mouse position in y-direction
+			@param[in] x_new New mouse position in x-direction
+			@param[in] y_new New mouse position in y-direction
 		*/
-		void rotate(int x_old_, int y_old_, int x_new_, int y_new_)
+		void rotate(int x_old, int y_old, int x_new, int y_new)
 		{
-			/**
-				Compute the radius of the imaginary sphere
-			*/
-			ElementType max_x = gl_center_x > (ElementType)0.5 ? gl_center_x : (ElementType)1.0 - gl_center_x;
-			ElementType max_y = gl_center_y > (ElementType)0.5 ? gl_center_y : (ElementType)1.0 - gl_center_y;
-
-			ElementType radius_sqr = max_x*max_x + max_y*max_y;
-
-			/**
-				Normalize the coordinates
-			*/
-			int width = glutGet(GLUT_WINDOW_WIDTH);
-			int height = glutGet(GLUT_WINDOW_HEIGHT);
-
-			if (x_new_ > 0 && x_new_ < width && y_new_ > 0 && y_new_ < height && 
-				!(x_new_ - x_old_ == 0 && y_new_ - y_old_ == 0) ) {
-
-				ElementType x_old = (ElementType)x_old_ / (ElementType)width - gl_center_x;
-				ElementType y_old = (ElementType)y_old_ / (ElementType)height - gl_center_y;
-				ElementType x_new = (ElementType)x_new_ / (ElementType)width - gl_center_x;
-				ElementType y_new = (ElementType)y_new_ / (ElementType)height - gl_center_y;
-
-				ElementType z_old = std::sqrt(radius_sqr - x_old*x_old - y_old*y_old);
-				ElementType z_new = std::sqrt(radius_sqr - x_new*x_new - y_new*y_new);
-				/**
-					Compute the rotation axis
-				*/
-				ElementType x = y_new*z_old - z_new*y_old;
-				ElementType y = z_new*x_old - x_new*z_old;
-				ElementType z = x_new*y_old - y_new*x_old;
-				
-				/**
-					Normalie the axis
-				*/
-				ElementType n = std::sqrt(x*x + y*y + z*z);
-				x /= n; y /= n; z /= n;
-
-				/** 
-					Computation of rotation angle
-				*/
-				ElementType w = (ElementType)5.0 * std::acos((x_new*x_old + y_new*y_old + z_new*z_old) /
-				(std::sqrt(x_new*x_new + y_new*y_new + z_new*z_new) * std::sqrt(x_old*x_old + y_old*y_old + z_old*z_old)));
-
-				gl_quaterion *= pointcloud::Quaterion<ElementType>(w, x, y, z);
-			}
+			gl_mouse_movement_.SetRotation(x_old, y_old, x_new, y_new);
 		}
 
 		/**
@@ -680,19 +629,22 @@ namespace gl
 				/**
 					Increase or decrease the entire pointcloud by the factor gl_zoom
 				*/
+				glScalef(1.0f / gl_mouse_movement_.getZoom(), 
+					1.0f / gl_mouse_movement_.getZoom(), 
+					1.0f / gl_mouse_movement_.getZoom());
 
-				glScalef(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
 				/**
 					Translate the pointcloud by the chosen centerpoint
 				*/
-
-				glTranslatef(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+				glTranslatef(gl_mouse_movement_.getCenterX() * gl_mouse_movement_.getZoom(),
+					gl_mouse_movement_.getCenterY() * gl_mouse_movement_.getZoom(),
+					gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
 
 				/**
 					Roatate the entire pointcloud around the x- and y-axis
 				*/
 				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
-				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+				gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
 				glRotatef(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
 				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
 				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
@@ -746,17 +698,17 @@ namespace gl
 				glBegin(GL_LINES);
 					glColor4f(1.0f, 0.0, 0.0, 0.0);
 					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.25f*gl_zoom, 0.0, 0.0);
+					glVertex3f(0.25f*gl_mouse_movement_.getZoom(), 0.0, 0.0);
 				glEnd();
 				glBegin(GL_LINES);
 					glColor4f(0.0, 1.0f, 0.0, 0.0);
 					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.25f*gl_zoom, 0.0);
+					glVertex3f(0.0, 0.25f*gl_mouse_movement_.getZoom(), 0.0);
 				glEnd();
 				glBegin(GL_LINES);
 					glColor4f(0.0, 0.0, 1.0f, 0.0);
 					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
+					glVertex3f(0.0, 0.0, 0.25f*gl_mouse_movement_.getZoom());
 				glEnd();
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
@@ -797,22 +749,26 @@ namespace gl
 				/**
 					Increase or decrease the entire pointcloud by the factor gl_zoom
 				*/
+				glScaled(1.0 / gl_mouse_movement_.getZoom(), 
+					1.0 / gl_mouse_movement_.getZoom(), 
+					1.0 / gl_mouse_movement_.getZoom());
 
-				glScaled(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
 				/**
 					Translate the pointcloud by the chosen centerpoint
 				*/
-
-				glTranslated(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+				glTranslated(gl_mouse_movement_.getCenterX() * gl_mouse_movement_.getZoom(),
+					gl_mouse_movement_.getCenterY() * gl_mouse_movement_.getZoom(),
+					gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
 
 				/**
 					Roatate the entire pointcloud around the x- and y-axis
 				*/
 				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
-				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotated(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotated(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotated(1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+				gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+				glRotated(-1.0 *math::toDeg<ElementType>(gl_rot_x), 1.0, 0.0, 0.0);
+				glRotated(1.0 *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0, 0.0);
+				glRotated(1.0 *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0);
+
 
 				/**
 					Determine the size of the points
@@ -862,17 +818,17 @@ namespace gl
 				glBegin(GL_LINES);
 					glColor4f(1.0f, 0.0, 0.0, 0.0);
 					glVertex3d(0.0, 0.0, 0.0);
-					glVertex3d(0.25*gl_zoom, 0.0, 0.0);
+					glVertex3d(0.25*gl_mouse_movement_.getZoom(), 0.0, 0.0);
 				glEnd();
 				glBegin(GL_LINES);
 					glColor4f(0.0, 1.0f, 0.0, 0.0);
 					glVertex3d(0.0, 0.0, 0.0);
-					glVertex3d(0.0, 0.25*gl_zoom, 0.0);
+					glVertex3d(0.0, 0.25*gl_mouse_movement_.getZoom(), 0.0);
 				glEnd();
 				glBegin(GL_LINES);
 					glColor4f(0.0, 0.0, 1.0f, 0.0);
 					glVertex3d(0.0, 0.0, 0.0);
-					glVertex3d(0.0, 0.0, 0.25*gl_zoom);
+					glVertex3d(0.0, 0.0, 0.25*gl_mouse_movement_.getZoom());
 				glEnd();
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
@@ -890,36 +846,14 @@ namespace gl
 		std::vector<PlotContainer<ElementType>> plot_container;
 
 		/**
-			Center in x-direction
+			Computes translation, rotation and zoom
 		*/
-		ElementType gl_center_x;
-
-		/**
-			Center in y-direction
-		*/
-		ElementType gl_center_y;
-
-		/**
-			Center in x-direction
-		*/
-		ElementType gl_center_z;
-		
-		/**
-			Quaterion
-		*/
-		pointcloud::Quaterion<ElementType> gl_quaterion;
-		
-		/*gl::GLMouseMovement<ElementType> gl_mouse_movement_;*/
+		gl::GLMouseMovement<ElementType> gl_mouse_movement_;
 
 		/**
 			Point size
 		*/
 		size_t gl_pointsize;
-
-		/**
-			Zoom factor
-		*/
-		ElementType gl_zoom;
 
 		/**
 			Number of pointclouds
@@ -1051,12 +985,6 @@ namespace gl
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-			//if (height_ > width_) {
-			//	glOrtho(0.0, 1.0,0.0, (double)height_ / (double)width_, -1.0, 1.0);
-			//}
-			//else{
-			//	glOrtho(0.0, (double)width_ / (double)height_,0.0, 1.0, -1.0, 1.0);
-			//}
 			glMatrixMode(GL_MODELVIEW);
 		}
 				
@@ -1127,12 +1055,7 @@ namespace gl
 		*/
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
-			if (direction_ == 1) {
-				plot3d_instances.getCurrentPlot3DInstance().zoomOut();
-			}
-			else {
-				plot3d_instances.getCurrentPlot3DInstance().zoomIn();
-			}
+			plot3d_instances.getCurrentPlot3DInstance().zoom(direction_);
 		}
 
 		/**

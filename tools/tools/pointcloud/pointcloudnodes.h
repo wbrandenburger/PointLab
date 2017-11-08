@@ -80,7 +80,7 @@ namespace pointcloud
 
 			@param[in] xyz_node An instance of class XYZNode
 		*/
-		XYZNode(const XYZNode<ElementType>& xyz_node) : XYZNode()
+		XYZNode(XYZNode<ElementType>& xyz_node) : XYZNode()
 		{
 			setPointPtr(xyz_node.getPointPtr());
 		}
@@ -164,7 +164,7 @@ namespace pointcloud
 			@param[in] index_ Dimension
 			@return Return point data of specified index
 		*/
-		ElementType getPoint(size_t index)
+		ElementType getPoint(size_t index) const
 		{
 			return point_[index];
 		}
