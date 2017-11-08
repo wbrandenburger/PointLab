@@ -623,33 +623,16 @@ namespace pointcloud
 
 			@param[in] new_points Pointer to point data
 		*/
-		void getPointsPtr(float** new_points) const
+		template<typename ReturnType> ReturnType* getPointsPtr() const
 		{
-			*new_points = new float[number_of_vertices * 3];
-			float* new_points_ptr = *new_points;
+			*new_points = new ReturnType[number_of_vertices * 3];
+			ReturnType* new_points_ptr = *new_points;
 
 			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++){
-				*new_points_ptr = (float)*it;
+				*new_points_ptr = (ReturnType)*it;
 				new_points_ptr++;
 			}
 		}
-
-		/**
-			Get Pointer to point data
-
-			@param[in] new_points Pointer to point data
-		*/
-		void getPointsPtr(double** new_points) const
-		{
-			*new_points = new double[number_of_vertices * 3];
-			double* new_points_ptr = *new_points;
-
-			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
-				*new_points_ptr = (double)*it;
-				new_points_ptr++;
-			}
-		}
-
 
 		/**
 			Get Pointer to the normal
@@ -672,31 +655,15 @@ namespace pointcloud
 		/**
 			Get Pointer to the normal
 
-			@param[in] new_normals Pointer to the normal
+			@return Return pointer to the normal
 		*/
-		void getNormalsPtr(float** new_normals) const
+		template<typename ReturnType> ReturnType* getNormalsPtr() const
 		{
-			*new_normals = new float[number_of_vertices * 3];
-			float* new_normals_ptr = *new_normals;
+			*new_normals = new ReturnType[number_of_vertices * 3];
+			ReturnType* new_normals_ptr = *new_normals;
 
 			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
-				*new_normals_ptr = (float)*it;
-				new_normals_ptr++;
-			}
-		}
-
-		/**
-			Get Pointer to the normal
-
-			@param[in] new_normals Pointer to the normal
-		*/
-		void getNormalsPtr(double** new_normals) const
-		{
-			*new_normals = new double[number_of_vertices * 3];
-			double* new_normals_ptr = *new_normals;
-
-			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
-				*new_normals_ptr = (double)*it;
+				*new_normals_ptr = (ReturnType)*it;
 				new_normals_ptr++;
 			}
 		}
@@ -734,7 +701,22 @@ namespace pointcloud
 				new_colors_ptr++;
 			}
 		}
-		
+
+		/**
+			Get Pointer to color information
+
+			@return Return pointer to color information
+		*/		
+		template<typename ReturnType> ReturnType* getColorsPtr() const
+		{
+			*new_colors = new ReturnType[number_of_vertices * 3];
+			ReturnType* new_colors_ptr = *new_colors;
+
+			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
+				*new_colors_ptr = (ReturnType)*it / 255.0f;
+				new_colors_ptr++;
+			}
+		}	
 		/**
 			Get Pointer to triangles
 
@@ -751,16 +733,15 @@ namespace pointcloud
 		/**
 			Get Pointer to triangles
 
-			@param[in] new_triangles Pointer to the triangles
+			@return Return pointer to the triangles
 		*/
-
-		void getTrianglesPtr(unsigned int** new_triangles) const
+		template<typename ReturnType> ReturnType* getTrianglesPtr() const
 		{
-			*new_triangles = new unsigned int[number_of_triangles * 3];
-			unsigned int* new_triangles_ptr = *new_triangles;
+			*new_triangles = new ReturnType[number_of_triangles * 3];
+			ReturnType* new_triangles_ptr = *new_triangles;
 
 			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
-				*new_triangles_ptr = (unsigned int)*it;
+				*new_triangles_ptr = (ReturnType)*it;
 				new_triangles_ptr++;
 			}
 		}

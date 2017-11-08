@@ -38,6 +38,153 @@
 
 namespace pointcloud
 {		
+	template<typename ElementType> struct XYZNode 
+	{
+
+		/**
+			Constructor
+		*/
+		XYZNode()
+		{
+			memset(&point_, (ElementType) 0.0, sizeof(ElementType)*3);
+		}
+
+		/**
+			Constructor
+			
+			@param[in] point_ Point
+			@param[in] normal_ Normal
+			@param[in] color_ Color
+		*/
+		XYZNode(ElementType* point) : XYZNode()
+		{
+			setPoint(point);
+		}
+
+		/**
+			Constructor
+			
+			@param[in] x x-value
+			@param[in] y y-value
+			@param[in] z z-value
+		*/
+		XYZNode(ElementType x, ElementType y, ElementType z) : XYZNode()
+		{
+			point_[0] = x;
+			point_[1] = y;
+			point_[2] = z;
+		}
+
+		/**
+			Copy constructor
+
+			@param[in] xyz_node An instance of class XYZNode
+		*/
+		XYZNode(const XYZNode<ElementType>& xyz_node) : XYZNode()
+		{
+			setPointPtr(xyz_node.getPointPtr());
+		}
+
+		/**
+			Copy constructor
+	
+			@param[in] xyz_node An instance of class XYZNode
+		*/
+		XYZNode(const XYZNode<ElementType>&& xyz_node) : XYZNode()
+		{
+			*this = xyz_node;
+		}
+	
+		/**
+			Operator =
+	
+			@param[in] xyz_node An instance of class XYZNode
+			@return Returns reference to the current instance
+		*/
+		XYZNode& operator=(const XYZNode<ElementType>& xyz_node)
+		{
+			setPointPtr(xyz_node.getPointPtr());
+			
+			return *this;
+		}
+	
+		/**
+			Operator =
+		
+			@param[in] xyz_node An instance of class XYZNode
+			@return Returns reference to the current instance
+		*/
+		XYZNode& operator=(const XYZNode<ElementType>&& xyz_node)
+		{
+			clearMemory();
+			
+			*this = xyz_node;
+			
+			return *this;
+		}
+		
+		/**
+			Set point
+			
+			@param[in] point_ Point
+		*/
+		void setPointPtr(ElementType* point)
+		{
+			std::memcpy(&point_[0], point, sizeof(ElementType) * 3);
+		}
+
+		/**
+			Set point
+			
+			@param[in] point_ Point
+			@parma[in] index_ Index
+		*/
+		void setPoint(ElementType point, size_t index)
+		{
+			point_[index] = point;
+		}
+
+		/**
+			Set point
+			
+			@param[in] x_ x-value
+			@param[in] y_ y-value
+			@param[in] z_ z-value
+		*/
+		void setPoint(ElementType x, ElementType y, ElementType z)
+		{
+			point_[0] = x;
+			point_[1] = y;
+			point_[2] = z;
+		}
+
+		/**
+			Get point data of specified index
+
+			@param[in] index_ Dimension
+			@return Return point data of specified index
+		*/
+		ElementType getPoint(size_t index)
+		{
+			return point_[index];
+		}
+
+		/**
+			Get pointer to point data
+
+			@return Return pointer to point data
+		*/
+		ElementType* getPointPtr()
+		{
+			return &point_[0];
+		}
+
+		/**
+			Point
+		*/
+		ElementType point_[3];
+	};
+
 	template<typename ElementType> struct PointcloudNode 
 	{
 

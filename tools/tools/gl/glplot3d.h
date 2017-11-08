@@ -50,6 +50,9 @@
 #include "tools/utils/mouseposition.h"
 #include "tools/utils/windowspec.h"
 
+#include "tools/gl/glmousemovement.h"
+
+#include "tools/pointcloud/pointcloudnodes.h"
 #include "tools/pointcloud/pointcloud.h"
 
 namespace utils
@@ -61,8 +64,8 @@ namespace utils
 			Constructor
 		*/
 		PlotContainer() : mode(NULL),
-			points(nullptr), color(nullptr), normals(nullptr), triangles(nullptr), lines(nullptr),
-			number_of_vertices(NULL), number_of_triangles(NULL), number_of_lines(NULL)
+			points(nullptr), color(nullptr), normals(nullptr), indices(nullptr),
+			number_of_vertices(NULL), number_of_indices(NULL)
 		{
 		}
 
@@ -88,8 +91,8 @@ namespace utils
 			number_of_vertices = pointcloud_.getNumberOfVertices();
 
 			if (pointcloud_.isTriangle()) {
-				number_of_triangles = pointcloud_.getNumberOfTriangles();
-				pointcloud_.getTrianglesPtr(&triangles);
+				number_of_indices = pointcloud_.getNumberOfTriangles() * 3;
+				indices = pointcloud_.getTrianglesPtr<unsigned int>();
 			}
 		}
 
@@ -114,26 +117,24 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
-			@param[in] lines_ Lines
+			@param[in] indices_ indices
 			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_lines_ Number of indices
+			@param[in] number_of_indices_ Number of indices
 		*/
-		PlotContainer(GLParams mode_, ElementType* points_, unsigned int* lines_,
-			size_t number_of_vertices_, size_t number_of_lines_)
+		PlotContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
+			size_t number_of_vertices_, size_t number_of_indices_)
 		{
 			setMode(mode_);
 
 			number_of_vertices = number_of_vertices_;
-			number_of_lines = number_of_lines_;
+
+			switch (mode_) {
+			case GLParams::LINES: number_of_indices = number_of_indices_* 2; break;
+			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
+			}
 
 			points = points_;
-			lines = lines_;
-
-			//for (int i = 0; i < number_of_lines_; i++) {
-			//	std::cout << i << " " << lines_[i * 2 + 0] << " " << lines_[i * 2 + 1] << std::endl;
-			//}
-
-
+			indices = indices_;
 		}
 
 		/**
@@ -161,13 +162,9 @@ namespace utils
 				delete[] normals;
 				normals = nullptr;
 			}
-			if (triangles) {
-				delete[] triangles;
-				triangles = nullptr;
-			}
-			if (lines) {
-				delete[] lines;
-				lines = nullptr;
+			if (indices) {
+				delete[] indices;
+				indices = nullptr;
 			}
 		}
 
@@ -222,10 +219,11 @@ namespace utils
 		*/
 		void copy(const PlotContainer<ElementType>& plot_container_)
 		{
+			
+
 			mode = plot_container_.getMode();
 			number_of_vertices = plot_container_.getNumberOfVertices();
-			number_of_triangles = plot_container_.getNumberOfTriangles();
-			number_of_lines = plot_container_.getNumberOfLines();
+			number_of_indices = plot_container_.getNumberOfIndices();
 
 			points = new ElementType[number_of_vertices * 3];
 			std::memcpy(points, plot_container_.getPoints(), sizeof(ElementType) * number_of_vertices * 3);
@@ -238,13 +236,9 @@ namespace utils
 				normals = new ElementType[number_of_vertices * 3];
 				std::memcpy(normals, plot_container_.getNormals(), sizeof(ElementType) * number_of_vertices * 3);
 			}
-			if (plot_container_.isTriangle()) {
-				triangles = new unsigned int[number_of_triangles * 3];
-				std::memcpy(triangles, plot_container_.getTriangles(), sizeof(unsigned int)*number_of_triangles * 3);
-			}
-			if (plot_container_.isLine()) {
-				lines = new unsigned int[number_of_lines * 2];
-				std::memcpy(lines, plot_container_.getLines(), sizeof(unsigned int)*number_of_lines * 2);
+			if (plot_container_.isIndice()) {
+				indices = new unsigned int[number_of_indices];
+				std::memcpy(indices, plot_container_.getIndices(), sizeof(unsigned int)*number_of_indices);
 			}
 		}
 
@@ -270,8 +264,8 @@ namespace utils
 			number_of_vertices = pointcloud_.getNumberOfVertices();
 
 			if (pointcloud_.isTriangle()) {
-				number_of_triangles = pointcloud.getNumberOfTriangles();
-				triangles = pointcloud.getTrianglesPtr();
+				number_of_indices = pointcloud.getNumberOfTriangles() * 3;
+				indices = pointcloud.getTrianglesPtr<unsigned int>();
 			}
 		}
 
@@ -296,20 +290,24 @@ namespace utils
 
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] points_ Points
-			@param[in] lines_ Indices
+			@param[in] indices_ Indices
 			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_lines_ Number of indices
+			@param[in] number_of_indices_ Number of indices
 		*/
-		void setPlotContainer(GLParams mode_, ElementType* points_, unsigned int* lines_,
-			size_t number_of_vertices_, size_t number_of_lines_)
+		void setPlotContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
+			size_t number_of_vertices_, size_t number_of_indices_)
 		{
 			setMode(mode_);
 
 			number_of_vertices = number_of_vertices_;
-			number_of_lines = number_of_lines_;
+
+			switch (mode_) {
+			case GLParams::LINES: number_of_indices = number_of_indices_ * 2; break;
+			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
+			}
 
 			points = points_;
-			lines = lines_;
+			indices = indices_;
 		}
 
 		/**
@@ -365,23 +363,13 @@ namespace utils
 		}
 
 		/**
-			Get Triangles
-			
-			@return triangles
-		*/
-		unsigned int* getTriangles() const
-		{
-			return triangles;
-		}
-
-		/**
-			Get indices
+			Get Indices
 			
 			@return indices
 		*/
-		unsigned int* getLines() const
+		unsigned int* getIndices() const
 		{
-			return lines;
+			return indices;
 		}
 
 		/**
@@ -399,19 +387,9 @@ namespace utils
 
 			@return Number of triangles
 		*/
-		size_t getNumberOfTriangles() const
+		size_t getNumberOfIndices() const
 		{
-			return number_of_triangles;
-		}
-
-		/**
-			Get Number of indices
-
-			@return Number of indices
-		*/
-		size_t getNumberOfLines() const
-		{
-			return number_of_lines;
+			return number_of_indices;
 		}
 
 		/**
@@ -449,19 +427,9 @@ namespace utils
 
 			@return True if triangles are set
 		*/
-		bool isTriangle() const
+		bool isIndice() const
 		{
-			return (triangles != nullptr);
-		}
-
-		/**
-			Returns true if lines are set
-
-			@return True if lines are set
-		*/
-		bool isLine() const
-		{
-			return (lines != nullptr);
+			return (indices != nullptr);
 		}
 
 	private:
@@ -487,14 +455,9 @@ namespace utils
 		ElementType* normals;
 
 		/**
-			Triangles
+			Indices
 		*/
-		unsigned int* triangles;
-
-		/**
-			Lines
-		*/
-		unsigned int* lines;
+		unsigned int* indices;
 
 		/**
 			Number of vertices
@@ -502,14 +465,9 @@ namespace utils
 		size_t number_of_vertices;
 
 		/**
-			Number of triangles
+			Number of indices
 		*/
-		size_t number_of_triangles;
-
-		/**
-			Number of lines
-		*/
-		size_t number_of_lines;
+		size_t number_of_indices;
 	};
 
 	template<typename ElementType> class Plot3DInstance
@@ -539,50 +497,12 @@ namespace utils
 		/**
 			Set pointcloud
 
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] pointcloud_ Pointcloud
+			@param[in] plot_container Container with elements which has to be drawn
 		*/
-		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(PlotContainer<ElementType>& plot_container_)
 		{
-			plot_container.push_back(PlotContainer<ElementType>(mode_,pointcloud_));
+			plot_container.push_back(plot_container_);
 
-			number_of_clouds++;
-
-			setParameters();
-		}
-
-		/**
-			Set pointcloud
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] number_of_vertices_ Number of elements
-		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
-		{
-			plot_container.push_back(PlotContainer<ElementType>(mode_, points_, number_of_vertices_));
-
-			number_of_clouds++;
-
-			setParameters();
-
-		}
-
-		/**
-			Set pointcloud
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] lines_ Lines
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_lines_ Number of indices
-		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines_,
-			size_t number_of_vertices_, size_t number_of_lines_)
-		{
-			plot_container.push_back(PlotContainer<ElementType>(mode_, points_, lines_,
-				number_of_vertices_, number_of_lines_));
-			
 			number_of_clouds++;
 
 			setParameters();
@@ -797,14 +717,8 @@ namespace utils
 					glDrawArrays(plot_container[i].getMode(), 0, plot_container[i].getNumberOfVertices());
 				}
 				else{
-					//if (plot_container[i].getMode() == GL_LINES) {
-					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfLines() * 2 ,
-						GL_UNSIGNED_INT, plot_container[i].getLines());
-					//}
-					//else {
-					//	glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfTriangles() * 3,
-					//		GL_UNSIGNED_INT, plot_container[i].getTriangles());
-					//}
+					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfIndices(),
+						GL_UNSIGNED_INT, plot_container[i].getIndices());
 				}
 
 				/**
@@ -873,7 +787,7 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].isTriangle()) {
+				if (plot_container[i].getMode() != GL_POINTS) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
 				glColor4f(1.0, 1.0, 1.0, 0.0);
@@ -915,12 +829,12 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glNormalPointer(GL_DOUBLE, 0, plot_container[i].getNormals());
 				}
-				if (!plot_container[i].isTriangle()) {
+				if (plot_container[i].getMode() == GL_POINTS) {
 					glDrawArrays(GL_POINTS, 0, plot_container[i].getNumberOfVertices());
 				}
 				else {
-					glDrawElements(GL_TRIANGLES, plot_container[i].getNumberOfTriangles() * 3, 
-						GL_UNSIGNED_INT, plot_container[i].getTriangles());
+					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfIndices(),
+						GL_UNSIGNED_INT, plot_container[i].getIndices());
 				}
 
 
@@ -934,7 +848,7 @@ namespace utils
 				if (plot_container[i].isNormal()) {
 					glDisableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].isTriangle()) {
+				if (plot_container[i].getMode() != GL_POINTS) {
 					glDisableClientState(GL_INDEX_ARRAY);
 				}
 			}
@@ -995,6 +909,8 @@ namespace utils
 		*/
 		pointcloud::Quaterion<ElementType> gl_quaterion;
 		
+		/*utils::GLMouseMovement<ElementType> gl_mouse_movement_;*/
+
 		/**
 			Point size
 		*/
@@ -1070,7 +986,8 @@ namespace utils
 		*/
 		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, pointcloud_);
+			PlotContainer<ElementType> plot_container(mode_, pointcloud_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(plot_container);
 		}
 
 		/**
@@ -1082,7 +999,8 @@ namespace utils
 		*/
 		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, number_of_vertices_);
+			PlotContainer<ElementType> plot_container(mode_, points_, number_of_vertices_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(plot_container);
 		}
 				
 		/**
@@ -1097,7 +1015,8 @@ namespace utils
 		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines_, 
 			size_t number_of_vertices_, size_t number_of_lines_)
 		{
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(mode_, points_, lines_, number_of_vertices_, number_of_lines_);
+			PlotContainer<ElementType> plot_container(mode_, points_, lines_, number_of_vertices_, number_of_lines_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(plot_container);
 		}
 
 		/** 

@@ -48,6 +48,9 @@
 #include "tools/utils/mouseposition.h"
 #include "tools/utils/windowspec.h"
 
+#include "tools/gl/glmousemovement.h"
+
+#include "tools/pointcloud/pointcloudnodes.h"
 #include "tools/pointcloud/pointcloud.h"
 
 namespace utils

@@ -82,6 +82,16 @@ namespace utils
 			- glview.setY(<container>) : assign the functions to the plotter
 			- glview.setPointcloud(<container>) : assign the data to the visualizer
 
+			To draw elements in GLPlot3d call
+				- glview.setPointcloud(mode, pointcloud)
+				- glview.setPointcloud(mode, points, number_of_vertices)
+				- glview.setPointcloud(mode, points, indices, number_of_vertices, number_of_indices)
+
+			There are three possible modes for the primitives to be rendered
+				- GLParams::POINTS
+				- GLParams::LINES
+				- GLParams::TRIANGLES
+
 		With the function plot()
 			- glview.plot()
 		the data will be visualized.

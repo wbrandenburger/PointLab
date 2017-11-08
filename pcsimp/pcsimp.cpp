@@ -77,16 +77,34 @@ int main(int argc, char* argv[]) {
 	std::cout << pointcloud_buny << std::endl;
 
 	float* dataset;
-	size_t number_of_vertices = 75;
+	size_t number_of_vertices = 100;
 	unsigned int* lines;
 	size_t number_of_lines;
-	utils::glMeshGrid<float>(&dataset, 0, 10, 0, 10, number_of_vertices, &lines, number_of_lines);
+	utils::glMeshGrid<float>(&dataset, -1, 1, -1, 1, number_of_vertices, &lines, number_of_lines);
 
-	//for (int i = 0; i < number_of_lines; i++) {
-	//	std::cout << i << " " << lines[i * 2 + 0] << " " << lines[i * 2 + 1] << std::endl;
-	//}
 
-	//std::cout << number_of_lines << " " << number_of_vertices << std::endl;
+	for (size_t i = 0; i < number_of_vertices; i++)
+	{
+		dataset[i * 3 + 2] = std::exp(-(dataset[i * 3 + 0] * dataset[i * 3 + 0] + dataset[i * 3 + 1] * dataset[i * 3 + 1]));
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_buny);
 
 	int versuch = 2048;
@@ -129,7 +147,7 @@ int main(int argc, char* argv[]) {
 	glview.setPlot3D();
 	//glview.setPointcloud(GLParams::POINTS, pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
 	glview.setPointcloud(GLParams::LINES, dataset, lines, number_of_vertices, number_of_lines);
-	//glview.setPointcloud(GLParams::POINTS, pointcloud_buny);
+	//glview.setPointcloud(GLParams::TRIANGLES, pointcloud_buny);
 	glview.subPlot(2, 2, 3);
 
 
