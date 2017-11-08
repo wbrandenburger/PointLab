@@ -29,8 +29,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_GLVIEWER_H_
-#define UTILS_GLVIEWER_H_
+#ifndef GL_GLVIEWER_H_
+#define GL_GLVIEWER_H_
 
 #include <map>
 #include <vector>
@@ -53,7 +53,7 @@
 #include "tools/pointcloud/pointcloudnodes.h"
 #include "tools/pointcloud/pointcloud.h"
 
-namespace utils
+namespace gl
 {
 	template<typename ElementType> class ViewerInstance
 	{
@@ -934,4 +934,4 @@ namespace utils
 
 }
 
-#endif /* UTILS_GLVIEWER_H_*/	
+#endif /* GL_GLVIEWER_H_*/	

@@ -29,8 +29,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_PLOT3D_H_
-#define UTILS_PLOT3D_H_
+#ifndef GL_PLOT3D_H_
+#define GL_PLOT3D_H_
 
 #include <map>
 #include <vector>
@@ -55,7 +55,7 @@
 #include "tools/pointcloud/pointcloudnodes.h"
 #include "tools/pointcloud/pointcloud.h"
 
-namespace utils
+namespace gl
 {
 	template<typename ElementType> class PlotContainer 
 	{
@@ -909,7 +909,7 @@ namespace utils
 		*/
 		pointcloud::Quaterion<ElementType> gl_quaterion;
 		
-		/*utils::GLMouseMovement<ElementType> gl_mouse_movement_;*/
+		/*gl::GLMouseMovement<ElementType> gl_mouse_movement_;*/
 
 		/**
 			Point size
@@ -1363,4 +1363,4 @@ namespace utils
 
 }
 
-#endif /* UTILS_PLOT3D_H_*/	
+#endif /* GL_PLOT3D_H_*/	

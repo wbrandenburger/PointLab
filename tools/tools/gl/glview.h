@@ -27,8 +27,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_PARAMETERS_H_
-#define UTILS_PARAMETERS_H_
+#ifndef GL_PARAMETERS_H_
+#define GL_PARAMETERS_H_
 
 #include <vector>
 
@@ -43,7 +43,7 @@
 #include "tools/gl/glplot3d.h"
 #include "tools/gl/glviewer.h"
 
-namespace utils
+namespace gl
 {
 	enum struct GLInstance
 	{
@@ -443,17 +443,17 @@ namespace utils
 		/**
 			Instance of plotting tool
 		*/
-		static utils::GLPlot<ElementType> glplot;
+		static gl::GLPlot<ElementType> glplot;
 		
 		/**
 			Instance of viewer tool
 		*/
-		static utils::GLViewer<ElementType> glviewer;
+		static gl::GLViewer<ElementType> glviewer;
 
 		/**
 			Instance of plotting in 3d
 		*/
-		static utils::GLPlot3D<ElementType> glplot3d;
+		static gl::GLPlot3D<ElementType> glplot3d;
 
 		/**
 			Current instance
@@ -464,18 +464,18 @@ namespace utils
 	/**
 		Static variable GLView<ElementType>::glplot
 	*/
-	template<typename ElementType> utils::GLPlot<ElementType> GLView<ElementType>::glplot;
+	template<typename ElementType> gl::GLPlot<ElementType> GLView<ElementType>::glplot;
 
 	/**
 		Static variable GLView<ElementType>::glviewer
 	*/
-	template<typename ElementType> utils::GLViewer<ElementType> GLView<ElementType>::glviewer;
+	template<typename ElementType> gl::GLViewer<ElementType> GLView<ElementType>::glviewer;
 
 	/**
 		Static variable GLPlot3D<ElementType>::glplot3d
 	*/
-	template<typename ElementType> utils::GLPlot3D<ElementType> GLView<ElementType>::glplot3d;
+	template<typename ElementType> gl::GLPlot3D<ElementType> GLView<ElementType>::glplot3d;
 
 }
 
-#endif /* UTILS_PARAMETERS_H_ */
+#endif /* GL_PARAMETERS_H_ */

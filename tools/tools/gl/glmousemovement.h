@@ -29,14 +29,14 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_MOUSEMOVEMENT_H_
-#define UTILS_MOUSEMOVEMENT_H_
+#ifndef GL_MOUSEMOVEMENT_H_
+#define GL_MOUSEMOVEMENT_H_
 
 #include "tools/pointcloud/pointcloudnodes.h"
 
 #include "tools/pointcloud/quaterion.h"
 
-namespace utils
+namespace gl
 {
 	template<typename ElementType> class GLMouseMovement
 	{
@@ -189,4 +189,4 @@ namespace utils
 	};
 }
 
-#endif /* UTILS_MOUSEMOVEMENT_H_ */
+#endif /* GL_MOUSEMOVEMENT_H_ */

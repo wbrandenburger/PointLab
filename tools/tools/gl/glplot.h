@@ -29,8 +29,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_GLPLOT_H_
-#define UTILS_GLPLOT_H_
+#ifndef GL_GLPLOT_H_
+#define GL_GLPLOT_H_
 
 #include <map>
 #include <vector>
@@ -42,7 +42,7 @@
 #include "tools/utils/matrix.h"
 #include "tools/utils/windowspec.h"
 
-namespace utils
+namespace gl
 {
 	template<typename ElementType> class PlotFunction
 	{
@@ -752,4 +752,4 @@ namespace utils
 	template<typename ElementType> StaticPlotInstance<ElementType> GLPlot<ElementType>::plot_instances;
 }
 
-#endif /* UTILS_GLPLOT_H_*/	
+#endif /* GL_GLPLOT_H_*/	

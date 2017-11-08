@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 	pointcloud::Quaterion<float> quat1;
 	pointcloud::Quaterion<float> quat2(1.2f, 0.12f, 0.45f);
 
-	utils::GLView<float> glview;
+	gl::GLView<float> glview;
 
 	glview.setViewer();
 	//glview.setPointcloud(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
