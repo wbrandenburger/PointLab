@@ -52,34 +52,36 @@ namespace gl
 
 			@param[in] number_of_elements_ Number of elements
 		*/
-		PlotFunction(size_t number_of_elements_) : index_left(0.0f), index_right(0.0f),
-			number_of_functions(NULL), number_of_elements(number_of_elements_), zero(NULL), x(nullptr), clear_x(false) {}
+		PlotFunction(size_t number_of_elements_) : index_left_(0.0f), index_right(0.0f),
+			number_of_functions_(NULL), number_of_elements_(number_of_elements_), zero_(NULL), x_(nullptr), clear_x_(false)
+		{
+		}
 		
 		/**
 			Destructor
 		*/
 		~PlotFunction() 
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
-			index_right = 0.0f;
-			index_left = 0.0f;
-			number_of_functions = NULL;
-			number_of_elements = NULL;
+			index_right_ = 0.0f;
+			index_left_ = 0.0f;
+			number_of_functions_ = NULL;
+			number_of_elements_ = NULL;
 
-			if (clear_x) {
-				delete[] x;
-				x = nullptr;
+			if (clear_x_) {
+				delete[] x_;
+				x_ = nullptr;
 			}
-			clear_x = false;
+			clear_x_ = false;
 			
-			zero = NULL;
+			zero_ = NULL;
 		}
 
 		/**
@@ -87,10 +89,10 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(ElementType* y_)
+		void setY(ElementType* y)
 		{
-			y.push_back(y_);
-			number_of_functions++;
+			y_.push_back(y);
+			number_of_functions_++;
 
 			setParametersY();
 		}
@@ -100,10 +102,10 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(std::vector<ElementType>& y_)
+		void setY(std::vector<ElementType>& y)
 		{
-			y.push_back((ElementType*)&y_[0]);
-			number_of_functions++;
+			y_.push_back((ElementType*)&y[0]);
+			number_of_functions_++;
 
 			setParametersY();
 		}
@@ -113,10 +115,10 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(utils::Matrix<ElementType>& y_)
+		void setY(utils::Matrix<ElementType>& y)
 		{
-			y.push_back((ElementType*)y_.getPtr());
-			number_of_functions++;
+			y_.push_back((ElementType*)y.getPtr());
+			number_of_functions_++;
 
 			setParametersY();
 		}
@@ -126,8 +128,8 @@ namespace gl
 		*/
 		void setParametersY()
 		{
-			index_left = 0;
-			index_right = (float)number_of_elements;
+			index_left_ = 0;
+			index_right_ = (float)number_of_elements_;
 		}
 
 		/**
@@ -135,12 +137,12 @@ namespace gl
 		*/
 		void setX()
 		{
-			x = new ElementType[number_of_elements];
-			for (size_t i = 0; i < number_of_elements; i++) {
-				x[i] = i;
+			x_ = new ElementType[number_of_elements_];
+			for (size_t i = 0; i < number_of_elements_; i++) {
+				x_[i] = i;
 			}
 
-			clear_x = true;
+			clear_x_ = true;
 
 			setParametersX();
 		}
@@ -150,9 +152,9 @@ namespace gl
 
 			@param[in] x_ x-values
 		*/
-		void setX(ElementType* x_)
+		void setX(ElementType* x)
 		{
-			x = x_;
+			x = x;
 
 			setParametersX();
 		}
@@ -162,9 +164,9 @@ namespace gl
 
 			@param[in] x_ x-values
 		*/
-		void setX(std::vector<ElementType>& x_)
+		void setX(std::vector<ElementType>& x)
 		{
-			x = (ElementType*) &x_[0];
+			x_ = (ElementType*) &x[0];
 
 			setParametersX();
 		}
@@ -174,9 +176,9 @@ namespace gl
 
 			@param[in] x_ x-values
 		*/
-		void setX(utils::Matrix<ElementType>& x_)
+		void setX(utils::Matrix<ElementType>& x)
 		{
-			x = (ElementType*) x_.getPtr();
+			x_ = (ElementType*) x.getPtr();
 
 			setParametersX();
 		}
@@ -186,13 +188,13 @@ namespace gl
 		*/
 		void setParametersX()
 		{
-			index_left = 0;
-			index_right = (float)number_of_elements;
+			index_left_ = 0;
+			index_right_ = (float)number_of_elements_;
 
-			if (x[(size_t)index_left] < 0 && x[(size_t)index_right - 1] >= 0) {
-				for (size_t i = (size_t)index_left + 1; i < (size_t)index_right; i++) {
-					if (x[i - 1] < 0 && x[i] >= 0) {
-						zero = (float)i;
+			if (x_[(size_t)index_left_] < 0 && x[(size_t)index_right_ - 1] >= 0) {
+				for (size_t i = (size_t)index_left_ + 1; i < (size_t)index_right_; i++) {
+					if (x_[i - 1] < 0 && x_[i] >= 0) {
+						zero_ = (float)i;
 					}
 				}
 			}
@@ -206,12 +208,12 @@ namespace gl
 			@param[in] width_ Current width of the window
 			@param[in] height_ Current height of the window
 		*/
-		void zoomIn(int x_, int y_, int width_, int height_)
+		void zoomIn(int x, int y, int width, int height)
 		{
 			float zoom_factor = 0.05f;
 
-			index_left = index_left + (float)x_ / float(width_) * zoom_factor*(index_right - index_left);
-			index_right = index_right - ((float)width_ - (float)x_) / float(width_) * zoom_factor*(index_right - index_left);
+			index_left_ = index_left_ + (float)x / float(width) * zoom_factor*(index_right_ - index_left_);
+			index_right_ = index_right_ - ((float)width - (float)x) / float(width) * zoom_factor*(index_right_ - index_left_);
 		}
 
 		/**
@@ -221,8 +223,8 @@ namespace gl
 		{
 			float zoom_factor = 0.05f;
 
-			index_left = (size_t)index_left - zoom_factor * (float)index_left;
-			index_right = (size_t)index_right + zoom_factor * (number_of_elements - index_right);
+			index_left_ = (size_t)index_left_ - zoom_factor * (float)index_left_;
+			index_right_ = (size_t)index_right_ + zoom_factor * (number_of_elements_ - index_right_);
 		}
 		/**
 			Get mouse position in x-direction
@@ -230,9 +232,9 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] width_ Current width of the window
 		*/
-		ElementType getX(int x_, int width_)
+		ElementType getX(int x, int width)
 		{
-			return  x[(size_t)index_left + (size_t) ((index_right - index_left) * (ElementType)x_ / (ElementType)width_)];
+			return  x_[(size_t)index_left_ + (size_t) ((index_right_ - index_left_) * (ElementType)x / (ElementType)width)];
 		}
 
 		/**
@@ -241,20 +243,20 @@ namespace gl
 			@param[in] y_ Mouse position in y-direction
 			@param[in] height_ Current height of the window
 		*/
-		ElementType getY(int y_, int heigth_)
+		ElementType getY(int y, int height)
 		{
 			/**
 				Minimum and maximum y-value
 			*/
-			ElementType y2 = y[0][(size_t)index_left];
-			ElementType y1 = y[0][(size_t)index_left];
-			for (size_t i = 0; i < number_of_functions; i++) {
-				for (size_t j = (size_t)index_left; j < (size_t)index_right; j++) {
-					y2 = y2 < y[i][j] ? y[i][j] : y2;
-					y1 = y1 > y[i][j] ? y[i][j] : y1;
+			ElementType y2 = y_[0][(size_t)index_left_];
+			ElementType y1 = y_[0][(size_t)index_left_];
+			for (size_t i = 0; i < number_of_functions_; i++) {
+				for (size_t j = (size_t)index_left_; j < (size_t)index_right_; j++) {
+					y2 = y2 < y_[i][j] ? y_[i][j] : y2;
+					y1 = y1 > y_[i][j] ? y_[i][j] : y1;
 				}
 			}
-			return  y1 + (y2 - y1)*((ElementType)heigth_ - (ElementType)y_) / (ElementType) heigth_;
+			return  y1 + (y2 - y1)*((ElementType)height - (ElementType)y) / (ElementType) height;
 		}
 
 		/**
@@ -267,19 +269,19 @@ namespace gl
 			/**
 				Minimum and maximum y-value
 			*/
-			ElementType y2 = y[0][(size_t)index_left];
-			ElementType y1 = y[0][(size_t)index_left];
-			for (size_t i = 0; i < number_of_functions; i++) {
-				for (size_t j = (size_t)index_left; j < (size_t)index_right; j++) {
-					y2 = y2 < y[i][j] ? y[i][j] : y2;
-					y1 = y1 > y[i][j] ? y[i][j] : y1;
+			ElementType y2 = y_[0][(size_t)index_left_];
+			ElementType y1 = y_[0][(size_t)index_left_];
+			for (size_t i = 0; i < number_of_functions_; i++) {
+				for (size_t j = (size_t)index_left_; j < (size_t)index_right_; j++) {
+					y2 = y2 < y_[i][j] ? y_[i][j] : y2;
+					y1 = y1 > y_[i][j] ? y_[i][j] : y1;
 				}
 			}
 
 			/**
 				Draw the functions
 			*/
-			glScalef(1.0f / (index_right - index_left), 1.0f / (y2 - y1), 1.0f);
+			glScalef(1.0f / (index_right_ - index_left_), 1.0f / (y2 - y1), 1.0f);
 			glTranslatef(0.0f, -y1, 0.0f);
 			
 			/**
@@ -287,17 +289,17 @@ namespace gl
 			*/
 			glLineWidth(1.0f);
 
-			for (size_t i = 0; i < number_of_functions; i++) {
+			for (size_t i = 0; i < number_of_functions_; i++) {
 
 				float r, g, b;
-				utils::colorSchemeRGB(r, g, b, i, number_of_functions);
+				utils::colorSchemeRGB(r, g, b, i, number_of_functions_);
 
 				glColor3f(r, g, b);
 
 				glBegin(GL_LINE_STRIP);
 
-				for (size_t j = (size_t) index_left; j < (size_t) index_right; j++) {
-					glVertex2f((float)j-index_left, y[i][j]);
+				for (size_t j = (size_t) index_left_; j < (size_t) index_right_; j++) {
+					glVertex2f((float)j-index_left_, y_[i][j]);
 				}
 
 				glEnd();
@@ -310,12 +312,12 @@ namespace gl
 			glColor3f(1.0f, 1.0f, 1.0f);
 
 			glBegin(GL_LINE_STRIP);
-			glVertex2f(zero - index_left, y2);
-			glVertex2f(zero - index_left, y1);
+			glVertex2f(zero_ - index_left_, y2);
+			glVertex2f(zero_ - index_left_, y1);
 			glEnd();
 			glBegin(GL_LINE_STRIP);
 			glVertex2f(0, 0);
-			glVertex2f(index_right-index_left, 0);
+			glVertex2f(index_right_-index_left_, 0);
 			glEnd();
 			glPopMatrix();
 		}
@@ -325,42 +327,42 @@ namespace gl
 		/**
 			Current left index
 		*/
-		float index_left;
+		float index_left_;
 
 		/**
 			Current right index
 		*/
-		float index_right;
+		float index_right_;
 		
 		/**
 			Number of functions
 		*/
-		size_t number_of_functions;
+		size_t number_of_functions_;
 
 		/**
 			Number of elements
 		*/
-		size_t number_of_elements;
+		size_t number_of_elements_;
 
 		/**
 			Zero;
 		*/
-		float zero;	
+		float zero_;	
 
 		/**
 			y-values
 		*/
-		std::vector<ElementType*> y;
+		std::vector<ElementType*> y_;
 
 		/**
 			x-values
 		*/
-		ElementType* x;
+		ElementType* x_;
 
 		/**
 			Flag which defines whether x has to be cleared
 		*/
-		bool clear_x;
+		bool clear_x_;
 	};
 
 	/**
