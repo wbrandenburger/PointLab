@@ -623,12 +623,17 @@ namespace gl
 		/**
 			Constructor
 		*/
-		StaticPlotInstance(void) : number_of_plots(0), current_instance(NULL) {}
+		StaticPlotInstance(void) : number_of_plots(0), current_instance(NULL), current_window(NULL)
+		{
+		}
 
 		/**
 			Destructor
 		*/
-		~StaticPlotInstance() {}
+		~StaticPlotInstance() 
+		{
+			clear();
+		}
 
 
 		/**
@@ -639,6 +644,7 @@ namespace gl
 			plot_indices.clear();
 			number_of_plots = 0;
 			current_instance = NULL;
+			current_window = NULL;
 		}
 		/**
 			Set plot

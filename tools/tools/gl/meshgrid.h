@@ -29,8 +29,8 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef UTILS_MESHGRID_H_
-#define UTILS_MESHGRID_H_
+#ifndef GL_MESHGRID_H_
+#define GL_MESHGRID_H_
 
 #include "tools/parameters.h"
 
@@ -38,7 +38,7 @@
 
 #include "tools/pointcloud/pointcloud.h"
 
-namespace utils
+namespace gl
 {
 	/**
 		Computes a 2D-meshgrid of a specific range
@@ -90,8 +90,8 @@ namespace utils
 		*/
 
 		ElementType quant = std::floor(x_right - x_left) > std::floor(y_right - y_left) ? 
-				std::floor(x_right - x_left) / ((ElementType) number_of_vertices - (ElementType) 1.0) : 
-				std::floor(y_right - y_left) / ((ElementType) number_of_vertices - (ElementType) 1.0);
+				std::floor(x_right - x_left) / (ElementType)( number_of_vertices - 1) :
+				std::floor(y_right - y_left) / (ElementType)( number_of_vertices - 1);
 		
 		size_t number_x = std::floor((x_right - x_left) / quant) + 1;
 		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
@@ -103,8 +103,10 @@ namespace utils
 			Set the mehsgrid
 		*/
 		ElementType* dataset_ptr = *dataset;
-		for (ElementType x = x_left; x <= x_right; x += quant) {
-			for (ElementType y = y_left; y <= y_right; y += quant) {
+		ElementType x = x_left;
+		for (size_t index_x = 0; index_x < number_x; index_x++) {
+			ElementType y = y_left;
+			for (size_t index_y = 0; index_y < number_y; index_y++) {
 				/**
 					Assign the x- and y-values
 				*/
@@ -114,7 +116,9 @@ namespace utils
 					Skip z-value
 				*/
 				*dataset_ptr = 0; dataset_ptr++;
+				y = y + quant;
 			}
+			x = x + quant;
 		}
 	}
 
@@ -175,18 +179,19 @@ namespace utils
 		*/
 
 		ElementType quant = std::floor(x_right - x_left) > std::floor(y_right - y_left) ? 
-				std::floor(x_right - x_left) / ((ElementType) number_of_vertices - (ElementType) 1.0) : 
-				std::floor(y_right - y_left) / ((ElementType) number_of_vertices - (ElementType) 1.0);
+				std::floor(x_right - x_left) / (ElementType)(number_of_vertices - 1) :
+				std::floor(y_right - y_left) / (ElementType)(number_of_vertices - 1);
 		
 		size_t number_x = std::floor((x_right - x_left) / quant) + 1;
 		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
-		
+
 		/**
 			compute the meshgrid
 		*/
 		meshGrid<ElementType>(dataset, x_left, x_right, y_left, y_right, number_of_vertices);
 
 		number_of_lines =  (number_x - 1) * (number_y - 1) * 2 + number_x + number_y - 2;
+
 		*lines = new unsigned int[number_of_lines * 2];
 
 		/**
@@ -207,8 +212,7 @@ namespace utils
 				index++;
 			}
 		}
-
 	}
 }
 
-#endif /* UTILS_MESHGRID_H_ */
+#endif /* GL_MESHGRID_H_ */

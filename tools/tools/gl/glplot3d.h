@@ -142,13 +142,13 @@ namespace gl
 		*/
 		~PlotContainer()
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
 			if (points) {
 				delete[] points;
@@ -195,7 +195,7 @@ namespace gl
 		*/
 		PlotContainer& operator=(const PlotContainer<ElementType>& plot_container_)
 		{
-			clear();
+			clearMemory();
 
 			copy(plot_container_);
 		}
@@ -207,7 +207,7 @@ namespace gl
 		*/
 		PlotContainer& operator=(const PlotContainer<ElementType>&& plot_container_)
 		{
-			clear();
+			clearMemory();
 
 			copy(plot_container_);
 		}
@@ -476,6 +476,7 @@ namespace gl
 		*/
 		Plot3DInstance() : number_of_clouds(0) 
 		{
+			gl_pointsize = 1;
 		}
 
 		/**
@@ -488,7 +489,7 @@ namespace gl
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
 		}
 
@@ -513,17 +514,14 @@ namespace gl
 				Compute the bounding box of the pointcloud
 			*/
 			utils::BoundingBox<ElementType> bounding_box;
-			for (size_t i = 0; i < number_of_clouds; i++){
+			for (size_t i = 0; i < number_of_clouds; i++) {
 				bounding_box.setBoundingBox(plot_container[i].getPoints(), plot_container[i].getNumberOfVertices(), 3);
 			}
-
-			gl_pointsize = 1;
 
 			/**
 				Center and normalize the pointlcoud
 			*/
 			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
-			
 			for (size_t i = 0; i < number_of_clouds; i++) {
 				ElementType* points = plot_container[i].getPoints();
 				for (size_t j = 0; j <  plot_container[i].getNumberOfVertices() * 3; j++) {
@@ -641,7 +639,7 @@ namespace gl
 					gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
 
 				/**
-					Roatate the entire pointcloud around the x- and y-axis
+					Rotate the entire pointcloud around the x- and y-axis
 				*/
 				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
 				gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
@@ -769,7 +767,6 @@ namespace gl
 				glRotated(1.0 *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0, 0.0);
 				glRotated(1.0 *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0);
 
-
 				/**
 					Determine the size of the points
 				*/
@@ -792,7 +789,6 @@ namespace gl
 					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfIndices(),
 						GL_UNSIGNED_INT, plot_container[i].getIndices());
 				}
-
 
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
@@ -876,7 +872,7 @@ namespace gl
 		*/	
 		GLPlot3D()
 		{
-			clear();
+			clearMemory();
 
 			if (!std::is_same<float,ElementType>::value && !std::is_same<double, ElementType>::value){
 				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
@@ -891,15 +887,15 @@ namespace gl
 		*/
 		~GLPlot3D() 
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear() 
+		void clearMemory() 
 		{
-			plot3d_instances.clear();
+			plot3d_instances.clearMemory();
 			
 			mouse_button = NULL;
 		}
@@ -1055,6 +1051,7 @@ namespace gl
 		*/
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
+			plot3d_instances.setCurrentInstance(glutGetWindow() - 1);
 			plot3d_instances.getCurrentPlot3DInstance().zoom(direction_);
 		}
 
@@ -1068,6 +1065,7 @@ namespace gl
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
+			plot3d_instances.setCurrentInstance(glutGetWindow() - 1);
 			if (!state_){
 				mouse_button = button_;
 
@@ -1087,6 +1085,7 @@ namespace gl
 		*/
 		static void mouseMotion(int x_, int y_)
 		{
+			plot3d_instances.setCurrentInstance(glutGetWindow() - 1);
 			if (mouse_button == GLUT_LEFT_BUTTON){
 				plot3d_instances.getCurrentPlot3DInstance().rotate(mouse_position.getX(), 
 					mouse_position.getY(), x_, y_);
@@ -1139,7 +1138,6 @@ namespace gl
 		*/
 		StaticPlot3DInstance() : number_of_plot3d(0), current_instance(NULL), current_window(NULL)
 		{
-			clear();
 		}
 
 		/**
@@ -1147,16 +1145,16 @@ namespace gl
 		*/
 		~StaticPlot3DInstance()
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
 			for (size_t i = 0; i < number_of_plot3d; i++) {
-				plot3d_instances[i].clear();
+				plot3d_instances[i].clearMemory();
 			}
 			plot3d_instances.clear();
 			number_of_plot3d = 0;

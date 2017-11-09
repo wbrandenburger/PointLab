@@ -77,14 +77,11 @@ int main(int argc, char* argv[]) {
 	std::cout << pointcloud_buny << std::endl;
 
 	float* dataset;
-	size_t number_of_vertices = 100;
+	size_t number_of_vertices = 87;
 	unsigned int* lines;
 	size_t number_of_lines;
-	utils::glMeshGrid<float>(&dataset, -1, 1, -1, 1, number_of_vertices, &lines, number_of_lines);
-
-
-	for (size_t i = 0; i < number_of_vertices; i++)
-	{
+	gl::glMeshGrid<float>(&dataset, -1, 1, -1, 1, number_of_vertices, &lines, number_of_lines);
+	for (size_t i = 0; i < number_of_vertices; i++) {
 		dataset[i * 3 + 2] = std::exp(-(dataset[i * 3 + 0] * dataset[i * 3 + 0] + dataset[i * 3 + 1] * dataset[i * 3 + 1]));
 	}
 
@@ -130,27 +127,30 @@ int main(int argc, char* argv[]) {
 	//glview.setPointcloud(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
 	glview.setPointcloud(pointcloud_buny);
 	glview.subPlot(2, 2, 0);
-
-	glview.setPlot(versuch);
-	glview.setY(array_y1);
-	glview.setY(array_y2);
-	glview.setY(array_y3);
-	glview.setX(array_x);
+	
+	glview.setViewer();
+	//glview.setPointcloud(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
+	glview.setPointcloud(pointcloud_buny);
 	glview.subPlot(2, 2, 1);
-
-	glview.setPlot(versuch);
-	glview.setY(array_y1);
-	glview.setY(array_y2);
-	glview.setX(array_x);
-	glview.subPlot(2, 2, 2);
 
 	glview.setPlot3D();
 	//glview.setPointcloud(GLParams::POINTS, pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
 	glview.setPointcloud(GLParams::LINES, dataset, lines, number_of_vertices, number_of_lines);
-	//glview.setPointcloud(GLParams::TRIANGLES, pointcloud_buny);
-	glview.subPlot(2, 2, 3);
+	glview.subPlot(2, 2, 2);
 
+	//glview.setPlot(versuch);
+	//glview.setY(array_y1);
+	//glview.setY(array_y2);
+	//glview.setY(array_y3);
+	//glview.setX(array_x);
+	//glview.subPlot(2, 2, 2);
 
+	//glview.setPlot(versuch);
+	//glview.setY(array_y1);
+	//glview.setY(array_y2);
+	//glview.setY(array_y3);
+	//glview.setX(array_x);
+	//glview.subPlot(2, 2, 3);
 
 	glview.mainLoop();
 

@@ -61,37 +61,39 @@ namespace gl
 		/**
 			Constructor
 		*/
-		ViewerInstance() : points(nullptr), color(nullptr), normals(nullptr), number_of_elements(NULL) {}
+		ViewerInstance() : points(nullptr), color(nullptr), normals(nullptr), number_of_elements(NULL) 
+		{
+			gl_pointsize = 1;
+		}
 
 		/**
 			Destructor
 		*/
 		~ViewerInstance() 
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
+			std::cout << "a" << std::endl;
 			if (points) {
 				delete[] points;
 				points = nullptr;
 			}
-
+			std::cout << "b" << std::endl;
 			if (color) {
 				delete[] color;
 				color = nullptr;
-			}
+			}std::cout << "c" << std::endl;
 
 			if (normals) {
 				delete[] normals;
 				normals = nullptr;
 			}
-
-			number_of_elements;
 		}
 
 		/**
@@ -101,6 +103,8 @@ namespace gl
 		*/
 		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
+			clearMemory();
+
 			points = pointcloud_.getPointsPtr();
 
 			if (pointcloud_.isColor()) {
@@ -122,6 +126,8 @@ namespace gl
 		*/
 		void setPointcloud(ElementType* points_, size_t number_of_elements_)
 		{
+			clearMemory()
+
 			points = points_;
 
 			number_of_elements = number_of_elements_;
@@ -139,21 +145,13 @@ namespace gl
 			*/
 			utils::BoundingBox<ElementType> bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
 
-			gl_pointsize = 1;
-
-			gl_center_x = 0.5;
-			gl_center_y = 0.5;
-			gl_center_z = 0.5;
-
 			/**
 				Center and normalize the pointlcoud
 			*/
-			gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
+			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
 			for (size_t i = 0; i < number_of_elements * 3; i++) {
 				points[i] = (points[i] - bounding_box.getMiddle(i % 3)) * ( 1 / gl_zoom);
 			}
-
-			gl_zoom = 1.0;
 		}
 
 		/**
@@ -177,78 +175,36 @@ namespace gl
 		}
 
 		/**
-			Zoom in
-		*/
-		void zoomIn() {
-			gl_zoom = gl_zoom * (ElementType) 1.1;
-		}
+			Zoom
 
-		/**
-			Zoom in
+			@param[in] direction_ Direction in which the wheel is turned: 1 for up and -1 for down
 		*/
-		void zoomOut() {
-			gl_zoom = gl_zoom / (ElementType) 1.1;
+		void zoom(int direction) {
+			gl_mouse_movement_.setZoom(direction);
 		}
 
 		/**
 			Translate
+
+			@param[in] x Mouse position in x-direction
+			@param[in] y Mouse position in y-direction
 		*/
-		void translate(int x_, int y_)
+		void translate(int x, int y)
 		{
-			gl_center_x = gl_center_x + (float)x_/500.0f;
-			gl_center_y = gl_center_y - (float)y_/500.0f;
+			gl_mouse_movement_.setTranslation(x, y);
 		}
 
 		/**
 			Rotate
+
+			@param[in] x_old Old mouse position in x-direction
+			@param[in] y_old Old mouse position in y-direction
+			@param[in] x_new New mouse position in x-direction
+			@param[in] y_new New mouse position in y-direction
 		*/
-		void rotate(int x_old_, int y_old_, int x_new_, int y_new_)
+		void rotate(int x_old, int y_old, int x_new, int y_new)
 		{
-			/**
-				Compute the radius of the imaginary sphere
-			*/
-			ElementType max_x = gl_center_x > (ElementType)0.5 ? gl_center_x : (ElementType)1.0 - gl_center_x;
-			ElementType max_y = gl_center_y > (ElementType)0.5 ? gl_center_y : (ElementType)1.0 - gl_center_y;
-
-			ElementType radius_sqr = max_x*max_x + max_y*max_y;
-
-			/**
-				Normalize the coordinates
-			*/
-			int width = glutGet(GLUT_WINDOW_WIDTH);
-			int height = glutGet(GLUT_WINDOW_HEIGHT);
-
-			if (x_new_ > 0 && x_new_ < width && y_new_ > 0 && y_new_ < height && 
-				!(x_new_ - x_old_ == 0 && y_new_ - y_old_ == 0) ) {
-
-				ElementType x_old = (ElementType)x_old_ / (ElementType)width - gl_center_x;
-				ElementType y_old = (ElementType)y_old_ / (ElementType)height - gl_center_y;
-				ElementType x_new = (ElementType)x_new_ / (ElementType)width - gl_center_x;
-				ElementType y_new = (ElementType)y_new_ / (ElementType)height - gl_center_y;
-
-				ElementType z_old = std::sqrt(radius_sqr - x_old*x_old - y_old*y_old);
-				ElementType z_new = std::sqrt(radius_sqr - x_new*x_new - y_new*y_new);
-				/**
-					Compute the rotation axis
-				*/
-				ElementType x = y_new*z_old - z_new*y_old;
-				ElementType y = z_new*x_old - x_new*z_old;
-				ElementType z = x_new*y_old - y_new*x_old;
-				
-				/**
-					Normalie the axis
-				*/
-				ElementType n = std::sqrt(x*x + y*y + z*z);
-				x /= n; y /= n; z /= n;
-
-				/** 
-					Computation of rotation angle
-				*/
-				ElementType w = (ElementType)5.0 * std::acos((x_new*x_old + y_new*y_old + z_new*z_old) /
-				(std::sqrt(x_new*x_new + y_new*y_new + z_new*z_new) * std::sqrt(x_old*x_old + y_old*y_old + z_old*z_old)));
-
-				gl_quaterion *= pointcloud::Quaterion<ElementType>(w, x, y, z);
-			}
+			gl_mouse_movement_.SetRotation(x_old, y_old, x_new, y_new);
 		}
 
 		/**
@@ -284,71 +240,72 @@ namespace gl
 			if (normals) {
 				glEnableClientState(GL_NORMAL_ARRAY);
 			}
-			//glEnableClientState(GL_INDEX_ARRAY);
+			glColor4f(1.0, 1.0, 1.0, 0.0);
 
-				glLoadIdentity();
+			glLoadIdentity();
 
-				/**
-					Increase or decrease the entire pointcloud by the factor gl_zoom
-				*/
+			/**
+				Increase or decrease the entire pointcloud by the factor gl_zoom
+			*/
 
-				glScalef(1.0f / gl_zoom, 1.0f / gl_zoom, 1.0f / gl_zoom);
-				/**
-					Translate the pointcloud by the chosen centerpoint
-				*/
+			glScalef(1.0f / gl_mouse_movement_.getZoom(),
+				1.0f / gl_mouse_movement_.getZoom(),
+				1.0f / gl_mouse_movement_.getZoom());
 
-				glTranslatef(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
+			/**
+				Translate the pointcloud by the chosen centerpoint
+			*/
+
+			glTranslatef(gl_mouse_movement_.getCenterX() * gl_mouse_movement_.getZoom(),
+				gl_mouse_movement_.getCenterY() * gl_mouse_movement_.getZoom(),
+				gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
 				
-				/**
-					Roatate the entire pointcloud around the x- and y-axis
-				*/
-				float gl_rot_x, gl_rot_y, gl_rot_z;
-				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotatef( -1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotatef(  1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotatef(  1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+			/**
+				Rotate the entire pointcloud around the x- and y-axis
+			*/
+			ElementType gl_rot_x, gl_rot_y, gl_rot_z;
+			gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+			glRotatef(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+			glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+			glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
-				/**
-					Determine the size of the points
-				*/
-				glPointSize((GLfloat) gl_pointsize);
+			/**
+				Determine the size of the points
+			*/
+			glPointSize((GLfloat) gl_pointsize);
 
-				/**
-					Link the points, colors and normals for drawing
-				*/
-				glVertexPointer(3, GL_FLOAT, 0, points);
-				if (color) {
-					glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
-				}
-				if (normals) {
-					glNormalPointer(GL_FLOAT, 0, normals);
-				}
-				glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
-				//////std::vector<GLuint> indices;
-				//////// populate vertices
-				//////glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));
+			/**
+				Link the points, colors and normals for drawing
+			*/
+			glVertexPointer(3, GL_FLOAT, 0, points);
+			if (color) {
+				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+			}
+			if (normals) {
+				glNormalPointer(GL_FLOAT, 0, normals);
+			}
+			glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
 
-				/**
-					Draw axis
-				*/				
-				glLineWidth(2.0f);
-				glBegin(GL_LINES);
-					glColor4f(1.0, 0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.25f*gl_zoom, 0.0, 0.0);
-				glEnd();
-				glBegin(GL_LINES);
-					glColor4f(0.0, 1.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.25f*gl_zoom, 0.0);
-				glEnd();
-				glBegin(GL_LINES);
-					glColor4f(0.0, 0.0, 1.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.25f*gl_zoom);
-				glEnd();
+			/**
+				Draw axis
+			*/				
+			glLineWidth(2.0f);
+			glBegin(GL_LINES);
+				glColor4f(1.0f, 0.0, 0.0, 0.0);
+				glVertex3d(0.0, 0.0, 0.0);
+				glVertex3d(0.25*gl_mouse_movement_.getZoom(), 0.0, 0.0);
+			glEnd();
+			glBegin(GL_LINES);
+				glColor4f(0.0, 1.0f, 0.0, 0.0);
+				glVertex3d(0.0, 0.0, 0.0);
+				glVertex3d(0.0, 0.25*gl_mouse_movement_.getZoom(), 0.0);
+			glEnd();
+			glBegin(GL_LINES);
+				glColor4f(0.0, 0.0, 1.0f, 0.0);
+				glVertex3d(0.0, 0.0, 0.0);
+				glVertex3d(0.0, 0.0, 0.25*gl_mouse_movement_.getZoom());
+			glEnd();
 
-				glColor4f(1.0, 1.0, 1.0, 0.0);
 			/**
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
@@ -384,72 +341,71 @@ namespace gl
 			}
 			if (normals) {
 				glEnableClientState(GL_NORMAL_ARRAY);
+			}	
+			glColor4f(1.0, 1.0, 1.0, 0.0);
+
+			glLoadIdentity();
+				
+			/**
+				Increase or decrease the entire pointcloud by the factor gl_zoom
+			*/
+			glScaled(1.0 / gl_mouse_movement_.getZoom(),
+				1.0 / gl_mouse_movement_.getZoom(),
+				1.0 / gl_mouse_movement_.getZoom());
+			
+			/**
+				Translate the pointlcoud by the chosen centerpoint
+			*/
+
+			glTranslated(gl_mouse_movement_.getCenterX() * gl_mouse_movement_.getZoom(),
+				gl_mouse_movement_.getCenterY() * gl_mouse_movement_.getZoom(),
+				gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
+				
+			/**
+				Roatate the entire pointcloud around the x- and y-axis
+			*/
+			ElementType gl_rot_x, gl_rot_y, gl_rot_z;
+			gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+			glRotated(-1.0 *math::toDeg<ElementType>(gl_rot_x), 1.0, 0.0, 0.0);
+			glRotated(1.0 *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0, 0.0);
+			glRotated(1.0 *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0);
+
+			/**
+				Determine the size of the points
+			*/
+			glPointSize((GLfloat)gl_pointsize);
+
+			/**
+				Link the points, colors and normals for drawing
+			*/
+			glVertexPointer(3, GL_DOUBLE, 0, points);
+			if (color) {
+				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
 			}
-			//glEnableClientState(GL_INDEX_ARRAY);	
-				
-				glLoadIdentity();
-				
-				/**
-					Increase or decrease the entire pointcloud by the factor gl_zoom
-				*/
+			if (normals) {
+				glNormalPointer(GL_DOUBLE, 0, normals);
+			}
+			glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
 
-				glScaled(1.0 / gl_zoom, 1.0 / gl_zoom, 1.0 / gl_zoom);
-				/**
-					Translate the pointlcoud by the chosen centerpoint
-				*/
-
-				glTranslated(gl_center_x * gl_zoom, gl_center_y * gl_zoom, gl_center_z * gl_zoom);
-				
-				/**
-					Roatate the entire pointcloud around the x- and y-axis
-				*/
-				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
-				gl_quaterion.getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotated(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotated( 1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotated( 1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
-
-				/**
-					Determine the size of the points
-				*/
-				glPointSize((GLfloat)gl_pointsize);
-
-								/**
-					Link the points, colors and normals for drawing
-				*/
-				glVertexPointer(3, GL_DOUBLE, 0, points);
-				if (color) {
-					glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
-				}
-				if (normals) {
-					glNormalPointer(GL_DOUBLE, 0, normals);
-				}
-				glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
-				//////std::vector<GLuint> indices;
-				//////// populate vertices
-				//////glDrawElements(GL_POINTS, indices.size(), GL_UNSIGNED_INT, reinterpret_cast<void*>(indices.data()));
-
-				/**
-					Draw axis
-				*/				
-				glLineWidth(2.0f);
-				glBegin(GL_LINES);
-					glColor4f(1.0, 0.0, 0.0, 0.0);
-					glVertex3d(0.0, 0.0, 0.0);
-					glVertex3d(0.25*gl_zoom, 0.0, 0.0);
-				glEnd();
-				glBegin(GL_LINES);
-					glColor4f(0.0, 1.0, 0.0, 0.0);
-					glVertex3d(0.0, 0.0, 0.0);
-					glVertex3d(0.0, 0.25*gl_zoom, 0.0);
-				glEnd();
-				glBegin(GL_LINES);
-					glColor4f(0.0, 0.0, 1.0, 0.0);
-					glVertex3d(0.0, 0.0, 0.0);
-					glVertex3d(0.0, 0.0, 0.25*gl_zoom);
-				glEnd();
-
-				glColor4f(1.0, 1.0, 1.0, 0.0);
+			/**
+				Draw axis
+			*/				
+			glLineWidth(2.0f);
+			glBegin(GL_LINES);
+				glColor4f(1.0f, 0.0, 0.0, 0.0);
+				glVertex3d(0.0, 0.0, 0.0);
+				glVertex3d(0.25*gl_mouse_movement_.getZoom(), 0.0, 0.0);
+			glEnd();
+			glBegin(GL_LINES);
+				glColor4f(0.0, 1.0f, 0.0, 0.0);
+				glVertex3d(0.0, 0.0, 0.0);
+				glVertex3d(0.0, 0.25*gl_mouse_movement_.getZoom(), 0.0);
+			glEnd();
+			glBegin(GL_LINES);
+				glColor4f(0.0, 0.0, 1.0f, 0.0);
+				glVertex3d(0.0, 0.0, 0.0);
+				glVertex3d(0.0, 0.0, 0.25*gl_mouse_movement_.getZoom());
+			glEnd();
 
 			/**
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
@@ -490,24 +446,9 @@ namespace gl
 		size_t number_of_elements;
 
 		/**
-			Center in x-direction
+			Computes translation, rotation and zoom
 		*/
-		ElementType gl_center_x;
-
-		/**
-			Center in y-direction
-		*/
-		ElementType gl_center_y;
-
-		/**
-			Center in x-direction
-		*/
-		ElementType gl_center_z;
-		
-		/**
-			Quaterion
-		*/
-		pointcloud::Quaterion<ElementType> gl_quaterion;
+		gl::GLMouseMovement<ElementType> gl_mouse_movement_;
 		
 		/**
 			Point size
@@ -535,11 +476,8 @@ namespace gl
 		*/	
 		GLViewer()
 		{
-			clear();
-
 			if (!std::is_same<float,ElementType>::value && !std::is_same<double, ElementType>::value){
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 			}
 
 			mouse_button = NULL;
@@ -550,15 +488,15 @@ namespace gl
 		*/
 		~GLViewer() 
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear() 
+		void clearMemory() 
 		{
-			viewer_instances.clear();
+			viewer_instances.clearMemory();
 			
 			mouse_button = NULL;
 		}
@@ -624,12 +562,6 @@ namespace gl
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-			//if (height_ > width_) {
-			//	glOrtho(0.0, 1.0,0.0, (double)height_ / (double)width_, -1.0, 1.0);
-			//}
-			//else{
-			//	glOrtho(0.0, (double)width_ / (double)height_,0.0, 1.0, -1.0, 1.0);
-			//}
 			glMatrixMode(GL_MODELVIEW);
 		}
 				
@@ -698,12 +630,8 @@ namespace gl
 		*/
 		static void mouseWheel(int button_, int direction_, int x_, int y_)
 		{
-			if (direction_ == 1) {
-				viewer_instances.getCurrentViewerInstance().zoomOut();
-			}
-			else {
-				viewer_instances.getCurrentViewerInstance().zoomIn();
-			}
+			viewer_instances.setCurrentInstance(glutGetWindow() - 1);
+			viewer_instances.getCurrentViewerInstance().zoom(direction_);
 		}
 
 		/**
@@ -716,6 +644,7 @@ namespace gl
 		*/
 		static void mouseFunc(int button_, int state_, int x_, int y_)
 		{
+			viewer_instances.setCurrentInstance(glutGetWindow() - 1);
 			if (!state_){
 				mouse_button = button_;
 
@@ -735,6 +664,7 @@ namespace gl
 		*/
 		static void mouseMotion(int x_, int y_)
 		{
+			viewer_instances.setCurrentInstance(glutGetWindow() - 1);
 			if (mouse_button == GLUT_LEFT_BUTTON){
 				viewer_instances.getCurrentViewerInstance().rotate(mouse_position.getX(), 
 					mouse_position.getY(), x_, y_);
@@ -787,7 +717,6 @@ namespace gl
 		*/
 		StaticViewerInstance() : number_of_viewer(0), current_instance(NULL), current_window(NULL)
 		{
-			clear();
 		}
 
 		/**
@@ -795,17 +724,19 @@ namespace gl
 		*/
 		~StaticViewerInstance()
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear()
+		void clearMemory()
 		{
-			for (size_t i = 0; i < number_of_viewer; i++) {
-				viewer_instances[i].clear();
-			}
+			std::cout << "aa" << std::endl;
+			//for (size_t i = 0; i < number_of_viewer; i++) {
+			//	viewer_instances[i].clearMemory();
+			//}
+
 			viewer_instances.clear();
 			number_of_viewer = 0;
 			current_instance = NULL;
@@ -868,7 +799,7 @@ namespace gl
 		*/
 		void setWindowIndex(size_t window_index_) 
 		{
-			viewer_indices[window_index_] = number_of_viewer-1;
+			viewer_indices[window_index_] = number_of_viewer - 1;
 		}
 
 		/** 
