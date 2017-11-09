@@ -145,7 +145,8 @@ int main(int argc, char* argv[]) {
 	glview.setPointcloud(GLParams::LINES, dataset, lines, number_of_vertices, number_of_lines);
 	glview.setPointcloud(GLParams::POINTS, datasetII, number_of_verticesII);
 	glview.subPlot(2, 2, 2);
-
+	delete[] dataset, datasetII, lines;
+	
 	//glview.setPlot(versuch);
 	//glview.setY(array_y1);
 	//glview.setY(array_y2);

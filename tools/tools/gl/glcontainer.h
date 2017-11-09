@@ -42,9 +42,9 @@ namespace gl
 		/**
 			Constructor
 		*/
-		GLContainer() : mode(NULL),
-			points(nullptr), color(nullptr), normals(nullptr), indices(nullptr),
-			number_of_vertices(NULL), number_of_indices(NULL)
+		GLContainer() : mode_(NULL),
+			points_(nullptr), color_(nullptr), normals_(nullptr), indices_(nullptr),
+			number_of_vertices_(NULL), number_of_indices_(NULL)
 		{
 		}
 
@@ -54,24 +54,24 @@ namespace gl
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		GLContainer(const pointcloud::Pointcloud<ElementType>& pointcloud_ ) : GLContainer()
+		GLContainer(const pointcloud::Pointcloud<ElementType>& pointcloud ) : GLContainer()
 		{
-			mode = GL_POINTS;
+			mode_ = GL_POINTS;
 
-			points = pointcloud_.getPointsPtr();
+			points_ = pointcloud.getPointsPtr();
 
-			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
+			if (pointcloud.isColor()) {
+				color_ = pointcloud.getColorsPtr();
 			}
-			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
+			if (pointcloud.isNormal()) {
+				normals_ = pointcloud.getNormalsPtr();
 			}
 
-			number_of_vertices = pointcloud_.getNumberOfVertices();
+			number_of_vertices_ = pointcloud.getNumberOfVertices();
 
-			if (pointcloud_.isTriangle()) {
-				number_of_indices = pointcloud_.getNumberOfTriangles() * 3;
-				indices = pointcloud_.getTrianglesPtr<unsigned int>();
+			if (pointcloud.isTriangle()) {
+				number_of_indices_ = pointcloud.getNumberOfTriangles() * 3;
+				indices_ = pointcloud.getTrianglesPtr<unsigned int>();
 			}
 		}
 
@@ -81,24 +81,24 @@ namespace gl
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		GLContainer(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_ ) : GLContainer()
+		GLContainer(GLParams mode, const pointcloud::Pointcloud<ElementType>& pointcloud ) : GLContainer()
 		{
-			setMode(mode_);
+			setMode(mode);
 
-			points = pointcloud_.getPointsPtr();
+			points = pointcloud.getPointsPtr();
 
-			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
+			if (pointcloud.isColor()) {
+				color_ = pointcloud.getColorsPtr();
 			}
-			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
+			if (pointcloud.isNormal()) {
+				normals_ = pointcloud.getNormalsPtr();
 			}
 
-			number_of_vertices = pointcloud_.getNumberOfVertices();
+			number_of_vertices_ = pointcloud.getNumberOfVertices();
 
-			if (pointcloud_.isTriangle()) {
-				number_of_indices = pointcloud_.getNumberOfTriangles() * 3;
-				indices = pointcloud_.getTrianglesPtr<unsigned int>();
+			if (pointcloud.isTriangle()) {
+				number_of_indices_ = pointcloud.getNumberOfTriangles() * 3;
+				indices_ = pointcloud.getTrianglesPtr<unsigned int>();
 			}
 		}
 
@@ -109,14 +109,14 @@ namespace gl
 			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of elements
 		*/
-		GLContainer(ElementType* points_, size_t number_of_vertices_) : GLContainer() 
+		GLContainer(ElementType* points, size_t number_of_vertices) : GLContainer() 
 		{
 			mode = GL_POINTS;
 
-			number_of_vertices = number_of_vertices_;
+			number_of_vertices_ = number_of_vertices;
 
-			points = new ElementType[number_of_vertices * 3]; 
-			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
+			points_ = new ElementType[number_of_vertices_ * 3]; 
+			std::memcpy(points_, points, sizeof(ElementType) * number_of_vertices_ * 3);
 		}
 
 		/**
@@ -126,14 +126,14 @@ namespace gl
 			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of elements
 		*/
-		GLContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_) : GLContainer() 
+		GLContainer(GLParams mode, ElementType* points, size_t number_of_vertices) : GLContainer() 
 		{
-			setMode(mode_);
+			setMode(mode);
 
-			number_of_vertices = number_of_vertices_;
+			number_of_vertices_ = number_of_vertices;
 
-			points = new ElementType[number_of_vertices * 3];
-			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
+			points_ = new ElementType[number_of_vertices_ * 3];
+			std::memcpy(points_, points, sizeof(ElementType) * number_of_vertices_ * 3);
 		}
 
 		/**
@@ -145,50 +145,23 @@ namespace gl
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] number_of_indices_ Number of indices
 		*/
-		GLContainer( ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_) : GLContainer()
+		GLContainer(GLParams mode, ElementType* points, unsigned int* indices,
+			size_t number_of_vertices, size_t number_of_indices) : GLContainer()
 		{
-			mode = GL_POINTS;
+			setMode(mode);
 
-			number_of_vertices = number_of_vertices_;
+			number_of_vertices_ = number_of_vertices;
 
-			switch (mode_) {
-			case GLParams::LINES: number_of_indices = number_of_indices_* 2; break;
-			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
+			switch (mode) {
+			case GLParams::LINES: number_of_indices_ = number_of_indices * 2; break;
+			case GLParams::TRIANGLES: number_of_indices_ = number_of_indices * 3; break;
 			}
 
-			points = new ElementType[number_of_vertices * 3];
-			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
+			points_ = new ElementType[number_of_vertices_ * 3];
+			std::memcpy(points_, points, sizeof(ElementType) * number_of_vertices_ * 3);
 
-
-			indices = indices_;
-		}
-
-		/**
-			Constructor
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] indices_ indices
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_indices_ Number of indices
-		*/
-		GLContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_) : GLContainer()
-		{
-			setMode(mode_);
-
-			number_of_vertices = number_of_vertices_;
-
-			switch (mode_) {
-			case GLParams::LINES: number_of_indices = number_of_indices_* 2; break;
-			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
-			}
-
-			points = new ElementType[number_of_vertices * 3];
-			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
-
-			indices = indices_;
+			indices_ = new unsigned int[number_of_indices_];
+			std::memcpy(indices_, indices, sizeof(unsigned int) * number_of_indices_);
 		}
 
 		/**
@@ -204,21 +177,21 @@ namespace gl
 		*/
 		void clearMemory()
 		{
-			if (points) {
-				delete[] points;
-				points = nullptr;
+			if (points_) {
+				delete[] points_;
+				points_ = nullptr;
 			}
-			if (color) {
-				delete[] color;
-				color = nullptr;
+			if (color_) {
+				delete[] color_;
+				color_ = nullptr;
 			}
-			if (normals) {
-				delete[] normals;
-				normals = nullptr;
+			if (normals_) {
+				delete[] normals_;
+				normals_ = nullptr;
 			}
-			if (indices) {
-				delete[] indices;
-				indices = nullptr;
+			if (indices_) {
+				delete[] indices_;
+				indices_ = nullptr;
 			}
 		}
 
@@ -227,9 +200,9 @@ namespace gl
 	
 			@param[in] gl_container_ An instance of class GLContainer
 		*/
-		GLContainer(const GLContainer <ElementType>& gl_container_) : GLContainer()
+		GLContainer(const GLContainer <ElementType>& gl_container) : GLContainer()
 		{
-			copy(gl_container_);
+			copy(gl_container);
 		}
 		
 		/**
@@ -238,20 +211,20 @@ namespace gl
 			@param[in] gl_container_ An instance of class GLContainer
 		*/
 
-		GLContainer(const GLContainer <ElementType>&& gl_container_) : GLContainer()
+		GLContainer(const GLContainer <ElementType>&& gl_container) : GLContainer()
 		{
-			copy(gl_container_);
+			copy(gl_container);
 		}
 		/**
 			Operator =
 	
 			@param[in] gl_container_ An instance of class GLContainer
 		*/
-		GLContainer& operator=(const GLContainer<ElementType>& gl_container_)
+		GLContainer& operator=(const GLContainer<ElementType>& gl_container)
 		{
 			clearMemory();
 
-			copy(gl_container_);
+			copy(gl_container);
 
 			return *this;
 		}
@@ -261,11 +234,11 @@ namespace gl
 	
 			@param[in] gl_container_ An instance of class GLContainer
 		*/
-		GLContainer& operator=(const GLContainer<ElementType>&& gl_container_)
+		GLContainer& operator=(const GLContainer<ElementType>&& gl_container)
 		{
 			clearMemory();
 
-			copy(gl_container_);
+			copy(gl_container);
 
 			return *this;
 		}
@@ -275,26 +248,26 @@ namespace gl
 
 			@param[in] gl_container_ An instance of class GLContainer
 		*/
-		void copy(const GLContainer<ElementType>& gl_container_)
+		void copy(const GLContainer<ElementType>& gl_container)
 		{
-			mode = gl_container_.getMode();
-			number_of_vertices = gl_container_.getNumberOfVertices();
-			number_of_indices = gl_container_.getNumberOfIndices();
+			mode_ = gl_container.getMode();
+			number_of_vertices_ = gl_container.getNumberOfVertices();
+			number_of_indices_ = gl_container.getNumberOfIndices();
 
-			points = new ElementType[number_of_vertices * 3];
-			std::memcpy(points, gl_container_.getPoints(), sizeof(ElementType) * number_of_vertices * 3);
+			points_ = new ElementType[number_of_vertices_ * 3];
+			std::memcpy(points_, gl_container.getPoints(), sizeof(ElementType) * number_of_vertices_ * 3);
 
-			if (gl_container_.isColor()) {
-				color = new uint8_t[number_of_vertices * 3];
-				std::memcpy(color, gl_container_.getColor(), sizeof(uint8_t) * number_of_vertices * 3);
+			if (gl_container.isColor()) {
+				color_ = new uint8_t[number_of_vertices_ * 3];
+				std::memcpy(color_, gl_container.getColor(), sizeof(uint8_t) * number_of_vertices_ * 3);
 			}
-			if (gl_container_.isNormal()) {
-				normals = new ElementType[number_of_vertices * 3];
-				std::memcpy(normals, gl_container_.getNormals(), sizeof(ElementType) * number_of_vertices * 3);
+			if (gl_container.isNormal()) {
+				normals_ = new ElementType[number_of_vertices_ * 3];
+				std::memcpy(normals_, gl_container.getNormals(), sizeof(ElementType) * number_of_vertices_ * 3);
 			}
-			if (gl_container_.isIndice()) {
-				indices = new unsigned int[number_of_indices];
-				std::memcpy(indices, gl_container_.getIndices(), sizeof(unsigned int)*number_of_indices);
+			if (gl_container.isIndice()) {
+				indices_ = new unsigned int[number_of_indices_];
+				std::memcpy(indices_, gl_container.getIndices(), sizeof(unsigned int)*number_of_indices_);
 			}
 		}
 
@@ -304,24 +277,24 @@ namespace gl
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setGLContainer(pointcloud::Pointcloud<ElementType>& pointcloud_ ) 
+		void setGLContainer(pointcloud::Pointcloud<ElementType>& pointcloud ) 
 		{
-			mode = GL_POINTS;
+			mode_ = GL_POINTS;
 
-			points = pointcloud_.getPointsPtr();
+			points_ = pointcloud.getPointsPtr();
 
-			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
+			if (pointcloud.isColor()) {
+				color_ = pointcloud_.getColorsPtr();
 			}
 			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
+				normals_ = pointcloud.getNormalsPtr();
 			}
 
-			number_of_vertices = pointcloud_.getNumberOfVertices();
+			number_of_vertices_ = pointcloud.getNumberOfVertices();
 
-			if (pointcloud_.isTriangle()) {
-				number_of_indices = pointcloud_.getNumberOfTriangles() * 3;
-				indices = pointcloud_.getTrianglesPtr<unsigned int>();
+			if (pointcloud.isTriangle()) {
+				number_of_indices_ = pointcloud.getNumberOfTriangles() * 3;
+				indices_ = pointcloud.getTrianglesPtr<unsigned int>();
 			}
 		}
 
@@ -331,24 +304,24 @@ namespace gl
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setGLContainer(GLParams mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) 
+		void setGLContainer(GLParams mode, pointcloud::Pointcloud<ElementType>& pointcloud) 
 		{
-			setMode(mode_);
+			setMode(mode);
 
-			points = pointcloud_.getPointsPtr();
+			points_ = pointcloud.getPointsPtr();
 
 			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
+				color_ = pointcloud.getColorsPtr();
 			}
 			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
+				normals_ = pointcloud.getNormalsPtr();
 			}
 
-			number_of_vertices = pointcloud_.getNumberOfVertices();
+			number_of_vertices_ = pointcloud.getNumberOfVertices();
 
-			if (pointcloud_.isTriangle()) {
-				number_of_indices = pointcloud_.getNumberOfTriangles() * 3;
-				indices = pointcloud_.getTrianglesPtr<unsigned int>();
+			if (pointcloud.isTriangle()) {
+				number_of_indices_ = pointcloud.getNumberOfTriangles() * 3;
+				indices_ = pointcloud.getTrianglesPtr<unsigned int>();
 			}
 		}
 
@@ -359,13 +332,14 @@ namespace gl
 			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setGLContainer(ElementType* points_, size_t number_of_vertices_)
+		void setGLContainer(ElementType* points, size_t number_of_vertices)
 		{
 			mode = GL_POINTS;
 
-			number_of_vertices = number_of_vertices_;
+			number_of_vertices_ = number_of_vertices;
 
-			points = points_;
+			points_ = new ElementType[number_of_vertices_ * 3];
+			std::memcpy(points_, points, sizeof(ElementType) * number_of_vertices_ * 3);
 		}
 
 		/**
@@ -375,13 +349,14 @@ namespace gl
 			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setGLContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
+		void setGLContainer(GLParams mode, ElementType* points, size_t number_of_vertices)
 		{
-			setMode(mode_);
+			setMode(mode);
 
-			number_of_vertices = number_of_vertices_;
+			number_of_vertices_ = number_of_vertices;
 
-			points = points_;
+			points_ = new ElementType[number_of_vertices_ * 3];
+			std::memcpy(points_, points, sizeof(ElementType) * number_of_vertices_ * 3);
 		}
 
 		/**
@@ -393,45 +368,23 @@ namespace gl
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] number_of_indices_ Number of indices
 		*/
-		void setGLContainer(ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_)
+		void setGLContainer(GLParams mode, ElementType* points, unsigned int* indices,
+			size_t number_of_vertices, size_t number_of_indices)
 		{
-			mode = GL_POINTS;
+			setMode(mode);
 
-			number_of_vertices = number_of_vertices_;
+			number_of_vertices_ = number_of_vertices;
 
-			switch (mode_) {
-			case GLParams::LINES: number_of_indices = number_of_indices_ * 2; break;
-			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
+			switch (mode) {
+			case GLParams::LINES: number_of_indices_ = number_of_indices * 2; break;
+			case GLParams::TRIANGLES: number_of_indices_ = number_of_indices * 3; break;
 			}
 
-			points = points_;
-			indices = indices_;
-		}	
-
-		/**
-			Set plot container
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] indices_ Indices
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_indices_ Number of indices
-		*/
-		void setGLContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_)
-		{
-			setMode(mode_);
-
-			number_of_vertices = number_of_vertices_;
-
-			switch (mode_) {
-			case GLParams::LINES: number_of_indices = number_of_indices_ * 2; break;
-			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
-			}
-
-			points = points_;
-			indices = indices_;
+			points_ = new ElementType[number_of_vertices_ * 3];
+			std::memcpy(points_, points, sizeof(ElementType) * number_of_vertices_ * 3);
+			
+			indices_ = new unsigned int[number_of_indices_];
+			std::memcpy(indices_, indices, sizeof(unsigned int) * number_of_indices_);
 		}
 
 		/**
@@ -439,12 +392,12 @@ namespace gl
 
 			@param[in] mode_ Specifies what kind of primitives to render
 		*/
-		void setMode(GLParams mode_)
+		void setMode(GLParams mode)
 		{
-			switch (mode_) {
-			case GLParams::POINTS: mode = GL_POINTS; break;
-			case GLParams::LINES: mode = GL_LINES; break;
-			case GLParams::TRIANGLES: mode = GL_TRIANGLES; break;
+			switch (mode) {
+			case GLParams::POINTS: mode_ = GL_POINTS; break;
+			case GLParams::LINES: mode_ = GL_LINES; break;
+			case GLParams::TRIANGLES: mode_ = GL_TRIANGLES; break;
 			}
 		}
 
@@ -453,7 +406,7 @@ namespace gl
 		*/
 		GLenum getMode() const
 		{
-			return mode;
+			return mode_;
 		}
 
 		/**
@@ -463,7 +416,7 @@ namespace gl
 		*/
 		ElementType* getPoints() const
 		{
-			return points;
+			return points_;
 		}
 
 		/**
@@ -473,7 +426,7 @@ namespace gl
 		*/
 		uint8_t* getColor() const
 		{
-			return color;
+			return color_;
 		}
 
 		/**
@@ -483,7 +436,7 @@ namespace gl
 		*/
 		ElementType* getNormals() const
 		{
-			return normals;
+			return normals_;
 		}
 
 		/**
@@ -493,7 +446,7 @@ namespace gl
 		*/
 		unsigned int* getIndices() const
 		{
-			return indices;
+			return indices_;
 		}
 
 		/**
@@ -503,7 +456,7 @@ namespace gl
 		*/
 		size_t getNumberOfVertices() const
 		{
-			return number_of_vertices;
+			return number_of_vertices_;
 		}
 
 		/**
@@ -513,7 +466,7 @@ namespace gl
 		*/
 		size_t getNumberOfIndices() const
 		{
-			return number_of_indices;
+			return number_of_indices_;
 		}
 
 		/**
@@ -523,7 +476,7 @@ namespace gl
 		*/
 		bool isPoint() const
 		{
-			return (points != nullptr);
+			return (points_ != nullptr);
 		}
 
 		/**
@@ -533,7 +486,7 @@ namespace gl
 		*/
 		bool isColor() const
 		{
-			return (color != nullptr);
+			return (color_ != nullptr);
 		}
 
 		/**
@@ -543,7 +496,7 @@ namespace gl
 		*/
 		bool isNormal() const
 		{
-			return (normals != nullptr);
+			return (normals_ != nullptr);
 		}
 
 		/**
@@ -553,7 +506,7 @@ namespace gl
 		*/
 		bool isIndice() const
 		{
-			return (indices != nullptr);
+			return (indices_ != nullptr);
 		}
 
 	private:
@@ -561,37 +514,37 @@ namespace gl
 		/**
 			Specifies what kind of primitives to render
 		*/
-		GLenum mode;
+		GLenum mode_;
 
 		/**
 			Points
 		*/
-		ElementType* points;
+		ElementType* points_;
 
 		/**
 			Color
 		*/
-		uint8_t* color;
+		uint8_t* color_;
 
 		/**
 			Normals
 		*/
-		ElementType* normals;
+		ElementType* normals_;
 
 		/**
 			Indices
 		*/
-		unsigned int* indices;
+		unsigned int* indices_;
 
 		/**
 			Number of vertices
 		*/
-		size_t number_of_vertices;
+		size_t number_of_vertices_;
 
 		/**
 			Number of indices
 		*/
-		size_t number_of_indices;
+		size_t number_of_indices_;
 	};
 }
 
