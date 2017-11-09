@@ -85,9 +85,9 @@ int main(int argc, char* argv[]) {
 		dataset[i * 3 + 2] = std::exp(-(dataset[i * 3 + 0] * dataset[i * 3 + 0] + dataset[i * 3 + 1] * dataset[i * 3 + 1]));
 	}
 
-
-
-
+	float* datasetII;
+	size_t number_of_verticesII = 40;
+	gl::meshGrid<float>(&datasetII, -1, 1, -1, 1, number_of_verticesII);
 
 
 
@@ -136,6 +136,7 @@ int main(int argc, char* argv[]) {
 	glview.setPlot3D();
 	//glview.setPointcloud(GLParams::POINTS, pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices());
 	glview.setPointcloud(GLParams::LINES, dataset, lines, number_of_vertices, number_of_lines);
+	glview.setPointcloud(GLParams::POINTS, datasetII, number_of_verticesII);
 	glview.subPlot(2, 2, 2);
 
 	//glview.setPlot(versuch);

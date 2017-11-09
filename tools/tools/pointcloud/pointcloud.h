@@ -625,13 +625,15 @@ namespace pointcloud
 		*/
 		template<typename ReturnType> ReturnType* getPointsPtr() const
 		{
-			*new_points = new ReturnType[number_of_vertices * 3];
-			ReturnType* new_points_ptr = *new_points;
+			ReturnType* new_points = new ReturnType[number_of_vertices * 3];
+			ReturnType* new_points_ptr = new_points;
 
 			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++){
 				*new_points_ptr = (ReturnType)*it;
 				new_points_ptr++;
 			}
+
+			return new_points;
 		}
 
 		/**
@@ -659,13 +661,15 @@ namespace pointcloud
 		*/
 		template<typename ReturnType> ReturnType* getNormalsPtr() const
 		{
-			*new_normals = new ReturnType[number_of_vertices * 3];
-			ReturnType* new_normals_ptr = *new_normals;
+			ReturnType* new_normals = new ReturnType[number_of_vertices * 3];
+			ReturnType* new_normals_ptr = new_normals;
 
 			for (Iterator<ElementType> it = beginNormal(); it != endNormal(); it++) {
 				*new_normals_ptr = (ReturnType)*it;
 				new_normals_ptr++;
 			}
+
+			return new_normals;
 		}
 
 		/**
@@ -709,13 +713,15 @@ namespace pointcloud
 		*/		
 		template<typename ReturnType> ReturnType* getColorsPtr() const
 		{
-			*new_colors = new ReturnType[number_of_vertices * 3];
-			ReturnType* new_colors_ptr = *new_colors;
+			ReturnType* new_colors = new ReturnType[number_of_vertices * 3];
+			ReturnType* new_colors_ptr = new_colors;
 
 			for (Iterator<uint8_t> it = beginColor(); it != endColor(); it++) {
-				*new_colors_ptr = (ReturnType)*it / 255.0f;
+				*new_colors_ptr = (ReturnType)*it;
 				new_colors_ptr++;
 			}
+
+			return new_colors;
 		}	
 		/**
 			Get Pointer to triangles
@@ -737,13 +743,15 @@ namespace pointcloud
 		*/
 		template<typename ReturnType> ReturnType* getTrianglesPtr() const
 		{
-			*new_triangles = new ReturnType[number_of_triangles * 3];
-			ReturnType* new_triangles_ptr = *new_triangles;
+			ReturnType* new_triangles = new ReturnType[number_of_triangles * 3];
+			ReturnType* new_triangles_ptr = new_triangles;
 
 			for (Iterator<size_t> it = beginTriangle(); it != endTriangle(); it++) {
 				*new_triangles_ptr = (ReturnType)*it;
 				new_triangles_ptr++;
 			}
+
+			return new_triangles;
 		}
 
 		/**

@@ -48,6 +48,7 @@
 #include "tools/utils/mouseposition.h"
 #include "tools/utils/windowspec.h"
 
+#include "tools/gl/glcontainer.h"
 #include "tools/gl/glmousemovement.h"
 
 #include "tools/pointcloud/pointcloudnodes.h"
@@ -61,7 +62,7 @@ namespace gl
 		/**
 			Constructor
 		*/
-		ViewerInstance() : points(nullptr), color(nullptr), normals(nullptr), number_of_elements(NULL) 
+		ViewerInstance()
 		{
 			gl_pointsize = 1;
 		}
@@ -79,18 +80,6 @@ namespace gl
 		*/
 		void clearMemory()
 		{
-			if (points) {
-				delete[] points;
-				points = nullptr;
-			}
-			if (color) {
-				delete[] color;
-				color = nullptr;
-			}
-			if (normals) {
-				delete[] normals;
-				normals = nullptr;
-			}
 		}
 
 		/**
@@ -98,37 +87,10 @@ namespace gl
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(gl::GLContainer<ElementType>& gl_container_)
 		{
-			clearMemory();
-
-			points = pointcloud_.getPointsPtr();
-
-			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
-			}
-			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
-			}
-			number_of_elements = pointcloud_.getNumberOfVertices();
+			gl_container = gl_container_;
 			
-			setParameters();
-		}
-
-		/**
-			Set pointcloud
-
-			@param[in] points_ Points
-			@param[in] number_of_elements_ Number of elements
-		*/
-		void setPointcloud(ElementType* points_, size_t number_of_elements_)
-		{
-			clearMemory()
-
-			points = points_;
-
-			number_of_elements = number_of_elements_;
-
 			setParameters();
 		}
 
@@ -140,13 +102,15 @@ namespace gl
 			/**
 				Compute the bounding box of the pointcloud
 			*/
-			utils::BoundingBox<ElementType> bounding_box = utils::BoundingBox<ElementType>(points, number_of_elements, 3);
+			utils::BoundingBox<ElementType> bounding_box = 
+				utils::BoundingBox<ElementType>(gl_container.getPoints(), gl_container.getNumberOfVertices(), 3);
 
 			/**
 				Center and normalize the pointlcoud
 			*/
 			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
-			for (size_t i = 0; i < number_of_elements * 3; i++) {
+			ElementType* points = gl_container.getPoints();
+			for (size_t i = 0; i < gl_container.getNumberOfVertices() * 3; i++) {
 				points[i] = (points[i] - bounding_box.getMiddle(i % 3)) * ( 1 / gl_zoom);
 			}
 		}
@@ -205,22 +169,9 @@ namespace gl
 		}
 
 		/**
-			Draw the pointcloud
-		*/
-		void draw()
-		{
-			if (std::is_same<float, ElementType>::value) {
-				drawf();
-			}
-			else {
-				drawd();
-			}
-		}
-
-		/**
 			Draw the pointcloud with float accurancy
 		*/
-		void drawf() 
+		void draw() 
 		{
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -231,10 +182,10 @@ namespace gl
 				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
 			glEnableClientState(GL_VERTEX_ARRAY);
-			if (color) {
+			if (gl_container.isColor()) {
 				glEnableClientState(GL_COLOR_ARRAY);
 			}
-			if (normals) {
+			if (gl_container.isNormal()) {
 				glEnableClientState(GL_NORMAL_ARRAY);
 			}
 			glColor4f(1.0, 1.0, 1.0, 0.0);
@@ -274,14 +225,14 @@ namespace gl
 			/**
 				Link the points, colors and normals for drawing
 			*/
-			glVertexPointer(3, GL_FLOAT, 0, points);
-			if (color) {
-				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
+			glVertexPointer(3, GL_FLOAT, 0, gl_container.getPoints());
+			if (gl_container.isColor()) {
+				glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container.getColor());
 			}
-			if (normals) {
-				glNormalPointer(GL_FLOAT, 0, normals);
+			if (gl_container.isNormal()) {
+				glNormalPointer(GL_FLOAT, 0, gl_container.getNormals());
 			}
-			glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
+			glDrawArrays(GL_POINTS, 0, (GLsizei)gl_container.getNumberOfVertices());
 
 			/**
 				Draw axis
@@ -307,140 +258,23 @@ namespace gl
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
 			glDisableClientState(GL_VERTEX_ARRAY);
-			if (color) {
+			if (gl_container.isColor()) {
 				glDisableClientState(GL_COLOR_ARRAY);
 			}
-			if (normals) {
+			if (gl_container.isNormal()) {
 				glDisableClientState(GL_NORMAL_ARRAY);
 			}
 
 			glPopMatrix();
 
 			glutSwapBuffers();
-		}
-
-		/**
-			Draw the pointcloud with double accurancy
-		*/
-		void drawd() 
-		{
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glMatrixMode(GL_MODELVIEW);
-			glPushMatrix();
-			
-			/**
-				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
-			*/
-			glEnableClientState(GL_VERTEX_ARRAY);
-			if (color) {
-				glEnableClientState(GL_COLOR_ARRAY);
-			}
-			if (normals) {
-				glEnableClientState(GL_NORMAL_ARRAY);
-			}	
-			glColor4f(1.0, 1.0, 1.0, 0.0);
-
-			glLoadIdentity();
-				
-			/**
-				Increase or decrease the entire pointcloud by the factor gl_zoom
-			*/
-			glScaled(1.0 / gl_mouse_movement_.getZoom(),
-				1.0 / gl_mouse_movement_.getZoom(),
-				1.0 / gl_mouse_movement_.getZoom());
-			
-			/**
-				Translate the pointlcoud by the chosen centerpoint
-			*/
-
-			glTranslated(gl_mouse_movement_.getCenterX() * gl_mouse_movement_.getZoom(),
-				gl_mouse_movement_.getCenterY() * gl_mouse_movement_.getZoom(),
-				gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
-				
-			/**
-				Roatate the entire pointcloud around the x- and y-axis
-			*/
-			ElementType gl_rot_x, gl_rot_y, gl_rot_z;
-			gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-			glRotated(-1.0 *math::toDeg<ElementType>(gl_rot_x), 1.0, 0.0, 0.0);
-			glRotated(1.0 *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0, 0.0);
-			glRotated(1.0 *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0);
-
-			/**
-				Determine the size of the points
-			*/
-			glPointSize((GLfloat)gl_pointsize);
-
-			/**
-				Link the points, colors and normals for drawing
-			*/
-			glVertexPointer(3, GL_DOUBLE, 0, points);
-			if (color) {
-				glColorPointer(3, GL_UNSIGNED_BYTE, 0, color);
-			}
-			if (normals) {
-				glNormalPointer(GL_DOUBLE, 0, normals);
-			}
-			glDrawArrays(GL_POINTS, 0, (GLsizei) number_of_elements);
-
-			/**
-				Draw axis
-			*/				
-			glLineWidth(2.0f);
-			glBegin(GL_LINES);
-				glColor4f(1.0f, 0.0, 0.0, 0.0);
-				glVertex3d(0.0, 0.0, 0.0);
-				glVertex3d(0.25*gl_mouse_movement_.getZoom(), 0.0, 0.0);
-			glEnd();
-			glBegin(GL_LINES);
-				glColor4f(0.0, 1.0f, 0.0, 0.0);
-				glVertex3d(0.0, 0.0, 0.0);
-				glVertex3d(0.0, 0.25*gl_mouse_movement_.getZoom(), 0.0);
-			glEnd();
-			glBegin(GL_LINES);
-				glColor4f(0.0, 0.0, 1.0f, 0.0);
-				glVertex3d(0.0, 0.0, 0.0);
-				glVertex3d(0.0, 0.0, 0.25*gl_mouse_movement_.getZoom());
-			glEnd();
-
-			/**
-				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
-			*/
-			glDisableClientState(GL_VERTEX_ARRAY);
-			if (color) {
-				glDisableClientState(GL_COLOR_ARRAY);
-			}
-			if (normals) {
-				glDisableClientState(GL_NORMAL_ARRAY);
-			}
-
-			glPopMatrix();
-
-			glutSwapBuffers();
-
 		}
 
 	private:
 		/**
-			Points
+			Container with points, colors, normals and indices
 		*/
-		ElementType* points;
-		
-		/**
-			Color
-		*/
-		uint8_t* color;
-		
-		/**
-			Normals
-		*/
-		ElementType* normals;
-		
-		/**
-			Number of elements
-		*/
-		size_t number_of_elements;
+		gl::GLContainer<ElementType> gl_container;
 
 		/**
 			Computes translation, rotation and zoom
@@ -455,7 +289,7 @@ namespace gl
 		/**
 			Zoom factor
 		*/
-		ElementType gl_zoom;
+		float gl_zoom;
 	};
 
 	/**
@@ -513,18 +347,20 @@ namespace gl
 		*/
 		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			viewer_instances.getCurrentViewerInstance().setPointcloud(pointcloud_);
+			gl::GLContainer<ElementType> gl_container(pointcloud_);
+			viewer_instances.getCurrentViewerInstance().setPointcloud(gl_container);
 		}
 
 		/**
 			Set pointcloud
 
 			@param[in] points_ Pointcloud
-			@param[in] number_of_elements_ Number of elements
+			@param[in] number_of_vertices_ Number of elements
 		*/
-		void setPointcloud(ElementType* points_, size_t number_of_elements_) 
+		void setPointcloud(ElementType* points_, size_t number_of_vertices_) 
 		{
-			viewer_instances.getCurrentViewerInstance().setPointcloud(points_, number_of_elements_);
+			gl::GLContainer<ElementType> gl_container(points_, number_of_vertices_);
+			viewer_instances.getCurrentViewerInstance().setPointcloud(gl_container);
 		}
 
 		/** 
@@ -729,11 +565,9 @@ namespace gl
 		*/
 		void clearMemory()
 		{
-			std::cout << "aa" << std::endl;
-			//for (size_t i = 0; i < number_of_viewer; i++) {
-			//	viewer_instances[i].clearMemory();
-			//}
-
+			for (size_t i = 0; i < number_of_viewer; i++) {
+				viewer_instances[i].clearMemory();
+			}
 			viewer_instances.clear();
 			number_of_viewer = 0;
 			current_instance = NULL;
