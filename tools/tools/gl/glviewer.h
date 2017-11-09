@@ -64,7 +64,7 @@ namespace gl
 		*/
 		ViewerInstance()
 		{
-			gl_pointsize = 1;
+			gl_pointsize_ = 1;
 		}
 
 		/**
@@ -87,9 +87,9 @@ namespace gl
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(gl::GLContainer<ElementType>& gl_container_)
+		void setPointcloud(gl::GLContainer<ElementType>& gl_container)
 		{
-			gl_container = gl_container_;
+			gl_container_ = gl_container;
 			
 			setParameters();
 		}
@@ -103,14 +103,14 @@ namespace gl
 				Compute the bounding box of the pointcloud
 			*/
 			utils::BoundingBox<ElementType> bounding_box = 
-				utils::BoundingBox<ElementType>(gl_container.getPoints(), gl_container.getNumberOfVertices(), 3);
+				utils::BoundingBox<ElementType>(gl_container_.getPoints(), gl_container_.getNumberOfVertices(), 3);
 
 			/**
 				Center and normalize the pointlcoud
 			*/
 			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
-			ElementType* points = gl_container.getPoints();
-			for (size_t i = 0; i < gl_container.getNumberOfVertices() * 3; i++) {
+			ElementType* points = gl_container_.getPoints();
+			for (size_t i = 0; i < gl_container_.getNumberOfVertices() * 3; i++) {
 				points[i] = (points[i] - bounding_box.getMiddle(i % 3)) * ( 1 / gl_zoom);
 			}
 		}
@@ -120,8 +120,8 @@ namespace gl
 		*/
 		void increasePointSize()
 		{
-			if (gl_pointsize < 10) {
-				gl_pointsize++;
+			if (gl_pointsize_ < 10) {
+				gl_pointsize_++;
 			}
 		}
 
@@ -130,8 +130,8 @@ namespace gl
 		*/
 		void decreasePointSize()
 		{
-			if (gl_pointsize > 1) {
-				gl_pointsize--;
+			if (gl_pointsize_ > 1) {
+				gl_pointsize_--;
 			}
 		}
 
@@ -182,10 +182,10 @@ namespace gl
 				Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
 			glEnableClientState(GL_VERTEX_ARRAY);
-			if (gl_container.isColor()) {
+			if (gl_container_.isColor()) {
 				glEnableClientState(GL_COLOR_ARRAY);
 			}
-			if (gl_container.isNormal()) {
+			if (gl_container_.isNormal()) {
 				glEnableClientState(GL_NORMAL_ARRAY);
 			}
 			glColor4f(1.0, 1.0, 1.0, 0.0);
@@ -220,19 +220,19 @@ namespace gl
 			/**
 				Determine the size of the points
 			*/
-			glPointSize((GLfloat) gl_pointsize);
+			glPointSize((GLfloat) gl_pointsize_);
 
 			/**
 				Link the points, colors and normals for drawing
 			*/
-			glVertexPointer(3, GL_FLOAT, 0, gl_container.getPoints());
-			if (gl_container.isColor()) {
-				glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container.getColor());
+			glVertexPointer(3, GL_FLOAT, 0, gl_container_.getPoints());
+			if (gl_container_.isColor()) {
+				glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container_.getColor());
 			}
-			if (gl_container.isNormal()) {
-				glNormalPointer(GL_FLOAT, 0, gl_container.getNormals());
+			if (gl_container_.isNormal()) {
+				glNormalPointer(GL_FLOAT, 0, gl_container_.getNormals());
 			}
-			glDrawArrays(GL_POINTS, 0, (GLsizei)gl_container.getNumberOfVertices());
+			glDrawArrays(GL_POINTS, 0, (GLsizei)gl_container_.getNumberOfVertices());
 
 			/**
 				Draw axis
@@ -258,10 +258,10 @@ namespace gl
 				Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 			*/
 			glDisableClientState(GL_VERTEX_ARRAY);
-			if (gl_container.isColor()) {
+			if (gl_container_.isColor()) {
 				glDisableClientState(GL_COLOR_ARRAY);
 			}
-			if (gl_container.isNormal()) {
+			if (gl_container_.isNormal()) {
 				glDisableClientState(GL_NORMAL_ARRAY);
 			}
 
@@ -274,7 +274,7 @@ namespace gl
 		/**
 			Container with points, colors, normals and indices
 		*/
-		gl::GLContainer<ElementType> gl_container;
+		gl::GLContainer<ElementType> gl_container_;
 
 		/**
 			Computes translation, rotation and zoom
@@ -284,12 +284,7 @@ namespace gl
 		/**
 			Point size
 		*/
-		size_t gl_pointsize;
-
-		/**
-			Zoom factor
-		*/
-		float gl_zoom;
+		size_t gl_pointsize_;
 	};
 
 	/**
