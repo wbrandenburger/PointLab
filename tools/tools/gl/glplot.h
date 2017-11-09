@@ -623,7 +623,7 @@ namespace gl
 		/**
 			Constructor
 		*/
-		StaticPlotInstance(void) : number_of_plots(0), current_instance(NULL), current_window(NULL)
+		StaticPlotInstance(void) : number_of_plots_(0), current_instance_(NULL), current_window_(NULL)
 		{
 		}
 
@@ -632,31 +632,31 @@ namespace gl
 		*/
 		~StaticPlotInstance() 
 		{
-			clear();
+			clearMemory();
 		}
 
 
 		/**
 			Clear
 		*/
-		void clear() {
-			plot_instances.clear();
-			plot_indices.clear();
-			number_of_plots = 0;
-			current_instance = NULL;
-			current_window = NULL;
+		void clearMemory() {
+			plot_instances_.clear();
+			plot_indices_.clear();
+			number_of_plots_ = 0;
+			current_instance_ = NULL;
+			current_window_ = NULL;
 		}
 		/**
 			Set plot
 
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPlot(size_t number_of_elements_)
+		void setPlot(size_t number_of_elements)
 		{
-			plot_instances.push_back(PlotFunction<ElementType>(number_of_elements_));
+			plot_instances_.push_back(PlotFunction<ElementType>(number_of_elements));
 
-			current_instance = number_of_plots;
-			number_of_plots++;
+			current_instance_ = number_of_plots_;
+			number_of_plots_++;
 		}
 
 		/**
@@ -664,15 +664,15 @@ namespace gl
 		*/
 		size_t getNumberOfPlots()
 		{
-			return number_of_plots;
+			return number_of_plots_;
 		}
 
 		/**
 			Set number of plots
 		*/
-		void setNumberOfPlots(size_t number_of_plots_)
+		void setNumberOfPlots(size_t number_of_plots)
 		{
-			number_of_plots = number_of_plots_;
+			number_of_plots_ = number_of_plots;
 		}
 
 		/**
@@ -680,31 +680,31 @@ namespace gl
 		*/
 		size_t getCurrentInstance()
 		{
-			return current_instance;
+			return current_instance_;
 		}
 
 		/**
 			Set current plot
 		*/
-		void setCurrentInstance(size_t current_window_)
+		void setCurrentInstance(size_t current_window)
 		{
-			current_instance = plot_indices[current_window_];
-			current_window = current_window_;
+			current_instance_ = plot_indices_[current_window];
+			current_window_ = current_window;
 		}
 
 		/**
 			Get current window
 		*/
 		size_t getCurrentWindow() {
-			return current_window;
+			return current_window_;
 		}
 
 		/**
 			Assign a window index with an plot index
 		*/
-		void setWindowIndex(size_t window_index_)
+		void setWindowIndex(size_t window_index)
 		{
-			plot_indices[window_index_] = number_of_plots - 1;
+			plot_indices_[window_index] = number_of_plots_ - 1;
 		}
 
 		/**
@@ -712,7 +712,7 @@ namespace gl
 		*/
 		PlotFunction<ElementType>& getCurrentInstanceFunction()
 		{
-			return plot_instances[current_instance];
+			return plot_instances_[current_instance_];
 		}
 
 		/**
@@ -722,34 +722,34 @@ namespace gl
 		*/
 		std::vector<PlotFunction<ElementType>>& operator()()
 		{
-			return plot_instances;
+			return plot_instances_;
 		}
 
 	private:
 		/**
 			Number of plots
 		*/
-		size_t  number_of_plots;
+		size_t  number_of_plots_;
 
 		/**
 			Current plot
 		*/
-		size_t current_instance;
+		size_t current_instance_;
 
 		/**
 			Current window
 		*/
-		size_t current_window;
+		size_t current_window_;
 
 		/**
 			Container which assign a instance to the windows
 		*/
-		std::map<size_t, size_t> plot_indices;
+		std::map<size_t, size_t> plot_indices_;
 
 		/**
 			Structure with all plots
 		*/
-		std::vector<PlotFunction<ElementType>> plot_instances;
+		std::vector<PlotFunction<ElementType>> plot_instances_;
 	};
 
 	/**
