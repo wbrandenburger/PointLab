@@ -64,9 +64,10 @@ namespace gl
 		/**
 			Constructor
 		*/
-		Plot3DInstance() : number_of_clouds(0) 
+		Plot3DInstance()
 		{
-			gl_pointsize = 1;
+			number_of_clouds_ = 0;
+			gl_pointsize_ = 1;
 		}
 
 		/**
@@ -88,11 +89,11 @@ namespace gl
 
 			@param[in] gl_container Container with elements which has to be drawn
 		*/
-		void setPointcloud(gl::GLContainer<ElementType>& gl_container_)
+		void setPointcloud(gl::GLContainer<ElementType>& gl_container)
 		{
-			gl_container.push_back(gl_container_);
+			gl_container_.push_back(gl_container);
 			
-			number_of_clouds++;
+			number_of_clouds_++;
 		}
 
 		/**
@@ -104,17 +105,17 @@ namespace gl
 				Compute the bounding box of the pointcloud
 			*/
 			utils::BoundingBox<ElementType> bounding_box;
-			for (size_t i = 0; i < number_of_clouds; i++) {
-				bounding_box.setBoundingBox(gl_container[i].getPoints(), gl_container[i].getNumberOfVertices(), 3);
+			for (size_t i = 0; i < number_of_clouds_; i++) {
+				bounding_box.setBoundingBox(gl_container_[i].getPoints(), gl_container_[i].getNumberOfVertices(), 3);
 			}
 
 			/**
 				Center and normalize the pointlcoud
 			*/
 			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
-			for (size_t i = 0; i < number_of_clouds; i++) {
-				ElementType* points = gl_container[i].getPoints();
-				for (size_t j = 0; j <  gl_container[i].getNumberOfVertices() * 3; j++) {
+			for (size_t i = 0; i < number_of_clouds_; i++) {
+				ElementType* points = gl_container_[i].getPoints();
+				for (size_t j = 0; j <  gl_container_[i].getNumberOfVertices() * 3; j++) {
 					points[j] = (points[j] - bounding_box.getMiddle(j % 3)) * (1 / gl_zoom);
 				}
 			}
@@ -125,8 +126,8 @@ namespace gl
 		*/
 		void increasePointSize()
 		{
-			if (gl_pointsize < 10) {
-				gl_pointsize++;
+			if (gl_pointsize_ < 10) {
+				gl_pointsize_++;
 			}
 		}
 
@@ -135,8 +136,8 @@ namespace gl
 		*/
 		void decreasePointSize()
 		{
-			if (gl_pointsize > 1) {
-				gl_pointsize--;
+			if (gl_pointsize_ > 1) {
+				gl_pointsize_--;
 			}
 		}
 
@@ -183,23 +184,23 @@ namespace gl
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 
-			for (size_t i = 0; i < number_of_clouds; i++) {
+			for (size_t i = 0; i < number_of_clouds_; i++) {
 				/**
 					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glEnableClientState(GL_VERTEX_ARRAY);
-				if (gl_container[i].isColor()) {
+				if (gl_container_[i].isColor()) {
 					glEnableClientState(GL_COLOR_ARRAY);
 				}
-				if (gl_container[i].isNormal()) {
+				if (gl_container_[i].isNormal()) {
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
-				if (gl_container[i].getMode() != GL_POINTS) {
+				if (gl_container_[i].getMode() != GL_POINTS) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
 
 				float r, g, b;
-				utils::colorSchemeRGB(r, g, b, i, number_of_clouds);
+				utils::colorSchemeRGB(r, g, b, i, number_of_clouds_);
 				glColor4f(r, g, b, 0.0f);
 
 
@@ -231,38 +232,38 @@ namespace gl
 				/**
 					Determine the size of the points
 				*/
-				glPointSize((GLfloat)gl_pointsize);
+				glPointSize((GLfloat)gl_pointsize_);
 
 				/**
 					Link the points, colors and normals for drawing
 				*/
-				glVertexPointer(3, GL_FLOAT, 0, gl_container[i].getPoints());
-				if (gl_container[i].isColor()) {
-					glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container[i].getColor());
+				glVertexPointer(3, GL_FLOAT, 0, gl_container_[i].getPoints());
+				if (gl_container_[i].isColor()) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container_[i].getColor());
 				}
-				if (gl_container[i].isNormal()) {
-					glNormalPointer(GL_FLOAT, 0, gl_container[i].getNormals());
+				if (gl_container_[i].isNormal()) {
+					glNormalPointer(GL_FLOAT, 0, gl_container_[i].getNormals());
 				}
 				
-				if (gl_container[i].getMode() == GL_POINTS) {
-					glDrawArrays(gl_container[i].getMode(), 0, gl_container[i].getNumberOfVertices());
+				if (gl_container_[i].getMode() == GL_POINTS) {
+					glDrawArrays(gl_container_[i].getMode(), 0, gl_container_[i].getNumberOfVertices());
 				}
 				else{
-					glDrawElements(gl_container[i].getMode(), gl_container[i].getNumberOfIndices(),
-						GL_UNSIGNED_INT, gl_container[i].getIndices());
+					glDrawElements(gl_container_[i].getMode(), gl_container_[i].getNumberOfIndices(),
+						GL_UNSIGNED_INT, gl_container_[i].getIndices());
 				}
 
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glDisableClientState(GL_VERTEX_ARRAY);
-				if (gl_container[i].isColor()) {
+				if (gl_container_[i].isColor()) {
 					glDisableClientState(GL_COLOR_ARRAY);
 				}
-				if (gl_container[i].isNormal()) {
+				if (gl_container_[i].isNormal()) {
 					glDisableClientState(GL_NORMAL_ARRAY);
 				}
-				if (gl_container[i].getMode() != GL_POINTS) {
+				if (gl_container_[i].getMode() != GL_POINTS) {
 					glDisableClientState(GL_INDEX_ARRAY);
 				}
 			}
@@ -302,7 +303,7 @@ namespace gl
 		/**
 			Container with points, colors, normals and indices
 		*/
-		std::vector<gl::GLContainer<ElementType>> gl_container;
+		std::vector<gl::GLContainer<ElementType>> gl_container_;
 
 		/**
 			Computes translation, rotation and zoom
@@ -312,12 +313,12 @@ namespace gl
 		/**
 			Point size
 		*/
-		size_t gl_pointsize;
+		size_t gl_pointsize_;
 
 		/**
 			Number of pointclouds
 		*/
-		size_t number_of_clouds;
+		size_t number_of_clouds_;
 	};
 
 	/**
