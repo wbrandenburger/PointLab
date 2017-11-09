@@ -42,8 +42,8 @@ namespace utils
 		/**
 			Constructor
 		*/
-		Matrix(void) :
-			rows(0), cols(0), data(NULL)
+		Matrix() :
+			rows_(0), cols_(0), data_(NULL)
 		{
 		}
 
@@ -54,41 +54,89 @@ namespace utils
 			@param[in] rows_ Rows of the matrix
 			@param[in] cols_ Columns of the matrix
 		*/
-		Matrix(ElementType* data_, size_t rows_, size_t cols_) :
-			rows(rows_), cols(cols_), data(data_)
+		Matrix(ElementType* data, size_t rows, size_t cols) : Matrix()
 		{
+			rows_ = rows;
+			cols_ = cols;
+			data_ = data;
 		}
 
 		/**
-			Copy Constructor
-
-			@param[in] matrix_ Matrix which shall be copied
+			Deconstructor
 		*/
-		Matrix(const Matrix<ElementType>& matrix_)
+		~Matrix()
 		{
-			clear();
+			clearMemory();
+		}
 
-			data = new ElementType[matrix_.rows*matrix_.cols];
-			std::memcpy(data, matrix_.getPtr(), sizeof(ElementType)*matrix_.rows*matrix_.cols);
+		/**
+			Deletes the data array
+		*/
+		void clearMemory ()
+		{
+			if (data_) {
+				delete[] data_;
+				data_ = nullptr;
+			}
+		}
 
-			rows = matrix_.rows;
-			cols = matrix_.cols;
+		/**
+			Copy constructor
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix(const Matrix<ElementType>& matrix) : Matrix()
+		{
+
+			data_ = new ElementType[matrix_.getRows()*matrix_.getCols()];
+			std::memcpy(data_, matrix.getPtr(), sizeof(ElementType)*matrix.getRows()*matrix.getCols());
+
+			rows_ = matrix.getRows();
+			cols_ = matrix.getCols();
 		}
 		
 		/**
-			Operator =
+			Copy constructor
 
-			@param[in] matrix_ Matrix which shall be copied
+			@param[in] matrix An instance of class Matrix
 		*/
-		void operator=(const Matrix<ElementType>& matrix_)
+		Matrix(const Matrix<ElementType>&& matrix) : Matrix()
 		{
-			clear();
+			*this = matrix;
+		}	
 
-			data = new ElementType[matrix_.rows*matrix_.cols];
-			std::memcpy(data, matrix_.getPtr(), sizeof(ElementType)*matrix_.rows*matrix_.cols);
+		/**
+			Operator =
+	
+			@param[in] matrix An instance of class Matrix
+			@return Returns reference to the current instance
+		*/
+		Matrix<ElementType>& operator=(const Matrix<ElementType>& matrix)
+		{
+			clearMemory();
 
-			rows = matrix_.rows;
-			cols = matrix_.cols;
+			data_ = new ElementType[matrix.getRows()*matrix.getCols()];
+			std::memcpy(data_, matrix.getPtr(), sizeof(ElementType)*matrix.getRows()*matrix.getCols());
+
+			rows_ = matrix.getRows();
+			cols_ = matrix.getCols();
+
+			return *this;
+		}
+
+		/**
+			Operator =
+	
+			@param[in] matrix An instance of class Matrix
+			@return Returns reference to the current instance
+		*/
+		Matrix<ElementType>& operator=(const Matrix<ElementType>&& matrix)
+		{
+			clearMemory();
+
+			*this = matrix;
+
+			return *this;
 		}
 
 		/**
@@ -98,34 +146,13 @@ namespace utils
 			@param[in] rows_ Rows of the matrix
 			@param[in] cols_ Columns of the matrix
 		*/
-		void setMatrix(ElementType* data_, size_t rows_, size_t cols_)
+		void setMatrix(ElementType* data, size_t rows, size_t cols)
 		{
-			clear();
+			clearMemory();
 
-			data = data_;
-			rows = rows_;
-			cols = cols_;
-		}
-
-		/**
-			Deconstructor
-		*/
-		~Matrix(void)
-		{
-			clear();
-		}
-
-		/**
-			Deletes the data array
-		*/
-		void clear()
-		{
-			rows = 0;
-			cols = 0;
-			if (data) {
-				delete[] data;
-				data = nullptr;
-			}
+			data_ = data;
+			rows_ = rows;
+			cols_ = cols;
 		}
 
 		/**
@@ -135,7 +162,7 @@ namespace utils
 		*/
 		ElementType* getPtr() const
 		{
-			return (data);
+			return data_;
 		}
 
 		/**
@@ -145,7 +172,7 @@ namespace utils
 		*/
 		size_t getRows() const
 		{
-			return rows;
+			return rows_;
 		}
 
 		/**
@@ -155,7 +182,7 @@ namespace utils
 		*/
 		size_t getCols() const
 		{
-			return cols;
+			return cols_;
 		}
 
 		/**
@@ -164,9 +191,9 @@ namespace utils
 			@param[in] index_ Index of the row
 			@return Returns the pointer of the indexth row
 		*/
-		inline ElementType* operator[](size_t index_) const
+		inline ElementType* operator[](size_t index) const
 		{
-			return data + index_*cols;
+			return data_ + index*cols_;
 		}
 		
 	public:
@@ -174,32 +201,32 @@ namespace utils
 		/** 
 			Rows of matrix 
 		*/
-		size_t rows; 
+		size_t rows_; 
 
 		/** 
 			Columns of matrix 
 		*/
-		size_t cols;  
+		size_t cols_;  
 
 		/** 
 			Pointer to data 
 		*/ 
-		ElementType* data; 
+		ElementType* data_; 
 	};
 
 	template<typename ElementType>
-	std::ostream& operator<<(std::ostream& out_, const Matrix<ElementType>& matrix_)
+	std::ostream& operator<<(std::ostream& out, const Matrix<ElementType>& matrix)
 	{
-		size_t number = matrix_.rows < 10 ? matrix_.rows : 10;
+		size_t number = matrix.getRows() < 10 ? matrix.getRows() : 10;
 
 		for (size_t i = 0; i < number; i++) {
-			for (size_t j = 0; j < matrix_.cols; j++) {
-				out_ << matrix_[i][j] << " ";
+			for (size_t j = 0; j < matrix.getCols(); j++) {
+				out << matrix_[i][j] << " ";
 			}
-			out_ <<  std::endl;
+			out <<  std::endl;
 		}
 
-		return out_;
+		return out;
 	}
 
 }

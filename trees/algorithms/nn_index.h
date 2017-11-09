@@ -73,8 +73,8 @@ namespace trees
 		*/
 		void setDataset(const utils::Matrix<ElementType>& dataset_)
 		{
-			size = dataset_.rows;
-			veclen = dataset_.cols;
+			size = dataset_.getRows();
+			veclen = dataset_.getCols();
 
 			dataset = dataset_;
 		}

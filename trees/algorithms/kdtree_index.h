@@ -191,7 +191,7 @@ namespace trees
 				delete[] dataset_nodes;
 				dataset_nodes = nullptr;
 			}
-			dataset_points.clear();
+			dataset_points.clearMemory();
 			if (root_node) { root_node->~Node(); }
 			pool.clear();
 		}

@@ -115,7 +115,8 @@ namespace gl
 
 			number_of_vertices = number_of_vertices_;
 
-			points = points_;
+			points = new ElementType[number_of_vertices * 3]; 
+			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
 		}
 
 		/**
@@ -131,7 +132,8 @@ namespace gl
 
 			number_of_vertices = number_of_vertices_;
 
-			points = points_;
+			points = new ElementType[number_of_vertices * 3];
+			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
 		}
 
 		/**
@@ -155,7 +157,10 @@ namespace gl
 			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
 			}
 
-			points = points_;
+			points = new ElementType[number_of_vertices * 3];
+			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
+
+
 			indices = indices_;
 		}
 
@@ -180,7 +185,9 @@ namespace gl
 			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
 			}
 
-			points = points_;
+			points = new ElementType[number_of_vertices * 3];
+			std::memcpy(points, points_, sizeof(ElementType) * number_of_vertices * 3);
+
 			indices = indices_;
 		}
 

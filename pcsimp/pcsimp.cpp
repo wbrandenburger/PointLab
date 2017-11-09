@@ -92,11 +92,18 @@ int main(int argc, char* argv[]) {
 
 
 
+	//utils::Matrix<float> matrix_buny;
+	//matrix_buny.setMatrix(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices(), 3);
+	//trees::Index<float> index(matrix_buny, trees::KDTreeIndexParams(20));
+	//index.buildIndex();
+	//int nn = 1000;
+	//int querynumber = 15000;
+	//utils::Matrix<size_t> indices(new size_t[nn], 1, nn);
+	//utils::Matrix<float> dists(new float[nn], 1, nn);
 
+	//utils::Matrix<float> matrix;
 
-
-
-
+	//index.knnSearch(, indices, dists, nn, params);
 
 
 
