@@ -335,14 +335,7 @@ namespace gl
 		*/	
 		GLPlot3D()
 		{
-			clearMemory();
-
-			if (!std::is_same<float,ElementType>::value && !std::is_same<double, ElementType>::value){
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
-			}
-
-			mouse_button = NULL;
+			mouse_button_ = NULL;
 		}
 
 		/**
@@ -358,9 +351,9 @@ namespace gl
 		*/
 		void clearMemory() 
 		{
-			plot3d_instances.clearMemory();
+			plot3d_instances_.clearMemory();
 			
-			mouse_button = NULL;
+			mouse_button_ = NULL;
 		}
 
 		/**
@@ -368,7 +361,7 @@ namespace gl
 		*/
 		void setPlot3D()
 		{
-			plot3d_instances.setPlot3DInstance();
+			plot3d_instances_.setPlot3DInstance();
 		}
 
 		/**
@@ -377,10 +370,10 @@ namespace gl
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(GLParams mode, const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
-			gl::GLContainer<ElementType> gl_container(mode_, pointcloud_);
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(gl_container);
+			gl::GLContainer<ElementType> gl_container(mode, pointcloud);
+			plot3d_instances_.getCurrentPlot3DInstance().setPointcloud(gl_container);
 		}
 
 		/**
@@ -390,10 +383,10 @@ namespace gl
 			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of elements
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
+		void setPointcloud(GLParams mode, ElementType* points, size_t number_of_vertices)
 		{
-			gl::GLContainer<ElementType> gl_container(mode_, points_, number_of_vertices_);
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(gl_container);
+			gl::GLContainer<ElementType> gl_container(mode, points, number_of_vertices);
+			plot3d_instances_.getCurrentPlot3DInstance().setPointcloud(gl_container);
 		}
 				
 		/**
@@ -405,11 +398,11 @@ namespace gl
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] number_of_lines_ Number of indices
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines_, 
-			size_t number_of_vertices_, size_t number_of_lines_)
+		void setPointcloud(GLParams mode, ElementType* points, unsigned int* lines, 
+			size_t number_of_vertices, size_t number_of_lines)
 		{
-			gl::GLContainer<ElementType> gl_container(mode_, points_, lines_, number_of_vertices_, number_of_lines_);
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(gl_container);
+			gl::GLContainer<ElementType> gl_container(mode, points, lines, number_of_vertices, number_of_lines);
+			plot3d_instances_.getCurrentPlot3DInstance().setPointcloud(gl_container);
 		}
 
 		/** 
@@ -417,9 +410,9 @@ namespace gl
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow((int)plot3d_instances.getCurrentWindow() + 1);
+			glutSetWindow((int)plot3d_instances_.getCurrentWindow() + 1);
 
-			plot3d_instances.getCurrentPlot3DInstance().draw();
+			plot3d_instances_.getCurrentPlot3DInstance().draw();
 		};
 
 		/**  
@@ -436,11 +429,11 @@ namespace gl
 			@param[in] width_ The new Width of the window
 			@param[in] height_ The new Height of the window
 		*/
-		static void reshape(int width_, int height_)
+		static void reshape(int width, int height)
 		{
 			glutSetWindow(glutGetWindow());
 
-			glViewport(0, 0, width_, height_);
+			glViewport(0, 0, width, height);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
@@ -452,11 +445,11 @@ namespace gl
 			
 			@param[in] window_name_ Name of the window
 		*/
-		void plot(char* window_name_ = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
+		void plot(char* window_name = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
 		{
-			if (!window_name_) {
-				window_name_ = new char[10];
-				sprintf(window_name_, "Plot3D %d", (int) plot3d_instances.getNumberOfPlot3D() - 1);
+			if (!window_name) {
+				window_name = new char[10];
+				sprintf(window_name, "Plot3D %d", (int) plot3d_instances_.getNumberOfPlot3D() - 1);
 			}
 
 
@@ -465,11 +458,11 @@ namespace gl
 			glutInitWindowSize((int)window_spec.getWidth(), (int)window_spec.getHeight());
 			glutInitWindowPosition((int)window_spec.getPositionX(), (int)window_spec.getPositionY());
 
-			size_t window_index = glutCreateWindow(window_name_) - 1;
-			plot3d_instances.setWindowIndex(window_index);
-			plot3d_instances.setCurrentInstance(window_index);
+			size_t window_index = glutCreateWindow(window_name) - 1;
+			plot3d_instances_.setWindowIndex(window_index);
+			plot3d_instances_.setCurrentInstance(window_index);
 
-			plot3d_instances.getCurrentPlot3DInstance().setParameters();
+			plot3d_instances_.getCurrentPlot3DInstance().setParameters();
 			/**
 				Register GLUT callbacks.
 			*/
@@ -495,11 +488,11 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void key(uint8_t key_, int x_, int y_)
+		static void key(uint8_t key, int x, int y)
 		{
-			switch (key_) {		
-			case '+': plot3d_instances.getCurrentPlot3DInstance().increasePointSize(); break;
-			case '-': plot3d_instances.getCurrentPlot3DInstance().decreasePointSize(); break;
+			switch (key) {		
+			case '+': plot3d_instances_.getCurrentPlot3DInstance().increasePointSize(); break;
+			case '-': plot3d_instances_.getCurrentPlot3DInstance().decreasePointSize(); break;
 			case 27	: glutLeaveMainLoop(); break;
 			}
 		};
@@ -512,10 +505,10 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseWheel(int button_, int direction_, int x_, int y_)
+		static void mouseWheel(int button, int direction, int x, int y)
 		{
-			plot3d_instances.setCurrentInstance(glutGetWindow() - 1);
-			plot3d_instances.getCurrentPlot3DInstance().zoom(direction_);
+			plot3d_instances_.setCurrentInstance(glutGetWindow() - 1);
+			plot3d_instances_.getCurrentPlot3DInstance().zoom(direction);
 		}
 
 		/**
@@ -526,16 +519,16 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseFunc(int button_, int state_, int x_, int y_)
+		static void mouseFunc(int button, int state, int x, int y)
 		{
-			plot3d_instances.setCurrentInstance(glutGetWindow() - 1);
-			if (!state_){
-				mouse_button = button_;
+			plot3d_instances_.setCurrentInstance(glutGetWindow() - 1);
+			if (!state){
+				mouse_button_ = button;
 
-				mouse_position.setPosition(x_, y_);
+				mouse_position_.setPosition(x, y);
 			}
 			else {
-				mouse_button = NULL;
+				mouse_button_ = NULL;
 			}
 
 		}
@@ -546,24 +539,24 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseMotion(int x_, int y_)
+		static void mouseMotion(int x, int y)
 		{
-			plot3d_instances.setCurrentInstance(glutGetWindow() - 1);
-			if (mouse_button == GLUT_LEFT_BUTTON){
-				plot3d_instances.getCurrentPlot3DInstance().rotate(mouse_position.getX(), 
-					mouse_position.getY(), x_, y_);
+			plot3d_instances_.setCurrentInstance(glutGetWindow() - 1);
+			if (mouse_button_ == GLUT_LEFT_BUTTON){
+				plot3d_instances_.getCurrentPlot3DInstance().rotate(mouse_position_.getX(), 
+					mouse_position_.getY(), x, y);
 				
-				mouse_position.setPosition(x_, y_);
+				mouse_position_.setPosition(x, y);
 			}
-			else if (mouse_button == GLUT_MIDDLE_BUTTON) {
-				mouse_position.setPosition(x_, y_);
+			else if (mouse_button_ == GLUT_MIDDLE_BUTTON) {
+				mouse_position_.setPosition(x, y);
 			}
-			else if (mouse_button == GLUT_RIGHT_BUTTON) {
+			else if (mouse_button_ == GLUT_RIGHT_BUTTON) {
 				int x_difference;
 				int y_difference;
 
-				mouse_position.setPosition(x_, y_, x_difference, y_difference);
-				plot3d_instances.getCurrentPlot3DInstance().translate(x_difference, y_difference);
+				mouse_position_.setPosition(x, y, x_difference, y_difference);
+				plot3d_instances_.getCurrentPlot3DInstance().translate(x_difference, y_difference);
 			}
 		}
 
@@ -580,17 +573,17 @@ namespace gl
 		/**
 			Structure where the different plots are organized		
 		*/
-		static StaticPlot3DInstance<ElementType> plot3d_instances;
+		static StaticPlot3DInstance<ElementType> plot3d_instances_;
 
 		/**
 			Mouse button
 		*/
-		static int mouse_button;
+		static int mouse_button_;
 
 		/**
 			Mouse position
 		*/
-		static utils::MousePosition mouse_position;
+		static utils::MousePosition mouse_position_;
 	};
 
 	template<typename ElementType> class StaticPlot3DInstance
@@ -733,17 +726,17 @@ namespace gl
 	/**
 		Static variable GLPlot3D<ElementType>::plot3d_instances
 	*/
-	template<typename ElementType> StaticPlot3DInstance<ElementType> GLPlot3D<ElementType>::plot3d_instances;
+	template<typename ElementType> StaticPlot3DInstance<ElementType> GLPlot3D<ElementType>::plot3d_instances_;
 
 	/**
 		Static variable GLPlot3D<ElementType>::mouse_button
 	*/
-	template<typename ElementType> int GLPlot3D<ElementType>::mouse_button;
+	template<typename ElementType> int GLPlot3D<ElementType>::mouse_button_;
 
 	/**
 		Static variable GLPlot3D<ElementType>::mouse_button
 	*/
-	template<typename ElementType> utils::MousePosition GLPlot3D<ElementType>::mouse_position;
+	template<typename ElementType> utils::MousePosition GLPlot3D<ElementType>::mouse_position_;
 
 }
 

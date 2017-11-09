@@ -307,11 +307,7 @@ namespace gl
 		*/	
 		GLViewer()
 		{
-			if (!std::is_same<float,ElementType>::value && !std::is_same<double, ElementType>::value){
-				exitFailure(__FILE__, __LINE__);
-			}
-
-			mouse_button = NULL;
+			mouse_button_ = NULL;
 		}
 
 		/**
@@ -327,9 +323,9 @@ namespace gl
 		*/
 		void clearMemory() 
 		{
-			viewer_instances.clearMemory();
+			viewer_instances_.clearMemory();
 			
-			mouse_button = NULL;
+			mouse_button_ = NULL;
 		}
 
 		/**
@@ -337,7 +333,7 @@ namespace gl
 		*/
 		void setViewer()
 		{
-			viewer_instances.setViewerInstance();
+			viewer_instances_.setViewerInstance();
 		}
 
 		/**
@@ -345,10 +341,10 @@ namespace gl
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
-			gl::GLContainer<ElementType> gl_container(pointcloud_);
-			viewer_instances.getCurrentViewerInstance().setPointcloud(gl_container);
+			gl::GLContainer<ElementType> gl_container(pointcloud);
+			viewer_instances_.getCurrentViewerInstance().setPointcloud(gl_container);
 		}
 
 		/**
@@ -357,10 +353,10 @@ namespace gl
 			@param[in] points_ Pointcloud
 			@param[in] number_of_vertices_ Number of elements
 		*/
-		void setPointcloud(ElementType* points_, size_t number_of_vertices_) 
+		void setPointcloud(ElementType* points, size_t number_of_vertices) 
 		{
-			gl::GLContainer<ElementType> gl_container(points_, number_of_vertices_);
-			viewer_instances.getCurrentViewerInstance().setPointcloud(gl_container);
+			gl::GLContainer<ElementType> gl_container(points, number_of_vertices);
+			viewer_instances_.getCurrentViewerInstance().setPointcloud(gl_container);
 		}
 
 		/** 
@@ -368,9 +364,9 @@ namespace gl
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow((int)viewer_instances.getCurrentWindow() + 1);
+			glutSetWindow((int)viewer_instances_.getCurrentWindow() + 1);
 
-			viewer_instances.getCurrentViewerInstance().draw();
+			viewer_instances_.getCurrentViewerInstance().draw();
 		};
 
 		/**  
@@ -387,11 +383,11 @@ namespace gl
 			@param[in] width_ The new Width of the window
 			@param[in] height_ The new Height of the window
 		*/
-		static void reshape(int width_, int height_)
+		static void reshape(int width, int height)
 		{
 			glutSetWindow(glutGetWindow());
 
-			glViewport(0, 0, width_, height_);
+			glViewport(0, 0, width, height);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
@@ -403,11 +399,11 @@ namespace gl
 			
 			@param[in] window_name_ Name of the window
 		*/
-		void plot(char* window_name_ = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
+		void plot(char* window_name = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
 		{
-			if (!window_name_) {
-				window_name_ = new char[10];
-				sprintf(window_name_, "Viewer %d", (int) viewer_instances.getNumberOfViewer() - 1);
+			if (!window_name) {
+				window_name = new char[10];
+				sprintf(window_name, "Viewer %d", (int) viewer_instances_.getNumberOfViewer() - 1);
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -415,9 +411,9 @@ namespace gl
 			glutInitWindowSize((int)window_spec.getWidth(), (int)window_spec.getHeight());
 			glutInitWindowPosition((int)window_spec.getPositionX(), (int)window_spec.getPositionY());
 
-			size_t window_index = glutCreateWindow(window_name_) - 1;
-			viewer_instances.setWindowIndex(window_index);
-			viewer_instances.setCurrentInstance(window_index);
+			size_t window_index = glutCreateWindow(window_name) - 1;
+			viewer_instances_.setWindowIndex(window_index);
+			viewer_instances_.setCurrentInstance(window_index);
 
 			/**
 				Register GLUT callbacks.
@@ -444,11 +440,11 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void key(uint8_t key_, int x_, int y_)
+		static void key(uint8_t key, int x, int y)
 		{
-			switch (key_) {		
-			case '+': viewer_instances.getCurrentViewerInstance().increasePointSize(); break;
-			case '-': viewer_instances.getCurrentViewerInstance().decreasePointSize(); break;
+			switch (key) {		
+			case '+': viewer_instances_.getCurrentViewerInstance().increasePointSize(); break;
+			case '-': viewer_instances_.getCurrentViewerInstance().decreasePointSize(); break;
 			case 27	: glutLeaveMainLoop(); break;
 			}
 		};
@@ -461,10 +457,10 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseWheel(int button_, int direction_, int x_, int y_)
+		static void mouseWheel(int button, int direction, int x, int y)
 		{
-			viewer_instances.setCurrentInstance(glutGetWindow() - 1);
-			viewer_instances.getCurrentViewerInstance().zoom(direction_);
+			viewer_instances_.setCurrentInstance(glutGetWindow() - 1);
+			viewer_instances_.getCurrentViewerInstance().zoom(direction);
 		}
 
 		/**
@@ -475,16 +471,16 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseFunc(int button_, int state_, int x_, int y_)
+		static void mouseFunc(int button, int state, int x, int y)
 		{
-			viewer_instances.setCurrentInstance(glutGetWindow() - 1);
-			if (!state_){
-				mouse_button = button_;
+			viewer_instances_.setCurrentInstance(glutGetWindow() - 1);
+			if (!state){
+				mouse_button_ = button;
 
-				mouse_position.setPosition(x_, y_);
+				mouse_position_.setPosition(x, y);
 			}
 			else {
-				mouse_button = NULL;
+				mouse_button_ = NULL;
 			}
 
 		}
@@ -495,24 +491,24 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseMotion(int x_, int y_)
+		static void mouseMotion(int x, int y)
 		{
-			viewer_instances.setCurrentInstance(glutGetWindow() - 1);
-			if (mouse_button == GLUT_LEFT_BUTTON){
-				viewer_instances.getCurrentViewerInstance().rotate(mouse_position.getX(), 
-					mouse_position.getY(), x_, y_);
+			viewer_instances_.setCurrentInstance(glutGetWindow() - 1);
+			if (mouse_button_ == GLUT_LEFT_BUTTON){
+				viewer_instances_.getCurrentViewerInstance().rotate(mouse_position_.getX(), 
+					mouse_position_.getY(), x, y);
 				
-				mouse_position.setPosition(x_, y_);
+				mouse_position_.setPosition(x, y);
 			}
-			else if (mouse_button == GLUT_MIDDLE_BUTTON) {
-				mouse_position.setPosition(x_, y_);
+			else if (mouse_button_ == GLUT_MIDDLE_BUTTON) {
+				mouse_position_.setPosition(x, y);
 			}
-			else if (mouse_button == GLUT_RIGHT_BUTTON) {
+			else if (mouse_button_ == GLUT_RIGHT_BUTTON) {
 				int x_difference;
 				int y_difference;
 
-				mouse_position.setPosition(x_, y_, x_difference, y_difference);
-				viewer_instances.getCurrentViewerInstance().translate(x_difference, y_difference);
+				mouse_position_.setPosition(x, y, x_difference, y_difference);
+				viewer_instances_.getCurrentViewerInstance().translate(x_difference, y_difference);
 			}
 		}
 
@@ -529,17 +525,17 @@ namespace gl
 		/**
 			Structure where the different plots are organized		
 		*/
-		static StaticViewerInstance<ElementType> viewer_instances;
+		static StaticViewerInstance<ElementType> viewer_instances_;
 
 		/**
 			Mouse button
 		*/
-		static int mouse_button;
+		static int mouse_button_;
 
 		/**
 			Mouse position
 		*/
-		static utils::MousePosition mouse_position;
+		static utils::MousePosition mouse_position_;
 	};
 
 	template<typename ElementType> class StaticViewerInstance
@@ -682,17 +678,17 @@ namespace gl
 	/**
 		Static variable GLViewer<ElementType>::viewer_instances
 	*/
-	template<typename ElementType> StaticViewerInstance<ElementType> GLViewer<ElementType>::viewer_instances;
+	template<typename ElementType> StaticViewerInstance<ElementType> GLViewer<ElementType>::viewer_instances_;
 
 	/**
 		Static variable GLViewer<ElementType>::mouse_button
 	*/
-	template<typename ElementType> int GLViewer<ElementType>::mouse_button;
+	template<typename ElementType> int GLViewer<ElementType>::mouse_button_;
 
 	/**
 		Static variable GLViewer<ElementType>::mouse_button
 	*/
-	template<typename ElementType> utils::MousePosition GLViewer<ElementType>::mouse_position;
+	template<typename ElementType> utils::MousePosition GLViewer<ElementType>::mouse_position_;
 
 }
 
