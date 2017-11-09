@@ -548,7 +548,7 @@ namespace gl
 		/** 
 			Constructor
 		*/
-		StaticViewerInstance() : number_of_viewer(0), current_instance(NULL), current_window(NULL)
+		StaticViewerInstance() : number_of_viewer_(0), current_instance_(NULL), current_window_(NULL)
 		{
 		}
 
@@ -565,13 +565,13 @@ namespace gl
 		*/
 		void clearMemory()
 		{
-			for (size_t i = 0; i < number_of_viewer; i++) {
-				viewer_instances[i].clearMemory();
+			for (size_t i = 0; i < number_of_viewer_; i++) {
+				viewer_instances_[i].clearMemory();
 			}
-			viewer_instances.clear();
-			number_of_viewer = 0;
-			current_instance = NULL;
-			current_window = NULL;
+			viewer_instances_.clear();
+			number_of_viewer_ = 0;
+			current_instance_ = NULL;
+			current_window_ = NULL;
 		}
 
 		/** 
@@ -579,10 +579,10 @@ namespace gl
 		*/
 		void setViewerInstance()
 		{
-			viewer_instances.push_back(ViewerInstance<ElementType>());
+			viewer_instances_.push_back(ViewerInstance<ElementType>());
 			
-			current_instance = number_of_viewer;
-			number_of_viewer++;
+			current_instance_ = number_of_viewer_;
+			number_of_viewer_++;
 		}
 
 		/**
@@ -590,15 +590,15 @@ namespace gl
 		*/
 		size_t getNumberOfViewer()
 		{
-			return number_of_viewer;
+			return number_of_viewer_;
 		}
 
 		/**
 			Set number of viewer
 		*/
-		void setNumberOfViewer(size_t number_of_viewer_)
+		void setNumberOfViewer(size_t number_of_viewer)
 		{
-			number_of_viewer = number_of_viewer_;
+			number_of_viewer_ = number_of_viewer;
 		}
 
 		/**
@@ -606,31 +606,31 @@ namespace gl
 		*/
 		size_t getCurrentInstance()
 		{
-			return current_instance;
+			return current_instance_;
 		}
 
 		/**
 			Set current instance
 		*/
-		void setCurrentInstance(size_t current_window_)
+		void setCurrentInstance(size_t current_window)
 		{
-			current_instance = viewer_indices[current_window_];
-			current_window = current_window_;
+			current_instance_ = viewer_indices_[current_window];
+			current_window_ = current_window;
 		}
 
 		/**
 			Get current window
 		*/
 		size_t getCurrentWindow(){
-			return current_window;
+			return current_window_;
 		}
 
 		/**
 			Assign a window index with an plot index
 		*/
-		void setWindowIndex(size_t window_index_) 
+		void setWindowIndex(size_t window_index) 
 		{
-			viewer_indices[window_index_] = number_of_viewer - 1;
+			viewer_indices_[window_index] = number_of_viewer_ - 1;
 		}
 
 		/** 
@@ -638,7 +638,7 @@ namespace gl
 		*/
 		ViewerInstance<ElementType>& getCurrentViewerInstance()
 		{
-			return viewer_instances[current_instance];
+			return viewer_instances_[current_instance_];
 		}
 
 		/**
@@ -648,7 +648,7 @@ namespace gl
 		*/
 		std::vector<ViewerInstance<ElementType>>& operator()()
 		{
-			return viewer_instances;
+			return viewer_instances_;
 		}
 
 	private:
@@ -656,27 +656,27 @@ namespace gl
 		/**
 			Number of viewer
 		*/
-		size_t  number_of_viewer;
+		size_t  number_of_viewer_;
 		
 		/**
 			Current plot
 		*/
-		size_t current_instance;
+		size_t current_instance_;
 
 		/**
 			Current window
 		*/
-		size_t current_window;
+		size_t current_window_;
 		
 		/**
 			Container which assign a instance to the windows
 		*/
-		std::map<size_t, size_t> viewer_indices;
+		std::map<size_t, size_t> viewer_indices_;
 
 		/**
 			Structure with all viewer
 		*/
-		std::vector<ViewerInstance<ElementType>> viewer_instances;
+		std::vector<ViewerInstance<ElementType>> viewer_instances_;
 	};
 
 	/**
