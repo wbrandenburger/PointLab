@@ -75,21 +75,18 @@ namespace gl
 		}
 
 		/**
-			Clear
+			Clear Memory
 		*/
 		void clearMemory()
 		{
-			std::cout << "a" << std::endl;
 			if (points) {
 				delete[] points;
 				points = nullptr;
 			}
-			std::cout << "b" << std::endl;
 			if (color) {
 				delete[] color;
 				color = nullptr;
-			}std::cout << "c" << std::endl;
-
+			}
 			if (normals) {
 				delete[] normals;
 				normals = nullptr;
@@ -492,7 +489,7 @@ namespace gl
 		}
 
 		/**
-			Clear
+			Clear Memory
 		*/
 		void clearMemory() 
 		{
@@ -728,7 +725,7 @@ namespace gl
 		}
 
 		/**
-			Clear
+			Clear Memory
 		*/
 		void clearMemory()
 		{

@@ -50,6 +50,7 @@
 #include "tools/utils/mouseposition.h"
 #include "tools/utils/windowspec.h"
 
+#include "tools/gl/glcontainer.h"
 #include "tools/gl/glmousemovement.h"
 
 #include "tools/pointcloud/pointcloudnodes.h"
@@ -57,417 +58,6 @@
 
 namespace gl
 {
-	template<typename ElementType> class PlotContainer 
-	{
-	public:
-		/**
-			Constructor
-		*/
-		PlotContainer() : mode(NULL),
-			points(nullptr), color(nullptr), normals(nullptr), indices(nullptr),
-			number_of_vertices(NULL), number_of_indices(NULL)
-		{
-		}
-
-		/**
-			Constructor
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] pointcloud_ Pointcloud
-		*/
-		PlotContainer(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_ ) : PlotContainer()
-		{
-			setMode(mode_);
-
-			points = pointcloud_.getPointsPtr();
-
-			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
-			}
-			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
-			}
-
-			number_of_vertices = pointcloud_.getNumberOfVertices();
-
-			if (pointcloud_.isTriangle()) {
-				number_of_indices = pointcloud_.getNumberOfTriangles() * 3;
-				indices = pointcloud_.getTrianglesPtr<unsigned int>();
-			}
-		}
-
-		/**
-			Constructor
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] number_of_vertices_ Number of elements
-		*/
-		PlotContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_) : PlotContainer() 
-		{
-			setMode(mode_);
-
-			number_of_vertices = number_of_vertices_;
-
-			points = points_;
-		}
-
-		/**
-			Constructor
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] indices_ indices
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_indices_ Number of indices
-		*/
-		PlotContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_) : PlotContainer()
-		{
-			setMode(mode_);
-
-			number_of_vertices = number_of_vertices_;
-
-			switch (mode_) {
-			case GLParams::LINES: number_of_indices = number_of_indices_* 2; break;
-			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
-			}
-
-			points = points_;
-			indices = indices_;
-		}
-
-		/**
-			Destructor
-		*/
-		~PlotContainer()
-		{
-			clearMemory();
-		}
-
-		/**
-			Clear
-		*/
-		void clearMemory()
-		{
-			if (points) {
-				delete[] points;
-				points = nullptr;
-			}
-			if (color) {
-				delete[] color;
-				color = nullptr;
-			}
-			if (normals) {
-				delete[] normals;
-				normals = nullptr;
-			}
-			if (indices) {
-				delete[] indices;
-				indices = nullptr;
-			}
-		}
-
-		/**
-			Copy constructor
-	
-			@param[in] plot_container_ An instance of class PlotContainer
-		*/
-		PlotContainer(const PlotContainer <ElementType>& plot_container_) : PlotContainer()
-		{
-			copy(plot_container_);
-		}
-		
-		/**
-			Copy constructor
-	
-			@param[in] plot_container_ An instance of class PlotContainer
-		*/
-
-		PlotContainer(const PlotContainer <ElementType>&& plot_container_) : PlotContainer()
-		{
-			copy(plot_container_);
-		}
-		/**
-			Operator =
-	
-			@param[in] plot_container_ An instance of class PlotContainer
-		*/
-		PlotContainer& operator=(const PlotContainer<ElementType>& plot_container_)
-		{
-			clearMemory();
-
-			copy(plot_container_);
-		}
-	
-		/**
-			Operator =
-	
-			@param[in] plot_container_ An instance of class PlotContainer
-		*/
-		PlotContainer& operator=(const PlotContainer<ElementType>&& plot_container_)
-		{
-			clearMemory();
-
-			copy(plot_container_);
-		}
-
-		/**
-			Copy data
-
-			@param[in] plot_container_ An instance of class PlotContainer
-		*/
-		void copy(const PlotContainer<ElementType>& plot_container_)
-		{
-			mode = plot_container_.getMode();
-			number_of_vertices = plot_container_.getNumberOfVertices();
-			number_of_indices = plot_container_.getNumberOfIndices();
-
-			points = new ElementType[number_of_vertices * 3];
-			std::memcpy(points, plot_container_.getPoints(), sizeof(ElementType) * number_of_vertices * 3);
-
-			if (plot_container_.isColor()) {
-				color = new uint8_t[number_of_vertices * 3];
-				std::memcpy(color, plot_container_.getColor(), sizeof(uint8_t) * number_of_vertices * 3);
-			}
-			if (plot_container_.isNormal()) {
-				normals = new ElementType[number_of_vertices * 3];
-				std::memcpy(normals, plot_container_.getNormals(), sizeof(ElementType) * number_of_vertices * 3);
-			}
-			if (plot_container_.isIndice()) {
-				indices = new unsigned int[number_of_indices];
-				std::memcpy(indices, plot_container_.getIndices(), sizeof(unsigned int)*number_of_indices);
-			}
-		}
-
-		/**
-			Set plot container
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] pointcloud_ Pointcloud
-		*/
-		void setPlotContainer(GLParams mode_, pointcloud::Pointcloud<ElementType>& pointcloud_ ) 
-		{
-			setMode(mode_);
-
-			points = pointcloud_.getPointsPtr();
-	
-			if (pointcloud_.isColor()) {
-				color = pointcloud_.getColorsPtr();
-			}
-			if (pointcloud_.isNormal()) {
-				normals = pointcloud_.getNormalsPtr();
-			}
-
-			number_of_vertices = pointcloud_.getNumberOfVertices();
-
-			if (pointcloud_.isTriangle()) {
-				number_of_indices = pointcloud.getNumberOfTriangles() * 3;
-				indices = pointcloud.getTrianglesPtr<unsigned int>();
-			}
-		}
-
-		/**
-			Set plot container
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] number_of_vertices_ Number of vertices
-		*/
-		void setPlotContainer(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
-		{
-			setMode(mode_);
-
-			number_of_vertices = number_of_vertices_;
-
-			points = points_;
-		}
-		
-		/**
-			Set plot container
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] indices_ Indices
-			@param[in] number_of_vertices_ Number of vertices
-			@param[in] number_of_indices_ Number of indices
-		*/
-		void setPlotContainer(GLParams mode_, ElementType* points_, unsigned int* indices_,
-			size_t number_of_vertices_, size_t number_of_indices_)
-		{
-			setMode(mode_);
-
-			number_of_vertices = number_of_vertices_;
-
-			switch (mode_) {
-			case GLParams::LINES: number_of_indices = number_of_indices_ * 2; break;
-			case GLParams::TRIANGLES: number_of_indices = number_of_indices_ * 3; break;
-			}
-
-			points = points_;
-			indices = indices_;
-		}
-
-		/**
-			Get the OpenGl specifier for the mode what kind of primitives to render
-
-			@param[in] mode_ Specifies what kind of primitives to render
-		*/
-		void setMode(GLParams mode_)
-		{
-			switch (mode_) {
-			case GLParams::POINTS: mode = GL_POINTS; break;
-			case GLParams::LINES: mode = GL_LINES; break;
-			case GLParams::TRIANGLES: mode = GL_TRIANGLES; break;
-			}
-		}
-
-		/**
-			Get the mode which specifies what kind of primitives to render
-		*/
-		GLenum getMode() const
-		{
-			return mode;
-		}
-
-		/**
-			Get points
-
-			@return Points
-		*/
-		ElementType* getPoints() const
-		{
-			return points;
-		}
-
-		/**
-			Get colors
-
-			@return Colors
-		*/
-		uint8_t* getColor() const
-		{
-			return color;
-		}
-
-		/**
-			Get normals
-
-			@return Normals
-		*/
-		ElementType* getNormals() const
-		{
-			return normals;
-		}
-
-		/**
-			Get Indices
-			
-			@return indices
-		*/
-		unsigned int* getIndices() const
-		{
-			return indices;
-		}
-
-		/**
-			Get number of vertices
-
-			@return Number of vertices
-		*/
-		size_t getNumberOfVertices() const
-		{
-			return number_of_vertices;
-		}
-
-		/**
-			Get number of triangles
-
-			@return Number of triangles
-		*/
-		size_t getNumberOfIndices() const
-		{
-			return number_of_indices;
-		}
-
-		/**
-			Returns true if points are set
-
-			@return True if points are set
-		*/
-		bool isPoint() const
-		{
-			return (points != nullptr);
-		}
-
-		/**
-			Returns true if colors are set
-
-			@return True if colors are set
-		*/
-		bool isColor() const
-		{
-			return (color != nullptr);
-		}
-
-		/**
-			Returns true if normals are set
-
-			@return True if normals are set
-		*/
-		bool isNormal() const
-		{
-			return (normals != nullptr);
-		}
-
-		/**
-			Returns true if triangles are set
-
-			@return True if triangles are set
-		*/
-		bool isIndice() const
-		{
-			return (indices != nullptr);
-		}
-
-	private:
-
-		/**
-			Specifies what kind of primitives to render
-		*/
-		GLenum mode;
-
-		/**
-			Points
-		*/
-		ElementType* points;
-
-		/**
-			Color
-		*/
-		uint8_t* color;
-
-		/**
-			Normals
-		*/
-		ElementType* normals;
-
-		/**
-			Indices
-		*/
-		unsigned int* indices;
-
-		/**
-			Number of vertices
-		*/
-		size_t number_of_vertices;
-
-		/**
-			Number of indices
-		*/
-		size_t number_of_indices;
-	};
-
 	template<typename ElementType> class Plot3DInstance
 	{
 	public: 
@@ -487,7 +77,7 @@ namespace gl
 		}
 
 		/**
-			Clear
+			Clear Memory
 		*/
 		void clearMemory()
 		{
@@ -496,11 +86,11 @@ namespace gl
 		/**
 			Set pointcloud
 
-			@param[in] plot_container Container with elements which has to be drawn
+			@param[in] gl_container Container with elements which has to be drawn
 		*/
-		void setPointcloud(PlotContainer<ElementType>& plot_container_)
+		void setPointcloud(GLContainer<ElementType>& gl_container_)
 		{
-			plot_container.push_back(plot_container_);
+			gl_container.push_back(gl_container_);
 			number_of_clouds++;
 			setParameters();
 		}
@@ -515,7 +105,7 @@ namespace gl
 			*/
 			utils::BoundingBox<ElementType> bounding_box;
 			for (size_t i = 0; i < number_of_clouds; i++) {
-				bounding_box.setBoundingBox(plot_container[i].getPoints(), plot_container[i].getNumberOfVertices(), 3);
+				bounding_box.setBoundingBox(gl_container[i].getPoints(), gl_container[i].getNumberOfVertices(), 3);
 			}
 
 			/**
@@ -523,8 +113,8 @@ namespace gl
 			*/
 			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
 			for (size_t i = 0; i < number_of_clouds; i++) {
-				ElementType* points = plot_container[i].getPoints();
-				for (size_t j = 0; j <  plot_container[i].getNumberOfVertices() * 3; j++) {
+				ElementType* points = gl_container[i].getPoints();
+				for (size_t j = 0; j <  gl_container[i].getNumberOfVertices() * 3; j++) {
 					points[j] = (points[j] - bounding_box.getMiddle(j % 3)) * (1 / gl_zoom);
 				}
 			}
@@ -611,13 +201,13 @@ namespace gl
 					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glEnableClientState(GL_VERTEX_ARRAY);
-				if (plot_container[i].isColor()) {
+				if (gl_container[i].isColor()) {
 					glEnableClientState(GL_COLOR_ARRAY);
 				}
-				if (plot_container[i].isNormal()) {
+				if (gl_container[i].isNormal()) {
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].getMode() != GL_POINTS) {
+				if (gl_container[i].getMode() != GL_POINTS) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
 				glColor4f(1.0, 1.0, 1.0, 0.0);
@@ -655,33 +245,33 @@ namespace gl
 				/**
 					Link the points, colors and normals for drawing
 				*/
-				glVertexPointer(3, GL_FLOAT, 0, plot_container[i].getPoints());
-				if (plot_container[i].isColor()) {
-					glColorPointer(3, GL_UNSIGNED_BYTE, 0, plot_container[i].getColor());
+				glVertexPointer(3, GL_FLOAT, 0, gl_container[i].getPoints());
+				if (gl_container[i].isColor()) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container[i].getColor());
 				}
-				if (plot_container[i].isNormal()) {
-					glNormalPointer(GL_FLOAT, 0, plot_container[i].getNormals());
+				if (gl_container[i].isNormal()) {
+					glNormalPointer(GL_FLOAT, 0, gl_container[i].getNormals());
 				}
 				
-				if (plot_container[i].getMode() == GL_POINTS) {
-					glDrawArrays(plot_container[i].getMode(), 0, plot_container[i].getNumberOfVertices());
+				if (gl_container[i].getMode() == GL_POINTS) {
+					glDrawArrays(gl_container[i].getMode(), 0, gl_container[i].getNumberOfVertices());
 				}
 				else{
-					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfIndices(),
-						GL_UNSIGNED_INT, plot_container[i].getIndices());
+					glDrawElements(gl_container[i].getMode(), gl_container[i].getNumberOfIndices(),
+						GL_UNSIGNED_INT, gl_container[i].getIndices());
 				}
 
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glDisableClientState(GL_VERTEX_ARRAY);
-				if (plot_container[i].isColor()) {
+				if (gl_container[i].isColor()) {
 					glDisableClientState(GL_COLOR_ARRAY);
 				}
-				if (plot_container[i].isNormal()) {
+				if (gl_container[i].isNormal()) {
 					glDisableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].getMode() != GL_POINTS) {
+				if (gl_container[i].getMode() != GL_POINTS) {
 					glDisableClientState(GL_INDEX_ARRAY);
 				}
 			}
@@ -731,13 +321,13 @@ namespace gl
 					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glEnableClientState(GL_VERTEX_ARRAY);
-				if (plot_container[i].isColor()) {
+				if (gl_container[i].isColor()) {
 					glEnableClientState(GL_COLOR_ARRAY);
 				}
-				if (plot_container[i].isNormal()) {
+				if (gl_container[i].isNormal()) {
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].getMode() != GL_POINTS) {
+				if (gl_container[i].getMode() != GL_POINTS) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
 				glColor4f(1.0, 1.0, 1.0, 0.0);
@@ -775,32 +365,32 @@ namespace gl
 				/**
 					Link the points, colors and normals for drawing
 				*/
-				glVertexPointer(3, GL_DOUBLE, 0, plot_container[i].getPoints());
-				if (plot_container[i].isColor()) {
-					glColorPointer(3, GL_UNSIGNED_BYTE, 0, plot_container[i].getColor());
+				glVertexPointer(3, GL_DOUBLE, 0, gl_container[i].getPoints());
+				if (gl_container[i].isColor()) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container[i].getColor());
 				}
-				if (plot_container[i].isNormal()) {
-					glNormalPointer(GL_DOUBLE, 0, plot_container[i].getNormals());
+				if (gl_container[i].isNormal()) {
+					glNormalPointer(GL_DOUBLE, 0, gl_container[i].getNormals());
 				}
-				if (plot_container[i].getMode() == GL_POINTS) {
-					glDrawArrays(GL_POINTS, 0, plot_container[i].getNumberOfVertices());
+				if (gl_container[i].getMode() == GL_POINTS) {
+					glDrawArrays(GL_POINTS, 0, gl_container[i].getNumberOfVertices());
 				}
 				else {
-					glDrawElements(plot_container[i].getMode(), plot_container[i].getNumberOfIndices(),
-						GL_UNSIGNED_INT, plot_container[i].getIndices());
+					glDrawElements(gl_container[i].getMode(), gl_container[i].getNumberOfIndices(),
+						GL_UNSIGNED_INT, gl_container[i].getIndices());
 				}
 
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glDisableClientState(GL_VERTEX_ARRAY);
-				if (plot_container[i].isColor()) {
+				if (gl_container[i].isColor()) {
 					glDisableClientState(GL_COLOR_ARRAY);
 				}
-				if (plot_container[i].isNormal()) {
+				if (gl_container[i].isNormal()) {
 					glDisableClientState(GL_NORMAL_ARRAY);
 				}
-				if (plot_container[i].getMode() != GL_POINTS) {
+				if (gl_container[i].getMode() != GL_POINTS) {
 					glDisableClientState(GL_INDEX_ARRAY);
 				}
 			}
@@ -839,7 +429,7 @@ namespace gl
 		/**
 			Container with points, colors, normals and indices
 		*/
-		std::vector<PlotContainer<ElementType>> plot_container;
+		std::vector<GLContainer<ElementType>> gl_container;
 
 		/**
 			Computes translation, rotation and zoom
@@ -891,7 +481,7 @@ namespace gl
 		}
 
 		/**
-			Clear
+			Clear Memory
 		*/
 		void clearMemory() 
 		{
@@ -916,8 +506,8 @@ namespace gl
 		*/
 		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
 		{
-			PlotContainer<ElementType> plot_container(mode_, pointcloud_);
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(plot_container);
+			GLContainer<ElementType> gl_container(mode_, pointcloud_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(gl_container);
 		}
 
 		/**
@@ -929,8 +519,8 @@ namespace gl
 		*/
 		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
 		{
-			PlotContainer<ElementType> plot_container(mode_, points_, number_of_vertices_);
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(plot_container);
+			GLContainer<ElementType> gl_container(mode_, points_, number_of_vertices_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(gl_container);
 		}
 				
 		/**
@@ -945,8 +535,8 @@ namespace gl
 		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines_, 
 			size_t number_of_vertices_, size_t number_of_lines_)
 		{
-			PlotContainer<ElementType> plot_container(mode_, points_, lines_, number_of_vertices_, number_of_lines_);
-			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(plot_container);
+			GLContainer<ElementType> gl_container(mode_, points_, lines_, number_of_vertices_, number_of_lines_);
+			plot3d_instances.getCurrentPlot3DInstance().setPointcloud(gl_container);
 		}
 
 		/** 
@@ -1149,7 +739,7 @@ namespace gl
 		}
 
 		/**
-			Clear
+			Clear Memory
 		*/
 		void clearMemory()
 		{
