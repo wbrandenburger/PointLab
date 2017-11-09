@@ -141,14 +141,14 @@ namespace gl
 
 			@param[in] glview_ An instance of class GLView
 		*/
-		GLView(const GLView<ElementType>& glview_) = delete;
+		GLView(const GLView<ElementType>& glview) = delete;
 		
 		/**
 			Copy constructor
 
 			@param[in] glview_ An instance of class GLView
 		*/
-		GLView(const GLView<ElementType>&& glview_) = delete;
+		GLView(const GLView<ElementType>&& glview) = delete;
 
 		/**
 			Operator =
@@ -169,9 +169,9 @@ namespace gl
 		*/
 		void setViewer()
 		{
-			glviewer.setViewer();
+			glviewer_.setViewer();
 
-			current_instance = GLInstance::GLVIEWER;
+			current_instance_ = GLInstance::GLVIEWER;
 		}
 
 		/**
@@ -181,9 +181,9 @@ namespace gl
 		*/
 		void setPlot(size_t number_of_elements_)
 		{
-			glplot.setPlot(number_of_elements_);
+			glplot_.setPlot(number_of_elements_);
 
-			current_instance = GLInstance::GLPLOT;
+			current_instance_ = GLInstance::GLPLOT;
 		}
 
 		/**
@@ -191,9 +191,9 @@ namespace gl
 		*/
 		void setPlot3D()
 		{
-			glplot3d.setPlot3D();
+			glplot3d_.setPlot3D();
 
-			current_instance = GLInstance::GLPLOT3D;
+			current_instance_ = GLInstance::GLPLOT3D;
 		}
 
 		/**
@@ -201,14 +201,13 @@ namespace gl
 
 			@param[in] x_ x-values
 		*/
-		void setX(ElementType* x_)
+		void setX(ElementType* x)
 		{
-			if (current_instance != GLInstance::GLPLOT) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot.setX(x_);
+			glplot_.setX(x);
 		}
 
 		/**
@@ -216,14 +215,13 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setX(std::vector<ElementType>& x_)
+		void setX(std::vector<ElementType>& x)
 		{
-			if (current_instance != GLInstance::GLPLOT) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot.setX(x_);
+			glplot_.setX(x);
 		}
 		
 		/**
@@ -231,14 +229,13 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setX(utils::Matrix<ElementType>& x_)
+		void setX(utils::Matrix<ElementType>& x)
 		{
-			if (current_instance != GLInstance::GLPLOT) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot.setX(x_);
+			glplot_.setX(x);
 		}
 
 		/**
@@ -246,14 +243,13 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(ElementType* y_)
+		void setY(ElementType* y)
 		{
-			if (current_instance != GLInstance::GLPLOT) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot.setY(y_);
+			glplot_.setY(y);
 		}
 
 		/**
@@ -261,14 +257,13 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(std::vector<ElementType>& y_)
+		void setY(std::vector<ElementType>& y)
 		{
-			if (current_instance != GLInstance::GLPLOT) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot.setY(y_);
+			glplot_.setY(y);
 		}
 		
 		/**
@@ -276,14 +271,13 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(utils::Matrix<ElementType>& y_)
+		void setY(utils::Matrix<ElementType>& y)
 		{
-			if (current_instance != GLInstance::GLPLOT) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot.setY(y_);
+			glplot_.setY(y);
 		}
 
 		/**
@@ -291,14 +285,13 @@ namespace gl
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
-			if (current_instance != GLInstance::GLVIEWER) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLVIEWER) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glviewer.setPointcloud(pointcloud_);
+			glviewer_.setPointcloud(pointcloud);
 		}
 
 		/**
@@ -307,14 +300,13 @@ namespace gl
 			@param[in] points_ Pointcloud
 			@param[in] number_of_elements_ Number of elements
 		*/
-		void setPointcloud(ElementType* points_, size_t number_of_elements_) 
+		void setPointcloud(ElementType* points, size_t number_of_elements) 
 		{
-			if (current_instance != GLInstance::GLVIEWER) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLVIEWER) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glviewer.setPointcloud(points_, number_of_elements_);
+			glviewer_.setPointcloud(points, number_of_elements);
 		}
 
 		/**
@@ -323,14 +315,13 @@ namespace gl
 			@param[in] mode_ Specifies what kind of primitives to render
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(GLParams mode_, const pointcloud::Pointcloud<ElementType>& pointcloud_)
+		void setPointcloud(GLParams mode, const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
-			if (current_instance != GLInstance::GLPLOT3D) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT3D) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot3d.setPointcloud(mode_, pointcloud_);
+			glplot3d_.setPointcloud(mode, pointcloud);
 		}
 
 		/**
@@ -340,14 +331,13 @@ namespace gl
 			@param[in] points_ Pointcloud
 			@param[in] number_of_vertices_ Number of vertices
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, size_t number_of_vertices_)
+		void setPointcloud(GLParams mode, ElementType* points, size_t number_of_vertices)
 		{
-			if (current_instance != GLInstance::GLPLOT3D) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT3D) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot3d.setPointcloud(mode_, points_, number_of_vertices_);
+			glplot3d_.setPointcloud(mode, points, number_of_vertices);
 		}
 
 		/**
@@ -359,15 +349,14 @@ namespace gl
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] number_of_lines_ Number of indices
 		*/
-		void setPointcloud(GLParams mode_, ElementType* points_, unsigned int* lines,
-			size_t number_of_vertices_, size_t number_of_lines)
+		void setPointcloud(GLParams mode, ElementType* points, unsigned int* lines,
+			size_t number_of_vertices, size_t number_of_lines)
 		{
-			if (current_instance != GLInstance::GLPLOT3D) {
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+			if (current_instance_ != GLInstance::GLPLOT3D) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot3d.setPointcloud(mode_, points_, lines, number_of_vertices_, number_of_lines);
+			glplot3d_.setPointcloud(mode, points, lines, number_of_vertices, number_of_lines);
 		}
 
 		/**
@@ -375,59 +364,57 @@ namespace gl
 		*/
 		void plot()
 		{
-			switch (current_instance) {
+			switch (current_instance_) {
 			case GLInstance::GLVIEWER:	
-				glviewer.plot(); 
+				glviewer_.plot(); 
 				break;
 			case GLInstance::GLPLOT:	
-				glplot.plot(); 
+				glplot_.plot(); 
 				break;
 			case GLInstance::GLPLOT3D:
-				glplot3d.plot();
+				glplot3d_.plot();
 				break;
 			default:	
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;	
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 				break;
 			}
-			current_instance = GLInstance::NONE;
+			current_instance_ = GLInstance::NONE;
 		}
 
 		/**
 			Creates a subwindow and sets the callback functions	
 		*/
-		void subPlot(size_t windows_x_, size_t windows_y_, size_t index_)
+		void subPlot(size_t windows_x, size_t windows_y, size_t index)
 		{
 			size_t screen_width = (size_t) GetSystemMetrics(SM_CXSCREEN);
 			size_t screen_height = (size_t) GetSystemMetrics(SM_CYSCREEN);
 
-			size_t index_window_x = index_ % windows_x_;
-			size_t index_window_y = index_ / windows_x_;
+			size_t index_window_x = index % windows_x;
+			size_t index_window_y = index / windows_x;
 
-			size_t width = screen_width / windows_x_;
-			size_t height = screen_height / windows_y_;
+			size_t width = screen_width / windows_x;
+			size_t height = screen_height / windows_y;
 
 			size_t position_x = width * index_window_x;
 			size_t position_y = height * index_window_y;
 
 			utils::WindowSpec window_spec(position_x, position_y, width, height);
 
-			switch (current_instance) {
+			switch (current_instance_) {
 			case GLInstance::GLVIEWER:
-				glviewer.plot(nullptr, window_spec);
+				glviewer_.plot(nullptr, window_spec);
 				break;
 			case GLInstance::GLPLOT:
-				glplot.plot(nullptr, window_spec);
+				glplot_.plot(nullptr, window_spec);
 				break;
 			case GLInstance::GLPLOT3D:
-				glplot3d.plot(nullptr, window_spec);
+				glplot3d_.plot(nullptr, window_spec);
 				break;
 			default:
-				std::cout << "Exit in " << __FILE__ << " in line " << __LINE__ << std::endl;
-				std::exit(EXIT_FAILURE);
+				exitFailure(__FILE__, __LINE__);
 				break;
 			}
-			current_instance = GLInstance::NONE;
+			current_instance_ = GLInstance::NONE;
 		}
 
 		/**
@@ -443,38 +430,38 @@ namespace gl
 		/**
 			Instance of plotting tool
 		*/
-		static gl::GLPlot<ElementType> glplot;
+		static gl::GLPlot<ElementType> glplot_;
 		
 		/**
 			Instance of viewer tool
 		*/
-		static gl::GLViewer<ElementType> glviewer;
+		static gl::GLViewer<ElementType> glviewer_;
 
 		/**
 			Instance of plotting in 3d
 		*/
-		static gl::GLPlot3D<ElementType> glplot3d;
+		static gl::GLPlot3D<ElementType> glplot3d_;
 
 		/**
 			Current instance
 		*/
-		GLInstance current_instance;
+		GLInstance current_instance_;
 	};
 
 	/**
 		Static variable GLView<ElementType>::glplot
 	*/
-	template<typename ElementType> gl::GLPlot<ElementType> GLView<ElementType>::glplot;
+	template<typename ElementType> gl::GLPlot<ElementType> GLView<ElementType>::glplot_;
 
 	/**
 		Static variable GLView<ElementType>::glviewer
 	*/
-	template<typename ElementType> gl::GLViewer<ElementType> GLView<ElementType>::glviewer;
+	template<typename ElementType> gl::GLViewer<ElementType> GLView<ElementType>::glviewer_;
 
 	/**
 		Static variable GLPlot3D<ElementType>::glplot3d
 	*/
-	template<typename ElementType> gl::GLPlot3D<ElementType> GLView<ElementType>::glplot3d;
+	template<typename ElementType> gl::GLPlot3D<ElementType> GLView<ElementType>::glplot3d_;
 
 }
 
