@@ -599,7 +599,7 @@ namespace gl
 		/** 
 			Constructor
 		*/
-		StaticPlot3DInstance() : number_of_plot3d(0), current_instance(NULL), current_window(NULL)
+		StaticPlot3DInstance() : number_of_plot3d_(0), current_instance_(NULL), current_window_(NULL)
 		{
 		}
 
@@ -616,13 +616,13 @@ namespace gl
 		*/
 		void clearMemory()
 		{
-			for (size_t i = 0; i < number_of_plot3d; i++) {
-				plot3d_instances[i].clearMemory();
+			for (size_t i = 0; i < number_of_plot3d_; i++) {
+				plot3d_instances_[i].clearMemory();
 			}
-			plot3d_instances.clear();
-			number_of_plot3d = 0;
-			current_instance = NULL;
-			current_window = NULL;
+			plot3d_instances_.clear();
+			number_of_plot3d_ = 0;
+			current_instance_ = NULL;
+			current_window_ = NULL;
 		}
 
 		/** 
@@ -630,10 +630,10 @@ namespace gl
 		*/
 		void setPlot3DInstance()
 		{
-			plot3d_instances.push_back(Plot3DInstance<ElementType>());
+			plot3d_instances_.push_back(Plot3DInstance<ElementType>());
 			
-			current_instance = number_of_plot3d;
-			number_of_plot3d++;
+			current_instance_ = number_of_plot3d_;
+			number_of_plot3d_++;
 		}
 
 		/**
@@ -641,15 +641,15 @@ namespace gl
 		*/
 		size_t getNumberOfPlot3D()
 		{
-			return number_of_plot3d;
+			return number_of_plot3d_;
 		}
 
 		/**
 			Set number of plot3d
 		*/
-		void setNumberOfPlot3D(size_t number_of_plot3d_)
+		void setNumberOfPlot3D(size_t number_of_plot3d)
 		{
-			number_of_plot3d = number_of_plot3d_;
+			number_of_plot3d_ = number_of_plot3d;
 		}
 
 		/**
@@ -657,31 +657,31 @@ namespace gl
 		*/
 		size_t getCurrentInstance()
 		{
-			return current_instance;
+			return current_instance_;
 		}
 
 		/**
 			Set current instance
 		*/
-		void setCurrentInstance(size_t current_window_)
+		void setCurrentInstance(size_t current_window)
 		{
-			current_instance = plot3d_indices[current_window_];
-			current_window = current_window_;
+			current_instance_ = plot3d_indices_[current_window];
+			current_window_ = current_window;
 		}
 
 		/**
 			Get current window
 		*/
 		size_t getCurrentWindow(){
-			return current_window;
+			return current_window_;
 		}
 
 		/**
 			Assign a window index with an plot index
 		*/
-		void setWindowIndex(size_t window_index_) 
+		void setWindowIndex(size_t window_index) 
 		{
-			plot3d_indices[window_index_] = number_of_plot3d-1;
+			plot3d_indices_[window_index] = number_of_plot3d_-1;
 		}
 
 		/** 
@@ -689,7 +689,7 @@ namespace gl
 		*/
 		Plot3DInstance<ElementType>& getCurrentPlot3DInstance()
 		{
-			return plot3d_instances[current_instance];
+			return plot3d_instances_[current_instance_];
 		}
 
 		/**
@@ -699,7 +699,7 @@ namespace gl
 		*/
 		std::vector<Plot3DInstance<ElementType>>& operator()()
 		{
-			return plot3d_instances;
+			return plot3d_instances_;
 		}
 
 	private:
@@ -707,27 +707,27 @@ namespace gl
 		/**
 			Number of plot3d
 		*/
-		size_t  number_of_plot3d;
+		size_t  number_of_plot3d_;
 		
 		/**
 			Current plot
 		*/
-		size_t current_instance;
+		size_t current_instance_;
 
 		/**
 			Current window
 		*/
-		size_t current_window;
+		size_t current_window_;
 		
 		/**
 			Container which assign a instance to the windows
 		*/
-		std::map<size_t, size_t> plot3d_indices;
+		std::map<size_t, size_t> plot3d_indices_;
 
 		/**
 			Structure with all plot3d
 		*/
-		std::vector<Plot3DInstance<ElementType>> plot3d_instances;
+		std::vector<Plot3DInstance<ElementType>> plot3d_instances_;
 	};
 
 	/**
