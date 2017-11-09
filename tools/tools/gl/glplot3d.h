@@ -111,9 +111,6 @@ namespace gl
 			/**
 				Center and normalize the pointlcoud
 			*/
-
-			std::cout << number_of_clouds << std::endl;
-
 			ElementType gl_zoom = bounding_box.getDifference(0) > bounding_box.getDifference(1) ? bounding_box.getDifference(0) : bounding_box.getDifference(1);
 			for (size_t i = 0; i < number_of_clouds; i++) {
 				ElementType* points = gl_container[i].getPoints();
