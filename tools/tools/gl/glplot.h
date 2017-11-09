@@ -378,9 +378,6 @@ namespace gl
 		*/
 		GLPlot()
 		{
-
-
-			clear();
 		}
 
 		/**
@@ -388,20 +385,20 @@ namespace gl
 		*/
 		~GLPlot()
 		{
-			clear();
+			clearMemory();
 		}
 
 		/**
 			Clear
 		*/
-		void clear() {}
+		void clearMemory() {}
 
 		/**
 			Set new plot
 		*/
-		void setPlot(size_t number_of_elements_)
+		void setPlot(size_t number_of_elements)
 		{
-			plot_instances.setPlot(number_of_elements_);
+			plot_instances_.setPlot(number_of_elements);
 		}
 
 		/**
@@ -409,9 +406,9 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(ElementType* y_)
+		void setY(ElementType* y)
 		{
-			plot_instances.getCurrentInstanceFunction().setY(y_);
+			plot_instances_.getCurrentInstanceFunction().setY(y);
 		}
 
 		/**
@@ -419,9 +416,9 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(std::vector<ElementType>& y_)
+		void setY(std::vector<ElementType>& y)
 		{
-			plot_instances.getCurrentInstanceFunction().setY(y_);
+			plot_instances_.getCurrentInstanceFunction().setY(y);
 		}
 
 		/**
@@ -429,9 +426,9 @@ namespace gl
 
 			@param[in] y_ y-values
 		*/
-		void setY(utils::Matrix<ElementType>& y_)
+		void setY(utils::Matrix<ElementType>& y)
 		{
-			plot_instances.getCurrentInstanceFunction().setY(y_);
+			plot_instances_.getCurrentInstanceFunction().setY(y);
 		}
 
 		/**
@@ -440,9 +437,9 @@ namespace gl
 			@param[in] x_ x-values
 		*/
 
-		void setX(ElementType* x_)
+		void setX(ElementType* x)
 		{
-			plot_instances.getCurrentInstanceFunction().setX(x_);
+			plot_instances_.getCurrentInstanceFunction().setX(x);
 		}
 
 		/**
@@ -450,9 +447,9 @@ namespace gl
 
 			@param[in] x_ x-values
 		*/
-		void setX(std::vector<ElementType>& x_)
+		void setX(std::vector<ElementType>& x)
 		{
-			plot_instances.getCurrentInstanceFunction().setX(x_);
+			plot_instances_.getCurrentInstanceFunction().setX(x);
 		}
 
 		/**
@@ -460,9 +457,9 @@ namespace gl
 
 			@param[in] x_ x-values
 		*/
-		void setX(utils::Matrix<ElementType>& x_)
+		void setX(utils::Matrix<ElementType>& x)
 		{
-			plot_instances.getCurrentInstanceFunction().setX(x_);
+			plot_instances_.getCurrentInstanceFunction().setX(x);
 		}
 
 		/**
@@ -470,14 +467,14 @@ namespace gl
 		*/
 		static void redraw(void)
 		{
-			glutSetWindow((int)plot_instances.getCurrentWindow() + 1);
+			glutSetWindow((int)plot_instances_.getCurrentWindow() + 1);
 
 			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 
-			plot_instances.getCurrentInstanceFunction().draw();
+			plot_instances_.getCurrentInstanceFunction().draw();
 
 			glutSwapBuffers();
 
@@ -497,11 +494,11 @@ namespace gl
 			@param[in] width_ The new Width of the window
 			@param[in] height_ The new Height of the window
 		*/
-		static void reshape(int width_, int height_)
+		static void reshape(int width, int height)
 		{
 			glutSetWindow(glutGetWindow());
 
-			glViewport(0, 0, width_, height_);
+			glViewport(0, 0, width, height);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
@@ -513,11 +510,11 @@ namespace gl
 
 			@param[in] window_name_ Name of the window
 		*/
-		void plot(char* window_name_ = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
+		void plot(char* window_name = nullptr, utils::WindowSpec window_spec = utils::WindowSpec())
 		{
-			if (!window_name_) {
-				window_name_ = new char[10];
-				sprintf(window_name_, "Plot %d", (int)plot_instances.getNumberOfPlots() - 1);
+			if (!window_name) {
+				window_name = new char[10];
+				sprintf(window_name, "Plot %d", (int)plot_instances_.getNumberOfPlots() - 1);
 			}
 
 			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
@@ -525,9 +522,9 @@ namespace gl
 			glutInitWindowSize((int)window_spec.getWidth(), (int)window_spec.getHeight());
 			glutInitWindowPosition((int)window_spec.getPositionX(), (int)window_spec.getPositionY());
 
-			size_t window_index = glutCreateWindow(window_name_) - 1;
-			plot_instances.setWindowIndex(window_index);
-			plot_instances.setCurrentInstance(window_index);
+			size_t window_index = glutCreateWindow(window_name) - 1;
+			plot_instances_.setWindowIndex(window_index);
+			plot_instances_.setCurrentInstance(window_index);
 
 			/**
 				Register GLUT callbacks.
@@ -553,9 +550,9 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void key(unsigned char key_, int x_, int y_)
+		static void key(unsigned char key, int x, int y)
 		{
-			switch (key_) {
+			switch (key) {
 			case 27: glutLeaveMainLoop(); break;
 			}
 		};
@@ -568,15 +565,15 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseWheel(int button_, int direction_, int x_, int y_)
+		static void mouseWheel(int button, int direction, int x, int y)
 		{
-			if (direction_ == 1) {
-				plot_instances.setCurrentInstance(glutGetWindow() - 1);
-				plot_instances.getCurrentInstanceFunction().zoomIn(x_, y_, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+			if (direction == 1) {
+				plot_instances_.setCurrentInstance(glutGetWindow() - 1);
+				plot_instances_.getCurrentInstanceFunction().zoomIn(x, y, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 			}
 			else {
-				plot_instances.setCurrentInstance(glutGetWindow() - 1);
-				plot_instances.getCurrentInstanceFunction().zoomOut();
+				plot_instances_.setCurrentInstance(glutGetWindow() - 1);
+				plot_instances_.getCurrentInstanceFunction().zoomOut();
 			}
 		}
 
@@ -588,12 +585,12 @@ namespace gl
 			@param[in] x_ Mouse position in x-direction
 			@param[in] y_ Mouse position in y-direction
 		*/
-		static void mouseFunc(int button_, int state_, int x_, int y_)
+		static void mouseFunc(int button, int state, int x, int y)
 		{
-			if (button_ == GLUT_LEFT_BUTTON && state_ == GLUT_UP) {
-				plot_instances.setCurrentInstance(glutGetWindow() - 1);
-				std::cout << plot_instances.getCurrentInstanceFunction().getX(x_, glutGet(GLUT_WINDOW_WIDTH)) << " "
-					<< plot_instances.getCurrentInstanceFunction().getY(y_, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
+			if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+				plot_instances_.setCurrentInstance(glutGetWindow() - 1);
+				std::cout << plot_instances_.getCurrentInstanceFunction().getX(x, glutGet(GLUT_WINDOW_WIDTH)) << " "
+					<< plot_instances_.getCurrentInstanceFunction().getY(y, glutGet(GLUT_WINDOW_HEIGHT)) << std::endl;
 			}
 		}
 
@@ -610,7 +607,7 @@ namespace gl
 		/**
 			Structure where the different plots are organized
 		*/
-		static StaticPlotInstance<ElementType> plot_instances;
+		static StaticPlotInstance<ElementType> plot_instances_;
 	};
 
 	/**
@@ -755,7 +752,7 @@ namespace gl
 	/**
 		Static variable GLPlot<ElementType>::plot_instances
 	*/
-	template<typename ElementType> StaticPlotInstance<ElementType> GLPlot<ElementType>::plot_instances;
+	template<typename ElementType> StaticPlotInstance<ElementType> GLPlot<ElementType>::plot_instances_;
 }
 
 #endif /* GL_GLPLOT_H_*/	
