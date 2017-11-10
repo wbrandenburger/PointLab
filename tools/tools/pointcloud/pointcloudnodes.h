@@ -38,13 +38,13 @@
 
 namespace pointcloud
 {		
-	template<typename ElementType> struct XYZNode 
+	template<typename ElementType> class PointNode 
 	{
-
+	public:
 		/**
 			Constructor
 		*/
-		XYZNode() : point_(nullptr)
+		PointNode() : point_(nullptr)
 		{
 			point_ = new ElementType[3];
 			memset(point_, (ElementType) 0.0, sizeof(ElementType)*3);
@@ -53,7 +53,7 @@ namespace pointcloud
 		/**
 			Destructor
 		*/
-		~XYZNode()
+		~PointNode()
 		{
 			clearMemory();
 		}
@@ -74,7 +74,7 @@ namespace pointcloud
 			
 			@param[in] point Point
 		*/
-		XYZNode(const ElementType* point) : XYZNode()
+		PointNode(ElementType* point) : PointNode()
 		{
 			setPointPtr(point);
 		}
@@ -86,7 +86,7 @@ namespace pointcloud
 			@param[in] y y-value
 			@param[in] z z-value
 		*/
-		XYZNode(const ElementType x, ElementType y, ElementType z) : XYZNode()
+		PointNode(ElementType x, ElementType y, ElementType z) : PointNode()
 		{
 			point_[0] = x;
 			point_[1] = y;
@@ -96,46 +96,56 @@ namespace pointcloud
 		/**
 			Copy constructor
 
-			@param[in] xyz_node An instance of class XYZNode
+			@param[in] point_node An instance of class PointNode
 		*/
-		XYZNode(const XYZNode<ElementType>& xyz_node) : XYZNode()
+		PointNode(const PointNode<ElementType>& point_node) : PointNode()
 		{
-			setPointPtr(xyz_node.getPointPtr());
+			clearMemory();
+
+			setPointPtr(point_node.getPointPtr());
+
 		}
 
 		/**
 			Copy constructor
 	
-			@param[in] xyz_node An instance of class XYZNode
+			@param[in] point_node An instance of class PointNode
 		*/
-		XYZNode(const XYZNode<ElementType>&& xyz_node) : XYZNode()
+		PointNode(const PointNode<ElementType>&& point_node) : PointNode()
 		{
-			*this = xyz_node;
+			clearMemory();
+
+			*this = point_node;
+
 		}
 	
 		/**
 			Operator =
 	
-			@param[in] xyz_node An instance of class XYZNode
+			@param[in] point_node An instance of class PointNode
 			@return Returns reference to the current instance
 		*/
-		XYZNode& operator=(const XYZNode<ElementType>& xyz_node)
+		PointNode& operator=(const PointNode<ElementType>& point_node)
 		{
-			setPointPtr(xyz_node.getPointPtr());
-			
+			clearMemory();
+
+			setPointPtr(point_node.getPointPtr());
+
 			return *this;
 		}
 	
 		/**
 			Operator =
 		
-			@param[in] xyz_node An instance of class XYZNode
+			@param[in] point_node An instance of class PointNode
 			@return Returns reference to the current instance
 		*/
-		XYZNode& operator=(const XYZNode<ElementType>&& xyz_node)
+		PointNode& operator=(const PointNode<ElementType>&& point_node)
 		{
-			*this = xyz_node;
-			
+			clearMemory();
+
+			*this = point_node;
+
 			return *this;
 		}
 		
@@ -146,6 +156,8 @@ namespace pointcloud
 		*/
 		void setPointPtr(ElementType* point)
 		{
+			clearMemory();
+
 			point_ = point;
 		}
 
@@ -195,25 +207,24 @@ namespace pointcloud
 			ElementType* point_new = new ElementType[3];
 			std::memcpy(point_new, point_, sizeof(ElementType) * 3);
 			
-			return point_;
+			return point_new;
 		}
 
+	protected: 
 		/**
 			Point
 		*/
 		ElementType* point_;
 	};
 
-	class RGBNode
+	class RGBNode : public PointNode<uint8_t>
 	{
 	public:
 		/**
 			Constructor
 		*/
-		RGBNode() : color_(nullptr)
+		RGBNode() : PointNode()
 		{
-			color_ = new uint8_t[4];
-			memset(&color_, 0, sizeof(uint8_t)*4);
 		}
 
 		/**
@@ -225,93 +236,97 @@ namespace pointcloud
 		}
 
 		/**
-			Clear memory
+			Constructor
+			
+			@param[in] point Point
 		*/
-		void clearMemory()
+		RGBNode(uint8_t* point) : RGBNode()
 		{
-			if (color_) {
-				delete[] color_;
-				color_ = nullptrM
+			clearMemory();
+
+			setPointPtr(point);
+		}
+
+		/**
+			Constructor
+			
+			@param[in] point Point
+		*/
+		RGBNode(float* point) : RGBNode()
+		{
+			clearMemory();
+
+			uint8_t* point_new = new uint8_t[3];
+			for (size_t i = 0; i < 3; i++){
+				point_new[i] = (uint8_t) std::floor(point[i] * 255.0f);
+				
 			}
+			setPointPtr(point_new);
 		}
 
 		/**
 			Constructor
 			
-			@param[in] color Color
+			@param[in] x x-value
+			@param[in] y y-value
+			@param[in] z z-value
 		*/
-		RGBNode(uint8_t* color) : RGBNode()
+		RGBNode(uint8_t x, uint8_t y, uint8_t z) : RGBNode()
 		{
-			setColorPtr(color);
+			point_[0] = x;
+			point_[1] = y;
+			point_[2] = z;
 		}
 
 		/**
 			Constructor
 			
-			@param[in] color Color
+			@param[in] x x-value
+			@param[in] y y-value
+			@param[in] z z-value
 		*/
-		RGBNode(float* color) : RGBNode()
+		RGBNode(float x, float y, float z) : RGBNode()
 		{
-			setColorPtr(color);
-		}
-
-		/**
-			Constructor
-			
-			@param[in] r r-value
-			@param[in] g g-value
-			@param[in] b b-value
-		*/
-		RGBNode(uint8_t r, uint8_t g, uint8_t b) : RGBNode()
-		{
-			color_[0] = r;
-			color_[1] = g;
-			color_[2] = b;
-		}
-
-		/**
-			Constructor
-			
-			@param[in] r r-value
-			@param[in] g g-value
-			@param[in] b b-value
-		*/
-		RGBNode(float r, float g, float b) : RGBNode()
-		{
-			color_[0] = (uint8_t) std::floor(r * 255);
-			color_[1] = (uint8_t) std::floor(g * 255);
-			color_[2] = (uint8_t) std::floor(b * 255);
+			point_[0] = (uint8_t) std::floor(x * 255.0f);
+			point_[1] = (uint8_t) std::floor(y * 255.0f);
+			point_[2] = (uint8_t) std::floor(z * 255.0f);
 		}
 
 		/**
 			Copy constructor
 
-			@param[in] rgb_node An instance of class RGBNode
+			@param[in] point_node An instance of class RGBNode
 		*/
 		RGBNode(const RGBNode& rgb_node) : RGBNode()
 		{
-			setColorPtr(rgb_node.getColorPtr());
+			clearMemory();
+
+			setPointPtr(rgb_node.getPointPtr());
 		}
 
 		/**
 			Copy constructor
 	
-			@param[in] rgb_node An instance of class RGBNode
+			@param[in] point_node An instance of class PointNode
 		*/
 		RGBNode(const RGBNode&& rgb_node) : RGBNode()
 		{
+			clearMemory();
+
 			*this = rgb_node;
 		}
 	
 		/**
 			Operator =
 	
-			@param[in] rgb_node An instance of class RGBNode
+			@param[in] point_node An instance of class RGBNode
 			@return Returns reference to the current instance
 		*/
 		RGBNode& operator=(const RGBNode& rgb_node)
 		{
-			setColorPtr(rgb_node.getColorPtr());
+			clearMemory();
+
+			setPointPtr(rgb_node.getPointPtr());
 			
 			return *this;
 		}
@@ -319,131 +334,48 @@ namespace pointcloud
 		/**
 			Operator =
 		
-			@param[in] xyz_node An instance of class XYZNode
+			@param[in] point_node An instance of class RGBNode
 			@return Returns reference to the current instance
 		*/
 		RGBNode& operator=(const RGBNode&& rgb_node)
 		{
+			clearMemory();
+
 			*this = rgb_node;
 			
 			return *this;
 		}
-		
-		/**
-			Set color
-			
-			@param[in] color_ Color
-		*/
-		void setColorPtr(uint8_t* color)
-		{
-			std::memcpy(&color_[0], color, sizeof(uint8_t) * 3);
-		}
 
 		/**
-			Set color
+			Set point
 			
-			@param[in] color_ Color
-		*/
-		void setColorPtr(float* color)
-		{
-			for (size_t i = 0; i < 3; i++) {
-				color_[i] = (uint8_t) std::floor(color[i] * 255);
-			}
-		}
-
-		/**
-			Set color
-			
-			@param[in] color_ Color
+			@param[in] point_ Point
 			@parma[in] index_ Index
 		*/
-		void setColor(uint8_t color, size_t index)
+		void setPoint(float point, size_t index)
 		{
-			color_[index] = color;
+			point_[index] = (uint8_t) std::floor(point * 255.0f);;
 		}
 
 		/**
-			Set color
+			Set point
 			
-			@param[in] color_ Color
-			@parma[in] index_ Index
+			@param[in] x_ x-value
+			@param[in] y_ y-value
+			@param[in] z_ z-value
 		*/
-		void setColor(float color, size_t index)
+		void setPoint(float x, float y, float z)
 		{
-			color_[index] = (uint8_t) std::floor(color * 255);
+			point_[0] = (uint8_t)std::floor(x * 255.0f);
+			point_[1] = (uint8_t)std::floor(y * 255.0f);
+			point_[2] = (uint8_t)std::floor(z * 255.0f);
 		}
 
+	private:
 		/**
-			Set color
-			
-			@param[in] r r-value
-			@param[in] g g-value
-			@param[in] b b-value
+			Padding
 		*/
-		void setColor(uint8_t r, uint8_t g, uint8_t b)
-		{
-			color_[0] = r;
-			color_[1] = g;
-			color_[2] = b;
-		}
-
-		/**
-			Set color
-			
-			@param[in] r r-value
-			@param[in] g g-value
-			@param[in] b b-value
-		*/
-		void setColor(float r, float g, float b)
-		{
-			color_[0] = (uint8_t) std::floor(r);
-			color_[1] = (uint8_t) std::floor(g);
-			color_[2] = (uint8_t) std::floor(b);
-		}
-
-		/**
-			Get color data of specified index
-
-			@param[in] index_ Dimension
-			@return Return color data of specified index
-		*/
-		uint8_t getColor(size_t index) const
-		{
-			return color_[index];
-		}
-
-		/**
-			Get pointer to color data
-
-			@return Return pointer to point data
-		*/
-		uint8_t* getColorPtr() const
-		{
-			uint8_t* color_new = new uint8_t[4];
-			std::memcpy(color_new, color_, sizeof(color_) * 4);
-
-			return color_new;
-		}
-
-		/**
-			Get pointer to color data
-
-			@return Return pointer to point data
-		*/
-		template<typename ElementType> ElementType* getColorPtr() const
-		{
-			uint8_t* color_new = new uint8_t[4];
-			for (size_t i = 0; i < 3; i++) {
-				color_new[i] = (ElementType) color[i] / (ElementType) 255.0;
-			}
-
-			return color_new;
-		}
-
-		/**
-			Color
-		*/
-		uint8_t* color_;
+		uint8_t padding;
 	};
 
 	template<typename ElementType> struct PointcloudNode 

@@ -57,7 +57,6 @@ namespace gl
 			
 			ElementType center = (ElementType) 0.5;
 			gl_center_.setPoint(center, center, center);
-
 			gl_zoom_ = (ElementType) 1.0;
 		}
 
@@ -186,7 +185,7 @@ namespace gl
 
 			@param[in] gl_center Center parameter
 		*/
-		void setCenter(pointcloud::XYZNode<ElementType> gl_center)
+		void setCenter(pointcloud::PointNode<ElementType> gl_center)
 		{
 			gl_center_ = gl_center;
 		}
@@ -206,7 +205,7 @@ namespace gl
 
 			@return center parameter
 		*/
-		pointcloud::XYZNode<ElementType> getCenter() const
+		pointcloud::PointNode<ElementType> getCenter() const
 		{
 			return gl_center_;
 		}
@@ -365,7 +364,7 @@ namespace gl
 		/**
 			Center
 		*/
-		pointcloud::XYZNode<ElementType> gl_center_;
+		pointcloud::PointNode<ElementType> gl_center_;
 
 		/**
 			Quaterion
