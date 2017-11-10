@@ -89,7 +89,7 @@ namespace gl
 
 			@param[in] gl_container Container with elements which has to be drawn
 		*/
-		void setPointcloud(gl::GLContainer<ElementType>& gl_container)
+		void setPointcloud(const gl::GLContainer<ElementType>& gl_container)
 		{
 			gl_container_.push_back(gl_container);
 			
