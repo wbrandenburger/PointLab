@@ -87,7 +87,7 @@ namespace gl
 
 			@param[in] pointcloud_ Pointcloud
 		*/
-		void setPointcloud(gl::GLContainer<ElementType>& gl_container)
+		void setPointcloud(const gl::GLContainer<ElementType>& gl_container)
 		{
 			gl_container_ = gl_container;
 			
