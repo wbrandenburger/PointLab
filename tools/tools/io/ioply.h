@@ -185,7 +185,6 @@ namespace io
 		ElementType getNormal() 
 		{
 			ElementType normal_temp = *iterator_normal_;
-			iterator_normal_++;
 
 			return normal_temp;
 		}
@@ -371,7 +370,7 @@ namespace io
 				e_ply_type type, length_type, value_type;
 				ply_get_property_info(prop, &prop_name, &type, &length_type, &value_type);
 
-				if (!strcmp(prop_name, "nx")) { pointcloud_flag |= PointcloudFlag::NORMALS; }
+				if (!strcmp(prop_name, "nx")) { pointcloud_flag |= PointcloudFlag::NORMALS;}
 				if (!strcmp(prop_name, "diffuse_red")) { color_spec = 1; pointcloud_flag |= PointcloudFlag::RGB; }
 				if (!strcmp(prop_name, "red")) { color_spec = 2; pointcloud_flag |= PointcloudFlag::RGB; }
 

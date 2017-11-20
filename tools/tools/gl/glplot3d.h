@@ -193,6 +193,7 @@ namespace gl
 					glEnableClientState(GL_COLOR_ARRAY);
 				}
 				if (gl_container_[i].isNormal()) {
+					std::cout << "HM" << std::endl;
 					glEnableClientState(GL_NORMAL_ARRAY);
 				}
 				if (gl_container_[i].getMode() != GL_POINTS) {

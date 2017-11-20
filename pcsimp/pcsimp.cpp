@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny_normals.ply";
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/mesh.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 	
@@ -89,23 +89,24 @@ int main(int argc, char* argv[]) {
 	size_t number_of_verticesII = 40;
 	gl::meshGrid<float>(&datasetII, -1, 1, -1, 1, number_of_verticesII);
 
+	utils::Matrix<float> matrix_buny;
+	matrix_buny.setMatrix(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices(), 3);
+	trees::Index<float> index(matrix_buny, trees::KDTreeIndexParams(20));
+	index.buildIndex();
+	int nn = 30;
+	int querynumber = 15000;
+	utils::Matrix<size_t> indices(1, nn);
+	utils::Matrix<float> dists(1, nn);
+	utils::Matrix<float> search_matrix(1,3);
+	search_matrix[0][0] = matrix_buny[querynumber][0];
+	search_matrix[0][1] = matrix_buny[querynumber][1];
+	search_matrix[0][2] = matrix_buny[querynumber][2];
+	trees::TreeParams params(24);
+	index.knnSearch(search_matrix, indices, dists, nn, params);
+	pointcloud::PointcloudSoA<float> search_pointcloud;
+	pointcloud_buny.getSubset(indices.getPtr(), nn, search_pointcloud);
 
-
-
-	//utils::Matrix<float> matrix_buny;
-	//matrix_buny.setMatrix(pointcloud_buny.getPointsPtr(), pointcloud_buny.getNumberOfVertices(), 3);
-	//trees::Index<float> index(matrix_buny, trees::KDTreeIndexParams(20));
-	//index.buildIndex();
-	//int nn = 1000;
-	//int querynumber = 15000;
-	//utils::Matrix<size_t> indices(new size_t[nn], 1, nn);
-	//utils::Matrix<float> dists(new float[nn], 1, nn);
-
-	//utils::Matrix<float> matrix;
-
-	//index.knnSearch(, indices, dists, nn, params);
-
-
+	std::cout << search_pointcloud << std::endl;
 
 
 
@@ -147,6 +148,13 @@ int main(int argc, char* argv[]) {
 	glview.subPlot(2, 2, 2);
 	delete[] dataset, datasetII, lines;
 	
+	glview.setPlot3D();
+	glview.setPointcloud(GLParams::POINTS, search_pointcloud);
+	glview.subPlot(2, 2, 3);
+
+
+
+
 	//glview.setPlot(versuch);
 	//glview.setY(array_y1);
 	//glview.setY(array_y2);

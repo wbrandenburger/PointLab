@@ -475,7 +475,7 @@ namespace pointcloud
 		*/
 		ElementType* endPoint() const
 		{
-			return  &points[(getNumberOfVertices() - 1) * 3 + 2] + 1;
+			return points + number_of_vertices * 3;
 		}
 		/**
 			Returns a pointer to the last entry + 1 of colors
@@ -484,7 +484,7 @@ namespace pointcloud
 		*/
 		uint8_t* endColor() const
 		{
-			return  &colors[(getNumberOfVertices() - 1) * 3 + 2] + 1;
+			return colors + number_of_vertices * 3;
 		}
 		/**
 			Returns a pointer to the last entry + 1 of normals
@@ -493,17 +493,7 @@ namespace pointcloud
 		*/
 		ElementType* endNormal() const
 		{
-			return  &normals[(getNumberOfVertices() - 1) * 3 + 2] + 1;
-		}
-	
-		/**
-			Returns a pointer to the last entry + 1 of triangles
-
-			@return Pointer to the last entry + 1 of triangles
-		*/
-		size_t* endTriangle() const
-		{
-			return &triangles[(getNumberOfTriangles() - 1) * 3 + 2] + 1;
+			return normals + number_of_vertices * 3;
 		}
 
 	private:

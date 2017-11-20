@@ -185,9 +185,6 @@ namespace gl
 			if (gl_container_.isColor()) {
 				glEnableClientState(GL_COLOR_ARRAY);
 			}
-			if (gl_container_.isNormal()) {
-				glEnableClientState(GL_NORMAL_ARRAY);
-			}
 			glColor4f(1.0, 1.0, 1.0, 0.0);
 
 			glLoadIdentity();
@@ -229,9 +226,6 @@ namespace gl
 			if (gl_container_.isColor()) {
 				glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container_.getColor());
 			}
-			if (gl_container_.isNormal()) {
-				glNormalPointer(GL_FLOAT, 0, gl_container_.getNormals());
-			}
 			glDrawArrays(GL_POINTS, 0, (GLsizei)gl_container_.getNumberOfVertices());
 
 			/**
@@ -260,9 +254,6 @@ namespace gl
 			glDisableClientState(GL_VERTEX_ARRAY);
 			if (gl_container_.isColor()) {
 				glDisableClientState(GL_COLOR_ARRAY);
-			}
-			if (gl_container_.isNormal()) {
-				glDisableClientState(GL_NORMAL_ARRAY);
 			}
 
 			glPopMatrix();

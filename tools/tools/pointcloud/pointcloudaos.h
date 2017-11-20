@@ -485,7 +485,7 @@ namespace pointcloud
 		*/
 		ElementType* endPoint() const
 		{
-			return reinterpret_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices() - 1]  + sizeof(PointcloudNode<ElementType>));
+			return reinterpret_cast<ElementType*>((char*)(pointcloud + number_of_vertices));
 		}
 		/**
 			Returns a pointer to the last entry + 1 of colors
@@ -494,7 +494,7 @@ namespace pointcloud
 		*/
 		uint8_t* endColor() const
 		{
-			return reinterpret_cast<uint8_t*>((char*)&pointcloud[getNumberOfVertices() - 1]  + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3 );
+			return reinterpret_cast<uint8_t*>((char*)(pointcloud + number_of_vertices) + sizeof(ElementType) * 3 );
 		}
 		/**
 			Returns a pointer to the last entry + 1 of normals
@@ -503,7 +503,7 @@ namespace pointcloud
 		*/
 		ElementType* endNormal() const
 		{
-			return reinterpret_cast<ElementType*>((char*)&pointcloud[getNumberOfVertices() - 1] + sizeof(PointcloudNode<ElementType>) + sizeof(ElementType) * 3 + 4);
+			return reinterpret_cast<ElementType*>((char*)(pointcloud + number_of_vertices) + sizeof(ElementType) * 3 + 4);
 		}
 
 		private:

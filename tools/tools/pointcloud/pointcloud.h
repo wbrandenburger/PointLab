@@ -281,13 +281,14 @@ namespace pointcloud
 		{
 			uint8_t flags = 0;
 			if (isColor()) {
-				flags |= Vertex::RGB;
+				flags |= PointcloudFlag::RGB;
 			}
 			if (isNormal()) {
-				flags |= Vertex::NORMALS;
+				flags |= PointcloudFlag::NORMALS;
 			}
 			subset_.setFlags(flags);
-			subset_.setPointcloud(list_.number_of_elements_in_list_);
+			subset_.setNumberOfVertices(number_of_elements_in_list_);
+			subset_.setPointcloud();
 
 			for (size_t i = 0; i < number_of_elements_in_list_; i++) {
 				if (list_[i] >= number_of_vertices) {
@@ -295,10 +296,10 @@ namespace pointcloud
 				}
 				subset_.setPointPtr(getPointPtr(list_[i]),i);
 				if (isColor()) {
-					subset_.setNormalPtr(getNormalPtr(list_[i]), i);
+					subset_.setColorPtr(getColorPtr(list_[i]), i);
 				}
 				if (isNormal()) {
-					subset_.setColorPtr(getColorPtr(list_[i]), i);
+					subset_.setNormalPtr(getNormalPtr(list_[i]), i);
 				}
 			}
 		}
@@ -931,7 +932,7 @@ namespace pointcloud
 		*/
 		size_t* endTriangle() const
 		{
-			return &triangles[(getNumberOfTriangles() - 1) * 3 + 2] + 1;
+			return triangles + number_of_triangles * 3;
 		}
 		/**
 			Structure of a iterator for points, colors, normals and triangles
@@ -1217,7 +1218,7 @@ namespace pointcloud
 			}
 
 			if (pointcloud_.isNormal()) {
-				out_ << (int)pointcloud_.getNormal(i, 0) << " " << (int)pointcloud_.getNormal(i, 1) << " " << (int)pointcloud_.getNormal(i, 2) << " ";
+				out_ << pointcloud_.getNormal(i, 0) << " " << pointcloud_.getNormal(i, 1) << " " << pointcloud_.getNormal(i, 2) << " ";
 			} 
 			
 			out_ << std::endl;

@@ -145,7 +145,7 @@ namespace trees
 			
 			utils::Threadpool pool(params_.cores);
 
-			for (int i = 0; i < queries_.rows; i++) {
+			for (int i = 0; i < queries_.getRows(); i++) {
 				while (!pool.runTask(boost::bind(&NNIndex<ElementType>::knnSearchThreadpool,
 					this, 
 					boost::ref(queries_), 

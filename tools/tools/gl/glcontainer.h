@@ -85,7 +85,7 @@ namespace gl
 		{
 			setMode(mode);
 
-			points = pointcloud.getPointsPtr();
+			points_ = pointcloud.getPointsPtr();
 
 			if (pointcloud.isColor()) {
 				color_ = pointcloud.getColorsPtr();

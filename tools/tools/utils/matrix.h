@@ -43,8 +43,23 @@ namespace utils
 			Constructor
 		*/
 		Matrix() :
-			rows_(0), cols_(0), data_(NULL)
+			rows_(0), cols_(0), data_(nullptr)
 		{
+		}
+		
+		/**
+			Constructor
+			
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		Matrix(size_t rows, size_t cols) : Matrix()
+		{
+			rows_ = rows;
+			cols_ = cols;
+
+			data_ = new ElementType[rows_ * cols_];
+			std::memset(data_, 0, sizeof(ElementType) * rows_ * cols_);
 		}
 
 		/**
@@ -58,6 +73,7 @@ namespace utils
 		{
 			rows_ = rows;
 			cols_ = cols;
+
 			data_ = data;
 		}
 
@@ -87,9 +103,14 @@ namespace utils
 		*/
 		Matrix(const Matrix<ElementType>& matrix) : Matrix()
 		{
+			data_ = new ElementType[matrix.getRows()*matrix.getCols()];
 
-			data_ = new ElementType[matrix_.getRows()*matrix_.getCols()];
-			std::memcpy(data_, matrix.getPtr(), sizeof(ElementType)*matrix.getRows()*matrix.getCols());
+			Matrix<ElementType>::Iterator it_cpy = begin();
+			ElementType* it_end = matrix.end();
+			for (Matrix<ElementType>::Iterator it = matrix.begin(); it != it_end; it++) {
+				*it_cpy = *it;
+				it_cpy++;
+			}
 
 			rows_ = matrix.getRows();
 			cols_ = matrix.getCols();
@@ -116,7 +137,13 @@ namespace utils
 			clearMemory();
 
 			data_ = new ElementType[matrix.getRows()*matrix.getCols()];
-			std::memcpy(data_, matrix.getPtr(), sizeof(ElementType)*matrix.getRows()*matrix.getCols());
+			
+			Matrix<ElementType>::Iterator it_cpy = begin();
+			ElementType* it_end = matrix.end();
+			for (Matrix<ElementType>::Iterator it = matrix.begin(); it != it_end; it++) {
+				*it_cpy = *it;
+				it_cpy++;
+			}
 
 			rows_ = matrix.getRows();
 			cols_ = matrix.getCols();
@@ -142,6 +169,23 @@ namespace utils
 		/**
 			Set Matrix
 			
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		void setMatrix(size_t rows, size_t cols)
+		{
+			clearMemory();
+
+			rows_ = rows;
+			cols_ = cols;
+
+			data_ = new ElementType[rows_ * cols_];
+			std::memset(data_, 0, sizeof(ElementType) * rows_ * cols_);
+		}
+
+		/**
+			Set Matrix
+			
 			@param[in] data_ Row-array of a specific Type
 			@param[in] rows_ Rows of the matrix
 			@param[in] cols_ Columns of the matrix
@@ -150,19 +194,33 @@ namespace utils
 		{
 			clearMemory();
 
-			data_ = data;
 			rows_ = rows;
 			cols_ = cols;
+
+			data_ = data;
 		}
 
 		/**
-			Returns the pointer of the data array
+			Returns the pointer to the data array
 			
 			@return Return pointer of data array
 		*/
 		ElementType* getPtr() const
 		{
 			return data_;
+		}
+
+		/**
+			Returns the pointer to the data array
+
+			@return Return pointer of data array
+		*/
+		ElementType* getAllocatedPtr() const
+		{
+			ElementType* data_new = new ElementType[rows_ * cols_];
+			std::memcpy(data_new, data_, sizeof(ElementType) * rows_ * cols_);
+
+			return data_new;
 		}
 
 		/**
@@ -193,9 +251,165 @@ namespace utils
 		*/
 		inline ElementType* operator[](size_t index) const
 		{
-			return data_ + index*cols_;
+			return data_ + index * cols_;
 		}
+		/**
+			Returns a pointer to the first entry of data_
+
+			@return Pointer to the first entry of data_
+		*/
+		ElementType* begin() const
+		{
+			return data_;
+		}
+	
+		/**
+			Returns a pointer to the last entry + 1 of the points
+
+			@return Pointer to the last entry + 1 of the points
+		*/
+		ElementType* end() const
+		{
+			return data_ + rows_ * cols_;
+		}
+
+		/**
+			Structure of a iterator for points, colors, normals and triangles
+		*/
+		class Iterator
+		{
+		public:
+			/**
+				Constructor
+			*/
+			Iterator() : iterator_(nullptr)
+			{
+			}
 		
+			/**
+				Constructor
+
+				@param[in] begin Initial pointer
+			*/
+			Iterator(ElementType* begin)
+			{
+				iterator_ = begin;
+			}
+
+			/**
+				Destructor
+				*/
+			~Iterator()
+			{
+			}
+			
+			/**
+				Copy Constructor
+
+				@param[in] An instance of class Iterator
+			*/
+			Iterator(const Iterator& iterator) = delete;
+
+			/**
+				Operator = 
+
+				@param[in] An instance of class Iterator
+			*/
+			Iterator(const Iterator&& iterator) = delete;
+
+			/**
+				Operator =
+				
+				@param[in] begin Initial pointer
+			*/
+			Iterator& operator=(const ElementType* begin)
+			{
+				iterator_ = begin;
+			
+				return *this;
+			}
+
+			/**
+				Operator = 
+
+				@param[in] An instance of class Iterator
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(const Iterator& iterator) = delete;
+
+			/**
+				Operator = 
+			
+				@param[in] iterator An instance of class Iterator
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(const Iterator&& iterator) = delete;
+	
+			/**
+				Operator ++
+
+				@param[in] Increment
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator++(int)
+			{
+				iterator_++; 
+			
+				return *this;
+			}
+
+			/**
+				Operator = 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			Iterator& operator=(ElementType* iterator)
+			{
+				iterator_ = iterator;
+			
+				return *this;
+			}
+
+			/**
+				Operator != 
+			
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator!=(ElementType* iterator)
+			{
+				return iterator_ != iterator;
+			}
+
+			/**
+				Operator == 
+
+				@param[in] iterator Pointer to an element
+				@return Returns reference to the current instance
+			*/
+			bool operator==(ElementType* iterator)
+			{
+				return iterator_ == iterator;
+			}
+
+			/**
+				Operator *
+
+				@return Content of current location of iterator
+			*/
+			ElementType& operator*()
+			{
+				return *iterator_;
+			}
+
+		private:		
+			/**
+				Pointer to the current element
+			*/
+			ElementType* iterator_;
+		};
+
 	public:
 
 		/** 
