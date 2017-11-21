@@ -106,9 +106,7 @@ int main(int argc, char* argv[]) {
 	pointcloud::PointcloudSoA<float> search_pointcloud;
 	pointcloud_buny.getSubset(indices.getPtr(), nn, search_pointcloud);
 
-	std::cout << search_pointcloud << std::endl;
-
-
+	pointcloud::computeNormals<float>(search_pointcloud, nn, NormalComputation::PLANESVD);
 
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_buny);
 

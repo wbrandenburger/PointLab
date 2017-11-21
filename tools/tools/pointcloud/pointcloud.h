@@ -324,6 +324,8 @@ namespace pointcloud
 		*/
 		void getSubset(size_t* list,size_t number_of_elements, utils::Matrix<ElementType>& subset) const
 		{
+			subset.setMatrix(number_of_elements, 3);
+
 			for (size_t i = 0; i <  number_of_elements; i++) {
 				if (list[i] >= number_of_vertices) {
 					exitFailure(__FILE__, __LINE__);

@@ -59,7 +59,7 @@ namespace utils
 			cols_ = cols;
 
 			data_ = new ElementType[rows_ * cols_];
-			std::memset(data_, 0, sizeof(ElementType) * rows_ * cols_);
+			std::memset(data_, (ElementType)0, sizeof(ElementType) * rows_ * cols_);
 		}
 
 		/**
@@ -188,7 +188,7 @@ namespace utils
 			cols_ = cols;
 
 			data_ = new ElementType[rows_ * cols_];
-			std::memset(data_, 0, sizeof(ElementType) * rows_ * cols_);
+			std::memset(data_, (ElementType)0, sizeof(ElementType) * rows_ * cols_);
 		}
 
 		/**
