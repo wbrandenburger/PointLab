@@ -265,9 +265,9 @@ namespace pointcloud
 			@param[in] list_ List with indices to elements of the subset
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubset(const std::vector<size_t>& list_, Pointcloud<ElementType>& subset_) const
+		void getSubset(const std::vector<size_t>& list, Pointcloud<ElementType>& subset) const
 		{
-			getSubset(list_.data(), list_.size(), subset_);
+			getSubset(list.data(), list.size(), subset);
 		}
 
 		/**
@@ -277,7 +277,7 @@ namespace pointcloud
 			@param[in] number_of_elements_in_list_ Number of elements in list
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubset(size_t* list_,size_t number_of_elements_in_list_, Pointcloud<ElementType>& subset_) const
+		void getSubset(size_t* list,size_t number_of_elements, Pointcloud<ElementType>& subset) const
 		{
 			uint8_t flags = 0;
 			if (isColor()) {
@@ -286,20 +286,20 @@ namespace pointcloud
 			if (isNormal()) {
 				flags |= PointcloudFlag::NORMALS;
 			}
-			subset_.setFlags(flags);
-			subset_.setNumberOfVertices(number_of_elements_in_list_);
-			subset_.setPointcloud();
+			subset.setFlags(flags);
+			subset.setNumberOfVertices(number_of_elements);
+			subset.setPointcloud();
 
-			for (size_t i = 0; i < number_of_elements_in_list_; i++) {
-				if (list_[i] >= number_of_vertices) {
+			for (size_t i = 0; i < number_of_elements; i++) {
+				if (list[i] >= number_of_vertices) {
 					exitFailure(__FILE__, __LINE__);
 				}
-				subset_.setPointPtr(getPointPtr(list_[i]),i);
+				subset.setPointPtr(getPointPtr(list[i]),i);
 				if (isColor()) {
-					subset_.setColorPtr(getColorPtr(list_[i]), i);
+					subset.setColorPtr(getColorPtr(list[i]), i);
 				}
 				if (isNormal()) {
-					subset_.setNormalPtr(getNormalPtr(list_[i]), i);
+					subset.setNormalPtr(getNormalPtr(list[i]), i);
 				}
 			}
 		}
@@ -310,9 +310,9 @@ namespace pointcloud
 			@param[in] list_ List with indices to elements of the subset
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubset(const std::vector<size_t>& list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(const std::vector<size_t>& list, utils::Matrix<ElementType>& subset) const
 		{
-			getSubset(list_.data(), list_.size(), subset_);
+			getSubset(list.data(), list.size(), subset);
 		}
 
 		/**
@@ -322,13 +322,13 @@ namespace pointcloud
 			@param[in] number_of_elements_in_list_ Number of elements in list
 			@param[in,out] subset_ Reference to the pointcloud with the subset
 		*/
-		void getSubset(size_t* list_,size_t number_of_elements_in_list_, utils::Matrix<ElementType>& subset_) const
+		void getSubset(size_t* list,size_t number_of_elements, utils::Matrix<ElementType>& subset) const
 		{
-			for (size_t i = 0; i <  number_of_elements_in_list_; i++) {
-				if (list_[i] >= number_of_vertices) {
+			for (size_t i = 0; i <  number_of_elements; i++) {
+				if (list[i] >= number_of_vertices) {
 					exitFailure(__FILE__, __LINE__);
 				}
-				std::memcpy(subset_[i],getPointPtr(list_[i]), sizeof(ElementType)*3);
+				std::memcpy(subset[i],getPointPtr(list[i]), sizeof(ElementType)*3);
 			}
 		}
 

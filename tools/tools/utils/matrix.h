@@ -167,6 +167,14 @@ namespace utils
 		}
 
 		/**
+			Reset the data-array
+		*/
+		void reset()
+		{
+			std::memset(data_, (ElementType)0, sizeof(ElementType) * rows_ * cols_);
+		}
+
+		/**
 			Set Matrix
 			
 			@param[in] rows_ Rows of the matrix

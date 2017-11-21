@@ -32,51 +32,105 @@
 #ifndef UTILS_PCA_H_
 #define UTILS_PCA_H_
 
-#include "utils/matrix.h"
+#include "tools/parameters.h"
+
+#include "tools/utils/matrix.h"
+#include "tools/pointcloud/pointcloud.h"
+
+#include "trees/trees.hpp"
 
 #include "eigen3/Eigen/Dense"
 
 namespace utils
 {
-
-	/**	
-		Computes the principal components of abitrary points. Every vector in the resultmatrix corresponds to a principal component
-
-		@param[in] data_ Matrix with the points
-		@param[in] instance_ The point which determines the frame
-		@param[in,out] principal_components_ The Matrix with the principal components
-		@param[in] distance_ Distance function
-		@param[in] smooth_factor_ Factor which adjusts the smoothing quality
-	*/
-	template<typename ElementType, typename DistanceType> void principalComponentAnalysis (const utils::Matrix<ElementType>& data_,
-		ElementType* const instance_, Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>& principal_components_, 
-		const DistanceType& distance_, const float smooth_factor_ = 0)
-	{
-		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> kovariance_matrix(data_.cols, data_.cols);
-
-		utils::Difference<ElementType> difference;
-		ElementType* difference_vector(new ElementType[data_.getCols()]);
-
-		for (size_t rows = 0; rows < data_.getCols(); rows++) {
-			for (size_t cols = 0; cols < data_.getCols(); cols++) {
-				kovariance_matrix(rows, cols) = 0;
-				for (size_t i = 0; i < data_.rows; i++) {
-					difference(data_[i], instance_, difference_vector, data_.getCols());s
-					if (smooth_factor_) {
-						kovariance_matrix(rows, cols) = kovariance_matrix(rows, cols) + difference_vector[rows] * difference_vector[cols] *
-							std::exp(-distance_(difference_vector, data_.getCols()) / smooth_factor_);
-					}
-					else {
-						kovariance_matrix(rows, cols) = kovariance_matrix(rows, cols) + difference_vector[rows] * difference_vector[cols];
-					}
-
-				}
-			}
-		}
+	/**
 		
-		Eigen::JacobiSVD <Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd(kovariance_matrix,/* Eigen::ComputeThinU | */Eigen::ComputeThinV);
-		principal_components_ = svd.matrixV();
+		@param[in,out] pointcloud Pointcloud
+		@param[in] neighbors Number of neighbors which will be considered for computation normals
+		@param[in] normal_computation Method which will be used for computing normals
+	*/
+	template<typename ElementType> void computeNormals(pointcloud::Pointcloud<ElementType> pointcloud, 
+		size_t  neighbors,
+		NormalComputation normal_computation = NormalComputation::PLANEPCA)
+	{
+		/**
+			Ensure assigning normals to pointcloud
+		*/
+		pointcloud.setNormals();
+
+		/**
+			Build a kd-tree with the entire pointcloud
+		*/
+		////trees::Index<ElementType> kdtree_index(/*Pointcloud*/,trees::KDTreeIndexParams(/*Number of points in a node*/));
+		////kdtree_index.buildIndex();
+		/**
+			Compute for every point in the pointcloud the corresponding normal
+		*/
+		for (size_t i = 0; i < pointcloud.getNumberOfVertices(); i++) {
+
+			/**
+				Search for the neighbors for the given point
+			*/
+
+			//indices
+			//dists
+
+			/**
+				Compute the normals depending on input method
+			*/
+			////switch (normal_comutation) {
+			////case NormalComputation::PLANESVD: pointcloud.setNormalPtr(/*Computation of normal*/, i); break;
+			////case NormalComputation::PLANEPCA: pointcloud.setNormalPtr(/*Computation of normal*/, i); break;
+			////case NormalComputation::VECTORSVD: pointcloud.setNormalPtr(/*Computation of normal*/, i); break;
+			////case NormalComputation::QUADSVD: pointcloud.setNormalPtr(/*Computation of normal*/, i); break;
+			////}
+		}
 	}
+
+	template<typename ElementType> void normalPlaneSVD()
+	{
+
+	}
+
+
+	///**	
+	//	Computes the principal components of abitrary points. Every vector in the resultmatrix corresponds to a principal component
+
+	//	@param[in] data_ Matrix with the points
+	//	@param[in] instance_ The point which determines the frame
+	//	@param[in,out] principal_components_ The Matrix with the principal components
+	//	@param[in] distance_ Distance function
+	//	@param[in] smooth_factor_ Factor which adjusts the smoothing quality
+	//*/
+	//template<typename ElementType, typename DistanceType> void principalComponentAnalysis (const utils::Matrix<ElementType>& data_,
+	//	ElementType* const instance_, Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>& principal_components_, 
+	//	const DistanceType& distance_, const float smooth_factor_ = 0)
+	//{
+	//	Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> kovariance_matrix(data_.cols, data_.cols);
+
+	//	utils::Difference<ElementType> difference;
+	//	ElementType* difference_vector(new ElementType[data_.getCols()]);
+
+	//	for (size_t rows = 0; rows < data_.getCols(); rows++) {
+	//		for (size_t cols = 0; cols < data_.getCols(); cols++) {
+	//			kovariance_matrix(rows, cols) = 0;
+	//			for (size_t i = 0; i < data_.rows; i++) {
+	//				difference(data_[i], instance_, difference_vector, data_.getCols());s
+	//				if (smooth_factor_) {
+	//					kovariance_matrix(rows, cols) = kovariance_matrix(rows, cols) + difference_vector[rows] * difference_vector[cols] *
+	//						std::exp(-distance_(difference_vector, data_.getCols()) / smooth_factor_);
+	//				}
+	//				else {
+	//					kovariance_matrix(rows, cols) = kovariance_matrix(rows, cols) + difference_vector[rows] * difference_vector[cols];
+	//				}
+
+	//			}
+	//		}
+	//	}
+	//	
+	//	Eigen::JacobiSVD <Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd(kovariance_matrix,/* Eigen::ComputeThinU | */Eigen::ComputeThinV);
+	//	principal_components_ = svd.matrixV();
+	//}
 }
 
 #endif /* UTILS_PCA_H_ */

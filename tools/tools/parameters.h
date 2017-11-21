@@ -150,4 +150,30 @@
 		TRIANGLES = 2
 	};
 
+	/**
+		Computation of normals
+	*/
+	enum struct NormalComputation
+	{
+		/**
+			Computation of a plane in the neighborhood of a point
+		*/
+		PLANESVD = 0,
+
+		/**
+			Computation of a plane using principal component analysis
+		*/
+		PLANEPCA = 1,
+
+		/**
+			Minimize the inner product of tangential vector and normal vector
+		*/
+		VECTORSVD = 2,
+
+		/**
+			Computation of a quadratic surface in the neighborhood of a point
+		*/
+		QUADSVD = 3
+	};
+
 #endif /* PARAMETERS_H_ */

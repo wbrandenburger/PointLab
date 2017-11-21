@@ -68,6 +68,9 @@ namespace gl
 		{
 			number_of_clouds_ = 0;
 			gl_pointsize_ = 1;
+			gl_normalsize_ = 0.5f;
+
+			gl_change_size_ = 0;
 		}
 
 		/**
@@ -122,22 +125,35 @@ namespace gl
 		}
 
 		/**
+			Change the flag which defines whether the size of the points or of the normals will be changed
+		*/
+		void setChangeSize(uint8_t key)
+		{
+			switch (key) {
+			case 'p': gl_change_size_ = 0; break;
+			case 'n': gl_change_size_ = 1; break;
+			}
+		}
+
+		/**
 			Increase point size
 		*/
-		void increasePointSize()
+		void increaseSize()
 		{
-			if (gl_pointsize_ < 10) {
-				gl_pointsize_++;
+			switch (gl_change_size_) {
+			case 0: if (gl_pointsize_ < 10) { gl_pointsize_++; } break;
+			case 1: gl_normalsize_ *= 1.1f; break;
 			}
 		}
 
 		/**
 			Decrease point size
 		*/
-		void decreasePointSize()
+		void decreaseSize()
 		{
-			if (gl_pointsize_ > 1) {
-				gl_pointsize_--;
+			switch (gl_change_size_) {
+			case 0: if (gl_pointsize_ > 1) { gl_pointsize_--; } break;
+			case 1: gl_normalsize_ /= 1.1f;  break;
 			}
 		}
 
@@ -192,10 +208,6 @@ namespace gl
 				if (gl_container_[i].isColor()) {
 					glEnableClientState(GL_COLOR_ARRAY);
 				}
-				if (gl_container_[i].isNormal()) {
-					std::cout << "HM" << std::endl;
-					glEnableClientState(GL_NORMAL_ARRAY);
-				}
 				if (gl_container_[i].getMode() != GL_POINTS) {
 					glEnableClientState(GL_INDEX_ARRAY);
 				}
@@ -242,10 +254,6 @@ namespace gl
 				if (gl_container_[i].isColor()) {
 					glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container_[i].getColor());
 				}
-				if (gl_container_[i].isNormal()) {
-					glNormalPointer(GL_FLOAT, 0, gl_container_[i].getNormals());
-				}
-				
 				if (gl_container_[i].getMode() == GL_POINTS) {
 					glDrawArrays(gl_container_[i].getMode(), 0, gl_container_[i].getNumberOfVertices());
 				}
@@ -254,15 +262,29 @@ namespace gl
 						GL_UNSIGNED_INT, gl_container_[i].getIndices());
 				}
 
+				if (gl_change_size_ == 1) {
+					ElementType* points = gl_container_[i].getPoints();
+					ElementType* normals = gl_container_[i].getNormals();
+					for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
+						glBegin(GL_LINES);
+						glColor4f(0.5f, 0.5, 0.5, 0.0);
+						glVertex3f(points[0], points[1], points[2]);
+						glVertex3f(points[0] + normals[0] * gl_normalsize_, 
+							points[1] + normals[1] * gl_normalsize_, 
+							points[2] + normals[2] * gl_normalsize_);
+						glEnd();
+
+						points += 3;
+						normals += 3;
+					}
+				}
+
 				/**
 					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
 				*/
 				glDisableClientState(GL_VERTEX_ARRAY);
 				if (gl_container_[i].isColor()) {
 					glDisableClientState(GL_COLOR_ARRAY);
-				}
-				if (gl_container_[i].isNormal()) {
-					glDisableClientState(GL_NORMAL_ARRAY);
 				}
 				if (gl_container_[i].getMode() != GL_POINTS) {
 					glDisableClientState(GL_INDEX_ARRAY);
@@ -315,6 +337,16 @@ namespace gl
 			Point size
 		*/
 		size_t gl_pointsize_;
+
+		/**
+			Normal size
+		*/
+		float gl_normalsize_;
+
+		/**
+			Flag which defines whether the size of the points or the normals will be changed
+		*/
+		size_t gl_change_size_;
 
 		/**
 			Number of pointclouds
@@ -492,9 +524,11 @@ namespace gl
 		*/
 		static void key(uint8_t key, int x, int y)
 		{
-			switch (key) {		
-			case '+': plot3d_instances_.getCurrentPlot3DInstance().increasePointSize(); break;
-			case '-': plot3d_instances_.getCurrentPlot3DInstance().decreasePointSize(); break;
+			switch (key) {	
+			case 'p': plot3d_instances_.getCurrentPlot3DInstance().setChangeSize(key); break;
+			case 'n': plot3d_instances_.getCurrentPlot3DInstance().setChangeSize(key); break;
+			case '+': plot3d_instances_.getCurrentPlot3DInstance().increaseSize(); break;
+			case '-': plot3d_instances_.getCurrentPlot3DInstance().decreaseSize(); break;
 			case 27	: glutLeaveMainLoop(); break;
 			}
 		};
