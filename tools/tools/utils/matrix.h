@@ -78,6 +78,28 @@ namespace utils
 		}
 
 		/**
+			Constructor
+
+			@param[in] data_ Initializer list
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		{
+			rows_ = rows;
+			cols_ = cols;
+
+			data_ = new ElementType[rows_ * cols_];
+			Matrix<ElementType>::Iterator it = begin();
+			auto it_data = data.begin();
+			while (it != end()) {
+				*it = *it_data;
+				it++;
+				it_data++;
+			}
+		}
+
+		/**
 			Deconstructor
 		*/
 		~Matrix()
@@ -206,6 +228,30 @@ namespace utils
 			cols_ = cols;
 
 			data_ = data;
+		}
+
+		/**
+			Set Matrix
+
+			@param[in] data_ Initializer list
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		void setMatrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		{
+			clearMemory();
+
+			rows_ = rows;
+			cols_ = cols;
+
+			data_ = new ElementType[rows_ * cols_];
+			Matrix<ElementType>::Iterator it = begin();
+			auto it_data = data.begin();
+			while (it != end()) {
+				*it = *it_data;
+				it++;
+				it_data++;
+			}
 		}
 
 		/**
@@ -424,7 +470,7 @@ namespace utils
 
 			@param[in] a Scalar
 		*/
-		Matrix<ElementType> operator+(ElementType a)
+		Matrix<ElementType> operator+(ElementType a) const
 		{
 			Matrix<ElementType> matrix_new(rows_, cols_);
 
@@ -462,7 +508,7 @@ namespace utils
 
 			@param[in] a Scalar
 		*/
-		Matrix<ElementType> operator-(ElementType a)
+		Matrix<ElementType> operator-(ElementType a) const
 		{
 			return (*this) + (-1) * a;
 		}	
@@ -484,7 +530,7 @@ namespace utils
 
 			@param[in] matrix An instance of class Matrix
 		*/
-		Matrix<ElementType> operator+(Matrix<ElementType> matrix)
+		Matrix<ElementType> operator+(const Matrix<ElementType>& matrix) const
 		{
 			Matrix<ElementType> matrix_new(rows_, cols_);
 			
@@ -525,13 +571,13 @@ namespace utils
 
 			@param[in] matrix An instance of class Matrix
 		*/
-		Matrix<ElementType>& operator+=(Matrix<ElementType> matrix)
+		Matrix<ElementType>& operator+=(const Matrix<ElementType>& matrix)
 		{
 			Matrix<ElementType>::Iterator it = begin();
 			/**
 				Add a mxn-matrix to the mxn matrix
 			*/
-			if (rows_ == matrix.getRows() && cols_ == matrix_.getCols()) {
+			if (rows_ == matrix.getRows() && cols_ == matrix.getCols()) {
 				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
 
 				while (it != end()) {
@@ -543,7 +589,7 @@ namespace utils
 			/**
 				Add 1xn-matrix to the mxn-matrix
 			*/
-			else if (matrix.getRows() == 1 && cols_ == matrix_.getCols()) {
+			else if (matrix.getRows() == 1 && cols_ == matrix.getCols()) {
 				for (size_t i = 0; i < rows_*cols_; i++) {
 					*it += matrix[0][i % matrix.getCols()];
 					it++;
@@ -561,7 +607,7 @@ namespace utils
 
 			@param[in] matrix An instance of class Matrix
 		*/
-		Matrix<ElementType> operator-(Matrix<ElementType> matrix)
+		Matrix<ElementType> operator-(const Matrix<ElementType>& matrix) const
 		{
 			return (*this) + matrix*(-1);
 		}
@@ -571,7 +617,7 @@ namespace utils
 
 			@param[in] matrix An instance of class Matrix
 		*/
-		Matrix<ElementType>& operator-=(Matrix<ElementType> matrix)
+		Matrix<ElementType>& operator-=(const Matrix<ElementType>& matrix)
 		{
 			*this += matrix * (-1);
 			
@@ -583,7 +629,7 @@ namespace utils
 
 			@param[in] matrix An instance of class Matrix
 		*/
-		Matrix<ElementType> operator*(Matrix<ElementType> matrix)
+		Matrix<ElementType> operator*(const Matrix<ElementType>& matrix) const
 		{
 			Matrix<ElementType> matrix_new(rows_, matrix.getCols());
 			/**
@@ -607,7 +653,7 @@ namespace utils
 			/**
 				Multiply a nx1-vector with a nxm-matrix
 			*/
-			else if (rows_ = matrix.getRows() && cols_ == 1) {
+			else if (rows_ == matrix.getRows() && cols_ == 1) {
 				Matrix<ElementType>::Iterator it = begin();
 				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
 				Matrix<ElementType>::Iterator it_matrix_new = matrix_new.begin();
@@ -638,7 +684,7 @@ namespace utils
 
 			@param[in] matrix An instance of class Matrix
 		*/
-		Matrix<ElementType>& operator*=(Matrix<ElementType> matrix)
+		Matrix<ElementType>& operator*=(const Matrix<ElementType>& matrix)
 		{
 			(*this) = (*this) * matrix;
 
@@ -650,7 +696,7 @@ namespace utils
 
 			@param[in] a Scalar
 		*/
-		Matrix<ElementType> operator*(ElementType a)
+		Matrix<ElementType> operator*(ElementType a) const
 		{
 			Matrix<ElementType> matrix_new(rows_, cols_);
 		
@@ -685,7 +731,7 @@ namespace utils
 
 			@param[in] a Scalar
 		*/
-		Matrix<ElementType> operator/(ElementType a)
+		Matrix<ElementType> operator/(ElementType a) const
 		{
 			return (*this) * ((ElementType)1 / a);
 		}
@@ -749,7 +795,27 @@ namespace utils
 
 		return out;
 	}
+}
 
+namespace std 
+{
+	template<typename ElementType> utils::Matrix<ElementType>& pow(utils::Matrix<ElementType>& matrix, ElementType scalar) 
+	{
+		for (utils::Matrix<ElementType>::Iterator it = matrix.begin(); it != matrix.end(); it++) {
+			*it = std::pow(*it, scalar);
+		}
+
+		return matrix;
+	}
+
+	template<typename ElementType> utils::Matrix<ElementType>& sqrt(utils::Matrix<ElementType>& matrix)
+	{
+		for (utils::Matrix<ElementType>::Iterator it = matrix.begin(); it != matrix.end(); it++) {
+			*it = std::sqrt(*it);
+		}
+
+		return matrix;
+	}
 }
 
 #endif /* UTILS_MATRIX_H_ */

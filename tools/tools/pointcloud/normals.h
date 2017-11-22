@@ -116,7 +116,10 @@ namespace pointcloud
 		*/
 		WeightFunctionGaussian(const utils::Matrix<ElementType>& data)
 		{
-			math::var<ElementType>(data);
+			utils::Matrix<ElementType> var;
+			math::computeVar<ElementType>(var,data);
+
+			std::cout << var << std::endl;
 		}
 
 	private:

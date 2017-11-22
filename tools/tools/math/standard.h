@@ -76,11 +76,37 @@ namespace math
 
 		return angle_;
 	}
-
 	/**
 		Computation of the mean of an array of data points
+
+		@param[in,out] mean The container whilch holds the mean
+		@param[in] data The data points
 	*/
-	template<typename ElementType> inline void mean(ElementType* mean, const utils::Matrix<ElementType>& data)
+	template<typename ElementType> inline void computeMean(utils::Matrix<ElementType>& mean, const utils::Matrix<ElementType>& data)
+	{
+		mean.setMatrix(1,data.getCols());
+
+		/**
+			Iterate through the data array and sum the values of a specific dimension
+		*/
+		size_t i = 0;
+		for (utils::Matrix<ElementType>::Iterator it = data.begin(); it != data.end(); it++)
+		{
+			mean[0][i % data.getCols()] += *it;
+			i++;
+		}
+
+		for (size_t i = 0; i < data.getCols(); i++) {
+			mean[0][i] /= data.getRows();
+		}
+	}
+	/**
+		Computation of the mean of an array of data points
+
+		@param[in,out] mean The container whilch holds the mean
+		@param[in] data The data points
+	*/
+	template<typename ElementType> inline void computeMean(ElementType* mean, const utils::Matrix<ElementType>& data)
 	{
 		std::memset(mean, (ElementType)0, sizeof(ElementType) * data.getCols());
 
@@ -99,35 +125,24 @@ namespace math
 		}
 	}
 
-	template<typename ElementType> inline void var( const utils::Matrix<ElementType>& data)
+	/**	
+		Computation of the variances and covariances of data points
+
+		@param[in,out] var Container which holds the variances and covariances
+		@param[in] data The data points
+	*/
+	template<typename ElementType> inline void computeVar(utils::Matrix<ElementType>& var, const utils::Matrix<ElementType>& data)
 	{
-		ElementType* mean_data = new ElementType[data.getCols()];
-
-		mean<ElementType>(mean_data, data);
-
-		utils::Matrix<ElementType> ma(2, 2);
-		ma[0][0] = 2;
-		ma[0][1] = 4;
-		ma[1][0] = 6;
-		ma[1][1] = 8;
-		utils::Matrix<ElementType> mo(2, 1);
-		mo[0][0] = 3;
-		mo[1][0] = 5;
-
-		utils::Matrix<ElementType> mb = ma;
-
-		std::cout << mo * ma << std::endl;
-		//std::cout << (data.transpose()*data +2) * 2  << std::endl;
+		/**
+			Compute mean
+		*/
+		utils::Matrix<ElementType> mean;
+		computeMean<ElementType>(mean, data);
 
 		/**
-			Iterate through the data array and 
+			Computation of the variances and covariances
 		*/
-		size_t i = 0;
-		for (utils::Matrix<ElementType>::Iterator it = data.begin(); it != data.end(); it++)
-		{
-		}
-
-		delete[] mean_data;
+		var = (data - mean).transpose()*(data - mean);
 	}
 }
 
