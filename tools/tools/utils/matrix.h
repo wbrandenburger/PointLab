@@ -261,6 +261,7 @@ namespace utils
 		{
 			return data_ + index * cols_;
 		}
+
 		/**
 			Returns a pointer to the first entry of data_
 
@@ -418,6 +419,267 @@ namespace utils
 			ElementType* iterator_;
 		};
 
+		/**
+			Operator +
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType> operator+(ElementType a)
+		{
+			Matrix<ElementType> matrix_new(rows_, cols_);
+
+			Matrix<ElementType>::Iterator it = begin();
+			Matrix<ElementType>::Iterator it_matrix_new = matrix_new.begin();
+
+			while (it != end()) {
+				*it_matrix_new = *it + a;
+				it_matrix_new++;
+				it++;
+			}
+
+			return matrix_new;
+		}
+
+		/**
+			Operator +=
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType>& operator+=(ElementType a)
+		{
+			Matrix<ElementType>::Iterator it = begin();
+
+			while (it != end()) {
+				*it += a;
+				it++;
+			}
+
+			return (*this);
+		}
+
+		/**
+			Operator -
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType> operator-(ElementType a)
+		{
+			return (*this) + (-1) * a;
+		}	
+				
+		/**
+			Operator +=
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType>& operator-=(ElementType a)
+		{
+			(*this) += (-1) * a;
+
+			return (*this);
+		}
+
+		/**
+			Operator +
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix<ElementType> operator+(Matrix<ElementType> matrix)
+		{
+			Matrix<ElementType> matrix_new(rows_, cols_);
+			
+			Matrix<ElementType>::Iterator it = begin();
+			Matrix<ElementType>::Iterator it_matrix_new = matrix_new.begin();
+			if (rows_ == matrix.getRows() && cols_ == matrix.getCols()) {
+				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
+
+				while (it != end()) {
+					*it_matrix_new = *it + *it_matrix;
+					it_matrix_new++;
+					it_matrix++;
+					it++;
+				}
+			}
+			else if (matrix.getRows() == 1 && cols_ == matrix.getCols()) {
+				for (size_t i = 0; i < rows_*cols_; i++) {
+					*it_matrix_new = *it + matrix[0][i % matrix.getCols()];
+					it_matrix_new++;
+					it++;
+				}
+			}
+			else {
+				exitFailure(__FILE__, __LINE__);
+			}
+
+			return matrix_new;
+		}
+
+		/**
+			Operator +=
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix<ElementType>& operator+=(Matrix<ElementType> matrix)
+		{
+			Matrix<ElementType>::Iterator it = begin();
+			if (rows_ == matrix.getRows() && cols_ == matrix_.getCols()) {
+				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
+
+				while (it != end()) {
+					*it += *it_matrix;
+					it_matrix++;
+					it++;
+				}
+			}
+			else if (matrix.getRows() == 1 && cols_ == matrix_.getCols()) {
+				for (size_t i = 0; i < rows_*cols_; i++) {
+					*it += matrix[0][i % matrix.getCols()];
+					it++;
+				}
+			}
+			else {
+				exitFailure(__FILE__, __LINE__);
+			}
+
+			return (*this);
+		}
+
+		/**
+			Operator -
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix<ElementType> operator-(Matrix<ElementType> matrix)
+		{
+			return (*this) + matrix*(-1);
+		}
+
+		/**
+			Operator -
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix<ElementType>& operator-=(Matrix<ElementType> matrix)
+		{
+			*this += matrix * (-1);
+			
+			return (*this);
+		}
+
+		/**
+			Operator *
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix<ElementType> operator*(Matrix<ElementType> matrix)
+		{
+			if (cols_ != matrix.getRows()) {
+				exitFailure(__FILE__, __LINE__);
+			}
+
+			Matrix<ElementType> matrix_new(rows_, matrix.getCols());
+			size_t index_left = 0, index_right = 0;
+			for (Matrix<ElementType>::Iterator it = matrix_new.begin(); it != matrix_new.end(); it++){
+				for (size_t i = 0; i < cols_; i++) {
+					*it += (*this)[index_left][i] * matrix[i][index_right];
+				}
+				if (index_right != matrix.getCols() - 1) {
+					index_right++;
+				}
+				else{
+					index_right = 0;
+					index_left++;
+				}
+			}
+
+			return matrix_new;
+
+		}
+
+		/**
+			Operator *=
+
+			@param[in] matrix An instance of class Matrix
+		*/
+		Matrix<ElementType>& operator*=(Matrix<ElementType> matrix)
+		{
+			(*this) = (*this) * matrix;
+
+			return (*this);
+		}
+
+		/**
+			Operator *
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType> operator*(ElementType a)
+		{
+			Matrix<ElementType> matrix_new(rows_, cols_);
+		
+			Matrix<ElementType>::Iterator it = begin();
+			Matrix<ElementType>::Iterator it_matrix_new = matrix_new.begin();
+			while(it != end()){
+				*it_matrix_new = *it*a;
+				it++;
+				it_matrix_new++;
+			}
+
+			return matrix_new;
+		}
+
+		/**
+			Operator *=
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType>& operator*=(ElementType a)
+		{
+			Matrix<ElementType>::Iterator it = begin();
+			while(it != end()){
+				*it *= a;
+				it++;
+			}
+			return (*this);
+		}
+
+		/**
+			Operator /
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType> operator/(ElementType a)
+		{
+			return (*this) * ((ElementType)1 / a);
+		}
+
+		/**
+			Operator *=
+
+			@param[in] a Scalar
+		*/
+		Matrix<ElementType>& operator/=(ElementType a)
+		{
+			(*this) *= ((ElementType)1 / a);
+
+			return (*this);
+		}
+
+		/**
+			Transpose matrix
+		*/
+		Matrix<ElementType> transpose() const
+		{
+			Matrix<ElementType> matrix_new(cols_, rows_);
+			for (size_t row = 0; row < rows_; row++) {
+				for (size_t col = 0; col < cols_; col++) {
+					matrix_new[col][row] = (*this)[row][col];
+				}
+			}
+			
+			return matrix_new;
+		}
+
 	public:
 
 		/** 
@@ -443,7 +705,7 @@ namespace utils
 
 		for (size_t i = 0; i < number; i++) {
 			for (size_t j = 0; j < matrix.getCols(); j++) {
-				out << matrix_[i][j] << " ";
+				out << matrix[i][j] << " ";
 			}
 			out <<  std::endl;
 		}

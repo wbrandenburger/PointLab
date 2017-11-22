@@ -47,6 +47,18 @@
 	}
 
 	/**
+		Swap
+
+		@param[in,out] a Object which should be swapped with b
+		@param[in,out] b Object which should be swapped with a
+	*/
+	template<typename ElementType> inline void swap(ElementType& a, ElementType& b) {
+		ElementType temp = b;
+		b = a;
+		a = temp;
+	}
+
+	/**
 		Flags which specify the members of a pointcloud
 	*/
 	enum struct PointcloudFlag

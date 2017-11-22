@@ -29,8 +29,10 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *************************************************************************/
 
-#ifndef MATH_ANGLE_H_
-#define MATH_ANGLE_H_
+#ifndef MATH_STANDARD_H_
+#define MATH_STANDARD_H_
+
+#include "tools/utils/matrix.h"
 
 namespace math
 {
@@ -74,6 +76,60 @@ namespace math
 
 		return angle_;
 	}
+
+	/**
+		Computation of the mean of an array of data points
+	*/
+	template<typename ElementType> inline void mean(ElementType* mean, const utils::Matrix<ElementType>& data)
+	{
+		std::memset(mean, (ElementType)0, sizeof(ElementType) * data.getCols());
+
+		/**
+			Iterate through the data array and sum the values of a specific dimension
+		*/
+		size_t i = 0;
+		for (utils::Matrix<ElementType>::Iterator it = data.begin(); it != data.end(); it++)
+		{
+			mean[i % data.getCols()] += *it;
+			i++;
+		}
+
+		for (size_t i = 0; i < data.getCols(); i++) {
+			mean[i] /= data.getRows();
+		}
+	}
+
+	template<typename ElementType> inline void var( const utils::Matrix<ElementType>& data)
+	{
+		ElementType* mean_data = new ElementType[data.getCols()];
+
+		mean<ElementType>(mean_data, data);
+
+		utils::Matrix<ElementType> ma(2, 2);
+		ma[0][0] = 2;
+		ma[0][1] = 4;
+		ma[1][0] = 6;
+		ma[1][1] = 8;
+		utils::Matrix<ElementType> mo(1, 2);
+		mo[0][0] = 2;
+		mo[0][1] = 4;
+
+		utils::Matrix<ElementType> mb = ma;
+
+		std::cout << ma * mb << std::endl;
+		std::cout << ma / 2 << std::endl;
+		//std::cout << (data.transpose()*data +2) * 2  << std::endl;
+
+		/**
+			Iterate through the data array and 
+		*/
+		size_t i = 0;
+		for (utils::Matrix<ElementType>::Iterator it = data.begin(); it != data.end(); it++)
+		{
+		}
+
+		delete[] mean_data;
+	}
 }
 
-#endif /* MATH_ANGLE_H_ */
+#endif /* MATH_STANDARD_H_ */

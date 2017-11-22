@@ -31,7 +31,7 @@
 #define INCLUDE_MATH_H_
 
 #include "math/adjustment.h"
-#include "math/angle.h"
+#include "math/standard.h"
 #include "math/function.h"
 #include "math/pca.h"
 #include "math/zero.h"

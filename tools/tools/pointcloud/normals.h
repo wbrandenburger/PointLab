@@ -37,12 +37,16 @@
 #include "tools/utils/matrix.h"
 #include "tools/pointcloud/pointcloud.h"
 
+#include "tools/math/standard.h"
+
 #include "trees/trees.hpp"
 
 #include "eigen3/Eigen/Dense"
 
 namespace pointcloud
 {
+
+
 	/**
 		
 		@param[in,out] pointcloud Pointcloud
@@ -81,7 +85,7 @@ namespace pointcloud
 			Compute for every point in the pointcloud the corresponding normal
 		*/
 		utils::Matrix<ElementType> points;
-		for (size_t i = 0; i < pointcloud.getNumberOfVertices(); i++) {
+		for (size_t i = 0; i < 1/*pointcloud.getNumberOfVertices()*/; i++) {
 			pointcloud.getSubset(indices[i], neighbors, points);
 
 			/**
@@ -90,8 +94,10 @@ namespace pointcloud
 			ElementType normal[3];
 			std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
 
+			WeightFunctionGaussian<ElementType> a(points);
+
 			switch (normal_computation) {
-			case NormalComputation::PLANESVD: normalPlaneSVD(normal,points,weightFunction); break;
+			case NormalComputation::PLANESVD: normalPlaneSVD(normal,points); break;
 			case NormalComputation::PLANEPCA: break;
 			case NormalComputation::VECTORSVD: break;
 			case NormalComputation::QUADSVD: break;
@@ -101,11 +107,21 @@ namespace pointcloud
 			points.reset();
 		}
 	}
-
-	template<typename ElementType> ElementType weightFunction(ElementType x)
+	
+	template<typename ElementType> class WeightFunctionGaussian
 	{
-		return 1;
-	}
+	public:
+		/**
+		Constructor
+		*/
+		WeightFunctionGaussian(const utils::Matrix<ElementType>& data)
+		{
+			math::var<ElementType>(data);
+		}
+
+	private:
+		ElementType std_;
+	};
 
 	/**
 		 A classical method is to fit a local plane S=n_{x}x+n_{y}y+n_{z}z+d 
@@ -114,9 +130,8 @@ namespace pointcloud
 		 @param[in] normal
 		 @param[in] points_matrix
 	*/
-	template<typename ElementType> void normalPlaneSVD(ElementType normal[], 
-		utils::Matrix<ElementType> points,
-		ElementType(*weight_function)(ElementType))
+	template<typename ElementType> void normalPlaneSVD(ElementType* normal, 
+		utils::Matrix<ElementType> points)
 	{
 		/**
 			Build a nx4 matrix A = [x y z 1] with n = number of points
@@ -135,7 +150,7 @@ namespace pointcloud
 		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> P(points.getRows(), points.getRows());
 
 		for (size_t i = 0; i < points.getRows(); i++) {
-			P(i, i) = weight_function(distance(points[i], points[0], 3));
+			P(i, i) = 1;
 		}
 
 		/**

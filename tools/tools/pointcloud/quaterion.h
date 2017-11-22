@@ -32,7 +32,7 @@
 #ifndef POINTCLOUD_QUATERION_H_
 #define POINTCLOUD_QUATERION_H_
 
-#include "tools/math/angle.h"
+#include "tools/math/standard.h"
 
 namespace pointcloud
 {
