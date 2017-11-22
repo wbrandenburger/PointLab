@@ -36,6 +36,40 @@
 
 namespace math
 {
+	template<typename ElementType> ElementType euclideanDistance(ElementType* a, size_t dim)
+	{
+		ElementType result = ElementType();
+		ElementType* end = a + dim;
+		
+		while (a != end) {
+			result += *a * *a;
+			a++;
+		}
+
+		return result;
+	}
+
+	template<typename ElementType> ElementType* euclideanDistance(ElementType* a, size_t number_of_elements, size_t dim)
+	{
+		ElementType* result = new ElementType[number_of_elements];
+		ElementType* result_ptr = result;
+		ElementType* end = a + number_of_elements * dim;
+		
+		while (a != end) {
+			*result_ptr = euclideanDistance<ElementType>(a, dim);
+			a += dim;
+
+			result_ptr++;
+		}
+
+		return result;
+	}
+
+	template<typename ElementType> utils::Matrix<ElementType> euclideanDistance(const utils::Matrix<ElementType>& matrix)
+	{
+		return utils::Matrix<ElementType>(euclideanDistance<ElementType>(matrix.getPtr(), matrix.getRows(), matrix.getCols()), matrix.getRows(),1);
+	}
+
 
 	struct Polynomial2D 
 	{

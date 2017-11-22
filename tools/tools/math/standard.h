@@ -84,30 +84,18 @@ namespace math
 	*/
 	template<typename ElementType> inline void computeMean(utils::Matrix<ElementType>& mean, const utils::Matrix<ElementType>& data)
 	{
-		mean.setMatrix(1,data.getCols());
-
-		/**
-			Iterate through the data array and sum the values of a specific dimension
-		*/
-		size_t i = 0;
-		for (utils::Matrix<ElementType>::Iterator it = data.begin(); it != data.end(); it++)
-		{
-			mean[0][i % data.getCols()] += *it;
-			i++;
-		}
-
-		for (size_t i = 0; i < data.getCols(); i++) {
-			mean[0][i] /= data.getRows();
-		}
+		mean = utils::Matrix<ElementType>(computeMean<ElementType>(data), 1, data.getCols());
 	}
+
 	/**
 		Computation of the mean of an array of data points
 
 		@param[in,out] mean The container whilch holds the mean
 		@param[in] data The data points
 	*/
-	template<typename ElementType> inline void computeMean(ElementType* mean, const utils::Matrix<ElementType>& data)
+	template<typename ElementType> inline ElementType* computeMean(const utils::Matrix<ElementType>& data)
 	{
+		ElementType* mean = new ElementType[data.getCols()];
 		std::memset(mean, (ElementType)0, sizeof(ElementType) * data.getCols());
 
 		/**
@@ -123,6 +111,8 @@ namespace math
 		for (size_t i = 0; i < data.getCols(); i++) {
 			mean[i] /= data.getRows();
 		}
+
+		return mean;
 	}
 
 	/**	

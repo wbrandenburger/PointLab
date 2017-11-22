@@ -37,6 +37,7 @@
 #include "tools/utils/matrix.h"
 #include "tools/pointcloud/pointcloud.h"
 
+#include "tools/math/function.h"
 #include "tools/math/standard.h"
 
 #include "trees/trees.hpp"
@@ -112,14 +113,10 @@ namespace pointcloud
 	{
 	public:
 		/**
-		Constructor
+			Constructor
 		*/
 		WeightFunctionGaussian(const utils::Matrix<ElementType>& data)
 		{
-			utils::Matrix<ElementType> var;
-			math::computeVar<ElementType>(var,data);
-
-			std::cout << var << std::endl;
 		}
 
 	private:
