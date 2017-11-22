@@ -110,14 +110,13 @@ namespace math
 		ma[0][1] = 4;
 		ma[1][0] = 6;
 		ma[1][1] = 8;
-		utils::Matrix<ElementType> mo(1, 2);
-		mo[0][0] = 2;
-		mo[0][1] = 4;
+		utils::Matrix<ElementType> mo(2, 1);
+		mo[0][0] = 3;
+		mo[1][0] = 5;
 
 		utils::Matrix<ElementType> mb = ma;
 
-		std::cout << ma * mb << std::endl;
-		std::cout << ma / 2 << std::endl;
+		std::cout << mo * ma << std::endl;
 		//std::cout << (data.transpose()*data +2) * 2  << std::endl;
 
 		/**

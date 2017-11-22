@@ -420,7 +420,7 @@ namespace utils
 		};
 
 		/**
-			Operator +
+			Operator+ Adds a scalar to the matrix
 
 			@param[in] a Scalar
 		*/
@@ -441,7 +441,7 @@ namespace utils
 		}
 
 		/**
-			Operator +=
+			Operator+= Add a scalar to the matrix
 
 			@param[in] a Scalar
 		*/
@@ -458,7 +458,7 @@ namespace utils
 		}
 
 		/**
-			Operator -
+			Operator- Subtract a scalar from the matrix
 
 			@param[in] a Scalar
 		*/
@@ -468,7 +468,7 @@ namespace utils
 		}	
 				
 		/**
-			Operator +=
+			Operator- Subtract a scalar from th matrix
 
 			@param[in] a Scalar
 		*/
@@ -480,7 +480,7 @@ namespace utils
 		}
 
 		/**
-			Operator +
+			Operator+ Add a matrix to the matrix
 
 			@param[in] matrix An instance of class Matrix
 		*/
@@ -490,6 +490,9 @@ namespace utils
 			
 			Matrix<ElementType>::Iterator it = begin();
 			Matrix<ElementType>::Iterator it_matrix_new = matrix_new.begin();
+			/**
+				Add a mxn-matrix to the mxn matrix
+			*/
 			if (rows_ == matrix.getRows() && cols_ == matrix.getCols()) {
 				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
 
@@ -500,6 +503,9 @@ namespace utils
 					it++;
 				}
 			}
+			/**
+				Add 1xn-matrix to the mxn-matrix
+			*/
 			else if (matrix.getRows() == 1 && cols_ == matrix.getCols()) {
 				for (size_t i = 0; i < rows_*cols_; i++) {
 					*it_matrix_new = *it + matrix[0][i % matrix.getCols()];
@@ -515,13 +521,16 @@ namespace utils
 		}
 
 		/**
-			Operator +=
+			Operator+= Add a matrix to the matrix
 
 			@param[in] matrix An instance of class Matrix
 		*/
 		Matrix<ElementType>& operator+=(Matrix<ElementType> matrix)
 		{
 			Matrix<ElementType>::Iterator it = begin();
+			/**
+				Add a mxn-matrix to the mxn matrix
+			*/
 			if (rows_ == matrix.getRows() && cols_ == matrix_.getCols()) {
 				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
 
@@ -531,6 +540,9 @@ namespace utils
 					it++;
 				}
 			}
+			/**
+				Add 1xn-matrix to the mxn-matrix
+			*/
 			else if (matrix.getRows() == 1 && cols_ == matrix_.getCols()) {
 				for (size_t i = 0; i < rows_*cols_; i++) {
 					*it += matrix[0][i % matrix.getCols()];
@@ -545,7 +557,7 @@ namespace utils
 		}
 
 		/**
-			Operator -
+			Operator- Subtract a matrix from the matrix
 
 			@param[in] matrix An instance of class Matrix
 		*/
@@ -555,7 +567,7 @@ namespace utils
 		}
 
 		/**
-			Operator -
+			Operator- Subtract a matrix from the matrix
 
 			@param[in] matrix An instance of class Matrix
 		*/
@@ -567,29 +579,54 @@ namespace utils
 		}
 
 		/**
-			Operator *
+			Operator* Multiply two matrices
 
 			@param[in] matrix An instance of class Matrix
 		*/
 		Matrix<ElementType> operator*(Matrix<ElementType> matrix)
 		{
-			if (cols_ != matrix.getRows()) {
-				exitFailure(__FILE__, __LINE__);
-			}
-
 			Matrix<ElementType> matrix_new(rows_, matrix.getCols());
-			size_t index_left = 0, index_right = 0;
-			for (Matrix<ElementType>::Iterator it = matrix_new.begin(); it != matrix_new.end(); it++){
-				for (size_t i = 0; i < cols_; i++) {
-					*it += (*this)[index_left][i] * matrix[i][index_right];
+			/**
+				Multiply a nxm-matrix with a mxo-matrix
+			*/
+			if (cols_ == matrix.getRows()) {
+				size_t index_left = 0, index_right = 0;
+				for (Matrix<ElementType>::Iterator it = matrix_new.begin(); it != matrix_new.end(); it++) {
+					for (size_t i = 0; i < cols_; i++) {
+						*it += (*this)[index_left][i] * matrix[i][index_right];
+					}
+					if (index_right != matrix.getCols() - 1) {
+						index_right++;
+					}
+					else {
+						index_right = 0;
+						index_left++;
+					}
 				}
-				if (index_right != matrix.getCols() - 1) {
-					index_right++;
+			}
+			/**
+				Multiply a nx1-vector with a nxm-matrix
+			*/
+			else if (rows_ = matrix.getRows() && cols_ == 1) {
+				Matrix<ElementType>::Iterator it = begin();
+				Matrix<ElementType>::Iterator it_matrix = matrix.begin();
+				Matrix<ElementType>::Iterator it_matrix_new = matrix_new.begin();
+				size_t index = 0;	
+				while (it_matrix != matrix.end()) {
+					*it_matrix_new = *it_matrix *  *it;
+					if (index == matrix.getCols() - 1) {
+						index = 0;
+						it++;
+					}
+					else {
+						index++;
+					}
+					it_matrix_new++;
+					it_matrix++;
 				}
-				else{
-					index_right = 0;
-					index_left++;
-				}
+			}
+			else {
+				exitFailure(__FILE__, __LINE__);
 			}
 
 			return matrix_new;
@@ -597,7 +634,7 @@ namespace utils
 		}
 
 		/**
-			Operator *=
+			Operator*= Multiply two matrices
 
 			@param[in] matrix An instance of class Matrix
 		*/
@@ -609,7 +646,7 @@ namespace utils
 		}
 
 		/**
-			Operator *
+			Operator* Multiply a matrix with a scalar
 
 			@param[in] a Scalar
 		*/
@@ -629,7 +666,7 @@ namespace utils
 		}
 
 		/**
-			Operator *=
+			Operator*= Multiply a matrix with a scalar
 
 			@param[in] a Scalar
 		*/
@@ -644,7 +681,7 @@ namespace utils
 		}
 
 		/**
-			Operator /
+			Operator/ Divide the matrix with a scalar
 
 			@param[in] a Scalar
 		*/
@@ -654,7 +691,7 @@ namespace utils
 		}
 
 		/**
-			Operator *=
+			Operator/= Divide the matrix with a scalar
 
 			@param[in] a Scalar
 		*/
