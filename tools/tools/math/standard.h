@@ -92,6 +92,7 @@ namespace math
 
 		@param[in,out] mean The container whilch holds the mean
 		@param[in] data The data points
+		@return Vector with the respective mean
 	*/
 	template<typename ElementType> inline ElementType* computeMean(const utils::Matrix<ElementType>& data)
 	{

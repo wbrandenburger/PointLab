@@ -77,27 +77,27 @@ namespace utils
 			data_ = data;
 		}
 
-		/**
-			Constructor
+		///**
+		//	Constructor
 
-			@param[in] data_ Initializer list
-			@param[in] rows_ Rows of the matrix
-			@param[in] cols_ Columns of the matrix
-		*/
-		Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
-		{
-			rows_ = rows;
-			cols_ = cols;
+		//	@param[in] data_ Initializer list
+		//	@param[in] rows_ Rows of the matrix
+		//	@param[in] cols_ Columns of the matrix
+		//*/
+		//Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		//{
+		//	rows_ = rows;
+		//	cols_ = cols;
 
-			data_ = new ElementType[rows_ * cols_];
-			Matrix<ElementType>::Iterator it = begin();
-			auto it_data = data.begin();
-			while (it != end()) {
-				*it = *it_data;
-				it++;
-				it_data++;
-			}
-		}
+		//	data_ = new ElementType[rows_ * cols_];
+		//	Matrix<ElementType>::Iterator it = begin();
+		//	auto it_data = data.begin();
+		//	while (it != end()) {
+		//		*it = *it_data;
+		//		it++;
+		//		it_data++;
+		//	}
+		//}
 
 		/**
 			Deconstructor
@@ -230,29 +230,29 @@ namespace utils
 			data_ = data;
 		}
 
-		/**
-			Set Matrix
+		///**
+		//	Set Matrix
 
-			@param[in] data_ Initializer list
-			@param[in] rows_ Rows of the matrix
-			@param[in] cols_ Columns of the matrix
-		*/
-		void setMatrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
-		{
-			clearMemory();
+		//	@param[in] data_ Initializer list
+		//	@param[in] rows_ Rows of the matrix
+		//	@param[in] cols_ Columns of the matrix
+		//*/
+		//void setMatrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		//{
+		//	clearMemory();
 
-			rows_ = rows;
-			cols_ = cols;
+		//	rows_ = rows;
+		//	cols_ = cols;
 
-			data_ = new ElementType[rows_ * cols_];
-			Matrix<ElementType>::Iterator it = begin();
-			auto it_data = data.begin();
-			while (it != end()) {
-				*it = *it_data;
-				it++;
-				it_data++;
-			}
-		}
+		//	data_ = new ElementType[rows_ * cols_];
+		//	Matrix<ElementType>::Iterator it = begin();
+		//	auto it_data = data.begin();
+		//	while (it != end()) {
+		//		*it = *it_data;
+		//		it++;
+		//		it_data++;
+		//	}
+		//}
 
 		/**
 			Returns the pointer to the data array
@@ -763,6 +763,39 @@ namespace utils
 			return matrix_new;
 		}
 
+		/**
+			Get the diagonal elements of a quadratic matrix
+
+			@return the diagonal elements of a quadratic matrix
+		*/
+		ElementType* diag() const
+		{
+			if (rows_ != cols_) {
+				exitFailure(__FILE__,__LINE__);
+			}
+			
+			ElementType* diag = new ElementType[rows_];
+			for (size_t i = 0; i < rows_; i++) {
+				diag[i] = (*this)[i][i];
+			}
+		}
+
+		/**
+			Get the diagonal elements of a quadratic matrix
+
+			@param[in] matrix Container which includes the diagonal elements
+		*/
+		void diag(Matrix<ElementType>& matrix) const
+		{
+			if (rows_ != cols_) {
+				exitFailure(__FILE__, __LINE__);
+			}
+			
+			matrix.setMatrix(1, rows_);
+			for (size_t i = 0; i < rows_; i++) {
+				matrix[0][i] = (*this)[i][i];
+			}
+		}
 	public:
 
 		/** 

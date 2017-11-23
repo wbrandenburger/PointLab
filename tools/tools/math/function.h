@@ -36,6 +36,14 @@
 
 namespace math
 {
+
+	/**
+		Computes the length of vector a with dimension dim
+
+		@param[in] a Vector
+		@param[in] dim Dimension
+		@return Length of vector a
+	*/
 	template<typename ElementType> ElementType euclideanDistance(ElementType* a, size_t dim)
 	{
 		ElementType result = ElementType();
@@ -49,6 +57,14 @@ namespace math
 		return result;
 	}
 
+	/**	
+		Computes the length of number_of_elements vectors with dimension dim
+
+		@param[in] a Container with the vectors
+		@param[in] number_of_elements Number of vectors
+		@param[in] dim Dimension
+		@return Array with the length of the vectors
+	*/
 	template<typename ElementType> ElementType* euclideanDistance(ElementType* a, size_t number_of_elements, size_t dim)
 	{
 		ElementType* result = new ElementType[number_of_elements];
@@ -64,10 +80,65 @@ namespace math
 
 		return result;
 	}
+	
+	/**	
+		Computes the length of several vectors with dimension dim
 
+		@param[in] matrix Container with the vectors
+		@return Container with the length of the vectors
+	*/
 	template<typename ElementType> utils::Matrix<ElementType> euclideanDistance(const utils::Matrix<ElementType>& matrix)
 	{
 		return utils::Matrix<ElementType>(euclideanDistance<ElementType>(matrix.getPtr(), matrix.getRows(), matrix.getCols()), matrix.getRows(),1);
+	}
+
+	/**
+		Computes the distance between vector a and vector b
+
+		@param[in] a Vector
+		@param[in] b Vector
+		@param[in] dim Dimension
+		@return Distance between vector a and vector b
+	*/
+	template<typename ElementType> ElementType euclideanDistance(ElementType* a, ElementType* b, size_t dim)
+	{
+		ElementType result = ElementType();
+		ElementType* end = a + dim;
+
+		while (a != end) {
+			result += (*a - *b)*(*a - *b);
+			a++;
+			b++;
+		}
+
+		return result;
+	}
+
+	/**	
+		Computes the length of number_of_elements vectors with dimension dim
+
+		@param[in] a Container with the vectors
+		@param[in] b Container with the vectors
+		@param[in] number_of_elements Number of vectors
+		@param[in] dim Dimension
+		@return Array with the length of the vectors
+	*/
+	template<typename ElementType> ElementType* euclideanDistance(ElementType* a, ElementType* b,
+		size_t number_of_elements, size_t dim)
+	{
+		ElementType* result = new ElementType[number_of_elements];
+		ElementType* result_ptr = result;
+		ElementType* end = a + number_of_elements * dim;
+		
+		while (a != end) {
+			*result_ptr = euclideanDistance<ElementType>(a, b, dim);
+			a += dim;
+			b += dim;
+
+			result_ptr++;
+		}
+
+		return result;
 	}
 
 

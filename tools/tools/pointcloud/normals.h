@@ -95,7 +95,8 @@ namespace pointcloud
 			ElementType normal[3];
 			std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
 
-			WeightFunctionGaussian<ElementType> a(points);
+			utils::Matrix<ElementType> distances = math::euclideanDistance<ElementType>(points);
+			WeightFunctionGaussian<ElementType> weightFunctionGaussian(distances);
 
 			switch (normal_computation) {
 			case NormalComputation::PLANESVD: normalPlaneSVD(normal,points); break;
@@ -115,12 +116,113 @@ namespace pointcloud
 		/**
 			Constructor
 		*/
-		WeightFunctionGaussian(const utils::Matrix<ElementType>& data)
+		WeightFunctionGaussian() : dim_(0), mean_(nullptr), var_(nullptr)
 		{
 		}
 
+		/**
+			Constructor
+
+			@param[in] data Data points
+		*/
+		WeightFunctionGaussian(const utils::Matrix<ElementType>& data) : WeightFunctionGaussian()
+		{
+			utils::Matrix<ElementType> mean;
+			math::computeMean<ElementType>(mean, data);
+
+			mean_ = mean.getAllocatedPtr();
+
+			utils::Matrix<ElementType> var;
+			math::computeVar<ElementType>(var, data);
+
+			var_ = var.diag();
+		}
+
+		/**
+			Destructor
+		*/
+		~WeightFunctionGaussian()
+		{
+			clearMemory();
+		}
+
+
+		/**
+			Clear Memory
+		*/
+		void  clearMemory()
+		{
+			if (var_) {
+				delete[] var_;
+				var_ = nullptr;
+			}
+			if (mean_) {
+				delete[] mean_;
+				mean_ = nullptr;
+			}
+		}
+
+		/**
+			Copy constructor
+
+			@param[in] weightFunctionGaussian An instance of class Class
+		*/
+		WeightFunctionGaussian(const WeightFunctionGaussian<ElementType>&  weightFunctionGaussian) = delete;
+
+		/**
+			Copy constructor
+	
+			@param[in] weightFunctionGaussian An instance of class WeightFunctionGaussian
+		*/
+		WeightFunctionGaussian(const WeightFunctionGaussian<ElementType>&& weightFunctionGaussian) = delete;
+	
+		/**
+			Operator =
+	
+			@param[in] weightFunctionGaussian An instance of class WeightFunctionGaussian
+			@return Returns reference to the current instance
+		*/
+		WeightFunctionGaussian& operator=(const WeightFunctionGaussian<ElementType>& weightFunctionGaussian) = delete;
+	
+		/**
+			Operator =
+		
+			@param[in] weightFunctionGaussian An instance of class WeightFunctionGaussian
+			@return Returns reference to the current instance
+		*/
+		WeightFunctionGaussian& operator=(const WeightFunctionGaussian<ElementType>&& weightFunctionGaussian) = delete;
+		
+
+		/**
+			Set mean to zero
+		*/
+		void setMeanZero() 
+		{
+			std::memset(mean_, (ElementType)0, sizeof(ElementType) * dim_);
+		}
+
+		/**
+			Operator()
+			
+			@param[in]
+		*/
+
 	private:
-		ElementType std_;
+
+		/**
+			Dimension
+		*/
+		size_t dim_;
+
+		/**
+			Means
+		*/
+		ElementType* mean_;
+
+		/**
+			Variances 
+		*/
+		ElementType* var_;
 	};
 
 	/**
