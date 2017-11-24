@@ -330,57 +330,25 @@ namespace utils
 		}
 
 		/**
-			Get a specific row
-
-			@param[in] row Number of the row
-			@return Row
-		*/
-		ElementType* getRow(size_t row) const
-		{
-			ElementType* row_array = new ElementType[cols_];
-			for (size_t i = 0; i < cols_; i++) {
-				row_array[i] = (*this)[row][i];
-			}
-			
-			return row_array;
-		}
-
-		/**
-			Get a specific row
+			Get a specific row as matrix
 
 			@param[in] matrix Matrix which contains the row
 			@param[in] row Number of the row
 		*/
-		void getRow(utils::Matrix<ElementType>& matrix, size_t row) const
+		utils::Matrix<ElementType> getRowMatrix(size_t row) const
 		{
-			matrix.setMatrix(getRow(row), 1, cols_);
+			return Matrix<ElementType>(getAllocatedRowPtr(row), 1, cols_);
 		}
 
 		/**
-			Get a specific col
-
-			@param[in] col Number of the col
-			@return Col
-		*/
-		ElementType* getCol(size_t col) const
-		{
-			ElementType* col_array = new ElementType[rows_];
-			for (size_t i = 0; i < rows_; i++) {
-				col_array[i] = (*this)[i][col];
-			}
-			
-			return col_array;
-		}
-
-		/**
-			Get a specific row
+			Get a specific column as matrix
 
 			@param[in] matrix Matrix which contains the col
 			@param[in] col Number of the col
 		*/
-		void getCol(utils::Matrix<ElementType>& matrix, size_t col) const
+		utils::Matrix<ElementType> getColMatrix(size_t col) const
 		{
-			matrix.setMatrix(getCol(col), rows_, 1);
+			return Matrix<ElementType>(getAllocatedColPtr(col), rows_, 1);
 		}
 
 		/**

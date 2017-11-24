@@ -44,7 +44,6 @@
 
 #include "trees/trees.hpp"
 
-
 	/**
 		Determination of t while computing a moving surface in a pointcloud
 	*/
@@ -57,12 +56,36 @@
 			utils::Matrix<ElementType> normal)
 		{
 			points_ = points;
-			normal_ = normal;
+			normal_ = normal.transpose();
 
 			/**
-				Computation of dists
+				Computation of the distances
 			*/
+			point_.setMatrix(points_.getAllocatedRowPtr(0), 3, 1);
+			utils::Matrix<float> distances = math::euclideanDistance(points - point_.transpose());
+			utils::Matrix<float> var;
+			math::computeVar<float>(var, distances);
+
+			var_ = var[0][0];
+
+			std::cout << sqrt(var_) << std::endl;
 		}
+
+		ElementType operator()(ElementType t)
+		{
+			ElementType result = ElementType();
+
+			for (size_t i = 0; i < points_.getRows(); i++)
+			{
+
+			}
+
+			return result;
+		}
+		/**
+			Point
+		*/
+		utils::Matrix<ElementType> point_;
 
 		/**
 			Neighborhood
@@ -74,6 +97,10 @@
 		*/
 		utils::Matrix<ElementType> normal_;
 
+		/**
+			Variance
+		*/
+		ElementType var_;
 	};
 
 int main(int argc, char* argv[]) {
@@ -93,7 +120,7 @@ int main(int argc, char* argv[]) {
 	pointcloud::PointcloudAoS<float> pointcloud;
 
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny_normals.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/mesh.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
@@ -132,7 +159,7 @@ int main(int argc, char* argv[]) {
 		/**
 			Search for the neighbors of a specific point
 		*/
-		size_t random_point = 1234;
+		size_t random_point = 15000;
 		utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 1, 3);
 		utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 1, 3);
 
@@ -158,9 +185,10 @@ int main(int argc, char* argv[]) {
 		utils::Matrix<float> distances = math::euclideanDistance(points - point);
 		utils::Matrix<float> var;
 		math::computeVar<float>(var, distances);
-		
-		std::cout << distances << std::endl;
+
 		std::cout << "Standarddeviation: "<< std::sqrt(var[0][0]) << std::endl;
+
+		MovingSurface<float> moving_surface(points, normal);
 
 	/**
 		Show results

@@ -289,9 +289,8 @@ namespace pointcloud
 		/**
 			Define the reference point. This is the first point in points
 		*/
-		utils::Matrix<ElementType> point;
-		points.getRow(point, 0);
-
+		utils::Matrix<ElementType> point = points.getRowMatrix(0);;
+		
 		/**
 			Computation of the distances to the reference point and define the weigths
 		*/
