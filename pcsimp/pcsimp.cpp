@@ -103,6 +103,16 @@ int main(int argc, char* argv[]) {
 		utils::Matrix<float> dists(1, neighbors);
 
 		kdtree_index.knnSearch(point, indices, dists, neighbors, tree_params);
+		
+		pointcloud::PointcloudAoS<float> pointcloud_points;
+		pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
+		utils::Matrix<float> points;
+		pointcloud_points.getMatrix(points);
+
+		utils::Matrix<float> var;
+		math::computeVar<float>(var, points);
+
+		std::cout << std::sqrt(var[0][0]) << std::endl;
 
 	/**
 		Show results
@@ -111,7 +121,11 @@ int main(int argc, char* argv[]) {
 
 		glview.setPlot3D();
 		glview.setPointcloud(GLParams::POINTS, pointcloud);
-		glview.plot();
+		glview.subPlot(2, 2, 0);
+
+		glview.setPlot3D();
+		glview.setPointcloud(GLParams::POINTS, pointcloud_points);
+		glview.subPlot(2, 2, 1);
 
 	glview.mainLoop();
 
@@ -124,7 +138,7 @@ int main(int argc, char* argv[]) {
 }
 
 
-template<ElementType> movingPoint(ElementType t)
+template<typename ElementType> ElementType movingPoint(ElementType t)
 {
-
+	return 0;
 }
