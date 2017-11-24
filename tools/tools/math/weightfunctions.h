@@ -45,7 +45,7 @@ namespace math
 		/**
 			Constructor
 		*/
-		WeightFunctionLinear() : a(NULL), b(NULL)
+		WeightFunctionLinear() : a_(NULL), b_(NULL)
 		{
 		}
 
@@ -57,10 +57,10 @@ namespace math
 		*/
 		WeightFunctionLinear(ElementType* data, size_t number_of_elements, bool min = true) : WeightFunctionLinear()
 		{
-			a = data[math::min(data, number_of_elements)];
-			b = data[math::max(data, number_of_elements)];
+			a_ = data[math::min(data, number_of_elements)];
+			b_ = data[math::max(data, number_of_elements)];
 			if (!min) {
-				swap(a, b);
+				swap(a_, b_);
 			}
 		}		
 
@@ -71,10 +71,10 @@ namespace math
 		*/
 		WeightFunctionLinear(const utils::Matrix<ElementType>& data, bool min = true) : WeightFunctionLinear()
 		{
-			a = data[math::min(data.getPtr(), data.getRows())][0];
-			b = data[math::max(data.getPtr(), data.getRows())][0];
+			a_ = data[math::min(data.getPtr(), data.getRows())][0];
+			b_ = data[math::max(data.getPtr(), data.getRows())][0];
 			if (!min) {
-				swap(a, b);
+				swap(a_, b_);
 			}
 		}	
 
@@ -123,7 +123,7 @@ namespace math
 		*/
 		ElementType operator()(ElementType x) const
 		{
-			return (b - x) / (b - a);
+			return (b_ - x) / (b_ - a_);
 		}
 
 		/**
@@ -161,17 +161,37 @@ namespace math
 			return weights;
 		}
 
+		/**
+			Get lower bound
+
+			@return Lower bound
+		*/
+		ElementType getLowerBound()
+		{
+			return a_;
+		}
+
+		/**
+			Get upper bound
+
+			@return Upper bound
+		*/
+		ElementType getUpperBound()
+		{
+			return b_;
+		}
+
 	private:
 
 		/**
 			Lower bound
 		*/
-		ElementType a;
+		ElementType a_;
 
 		/**
 			Upper bound
 		*/
-		ElementType b;
+		ElementType b_;
 
 	};
 
@@ -383,6 +403,35 @@ namespace math
 			return weight;
 		}
 
+		/**
+			Get dimension
+
+			@return Dimension
+		*/
+		size_t getDim()
+		{
+			return dim_;
+		}
+
+		/**
+			Get mean
+
+			@return Mean
+		*/
+		ElementType* getMean()
+		{
+			return mean_;
+		}
+
+		/**
+			Get variances
+
+			@return Variances
+		*/
+		ElementType* getVar()
+		{
+			return var_;
+		}
 	private:
 
 		/**
@@ -391,7 +440,7 @@ namespace math
 		size_t dim_;
 
 		/**
-			Means
+			Mean
 		*/
 		ElementType* mean_;
 
