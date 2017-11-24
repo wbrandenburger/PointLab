@@ -142,8 +142,8 @@ int main(int argc, char* argv[]) {
 		utils::Matrix<float> points;
 		pointcloud_points.getMatrix(points);
 		
-		utils::Matrix<float> point (points.getAll)
-		utils::Matrix<float> distances = math::euclideanDistance(points - );
+		utils::Matrix<float> point(points.getAllocatedRowPtr(0), 1, 3);
+		utils::Matrix<float> distances = math::euclideanDistance(points - point);
 		
 		std::cout <<  distances << std::endl;
 
