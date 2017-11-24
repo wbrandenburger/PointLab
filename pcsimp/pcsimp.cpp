@@ -83,6 +83,26 @@ int main(int argc, char* argv[]) {
 		pointcloud::computeNormals<float>(pointcloud, neighbors, normal_params);
 
 	std::cout << "Computation of Normals in " << time.stop() << " s" << std::endl;
+		
+	/**
+		----------------------- Computation of the moving point -----------------------
+	*/
+		utils::Matrix<float> pointcloud_matrix;
+		pointcloud.getMatrix(pointcloud_matrix);
+		trees::Index<float> kdtree_index(pointcloud_matrix, trees::KDTreeIndexParams(neighbors));
+		kdtree_index.buildIndex();
+
+		size_t random_point = 1234;
+		utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 1, 3);
+		utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 1, 3);
+
+		trees::TreeParams tree_params;
+		tree_params.setCores(normal_params.getCores());
+
+		utils::Matrix<size_t> indices(1, neighbors);
+		utils::Matrix<float> dists(1, neighbors);
+
+		kdtree_index.knnSearch(point, indices, dists, neighbors, tree_params);
 
 	/**
 		Show results
@@ -101,4 +121,10 @@ int main(int argc, char* argv[]) {
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	return(0);
+}
+
+
+template<ElementType> movingPoint(ElementType t)
+{
+
 }
