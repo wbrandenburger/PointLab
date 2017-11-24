@@ -188,4 +188,20 @@
 		QUADSVD = 3
 	};
 
+	/**
+		Weight functions
+	*/
+	enum struct WeightFunction
+	{
+		/**
+			Gaussian weight function
+		*/
+		GAUSSIAN = 0,
+
+		/**
+			Linear weight function
+		*/
+		LINEAR = 1
+	};
+
 #endif /* PARAMETERS_H_ */

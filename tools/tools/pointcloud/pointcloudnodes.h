@@ -521,7 +521,20 @@ namespace pointcloud
 		{
 			return &point[0];
 		}
-	
+
+		/**
+			Get pointer to point data
+
+			@return Return pointer to point data
+		*/
+		ElementType* getAllocatedPointPtr()
+		{
+			ElementType* point_ptr = new ElementType[3];
+			std::memcpy(point_ptr, point, sizeof(ElementType) * 3);
+			
+			return point_ptr;
+		}
+
 		/**
 			Get pointer to color information
 
@@ -531,6 +544,20 @@ namespace pointcloud
 		{
 			return &color[0];
 		}
+
+		/**
+			Get pointer to color information
+
+			@return Return pointer to color information
+		*/
+		uint8_t* getAllocatedColorPtr()
+		{
+			uint8_t* color_ptr = new uint8_t[3];
+			std::memcpy(color_ptr, color, sizeof(uint8_t) * 3);
+			
+			return color_ptr;
+		}
+
 		/**
 			Get pointer to the normal
 
@@ -539,6 +566,19 @@ namespace pointcloud
 		ElementType* getNormalPtr()
 		{
 			return &normal[0];
+		}
+
+		/**
+			Get pointer to the normal 
+
+			@return Return pointer to the normal
+		*/
+		ElementType* getAllocatedNormalPtr()
+		{
+			ElementType* normal_ptr = new ElementType[3];
+			std::memcpy(normal_ptr, normal, sizeof(ElementType) * 3);
+			
+			return normal_ptr;
 		}
 
 		/**

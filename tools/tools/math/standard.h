@@ -76,6 +76,79 @@ namespace math
 
 		return angle_;
 	}
+
+	/**
+		Computation of the maximal value in a array
+
+		@param[in] a Array
+		@param[in] number_of_elements Number of elements
+		@return Index of the maximum
+	*/
+	template<typename ElementType> inline size_t max(ElementType* a, size_t number_of_elements)
+	{
+		size_t index = NULL;
+		ElementType max_element = *a;
+		for (size_t i = 0; i < number_of_elements; i++){
+			if (max_element < *a) { max_element = *a; index = i; }
+			a++;
+		}
+
+		return index;
+	}
+
+	/**
+		Computation of the minimal value in a array
+
+		@param[in] a Array
+		@param[in] number_of_elements Number of elements
+		@return Index of the minimum
+	*/
+	template<typename ElementType> inline size_t min(ElementType* a, size_t number_of_elements)
+	{
+		size_t index = NULL;
+		ElementType min_element = *a;
+		for (size_t i = 0; i < number_of_elements; i++){
+			if (min_element > *a) { min_element = *a; index = i; }
+			a++;
+		}
+
+		return index;
+	}
+
+	/**
+		Computation of the maximal values in a matrix
+
+		@param[in] matrix Matrix
+		return Matrix with indices of the maximums
+	*/
+	template<typename ElementType> inline utils::Matrix<size_t> max(const utils::Matrix<ElementType>& matrix)
+	{
+		utils::Matrix<ElementType> matrix_transpose = matrix.transpose();
+		utils::Matrix<size_t> matrix_indices(1, matrix_transpose.getRows());
+		for (size_t i = 0; i < matrix_transpose.getRows()) {
+			matrix_indices[0][i] = max(matrix_transpose[i], matrix_transpose.getCols());
+		}
+
+		return matrix_indices;
+	}
+
+	/**
+		Computation of the minimum values in a matrix
+
+		@param[in] matrix Matrix
+		return Matrix with indices of the maximums
+	*/
+	template<typename ElementType> inline utils::Matrix<size_t> min(const utils::Matrix<ElementType>& matrix)
+	{
+		utils::Matrix<ElementType> matrix_transpose = matrix.transpose();
+		utils::Matrix<size_t> matrix_indices(1, matrix_transpose.getRows());
+		for (size_t i = 0; i < matrix_transpose.getRows()) {
+			matrix_indices[0][i] = min(matrix_transpose[i], matrix_transpose.getCols());
+		}
+
+		return matrix_indices;
+	}
+
 	/**
 		Computation of the mean of an array of data points
 
@@ -90,7 +163,6 @@ namespace math
 	/**
 		Computation of the mean of an array of data points
 
-		@param[in,out] mean The container whilch holds the mean
 		@param[in] data The data points
 		@return Vector with the respective mean
 	*/
@@ -116,6 +188,46 @@ namespace math
 		return mean;
 	}
 
+	/**
+		Computation of the mean of an array of data points
+
+		@param[in] data The data points
+		@param[in] number_of_elements Number of elements
+		@return Mean
+	*/
+	template<typename ElementType> inline ElementType computeMean(ElementType* data, size_t number_of_elements)
+	{
+		ElementType mean = 0;
+		ElementType* end = data + number_of_elements;
+
+		/**
+			Iterate through the data array and sum the values of a specific dimension
+		*/
+		while (data != end)
+		{
+			mean += *data;
+			data++;
+		}
+		mean /= number_of_elements
+
+		return mean;
+	}
+
+	/**	
+		Computation of the variances and covariances of data points
+
+		@param[in] mean Mean
+		@param[in,out] var Container which holds the variances and covariances
+		@param[in] data The data points
+	*/
+	template<typename ElementType> inline void computeVar(const utils::Matrix<ElementType>& mean, utils::Matrix<ElementType>& var, const utils::Matrix<ElementType>& data)
+	{
+		/**
+			Computation of the variances and covariances
+		*/
+		var = (data - mean).transpose()*(data - mean) / (data.getRows()-1);
+	}
+
 	/**	
 		Computation of the variances and covariances of data points
 
@@ -133,7 +245,52 @@ namespace math
 		/**
 			Computation of the variances and covariances
 		*/
-		var = (data - mean).transpose()*(data - mean);
+		computeVar<ElementType>(mean, var, data);
+	}
+
+	/**	
+		Computation of the variances and covariances of data points
+
+		@param[in] mean Mean
+		@param[in] data The data points
+		@param[in] number_of_elements Number of elements
+		@return Variance
+	*/
+	template<typename ElementType> inline ElementType computeVar(ElementType mean, ElementType* data, size_t number_of_elements)
+	{
+		ElementType var = 0;
+		ElementType* end = data + number_of_elements;
+
+		/**
+			Computation of the variances and covariances
+		*/
+		while (data != end) {
+			var += (*data - mean)*(*data - mean);
+		}
+		var /= (number_of_elements - 1);
+
+		return var;
+	}
+
+	/**	
+		Computation of the variances and covariances of data points
+
+		
+		@param[in] data The data points
+		@param[in] number_of_elements Number of elements
+		@return Variance
+	*/
+	template<typename ElementType> inline ElementType computeVar(ElementType* data, size_t number_of_elements)
+	{
+		/**
+			Compute mean
+		*/
+		ElementType mean = computeMean<ElementType>(data, number_of_elements);
+
+		/**
+			Computation of the variances and covariances
+		*/	
+		return computeVar<ElementType>(mean, data, number_of_elements);
 	}
 }
 

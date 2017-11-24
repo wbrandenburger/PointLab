@@ -577,12 +577,28 @@ namespace pointcloud
 		virtual ElementType* getPointPtr(size_t row_) const = 0;
 
 		/**
+			Get Pointer to point data
+
+			@param[in] row_ Row
+			@return Return pointer to point data
+		*/
+		virtual ElementType* getAllocatedPointPtr(size_t row_) const = 0;
+
+		/**
 			Get Pointer to the normal
 
 			@param[in] row_ Row
 			@return Return pointer to the normal
 		*/
 		virtual ElementType* getNormalPtr(size_t row_) const = 0;
+		
+		/**
+			Get Pointer to the normal
+
+			@param[in] row_ Row
+			@return Return pointer to the normal
+		*/
+		virtual ElementType* getAllocatedNormalPtr(size_t row_) const = 0;
 
 		/**
 			Get Pointer to color information
@@ -591,6 +607,14 @@ namespace pointcloud
 			@return Return pointer to color information
 		*/		
 		virtual uint8_t* getColorPtr(size_t row_) const = 0;
+		
+		/**
+			Get Pointer to color information
+
+			@param[in] row_ Row
+			@return Return pointer to color information
+		*/		
+		virtual uint8_t* getAllocatedColorPtr(size_t row_) const = 0;
 
 		/**
 			Get Pointer to triangle
@@ -601,6 +625,20 @@ namespace pointcloud
 		size_t* getTrianglePtr(size_t row_) const
 		{
 			return &triangles[row_ * 3]
+		}
+
+		/**
+			Get Pointer to triangle
+
+			@param[in] row_ Row
+			@return Return pointer to triangle
+		*/	
+		size_t* getAllocatedTrianglePtr(size_t row_) const
+		{
+			size_t* triangle = new size_t[3];
+			std::memcpy(triangle, &triangles[row_ * 3], sizeof(size_t) * 3);
+			
+			return triangle;
 		}
 
 		/**

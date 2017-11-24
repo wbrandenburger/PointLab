@@ -421,6 +421,17 @@ namespace pointcloud
 		}
 
 		/**
+			Get Pointer to point data
+
+			@param[in] row_ Row
+			@return Return pointer to point data
+		*/
+		ElementType* getAllocatedPointPtr(size_t row_) const
+		{
+			return pointcloud[row_].getAllocatedPointPtr();
+		}
+
+		/**
 			Get Pointer to the normal
 
 			@param[in] row_ Row
@@ -432,6 +443,17 @@ namespace pointcloud
 		}
 
 		/**
+			Get Pointer to the normal
+
+			@param[in] row_ Row
+			@return Return pointer to the normal
+		*/
+		ElementType* getAllocatedNormalPtr(size_t row_) const
+		{
+			return pointcloud[row_].getAllocatedNormalPtr();
+		}
+
+		/**
 			Get Pointer to color information
 
 			@param[in] row_ Row
@@ -440,6 +462,17 @@ namespace pointcloud
 		uint8_t* getColorPtr(size_t row_) const
 		{
 			return pointcloud[row_].getColorPtr();
+		}
+
+		/**
+			Get Pointer to color information
+
+			@param[in] row_ Row
+			@return Return pointer to color information
+		*/		
+		uint8_t* getAllocatedColorPtr(size_t row_) const
+		{
+			return pointcloud[row_].getAllocatedColorPtr();
 		}
 
 		/**

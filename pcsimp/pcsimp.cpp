@@ -106,7 +106,11 @@ int main(int argc, char* argv[]) {
 	pointcloud::PointcloudSoA<float> search_pointcloud;
 	pointcloud_buny.getSubset(indices.getPtr(), nn, search_pointcloud);
 
-	pointcloud::computeNormals<float>(search_pointcloud, nn, NormalComputation::PLANESVD);
+	time.start();
+	pointcloud::NormalParams normal_params;
+	normal_params.setCores(24);
+	pointcloud::computeNormals<float>(pointcloud_buny, 30, normal_params);
+	std::cout << "Computation of Normals in " << time.stop() << " s" << std::endl;
 
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud_buny);
 
@@ -147,7 +151,7 @@ int main(int argc, char* argv[]) {
 	delete[] dataset, datasetII, lines;
 	
 	glview.setPlot3D();
-	glview.setPointcloud(GLParams::POINTS, search_pointcloud);
+	glview.setPointcloud(GLParams::POINTS, pointcloud_buny);
 	glview.subPlot(2, 2, 3);
 
 

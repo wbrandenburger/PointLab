@@ -32,6 +32,8 @@
 #ifndef UTILS_MATRIX_H_
 #define UTILS_MATRIX_H_
 
+#include <initializer_list>
+
 namespace utils
 {
 	template <typename ElementType>
@@ -77,27 +79,27 @@ namespace utils
 			data_ = data;
 		}
 
-		///**
-		//	Constructor
+		/**
+			Constructor
 
-		//	@param[in] data_ Initializer list
-		//	@param[in] rows_ Rows of the matrix
-		//	@param[in] cols_ Columns of the matrix
-		//*/
-		//Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
-		//{
-		//	rows_ = rows;
-		//	cols_ = cols;
+			@param[in] data_ Initializer list
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		{
+			rows_ = rows;
+			cols_ = cols;
 
-		//	data_ = new ElementType[rows_ * cols_];
-		//	Matrix<ElementType>::Iterator it = begin();
-		//	auto it_data = data.begin();
-		//	while (it != end()) {
-		//		*it = *it_data;
-		//		it++;
-		//		it_data++;
-		//	}
-		//}
+			data_ = new ElementType[rows_ * cols_];
+			Matrix<ElementType>::Iterator it = begin();
+			auto it_data = data.begin();
+			while (it != end()) {
+				*it = *it_data;
+				it++;
+				it_data++;
+			}
+		}
 
 		/**
 			Deconstructor
@@ -230,29 +232,29 @@ namespace utils
 			data_ = data;
 		}
 
-		///**
-		//	Set Matrix
+		/**
+			Set Matrix
 
-		//	@param[in] data_ Initializer list
-		//	@param[in] rows_ Rows of the matrix
-		//	@param[in] cols_ Columns of the matrix
-		//*/
-		//void setMatrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
-		//{
-		//	clearMemory();
+			@param[in] data_ Initializer list
+			@param[in] rows_ Rows of the matrix
+			@param[in] cols_ Columns of the matrix
+		*/
+		void setMatrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		{
+			clearMemory();
 
-		//	rows_ = rows;
-		//	cols_ = cols;
+			rows_ = rows;
+			cols_ = cols;
 
-		//	data_ = new ElementType[rows_ * cols_];
-		//	Matrix<ElementType>::Iterator it = begin();
-		//	auto it_data = data.begin();
-		//	while (it != end()) {
-		//		*it = *it_data;
-		//		it++;
-		//		it_data++;
-		//	}
-		//}
+			data_ = new ElementType[rows_ * cols_];
+			Matrix<ElementType>::Iterator it = begin();
+			auto it_data = data.begin();
+			while (it != end()) {
+				*it = *it_data;
+				it++;
+				it_data++;
+			}
+		}
 
 		/**
 			Returns the pointer to the data array
@@ -295,6 +297,60 @@ namespace utils
 		size_t getCols() const
 		{
 			return cols_;
+		}
+
+		/**
+			Get a specific row
+
+			@param[in] row Number of the row
+			@return Row
+		*/
+		ElementType* getRow(size_t row) const
+		{
+			ElementType* row_array = new ElementType[cols_];
+			for (size_t i = 0; i < cols_; i++) {
+				row_array[i] = (*this)[row][i];
+			}
+			
+			return row_array;
+		}
+
+		/**
+			Get a specific row
+
+			@param[in] matrix Matrix which contains the row
+			@param[in] row Number of the row
+		*/
+		void getRow(utils::Matrix<ElementType>& matrix, size_t row) const
+		{
+			matrix.setMatrix(getRow(row), 1, cols_);
+		}
+
+		/**
+			Get a specific col
+
+			@param[in] col Number of the col
+			@return Col
+		*/
+		ElementType* getCol(size_t col) const
+		{
+			ElementType* col_array = new ElementType[rows_];
+			for (size_t i = 0; i < rows_; i++) {
+				col_array[i] = (*this)[i][col];
+			}
+			
+			return col_array;
+		}
+
+		/**
+			Get a specific row
+
+			@param[in] matrix Matrix which contains the col
+			@param[in] col Number of the col
+		*/
+		void getCol(utils::Matrix<ElementType>& matrix, size_t col) const
+		{
+			matrix.setMatrix(getCol(col), rows_, 1);
 		}
 
 		/**
@@ -768,7 +824,7 @@ namespace utils
 
 			@return the diagonal elements of a quadratic matrix
 		*/
-		ElementType* diag() const
+		ElementType* getDiag() const
 		{
 			if (rows_ != cols_) {
 				exitFailure(__FILE__,__LINE__);
@@ -778,6 +834,8 @@ namespace utils
 			for (size_t i = 0; i < rows_; i++) {
 				diag[i] = (*this)[i][i];
 			}
+
+			return diag;
 		}
 
 		/**
@@ -785,7 +843,7 @@ namespace utils
 
 			@param[in] matrix Container which includes the diagonal elements
 		*/
-		void diag(Matrix<ElementType>& matrix) const
+		void getDiag(Matrix<ElementType>& matrix) const
 		{
 			if (rows_ != cols_) {
 				exitFailure(__FILE__, __LINE__);

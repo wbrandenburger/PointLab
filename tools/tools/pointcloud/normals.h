@@ -35,10 +35,13 @@
 #include "tools/parameters.h"
 
 #include "tools/utils/matrix.h"
+#include "tools/utils/threadpool.h"
+
 #include "tools/pointcloud/pointcloud.h"
 
 #include "tools/math/function.h"
 #include "tools/math/standard.h"
+#include "tools/math/weightfunctions.h"
 
 #include "trees/trees.hpp"
 
@@ -46,17 +49,113 @@
 
 namespace pointcloud
 {
+	/**
+		Structure which holds tree parameters
+	*/
+	struct NormalParams 
+	{
+	public:
+		/**
+			Constructor
+		*/
+		NormalParams() :
+			normal_computation_(NormalComputation::PLANESVD), 
+			weight_function_(WeightFunction::LINEAR), 
+			cores_(1)
+		{
+		}
 
+		/**
+			Constructor
+
+			@param[in] normal_computation Method which will be used for computing normals
+			@param[in] weight_function Defines the weight function
+			@param[in] cores Number of cores
+		*/
+		NormalParams(NormalComputation normal_computation,
+			WeightFunction weight_function,
+			size_t cores)  : NormalParams()
+		{
+			normal_computation_ = normal_computation;
+			weight_function_ = weight_function;
+			cores_ = cores;
+		}
+
+		/**
+			Set method which will be used for computing normals
+		*/
+		void setNormalComputation(NormalComputation normal_computation)
+		{
+			normal_computation_ = normal_computation;
+		}
+
+		/**
+			Set the weight function
+		*/
+		void setWeightFunction(WeightFunction weight_function)
+		{
+			weight_function_ = weight_function;
+		}
+				
+		/**
+			Set number of cores
+		*/
+		void setCores(size_t cores)
+		{
+			cores_ = cores;
+		}
+
+		/**
+			Get method which will be used for computing normals
+		*/
+		NormalComputation getNormalComputation()
+		{
+			return normal_computation_;
+		}
+
+		/**
+			Get the weight function
+		*/
+		WeightFunction getWeightFunction()
+		{
+			return weight_function_;
+		}
+				
+		/**
+			Get number of cores
+		*/
+		size_t getCores()
+		{
+			return cores_;
+		}
+
+	private:
+		/**
+			Method for computing normals
+		*/
+		NormalComputation normal_computation_;
+
+		/**
+			WeightFunction weight_function
+		*/
+		WeightFunction weight_function_;
+
+		/**
+			Cores
+		*/
+		size_t cores_;
+	};
 
 	/**
+		Computes the normals of a pointcloud and sets the normals
 		
 		@param[in,out] pointcloud Pointcloud
 		@param[in] neighbors Number of neighbors which will be considered for computation normals
-		@param[in] normal_computation Method which will be used for computing normals
+		@param[in] normal_params Parameter for computing normals
 	*/
 	template<typename ElementType> void computeNormals(pointcloud::Pointcloud<ElementType>& pointcloud, 
 		size_t  neighbors,
-		NormalComputation normal_computation = NormalComputation::PLANESVD)
+		NormalParams normal_params = NormalParams())
 	{
 		/**
 			Ensure assigning normals to pointcloud
@@ -72,194 +171,154 @@ namespace pointcloud
 		kdtree_index.buildIndex();
 
 		/**
-			Search for the neighbors 
+			Build container which include the indices of the neighbors
 		*/
-		utils::Matrix<size_t> indices(pointcloud.getNumberOfVertices(), neighbors);
-		utils::Matrix<ElementType> dists(pointcloud.getNumberOfVertices(), neighbors);
-		
-		int cores = (unsigned int)std::thread::hardware_concurrency();
-		trees::TreeParams tree_parameter(cores);
 
-		kdtree_index.knnSearch(pointcloud_matrix, indices, dists, neighbors, tree_parameter);
+		
+		trees::TreeParams tree_parameter(1);
+
+		utils::Threadpool pool(normal_params.getCores());
+		for (size_t i = 0; i < pointcloud.getNumberOfVertices(); i++) {
+			while (!pool.runTask(boost::bind(&computeNormal<ElementType>,
+				i,
+				std::ref(pointcloud),
+				std::ref(kdtree_index),
+				neighbors,
+				tree_parameter, 
+				normal_params)));
+			
+			//computeNormal<ElementType>(
+			//	i,
+			//	pointcloud,
+			//	kdtree_index,
+			//	neighbors,
+			//	tree_parameter,
+			//	normal_computation,
+			//	weight_function);
+		}
+
+		pool.shutdown();
+	}
+
+	/**
+		Computes the normal of a point and sets the normal
+		
+		@param[in] index Index of the query point in the pointcloud
+		@param[in,out] pointcloud Pointcloud
+		@param[in] kdtree_index Index of a kdtree build on the pointcloud
+		@param[in] neighbors Number of neighbors which will be considered for computation normals
+		@param[in] normal_params Parameter for computing normals
+	*/
+	template<typename ElementType> void computeNormal(size_t index,
+		pointcloud::Pointcloud<ElementType>& pointcloud,
+		trees::Index<ElementType>& kdtree_index,
+		size_t neighbors,
+		trees::TreeParams& tree_parameter, 
+		NormalParams normal_params)
+	{
+		utils::Matrix<size_t> indices(1, neighbors);
+		utils::Matrix<ElementType> dists(1, neighbors);
+		utils::Matrix<ElementType> points;
 
 		/**
-			Compute for every point in the pointcloud the corresponding normal
+			Search for the neighbors of a specific point
 		*/
-		utils::Matrix<ElementType> points;
-		for (size_t i = 0; i < 1/*pointcloud.getNumberOfVertices()*/; i++) {
-			pointcloud.getSubset(indices[i], neighbors, points);
+		utils::Matrix<ElementType> point(pointcloud.getAllocatedPointPtr(index), 1, 3);
+		kdtree_index.knnSearch(point, indices, dists, neighbors, tree_parameter);
 
-			/**
-				Compute the normals depending on input method
-			*/
-			ElementType normal[3];
-			std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
+		/**
+			Compute the normal with the neighbors
+		*/
+		pointcloud.getSubset(indices.getPtr(), neighbors, points);
+		ElementType normal[3];
+		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
+		computeNormal<ElementType>(normal, points, normal_params);
 
-			utils::Matrix<ElementType> distances = math::euclideanDistance<ElementType>(points);
-			WeightFunctionGaussian<ElementType> weightFunctionGaussian(distances);
+		/**
+			Set the normal
+		*/
+		pointcloud.setNormalPtr(normal, index);
+	}
 
-			switch (normal_computation) {
-			case NormalComputation::PLANESVD: normalPlaneSVD(normal,points); break;
-			case NormalComputation::PLANEPCA: break;
-			case NormalComputation::VECTORSVD: break;
-			case NormalComputation::QUADSVD: break;
-			}
-			pointcloud.setNormalPtr(normal, i);
-
-			points.reset();
+	/**
+		Normal computation switch which depends on the chosen method for computing normals
+		
+		@param[in,out] normal Normal
+		@param[in] points Matrix with the points
+		@param[in] normal_params Parameter for computing normals
+	*/
+	template<typename ElementType> void computeNormal(ElementType* normal,
+		const utils::Matrix<ElementType>& points,
+		NormalParams normal_params = NormalParams())
+	{
+		switch (normal_params.getNormalComputation()) {
+		case NormalComputation::PLANESVD: normalPlaneSVD(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::PLANEPCA: normalPlanePCA(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::VECTORSVD: normalVectorSVD(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::QUADSVD: normalQuadSVD(normal, points, normal_params.getWeightFunction()); break;
 		}
 	}
-	
-	template<typename ElementType> class WeightFunctionGaussian
-	{
-	public:
-		/**
-			Constructor
-		*/
-		WeightFunctionGaussian() : dim_(0), mean_(nullptr), var_(nullptr)
-		{
-		}
-
-		/**
-			Constructor
-
-			@param[in] data Data points
-		*/
-		WeightFunctionGaussian(const utils::Matrix<ElementType>& data) : WeightFunctionGaussian()
-		{
-			utils::Matrix<ElementType> mean;
-			math::computeMean<ElementType>(mean, data);
-
-			mean_ = mean.getAllocatedPtr();
-
-			utils::Matrix<ElementType> var;
-			math::computeVar<ElementType>(var, data);
-
-			var_ = var.diag();
-		}
-
-		/**
-			Destructor
-		*/
-		~WeightFunctionGaussian()
-		{
-			clearMemory();
-		}
-
-
-		/**
-			Clear Memory
-		*/
-		void  clearMemory()
-		{
-			if (var_) {
-				delete[] var_;
-				var_ = nullptr;
-			}
-			if (mean_) {
-				delete[] mean_;
-				mean_ = nullptr;
-			}
-		}
-
-		/**
-			Copy constructor
-
-			@param[in] weightFunctionGaussian An instance of class Class
-		*/
-		WeightFunctionGaussian(const WeightFunctionGaussian<ElementType>&  weightFunctionGaussian) = delete;
-
-		/**
-			Copy constructor
-	
-			@param[in] weightFunctionGaussian An instance of class WeightFunctionGaussian
-		*/
-		WeightFunctionGaussian(const WeightFunctionGaussian<ElementType>&& weightFunctionGaussian) = delete;
-	
-		/**
-			Operator =
-	
-			@param[in] weightFunctionGaussian An instance of class WeightFunctionGaussian
-			@return Returns reference to the current instance
-		*/
-		WeightFunctionGaussian& operator=(const WeightFunctionGaussian<ElementType>& weightFunctionGaussian) = delete;
-	
-		/**
-			Operator =
-		
-			@param[in] weightFunctionGaussian An instance of class WeightFunctionGaussian
-			@return Returns reference to the current instance
-		*/
-		WeightFunctionGaussian& operator=(const WeightFunctionGaussian<ElementType>&& weightFunctionGaussian) = delete;
-		
-
-		/**
-			Set mean to zero
-		*/
-		void setMeanZero() 
-		{
-			std::memset(mean_, (ElementType)0, sizeof(ElementType) * dim_);
-		}
-
-		/**
-			Operator()
-			
-			@param[in]
-		*/
-
-	private:
-
-		/**
-			Dimension
-		*/
-		size_t dim_;
-
-		/**
-			Means
-		*/
-		ElementType* mean_;
-
-		/**
-			Variances 
-		*/
-		ElementType* var_;
-	};
 
 	/**
 		 A classical method is to fit a local plane S=n_{x}x+n_{y}y+n_{z}z+d 
 		 to the points in the neighborhood
 
-		 @param[in] normal
-		 @param[in] points_matrix
+		 @param[in,out] normal Normal
+		 @param[in] points Matrix with the points
+		 @param[in] weight_function Defines the weight function
 	*/
 	template<typename ElementType> void normalPlaneSVD(ElementType* normal, 
-		utils::Matrix<ElementType> points)
+		const utils::Matrix<ElementType>& points,
+		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
 		/**
-			Build a nx4 matrix A = [x y z 1] with n = number of points
+			Define the reference point. This is the first point in points
 		*/
-		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> A(points.getRows(), 4);
-		for (size_t i = 0; i < points.getRows(); i++) {
-			A(i, 0) = points[i][0];
-			A(i, 1) = points[i][1];
-			A(i, 2) = points[i][2];
-			A(i, 3) = (ElementType)1;
-		}
-		/**
-			Build a nxn matrix with the weights
-		*/
-		utils::L2<ElementType> distance;
-		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> P(points.getRows(), points.getRows());
+		utils::Matrix<ElementType> point;
+		points.getRow(point, 0);
 
-		for (size_t i = 0; i < points.getRows(); i++) {
-			P(i, i) = 1;
+		/**
+			Computation of the distances to the reference point and define the weigths
+		*/
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point));
+		
+		utils::Matrix<ElementType> weights;
+		switch (weight_function) {
+		case WeightFunction::GAUSSIAN: {
+			math::WeightFunctionGaussian<ElementType> weight_function_gaussian(utils::Matrix<ElementType>({ 0 }, 1, 1), distances);
+			weights = weight_function_gaussian(distances);
+			break;
+			}
+		case WeightFunction::LINEAR: {
+			math::WeightFunctionLinear<ElementType> weight_function_linear(distances, true);
+			weights = weight_function_linear(distances);
+			break;
+			}
 		}
+		
+		/**
+			Build a nx4 design matrix = [x y z 1] with n = number of points
+		*/
+		utils::Matrix<ElementType> design_matrix(points.getRows(), 4);
+		for (size_t i = 0; i < points.getRows(); i++) {
+			design_matrix[i][0] = points[i][0];
+			design_matrix[i][1] = points[i][1];
+			design_matrix[i][2] = points[i][2];
+			design_matrix[i][3] = (ElementType)1;
+		}
+		
+		/**
+			Add the weights to the design matrix
+		*/
+		design_matrix = weights*design_matrix;
 
 		/**
 			Compute the singular value decomposition of A
 		*/
+		Eigen::Map<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor>> design_eigen(
+			design_matrix.getPtr(), design_matrix.getRows(), design_matrix.getCols());
 		Eigen::JacobiSVD<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd_eigen(
-			A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+			design_eigen, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
 		/**
 			The last vector of matrix v computed by the singular value decomposition corresponds to the
@@ -269,6 +328,49 @@ namespace pointcloud
 		normal[0] = v_eigen(0, 3);
 		normal[1] = v_eigen(1, 3);
 		normal[2] = v_eigen(2, 3);
+	}
+
+	/**
+		Instead of minimizing the fitting error, one can minimize the variance by removing the empirical
+		mean from the data matrix Q and then performing a SVD on the modified data matrix
+
+		 @param[in,out] normal Normal
+		 @param[in] points Matrix with the points
+		 @param[in] weight_function Defines the weight function
+	*/
+	template<typename ElementType> void normalPlanePCA(ElementType* normal,
+		const utils::Matrix<ElementType>& points, 
+		WeightFunction weight_function = WeightFunction::LINEAR)
+	{
+	}
+
+	/**
+		An equally straight - forward alternative to fitting a local plane S into Q is to maximize
+		the angle(minimize the inner product) between the tangential vectors from 
+		p to q and the normal vector n
+
+		@param[in,out] normal Normal
+		@param[in] points Matrix with the points
+		@param[in] weight_function Defines the weight function
+	*/
+	template<typename ElementType> void normalVectorSVD(ElementType* normal,
+		const utils::Matrix<ElementType>& points, 
+		WeightFunction weight_function = WeightFunction::LINEAR)
+	{
+	}
+	
+	/**
+		Some methods apprximate not only the orientation of the tangent plane but also the curvature
+		by fitting a quadric surface
+
+		@param[in,out] normal Normal
+		@param[in] points Matrix with the points
+		@param[in] weight_function Defines the weight function
+	*/
+	template<typename ElementType> void normalQuadSVD(ElementType* normal,
+		const utils::Matrix<ElementType>& points, 
+		WeightFunction weight_function = WeightFunction::LINEAR)
+	{
 	}
 }
 
