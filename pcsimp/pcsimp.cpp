@@ -55,39 +55,41 @@
 		MovingSurface(utils::Matrix<ElementType> points, 
 			utils::Matrix<ElementType> normal)
 		{
-			points_ = points;
-			normal_ = normal.transpose();
+			/**
+				The first point in points is the reference point
+			*/
+			r_.setMatrix(points.getAllocatedRowPtr(0), 3, 1);
+			
+			/**
+				Set the normal and the vectors of the neighborhood
+			*/
+			points_ = points - r_.transpose();
+			n_ = normal.transpose();
 
 			/**
-				Computation of the distances
+				Compute the variance
 			*/
-			point_.setMatrix(points_.getAllocatedRowPtr(0), 3, 1);
-			utils::Matrix<float> distances = math::euclideanDistance(points - point_.transpose());
 			utils::Matrix<float> var;
-			math::computeVar<float>(var, distances);
+			math::computeVar<float>(var, math::euclideanDistance(points_));
 
-			var_ = var[0][0];
-
-			std::cout << sqrt(var_) << std::endl;
+			h_ = var[0][0];
 		}
 
 		ElementType operator()(ElementType t)
 		{
 			ElementType result = ElementType();
 
-			result = (normal_.transpose() * normal_)[0][0];
+			for (size_t i = 0; i < points_.getRows(); i++)
+			{
 
-			//for (size_t i = 0; i < points_.getRows(); i++)
-			//{
-			//	
-			//}
+			}
 
 			return result;
 		}
 		/**
 			Point
 		*/
-		utils::Matrix<ElementType> point_;
+		utils::Matrix<ElementType> r_;
 
 		/**
 			Neighborhood
@@ -97,12 +99,12 @@
 		/**
 			Normal
 		*/
-		utils::Matrix<ElementType> normal_;
+		utils::Matrix<ElementType> n_;
 
 		/**
 			Variance
 		*/
-		ElementType var_;
+		ElementType h_;
 	};
 
 int main(int argc, char* argv[]) {
