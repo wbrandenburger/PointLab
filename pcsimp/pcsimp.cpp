@@ -70,7 +70,7 @@
 				Compute the variance
 			*/
 			utils::Matrix<float> var;
-			math::computeVar<float>(var, math::euclideanDistance(points_));
+			math::computeVar<float>(var, std::sqrt(math::euclideanDistance(points_)));
 
 			h_ = var.getValue();
 		}
@@ -93,7 +93,7 @@
 				ElementType qq = std::pow((q.transpose()*q).getValue(),2);
 				ElementType nq = (n_.transpose()* q).getValue();
 
-				result += nq * (1 + std::pow(nq, 2) / (2*h_)) * std::exp(-qq/h_);
+				result += nq * (1 + std::pow(nq, 2) / (h_)) * std::exp(-qq/(h_));
 			}
 			result *= 2;
 
@@ -199,23 +199,21 @@ int main(int argc, char* argv[]) {
 		/**
 			Compute the distances and the variance of these distances
 		*/
-		utils::Matrix<float> distances = math::euclideanDistance(points - point);
 		utils::Matrix<float> var;
-		math::computeVar<float>(var, distances);
+		math::computeVar<float>(var, std::sqrt(math::euclideanDistance(points - point)));
 
 		MovingSurface<float> moving_surface(points, normal);
 		
 		size_t number_of_elements = 1000;
 		std::vector<float> array_x(number_of_elements);
 		std::vector<float> array_y(number_of_elements);
-		//float quant = var.getValue() / 500;
-		//array_x[0] = -var.getValue();
-		//array_y[0] = moving_surface(array_x[0]);
-		for (size_t i = 0; i < number_of_elements; i++) {
-			//array_x[i] = array_x[0] + quant;
-			//array_y[i] = moving_surface(array_x[i]);
-			array_x[i] = i;
-			array_y[i] = i;
+		float quant = std::sqrt(var.getValue())/ (number_of_elements/2);
+		array_x[0] = -std::sqrt(var.getValue());
+		array_y[0] = moving_surface(array_x[0]);
+		for (size_t i = 1; i < number_of_elements; i++) {
+			array_x[i] = array_x[i-1] + quant;
+			array_y[i] = moving_surface(array_x[i]);
+
 		}
 
 

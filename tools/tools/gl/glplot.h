@@ -308,7 +308,6 @@ namespace gl
 			/**
 				Draw the axis
 			*/
-
 			glColor3f(1.0f, 1.0f, 1.0f);
 
 			glBegin(GL_LINE_STRIP);
