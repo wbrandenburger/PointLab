@@ -330,6 +330,14 @@ namespace utils
 		}
 
 		/**
+			Returns the first value
+		*/
+		ElementType getValue() const
+		{
+			return data_[0];
+		}
+
+		/**
 			Get a specific row as matrix
 
 			@param[in] matrix Matrix which contains the row

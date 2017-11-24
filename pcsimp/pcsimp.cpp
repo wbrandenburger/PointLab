@@ -65,24 +65,33 @@
 			*/
 			points_ = points - r_.transpose();
 			n_ = normal.transpose();
-
+			std::cout << points_ << std::endl;
 			/**
 				Compute the variance
 			*/
 			utils::Matrix<float> var;
 			math::computeVar<float>(var, math::euclideanDistance(points_));
 
-			h_ = var[0][0];
+			h_ = var.getValue();
 		}
 
 		ElementType operator()(ElementType t)
 		{
+			t = 0;
 			ElementType result = ElementType();
 
 			for (size_t i = 0; i < points_.getRows(); i++)
 			{
+				utils::Matrix<ElementType> p(points_.getAllocatedRowPtr(i), 3, 1);
+				utils::Matrix<ElementType> q = p - n_*t;
+				ElementType qq = std::pow((q.transpose()*q).getValue(),2);
+				ElementType nq = (n_.transpose()* q).getValue();
 
+				std::cout << qq  << " " << h_ << " " << std::exp(- qq / (2*h_)) << std::endl;
+
+				result += nq * (1 + std::pow(nq, 2) / (2*h_)) * std::exp(-qq/h_);
 			}
+			result *= 2;
 
 			return result;
 		}
