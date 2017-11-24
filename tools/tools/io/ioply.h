@@ -433,9 +433,9 @@ namespace io
 		if (!ply_read(ply)) {
 			return 0;
 		}
-		
+
 		ply_close(ply);
-		
+
 		return true;
 	}
 
