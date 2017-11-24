@@ -143,7 +143,7 @@ namespace trees
 			assert(indices_.cols >= knn_);
 			assert(dists_.cols >= knn_);
 			
-			utils::Threadpool pool(params_.cores);
+			utils::Threadpool pool(params_.getCores());
 
 			for (int i = 0; i < queries_.getRows(); i++) {
 				while (!pool.runTask(boost::bind(&NNIndex<ElementType>::knnSearchThreadpool,

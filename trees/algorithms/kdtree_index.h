@@ -514,7 +514,7 @@ namespace trees
 		*/
 		void findNeighbors(ResultSet<ElementType>& result_set_, const ElementType* vec_, const TreeParams& params_) const
 		{
-			float epsError = 1 + params_.eps;
+			float epsError = 1 + params_.getEpsilon();
 
 			std::vector<ElementType> dists(veclen, 0);
 			ElementType distsq = computeInitialDistances(vec_, dists);

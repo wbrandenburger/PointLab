@@ -47,6 +47,15 @@ namespace trees
 		Structure which holds tree parameters
 	*/
 	struct TreeParams {
+		
+		/**
+			Constructor
+		*/
+		TreeParams() : 
+			cores_(1),
+			eps_(std::numeric_limits<float>::epsilon())
+		{
+		}
 
 		/**
 			Constructor
@@ -54,21 +63,61 @@ namespace trees
 			@param[in] cores_ Number of cores
 			@param[in] eps_  Machine epsilon
 		*/
-		TreeParams(int cores_ = 1, float eps_ = std::numeric_limits<float>::epsilon()) 
+		TreeParams(size_t cores, float eps = std::numeric_limits<float>::epsilon()) : TreeParams() 
 		{
-			cores = cores_;
-			eps = eps_;
+			cores_ = cores;
+			eps_ = eps;
 		}
 
+		/** 
+			Set number of cores
+			
+			@param[in] cores Number of cores
+		*/
+		void setCores(size_t cores)
+		{
+			cores_ = cores;
+		}
+		
+		/**
+			Set epsilon
+			
+			@param[in] Accuracy
+		*/
+		void setEpsilon(float eps)
+		{
+			eps_ = eps;
+		}
+		
+		/** 
+			Get number of cores
+			
+			@return cores Number of cores
+		*/
+		size_t getCores() const
+		{
+			return cores_;
+		}
+		
+		/**
+			Get epsilon
+			
+			@return Accuracy
+		*/
+		float getEpsilon() const
+		{
+			return eps_;
+		}	
+		
 		/**
 			Number of cores
 		*/
-		int cores;
+		size_t cores_;
 
 		/**
 			Machine epsilon
 		*/
-		float eps;
+		float eps_;
 	};
 
 	/**

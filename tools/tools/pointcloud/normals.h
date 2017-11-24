@@ -107,6 +107,8 @@ namespace pointcloud
 
 		/**
 			Get method which will be used for computing normals
+
+			@return Method which will be used for computing normals
 		*/
 		NormalComputation getNormalComputation()
 		{
@@ -115,6 +117,8 @@ namespace pointcloud
 
 		/**
 			Get the weight function
+
+			@return Weight function
 		*/
 		WeightFunction getWeightFunction()
 		{
@@ -123,6 +127,8 @@ namespace pointcloud
 				
 		/**
 			Get number of cores
+			
+			@return Number of cores
 		*/
 		size_t getCores()
 		{
@@ -173,31 +179,46 @@ namespace pointcloud
 		/**
 			Build container which include the indices of the neighbors
 		*/
+		trees::TreeParams tree_params;
+		tree_params.setCores(normal_params.getCores());
 
+		utils::Matrix<size_t> indices(pointcloud.getNumberOfVertices(), neighbors);
+		utils::Matrix<ElementType> dists(pointcloud.getNumberOfVertices(), neighbors);
 		
-		trees::TreeParams tree_parameter(1);
+		utils::Matrix<ElementType> points;
+		pointcloud.getMatrix(points);
+		
+		/**
+			Search for the neighbors 
+		*/
+		kdtree_index.knnSearch(points, indices, dists, neighbors, tree_params);
 
-		utils::Threadpool pool(normal_params.getCores());
-		for (size_t i = 0; i < pointcloud.getNumberOfVertices(); i++) {
-			while (!pool.runTask(boost::bind(&computeNormal<ElementType>,
-				i,
-				std::ref(pointcloud),
-				std::ref(kdtree_index),
-				neighbors,
-				tree_parameter, 
-				normal_params)));
-			
-			//computeNormal<ElementType>(
-			//	i,
-			//	pointcloud,
-			//	kdtree_index,
-			//	neighbors,
-			//	tree_parameter,
-			//	normal_computation,
-			//	weight_function);
+		/**
+			Compute the normals
+		*/
+		if (normal_params.getCores() != 1) {
+			utils::Threadpool pool(normal_params.getCores());
+			for (size_t i = 0; i < pointcloud.getNumberOfVertices(); i++) {
+				while (!pool.runTask(boost::bind(&computeNormal<ElementType>,
+					i,
+					std::ref(pointcloud),
+					indices[i],
+					neighbors,
+					normal_params)));
+			}
+
+			pool.shutdown();
 		}
-
-		pool.shutdown();
+		else {
+			for (size_t i = 0; i < pointcloud.getNumberOfVertices(); i++) {
+				computeNormal<ElementType>(
+					i,
+					pointcloud,
+					indices[i],
+					neighbors,
+					normal_params);
+			}
+		}
 	}
 
 	/**
@@ -205,31 +226,25 @@ namespace pointcloud
 		
 		@param[in] index Index of the query point in the pointcloud
 		@param[in,out] pointcloud Pointcloud
-		@param[in] kdtree_index Index of a kdtree build on the pointcloud
-		@param[in] neighbors Number of neighbors which will be considered for computation normals
+		@param[in] indices Indices of the neighbors of one point
+		@param[in] neighbors Number of neighbors
 		@param[in] normal_params Parameter for computing normals
 	*/
 	template<typename ElementType> void computeNormal(size_t index,
 		pointcloud::Pointcloud<ElementType>& pointcloud,
-		trees::Index<ElementType>& kdtree_index,
+		size_t* indices,
 		size_t neighbors,
-		trees::TreeParams& tree_parameter, 
 		NormalParams normal_params)
 	{
-		utils::Matrix<size_t> indices(1, neighbors);
-		utils::Matrix<ElementType> dists(1, neighbors);
+		/**
+			Get the neighbors of a point
+		*/
 		utils::Matrix<ElementType> points;
-
+		pointcloud.getSubset(indices, neighbors, points);
+		
 		/**
-			Search for the neighbors of a specific point
+			Compute the normal
 		*/
-		utils::Matrix<ElementType> point(pointcloud.getAllocatedPointPtr(index), 1, 3);
-		kdtree_index.knnSearch(point, indices, dists, neighbors, tree_parameter);
-
-		/**
-			Compute the normal with the neighbors
-		*/
-		pointcloud.getSubset(indices.getPtr(), neighbors, points);
 		ElementType normal[3];
 		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
 		computeNormal<ElementType>(normal, points, normal_params);
