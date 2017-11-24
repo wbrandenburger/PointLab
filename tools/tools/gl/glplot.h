@@ -52,7 +52,7 @@ namespace gl
 
 			@param[in] number_of_elements_ Number of elements
 		*/
-		PlotFunction(size_t number_of_elements_) : index_left_(0.0f), index_right(0.0f),
+		PlotFunction(size_t number_of_elements_) : index_left_(0.0f), index_right_(0.0f),
 			number_of_functions_(NULL), number_of_elements_(number_of_elements_), zero_(NULL), x_(nullptr), clear_x_(false)
 		{
 		}
@@ -191,7 +191,7 @@ namespace gl
 			index_left_ = 0;
 			index_right_ = (float)number_of_elements_;
 
-			if (x_[(size_t)index_left_] < 0 && x[(size_t)index_right_ - 1] >= 0) {
+			if (x_[(size_t)index_left_] < 0 && x_[(size_t)index_right_ - 1] >= 0) {
 				for (size_t i = (size_t)index_left_ + 1; i < (size_t)index_right_; i++) {
 					if (x_[i - 1] < 0 && x_[i] >= 0) {
 						zero_ = (float)i;
@@ -295,7 +295,7 @@ namespace gl
 				utils::colorSchemeRGB(r, g, b, i, number_of_functions_);
 
 				glColor3f(r, g, b);
-
+				
 				glBegin(GL_LINE_STRIP);
 
 				for (size_t j = (size_t) index_left_; j < (size_t) index_right_; j++) {

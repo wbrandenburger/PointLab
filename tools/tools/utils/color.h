@@ -71,7 +71,7 @@ namespace utils
 	*/
 	void colorSchemeRGB(float& r_, float& g_, float& b_, size_t index_, size_t number_of_colors_) {
 
-		float index = (float)number_of_colors_ / 2.0f;
+		float index = std::ceil((float)number_of_colors_ / 2.0f);
 		float increment = index_ > index ? 1.0f / std::ceil(index) : 1.0f / std::floor(index);
 
 		if (index_ < index) {

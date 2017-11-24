@@ -77,17 +77,21 @@
 
 		ElementType operator()(ElementType t)
 		{
-			t = 0;
 			ElementType result = ElementType();
 
 			for (size_t i = 0; i < points_.getRows(); i++)
 			{
+				/**
+					Vector between searched point and data point
+				*/
 				utils::Matrix<ElementType> p(points_.getAllocatedRowPtr(i), 3, 1);
 				utils::Matrix<ElementType> q = p - n_*t;
+
+				/**
+					Distance of vector between searched point and data point
+				*/
 				ElementType qq = std::pow((q.transpose()*q).getValue(),2);
 				ElementType nq = (n_.transpose()* q).getValue();
-
-				std::cout << qq  << " " << h_ << " " << std::exp(- qq / (2*h_)) << std::endl;
 
 				result += nq * (1 + std::pow(nq, 2) / (2*h_)) * std::exp(-qq/h_);
 			}
@@ -199,10 +203,22 @@ int main(int argc, char* argv[]) {
 		utils::Matrix<float> var;
 		math::computeVar<float>(var, distances);
 
-		std::cout << "Standarddeviation: "<< std::sqrt(var[0][0]) << std::endl;
-
 		MovingSurface<float> moving_surface(points, normal);
-		std::cout << moving_surface(1.0) << std::endl;
+		
+		size_t number_of_elements = 1000;
+		std::vector<float> array_x(number_of_elements);
+		std::vector<float> array_y(number_of_elements);
+		//float quant = var.getValue() / 500;
+		//array_x[0] = -var.getValue();
+		//array_y[0] = moving_surface(array_x[0]);
+		for (size_t i = 0; i < number_of_elements; i++) {
+			//array_x[i] = array_x[0] + quant;
+			//array_y[i] = moving_surface(array_x[i]);
+			array_x[i] = i;
+			array_y[i] = i;
+		}
+
+
 
 	/**
 		Show results
@@ -216,6 +232,11 @@ int main(int argc, char* argv[]) {
 		glview.setPlot3D();
 		glview.setPointcloud(GLParams::POINTS, pointcloud_points);
 		glview.subPlot(2, 2, 1);
+
+		glview.setPlot(number_of_elements);
+		glview.setX(array_x);
+		glview.setY(array_y);
+		glview.subPlot(2, 2, 2);
 
 	glview.mainLoop();
 
