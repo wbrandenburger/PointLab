@@ -49,11 +49,10 @@ namespace pcsimp
 			@param neighbor_ number of used neighbors for computing surface
 			@param weight_ the weight of the furthest points when computing Least Squares
 		*/
-		MLSIndexParams(int neighbor_ = 30, float weight_ = 0.05f)
+		MLSIndexParams(int neighbors = 30)
 		{
 			(*this)["algorithm"] = PCSIMP_INDEX_MLS;
-			(*this)["neighbor"] = neighbor_;
-			(*this)["weight"] = weight_;
+			(*this)["neighbor"] = neighbors;
 		}
 	};
 
@@ -68,10 +67,9 @@ namespace pcsimp
 			@param data_ pointcloud which sould be simplified
 			@param params_ input parameters for the simplification process
 		*/
-		MLSIndex(const utils::Matrix<ElementType>& dataset_, const IndexParams& params_ = MLSIndexParams())
+		MLSIndex(const utils::Matrix<ElementType>& dataset, const IndexParams& params = MLSIndexParams())
 		{
-			neighbor = get_param(params_, "neighbor", 30);
-			weight = get_param(params_, "weight", 0.05f);
+			neighbor = get_param(params, "neighbor", 30);
 		}
 
 	private:
@@ -79,13 +77,7 @@ namespace pcsimp
 		/**
 			Number of used neigbors for computing surface
 		*/
-		int neighbor;
-
-		/**
-			The weight of the furthest points when computing Least Squares
-		*/
-		float weight;
-
+		int neighbors_;
 	};
 
 }

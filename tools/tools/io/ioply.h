@@ -380,7 +380,7 @@ namespace io
 			/**
 				Get the next element in the header
 			*/
-				elem = ply_get_next_element(ply, elem);
+			elem = ply_get_next_element(ply, elem);
 		}
 
 		/**

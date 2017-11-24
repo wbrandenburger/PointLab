@@ -102,14 +102,40 @@ namespace gl
 		call mainLoop() once.
 
 		Example for visualization of a pointcloud:
+		
 		utils::GLView<ElementType> glview;
-		glview.setViewer();
-			pointcloud::Pointcloud<ElementType> pointcloud;
-			*
-			* Assigning values to pointcloud
-			*
-			glview.setPointlcoud(pointcloud),
-		glview.plot();
+
+			glview.setViewer();
+				pointcloud::Pointcloud<ElementType> pointcloud;
+				*
+				* Assigning values to pointcloud
+				*
+				glview.setPointlcoud(pointcloud),
+			glview.subPlot(2, 2, 0)
+
+			glview.setPlot3D();
+				float* dataset;
+				size_t number_of_vertices;
+				unsigned int* lines;
+				size_t number_of_lines;
+				gl::glMeshGrid<float>(&dataset, -1, 1, -1, 1, number_of_vertices, &lines, number_of_lines);
+				glview.setPointcloud(GLParams::LINES, dataset, lines, number_of_vertices, number_of_lines);
+			glview.subPlot(2, 2, 1);
+			delete[] dataset, lines;
+
+			glview.setPlot(versuch);
+				int number_of_elements;
+				float* array_x(new float[number_of_elements]);
+				float* array_y(new float[number_of_elements]);
+
+				for (int i = 0; i < number_of_elements; i++) {
+					array_x[i] = (float) i;
+					array_y1[i] = (float) i;
+				}
+				glview.setY(array_y);
+				glview.setX(array_x);
+			glview.subPlot(2, 2, 2);
+
 		glview.mainLoop();
 	*/
 
