@@ -36,7 +36,6 @@
 
 namespace math
 {
-
 	/**
 		Computes the length of vector a with dimension dim
 

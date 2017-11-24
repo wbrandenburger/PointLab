@@ -273,10 +273,40 @@ namespace utils
 		*/
 		ElementType* getAllocatedPtr() const
 		{
-			ElementType* data_new = new ElementType[rows_ * cols_];
-			std::memcpy(data_new, data_, sizeof(ElementType) * rows_ * cols_);
+			ElementType* data_ptr = new ElementType[rows_ * cols_];
+			std::memcpy(data_ptr, data_, sizeof(ElementType) * rows_ * cols_);
 
-			return data_new;
+			return data_ptr;
+		}
+
+		/**
+			Returns the pointer to a row
+
+			@param[in] row Row
+			@return Return pointer to the row
+		*/
+		ElementType* getAllocatedRowPtr(size_t row) const
+		{
+			ElementType* row_ptr = new ElementType[cols_];
+			std::memcpy(row_ptr, (*this)[row], sizeof(ElementType) * cols_);
+
+			return row_ptr;
+		}
+
+		/**
+			Returns the pointer to a column
+
+			@param[in] col Column
+			@return Return pointer to the rcol
+		*/
+		ElementType* getAllocatedColPtr(size_t col) const
+		{
+			ElementType* col_ptr = new ElementType[rows_];
+			for (size_t i = 0; i < rows_; i++) {
+				col_ptr[i] = (*this)[i][col];
+			}
+
+			return col_ptr;
 		}
 
 		/**

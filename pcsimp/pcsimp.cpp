@@ -43,6 +43,39 @@
 #include "tools/utils.h"
 
 #include "trees/trees.hpp"
+
+
+	/**
+		Determination of t while computing a moving surface in a pointcloud
+	*/
+	template<typename ElementType> struct MovingSurface
+	{
+		/**
+			Constructor
+		*/
+		MovingSurface(utils::Matrix<ElementType> points, 
+			utils::Matrix<ElementType> normal)
+		{
+			points_ = points;
+			normal_ = normal;
+
+			/**
+				Computation of dists
+			*/
+		}
+
+		/**
+			Neighborhood
+		*/
+		utils::Matrix<ElementType> points_;
+
+		/**
+			Normal
+		*/
+		utils::Matrix<ElementType> normal_;
+
+	};
+
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
@@ -108,11 +141,16 @@ int main(int argc, char* argv[]) {
 		pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
 		utils::Matrix<float> points;
 		pointcloud_points.getMatrix(points);
+		
+		utils::Matrix<float> point (points.getAll)
+		utils::Matrix<float> distances = math::euclideanDistance(points - );
+		
+		std::cout <<  distances << std::endl;
 
 		utils::Matrix<float> var;
-		math::computeVar<float>(var, points);
+		math::computeVar<float>(var, distances);
 
-		std::cout << std::sqrt(var[0][0]) << std::endl;
+		std::cout << "Standarddeviation: "<< std::sqrt(var[0][0]) << std::endl;
 
 	/**
 		Show results
@@ -135,10 +173,4 @@ int main(int argc, char* argv[]) {
 	io::writePly("C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/result.ply", pointcloud);
 
 	return(0);
-}
-
-
-template<typename ElementType> ElementType movingPoint(ElementType t)
-{
-	return 0;
 }
