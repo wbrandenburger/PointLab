@@ -75,10 +75,12 @@
 		{
 			ElementType result = ElementType();
 
-			for (size_t i = 0; i < points_.getRows(); i++)
-			{
+			result = (normal_.transpose() * normal_)[0][0];
 
-			}
+			//for (size_t i = 0; i < points_.getRows(); i++)
+			//{
+			//	
+			//}
 
 			return result;
 		}
@@ -189,6 +191,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "Standarddeviation: "<< std::sqrt(var[0][0]) << std::endl;
 
 		MovingSurface<float> moving_surface(points, normal);
+		std::cout << moving_surface(1.0) << std::endl;
 
 	/**
 		Show results

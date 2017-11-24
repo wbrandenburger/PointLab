@@ -123,7 +123,7 @@ namespace gl
 	}
 
 	/**
-		Computes a 2D-meshgrid of a specific range
+		Computes a 2D-meshgrid of a specific range and builds a mesh
 		
 		@param[in] dataset_in Pointer to a dataset with the reference to a neighborhood
 		@param[in,out] dataset_new Pointer in which the mehsgrid will be saved
@@ -142,7 +142,7 @@ namespace gl
 	}
 
 	/**
-		Computes a 2D-meshgrid of a specific range
+		Computes a 2D-meshgrid of a specific range builds a mesh
 
 		@param[in,out] dataset Pointer in which the mehsgrid will be saved
 		@param[in] bounding_box Bounding box
@@ -158,7 +158,7 @@ namespace gl
 	}
 
 	/**
-		Computes a 2D-meshgrid of a specific range
+		Computes a 2D-meshgrid of a specific range  builds a mesh
 
 		@param[in,out] dataset Pointer in which the mehsgrid will be saved
 		@param[in] x_left Left border in x-direction
