@@ -120,11 +120,18 @@ int main(int argc, char* argv[]) {
 	/**
 		----------------------- Computation of the moving point -----------------------
 	*/
+
+		/**
+			Build kdtree
+		*/
 		utils::Matrix<float> pointcloud_matrix;
 		pointcloud.getMatrix(pointcloud_matrix);
 		trees::Index<float> kdtree_index(pointcloud_matrix, trees::KDTreeIndexParams(neighbors));
 		kdtree_index.buildIndex();
 
+		/**
+			Search for the neighbors of a specific point
+		*/
 		size_t random_point = 1234;
 		utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 1, 3);
 		utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 1, 3);
@@ -137,19 +144,22 @@ int main(int argc, char* argv[]) {
 
 		kdtree_index.knnSearch(point, indices, dists, neighbors, tree_params);
 		
+		/**
+			Get the neighbors of the point
+		*/
 		pointcloud::PointcloudAoS<float> pointcloud_points;
 		pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
 		utils::Matrix<float> points;
 		pointcloud_points.getMatrix(points);
 		
-		utils::Matrix<float> point(points.getAllocatedRowPtr(0), 1, 3);
+		/**
+			Compute the distances and the variance of these distances
+		*/
 		utils::Matrix<float> distances = math::euclideanDistance(points - point);
-		
-		std::cout <<  distances << std::endl;
-
 		utils::Matrix<float> var;
 		math::computeVar<float>(var, distances);
-
+		
+		std::cout << distances << std::endl;
 		std::cout << "Standarddeviation: "<< std::sqrt(var[0][0]) << std::endl;
 
 	/**
