@@ -40,62 +40,75 @@
 
 namespace pointcloud
 {
-	template<typename ElementType> class MovingPoint
+	/**
+		Computes the supporting plane of a neighborhood of points
+
+		@param[in] point Reference point
+		@param[in] points Neighborhood of the point
+	*/
+	template<typename ElementType> utils::Matrix<ElementType> plane(
+		const utils::Matrix<ElementType>& point,
+		const utils::Matrix<ElementType>& points)
 	{
-	public:
+		pointcloud::NormalParams();
+
+		return plane<ElementType>(point, points, pointcloud::computeNormal<ElementType>(points, normal_params));
+	}
+
+	/**
+		Computes the supporting plane of a neighborhood of points
+
+		@param[in] point Reference point
+		@param[in] points Neighborhood of the point
+		@param[in] normal Normal of the reference point
+	*/
+	template<typename ElementType> utils::Matrix<ElementType> plane(
+		const utils::Matrix<ElementType>& point,
+		const utils::Matrix<ElementType>& points,
+		const utils::Matrix<ElementType>& normal)
+	{	
+
+		return plane<ElementType>(point, points, normal, math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points - point.transpose())).getPtr(), points_.getRows()));
+	}
+
+	/**
+		Computes the supporting plane of a neighborhood of points
+
+		@param[in] point Reference point
+		@param[in] points Neighborhood of the point
+		@param[in] normal Normal of the reference point
+		@param[in] var Variance of the distances from the points of the neighborhood to the reference point
+	*/
+	template<typename ElementType> utils::Matrix<ElementType> plane(
+		const utils::Matrix<ElementType>& point,
+		const utils::Matrix<ElementType>& points,
+		const utils::Matrix<ElementType>& normal,
+		ElementType var,
+		size_t eps)
+	{
+		/**
+			Intervall in which the zero is assumed
+		*/
+		ElementType h = std::sqrt(var) / 2;
+		size_t number_of_elements = std::round(2 * h / eps);
+
+		ElementType* x = new ElementType[number_of_elements];
+		ElementType* x_ptr = x;
 
 		/**
-			Constructor
-
-			@param[in] point Reference point
-			@param[in] points Neighborhood of the point
+			Structure which holds the computation for the parameter t which shall be minimized
 		*/
-		MovingPoint(utils::Matrix<ElementType> point,
-			utils::Matrix<ElementType> points)
+		NonLinearPlaneMinimization minimization(point, points, normal, var);
+
+		for (size_t i = 0; i < number_of_elements)
 		{
-			point_ = point;
-
-			points_ = points;
-
-			pointcloud::NormalParams();
-
-			/**
-				Computation of the normal
-			*/
-			ElementType normal[3];
-			pointcloud::computeNormal<ElementType>(normal, points, normal_params);
-			normal_.setMatrix(normal, 3, 1);
-
-			/**
-				Computation of the variance of the distances
-			*/
-			var = math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points_)).getPtr(), points_.getRows());
 
 		}
+		return utils::Matrix(3, 1);
+	}
 
-		/**
-			Constructor
-
-			@param[in] point Reference point
-			@param[in] points Neighborhood of the point
-			@param[in] normal Normal of the reference point
-		*/
-		MovingPoint(utils::Matrix<ElementType> point,
-			utils::Matrix<ElementType> points,
-			utils::Matrix<ElementType> normal)
-		{
-			point_ = point;
-
-			points_ = points;
-
-			normal_ = normal;
-			
-			/**
-				Computation of the variance of the distances
-			*/
-			var = math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points_)).getPtr(), points_.getRows());
-		}
-
+	template<typename ElementType> struct NonLinearPlaneMinimization
+	{	
 		/**
 			Constructor
 
@@ -104,83 +117,62 @@ namespace pointcloud
 			@param[in] normal Normal of the reference point
 			@param[in] var Variance of the distances from the points of the neighborhood to the reference point
 		*/
-		MovingPoint(utils::Matrix<ElementType> point,
+		NonLinearPlaneMinimization(
+			utils::Matrix<ElementType> point,
 			utils::Matrix<ElementType> points,
-			utils::Matrix<ElementType> normal
+			utils::Matrix<ElementType> normal,
 			ElementType var)
 		{
 			point_ = point;
-
 			points_ = points;
-
 			normal_ = normal;
-
 			var_ = var;
 		}
 
-		/**
-			Destructor
-		*/
-		~MovingPoint()
+		ElementType operator()(ElementType t)
 		{
-		}
-		
-		/**
-			Copy constructor
+			ElementType result = ElementType();
 
-			@param[in] moving_point An instance of class MovingPoint
-		*/
-		MovingPoint(const  MovingPoint<ElementType>& moving_point) = delete;
+			for (size_t i = 0; i < points_.getRows(); i++)
+			{
+				/**
+				Vector between searched point and data point
+				*/
+				utils::Matrix<ElementType> q = (points_.getRowMatrix(i) - point)_ - normal_ * t;
 
-		/**
-			Copy constructor
-	
-			@param[in] moving_point An instance of class MovingPoint
-		*/
-		MovingPoint(const  MovingPoint<ElementType>&& moving_point) = delete;
-	
-		/**
-			Operator =
-	
-			@param[in] moving_point An instance of class MovingPoint
-			@return Returns reference to the current instance
-		*/
-		MovingPoint& operator=(const  MovingPoint<ElementType>& moving_point) = delete;
-	
-		/**
-			Operator =
-		
-			@param[in] moving_point An instance of class MovingPoint
-			@return Returns reference to the current instance
-		*/
-		MovingPoint& operator=(const  MovingPoint<ElementType>&& moving_point) = delete;
-		
-		/**
-			Set MovingPoint
-		*/
-		void setMovingPoint()
-		{
-			
+				/**
+				Distance of vector between searched point and data point
+				*/
+				ElementType qq = std::pow((q.transpose()*q).getValue(), 2);
+				ElementType nq = (normal_.transpose()* q).getValue();
+
+				/**
+				Computing and Rendering Point Set Surfaces, equation (6)
+				*/
+				result += nq * (1 + std::pow(nq, 2) / (2 * var_)) * std::exp(-qq / (2 * var_));
+			}
+			result *= 2;
+
+			return result;
 		}
 
-	private:
 		/**
-			Point
+			Reference point
 		*/
 		utils::Matrix<ElementType> point_;
 
 		/**
-			Neighborhood
+			Neighborhood of the point
 		*/
 		utils::Matrix<ElementType> points_;
 
 		/**
-			Normal
+			Normal of the reference point
 		*/
 		utils::Matrix<ElementType> normal_;
 
 		/**
-			Variance
+			Variance of the distances from the points of the neighborhood to the reference point
 		*/
 		ElementType var_;
 	};

@@ -345,7 +345,7 @@ namespace utils
 		*/
 		utils::Matrix<ElementType> getRowMatrix(size_t row) const
 		{
-			return Matrix<ElementType>(getAllocatedRowPtr(row), 1, cols_);
+			return Matrix<ElementType>(getAllocatedRowPtr(row), cols_, 1);
 		}
 
 		/**

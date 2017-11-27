@@ -322,7 +322,7 @@ namespace pointcloud
 		/**
 			Computation of the distances to the reference point and define the weigths
 		*/
-		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point));
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point.transpose()));
 		
 		utils::Matrix<ElementType> weights;
 		switch (weight_function) {

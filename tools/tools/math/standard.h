@@ -70,7 +70,8 @@ namespace math
 	template<typename ElementType> inline ElementType inPI(ElementType angle_)
 	{
 		ElementType pi = PI<ElementType>;
-		while (angle_ < -pi || angle_ > pi) {
+		while (angle_ < -pi || angle_ > pi) 
+		{
 			angle_ += angle_ < -pi ? pi : -pi;
 		}
 
@@ -88,7 +89,8 @@ namespace math
 	{
 		size_t index = NULL;
 		ElementType max_element = *a;
-		for (size_t i = 0; i < number_of_elements; i++){
+		for (size_t i = 0; i < number_of_elements; i++)
+		{
 			if (max_element < *a) { max_element = *a; index = i; }
 			a++;
 		}
@@ -107,7 +109,8 @@ namespace math
 	{
 		size_t index = NULL;
 		ElementType min_element = *a;
-		for (size_t i = 0; i < number_of_elements; i++){
+		for (size_t i = 0; i < number_of_elements; i++)
+		{
 			if (min_element > *a) { min_element = *a; index = i; }
 			a++;
 		}
@@ -125,7 +128,8 @@ namespace math
 	{
 		utils::Matrix<ElementType> matrix_transpose = matrix.transpose();
 		utils::Matrix<size_t> matrix_indices(1, matrix_transpose.getRows());
-		for (size_t i = 0; i < matrix_transpose.getRows()) {
+		for (size_t i = 0; i < matrix_transpose.getRows())
+		{
 			matrix_indices[0][i] = max(matrix_transpose[i], matrix_transpose.getCols());
 		}
 
@@ -142,7 +146,8 @@ namespace math
 	{
 		utils::Matrix<ElementType> matrix_transpose = matrix.transpose();
 		utils::Matrix<size_t> matrix_indices(1, matrix_transpose.getRows());
-		for (size_t i = 0; i < matrix_transpose.getRows()) {
+		for (size_t i = 0; i < matrix_transpose.getRows()) 
+		{
 			matrix_indices[0][i] = min(matrix_transpose[i], matrix_transpose.getCols());
 		}
 
@@ -183,7 +188,8 @@ namespace math
 			i++;
 		}
 
-		for (size_t i = 0; i < data.getCols(); i++) {
+		for (size_t i = 0; i < data.getCols(); i++) 
+		{
 			mean[i] /= data.getRows();
 		}
 	}
@@ -257,7 +263,8 @@ namespace math
 		/**
 			Computation of the variances and covariances
 		*/
-		while (data != end) {
+		while (data != end) 
+		{
 			var += (*data - mean)*(*data - mean);
 			data++;
 		}
