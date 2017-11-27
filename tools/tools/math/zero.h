@@ -32,20 +32,10 @@
 #ifndef MATH_ZERO_H_
 #define MATH_ZERO_H_
 
+#include "tools/parameters.h"
+
 namespace math
 {
-	/**
-		Swap Elements
-
-		@param[in,out] a_ First element
-		@param[in,out] b_ Second element
-	*/
-	template<typename ElementType> inline void swapElement(ElementType& a_, ElementType& b_)
-	{
-		ElementType temp = a_;
-		a_ = b_;
-		b_ = temp;
-	}
 
 	template<typename ElementType> struct NewtonMethod
 	{
@@ -61,12 +51,13 @@ namespace math
 		ElementType operator() (FunctionHandle function_, ElementType a_, ElementType b_, ElementType eps_)
 		{
 			if (std::abs(a_) < std::abs(b_)) {
-				swapElement(a_, b_);
+				swap(a_, b_);
 			}
 			
-			while (std::abs(function_(b_)) > eps_ && std::abs(function_(a_)) > eps_) {
+			while (std::abs(function_(b_)) > eps_ && std::abs(function_(a_)) > eps_) 
+			{
 				/**
-					Newton method x_n+1 = x_n - f(x_n)/f'(x_n)
+					Newton method x_n+1 = x_n - f(x_n)/f'(x_n) with f'(x_n) = (f(x_2) - f(x_1)/(x_2 - x_1)
 				*/
 				ElementType s = b_ - function_(b_)*(b_ - a_) / (function_(b_) - function_(a_));
 				a_ = b_;
@@ -114,7 +105,7 @@ namespace math
 			}
 
 			if (std::abs(a_) < std::abs(b_)) {
-				swapElement(a_, b_);
+				swap(a_, b_);
 			}
 
 			while (std::abs(function_(b_)) > eps_ && std::abs(function_(a_)) > eps_) {
@@ -144,7 +135,7 @@ namespace math
 				}
 
 				if (std::abs(a_) < std::abs(b_)) {
-					swapElement(a_, b_);
+					swap(a_, b_);
 				}
 			}
 

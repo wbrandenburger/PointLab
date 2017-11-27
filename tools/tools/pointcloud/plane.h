@@ -35,6 +35,7 @@
 #include "tools/utils/matrix.h"
 
 #include "tools/math/standard.h"
+#include "tools/math/zero.h"
 
 #include "tools/pointcloud/normals.h"
 
@@ -106,7 +107,7 @@ namespace pointcloud
 		ElementType eps )
 	{
 		/**
-			Intervall in which the zero is assumed
+			Intervall in which zero is assumed
 		*/
 		ElementType h = std::sqrt(var) / 2;
 		size_t number_of_elements = eps;
@@ -116,7 +117,7 @@ namespace pointcloud
 		ElementType* y_end = y + number_of_elements;
 
 		/**
-			Structure which holds the computation for the parameter t which shall be minimized
+			Structure which holds the computation for the parameter t to be minimized
 		*/
 		NonLinearPlaneMLSMinimization<ElementType> minimization(point, points, normal, var);
 
@@ -127,9 +128,11 @@ namespace pointcloud
 		for (ElementType* y_ptr = y; y_ptr != y_end; y_ptr++)
 		{
 			*y_ptr = minimization(-h + step);
-			std::cout << -h + step << " " << *y_ptr << " " << size_of_steps <<  std::endl;
 			step += size_of_steps;
 		}
+
+		math::NewtonMethod<ElementType> zero_function;
+		std::cout << zero_function(minimization, h, -h, h / 1000) << std::endl;
 
 		return y;
 	}

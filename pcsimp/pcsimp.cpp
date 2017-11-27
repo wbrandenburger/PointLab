@@ -195,8 +195,14 @@ int main(int argc, char* argv[]) {
 			Compute the distances and the variance of these distances
 		*/
 		size_t number_of_elements = 100;
+		utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points-point.transpose())));
+		std::cout << var << std::endl;
+		float* x = new float[number_of_elements];
+		for (size_t i = 0; i < number_of_elements; i++) 
+		{
+			x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
+		}
 		float* y = pointcloud::planeMLS<float>(points, number_of_elements);
-		//delete[] y;
 
 
 	/**
@@ -213,6 +219,7 @@ int main(int argc, char* argv[]) {
 		glview.subPlot(2, 2, 1);
 
 		glview.setPlot(number_of_elements);
+		glview.setX(x);
 		glview.setY(y);
 		glview.subPlot(2, 2, 2);
 

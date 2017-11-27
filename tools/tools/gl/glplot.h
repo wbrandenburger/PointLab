@@ -91,8 +91,6 @@ namespace gl
 		*/
 		void setY(ElementType* y)
 		{
-			//ElementType* y_new = new ElementType[number_of_elements_];
-			//std::memcpy(y_new, y, sizeof(ElementType) * number_of_elements_);
 			y_.push_back(y);
 			number_of_functions_++;
 
@@ -156,9 +154,6 @@ namespace gl
 		*/
 		void setX(ElementType* x)
 		{
-			//ElementType* x_new = new ElementType[number_of_elements_];
-			//std::memcpy(x_new, x, sizeof(ElementType) * number_of_elements_)
-
 			x_ = x;
 
 			setParametersX();
