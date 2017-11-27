@@ -60,7 +60,7 @@ namespace pointcloud
 		*/
 		NormalParams() :
 			normal_computation_(NormalComputation::PLANESVD), 
-			weight_function_(WeightFunction::LINEAR), 
+			weight_function_(WeightFunction::GAUSSIAN), 
 			cores_(1)
 		{
 		}
@@ -159,7 +159,8 @@ namespace pointcloud
 		@param[in] neighbors Number of neighbors which will be considered for computation normals
 		@param[in] normal_params Parameter for computing normals
 	*/
-	template<typename ElementType> void computeNormals(pointcloud::Pointcloud<ElementType>& pointcloud, 
+	template<typename ElementType> void computeNormals(
+		pointcloud::Pointcloud<ElementType>& pointcloud, 
 		size_t  neighbors,
 		NormalParams normal_params = NormalParams())
 	{
@@ -230,7 +231,8 @@ namespace pointcloud
 		@param[in] neighbors Number of neighbors
 		@param[in] normal_params Parameter for computing normals
 	*/
-	template<typename ElementType> void computeNormal(size_t index,
+	template<typename ElementType> void computeNormal(
+		size_t index,
 		pointcloud::Pointcloud<ElementType>& pointcloud,
 		size_t* indices,
 		size_t neighbors,
@@ -262,7 +264,8 @@ namespace pointcloud
 		@param[in] points Matrix with the points
 		@param[in] normal_params Parameter for computing normals
 	*/
-	template<typename ElementType> void computeNormal(ElementType* normal,
+	template<typename ElementType> void computeNormal(
+		ElementType* normal,
 		const utils::Matrix<ElementType>& points,
 		NormalParams normal_params = NormalParams())
 	{
@@ -275,6 +278,30 @@ namespace pointcloud
 	}
 
 	/**
+		Normal computation switch which depends on the chosen method for computing normals
+		
+		@param[in] points Matrix with the points
+		@param[in] normal_params Parameter for computing normals
+		@return Normal
+	*/
+	template<typename ElementType> utils::Matrix<ElementType> computeNormal(
+		const utils::Matrix<ElementType>& points,
+		NormalParams normal_params = NormalParams())
+	{
+		ElementType normal = new ElementType[3];
+		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
+
+		switch (normal_params.getNormalComputation()) {
+		case NormalComputation::PLANESVD: normalPlaneSVD(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::PLANEPCA: normalPlanePCA(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::VECTORSVD: normalVectorSVD(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::QUADSVD: normalQuadSVD(normal, points, normal_params.getWeightFunction()); break;
+		}
+
+		return utils::Matrix<ElementType>(normal, 3, 1)
+	}
+
+	/**
 		 A classical method is to fit a local plane S=n_{x}x+n_{y}y+n_{z}z+d 
 		 to the points in the neighborhood
 
@@ -282,7 +309,8 @@ namespace pointcloud
 		 @param[in] points Matrix with the points
 		 @param[in] weight_function Defines the weight function
 	*/
-	template<typename ElementType> void normalPlaneSVD(ElementType* normal, 
+	template<typename ElementType> void normalPlaneSVD(
+		ElementType* normal, 
 		const utils::Matrix<ElementType>& points,
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
@@ -352,7 +380,9 @@ namespace pointcloud
 		 @param[in] points Matrix with the points
 		 @param[in] weight_function Defines the weight function
 	*/
-	template<typename ElementType> void normalPlanePCA(ElementType* normal,
+
+	template<typename ElementType> void normalPlanePCA(
+		ElementType* normal,
 		const utils::Matrix<ElementType>& points, 
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
@@ -367,7 +397,8 @@ namespace pointcloud
 		@param[in] points Matrix with the points
 		@param[in] weight_function Defines the weight function
 	*/
-	template<typename ElementType> void normalVectorSVD(ElementType* normal,
+	template<typename ElementType> void normalVectorSVD(
+		ElementType* normal,
 		const utils::Matrix<ElementType>& points, 
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
@@ -381,7 +412,8 @@ namespace pointcloud
 		@param[in] points Matrix with the points
 		@param[in] weight_function Defines the weight function
 	*/
-	template<typename ElementType> void normalQuadSVD(ElementType* normal,
+	template<typename ElementType> void normalQuadSVD(
+		ElementType* normal,
 		const utils::Matrix<ElementType>& points, 
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{

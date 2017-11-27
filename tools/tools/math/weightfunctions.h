@@ -250,8 +250,7 @@ namespace math
 
 			mean_ = mean.getAllocatedPtr();
 
-			utils::Matrix<ElementType> var;
-			math::computeVar<ElementType>(mean, var, data);
+			utils::Matrix<ElementType> var = math::computeVar<ElementType>(mean, data);
 
 			var_ = var.getDiag();
 		}
@@ -266,13 +265,11 @@ namespace math
 		{
 			dim_ = data.getCols();
 
-			utils::Matrix<ElementType> mean;
-			math::computeMean<ElementType>(mean, data);
+			utils::Matrix<ElementType> mean = math::computeMean<ElementType>(data);
 
 			mean_ = mean.getAllocatedPtr();
-
-			utils::Matrix<ElementType> var;
-			math::computeVar<ElementType>(mean, var, data);
+	
+			utils::Matrix<ElementType> var = math::computeVar<ElementType>(mean, data);
 
 			var_ = var.getDiag();
 		}

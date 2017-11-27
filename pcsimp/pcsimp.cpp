@@ -69,10 +69,7 @@
 			/**
 				Compute the variance
 			*/
-			utils::Matrix<float> var;
-			math::computeVar<float>(var, std::sqrt(math::euclideanDistance(points_)));
-
-			h_ = var.getValue();
+			h_ = math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points_)).getPtr(), points_.getRows());
 		}
 
 		ElementType operator()(ElementType t)
@@ -195,15 +192,15 @@ int main(int argc, char* argv[]) {
 		pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
 		utils::Matrix<float> points;
 		pointcloud_points.getMatrix(points);
-		
+
 		/**
 			Compute the distances and the variance of these distances
 		*/
-		utils::Matrix<float> var;
-		math::computeVar<float>(var, std::sqrt(math::euclideanDistance(points - point)));
+		
+		utils::Matrix<float> var= math::computeVar<float>(std::sqrt(math::euclideanDistance(points - point)));
 
 		MovingSurface<float> moving_surface(points, normal);
-		
+
 		size_t number_of_elements = 1000;
 		std::vector<float> array_x(number_of_elements);
 		std::vector<float> array_y(number_of_elements);
@@ -215,8 +212,6 @@ int main(int argc, char* argv[]) {
 			array_y[i] = moving_surface(array_x[i]);
 
 		}
-
-
 
 	/**
 		Show results

@@ -32,6 +32,12 @@
 #ifndef POINTCLOUD_MOVINGPOINT_H_
 #define POINTCLOUD_MOVINGPOINT_H_
 
+#include "tools/utils/matrix.h"
+
+#include "tools/math/standard.h"
+
+#include "tools/pointcloud/normals.h"
+
 namespace pointcloud
 {
 	template<typename ElementType> class MovingPoint
@@ -40,9 +46,76 @@ namespace pointcloud
 
 		/**
 			Constructor
+
+			@param[in] point Reference point
+			@param[in] points Neighborhood of the point
 		*/
-		MovingPoint()
+		MovingPoint(utils::Matrix<ElementType> point,
+			utils::Matrix<ElementType> points)
 		{
+			point_ = point;
+
+			points_ = points;
+
+			pointcloud::NormalParams();
+
+			/**
+				Computation of the normal
+			*/
+			ElementType normal[3];
+			pointcloud::computeNormal<ElementType>(normal, points, normal_params);
+			normal_.setMatrix(normal, 3, 1);
+
+			/**
+				Computation of the variance of the distances
+			*/
+			var = math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points_)).getPtr(), points_.getRows());
+
+		}
+
+		/**
+			Constructor
+
+			@param[in] point Reference point
+			@param[in] points Neighborhood of the point
+			@param[in] normal Normal of the reference point
+		*/
+		MovingPoint(utils::Matrix<ElementType> point,
+			utils::Matrix<ElementType> points,
+			utils::Matrix<ElementType> normal)
+		{
+			point_ = point;
+
+			points_ = points;
+
+			normal_ = normal;
+			
+			/**
+				Computation of the variance of the distances
+			*/
+			var = math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points_)).getPtr(), points_.getRows());
+		}
+
+		/**
+			Constructor
+
+			@param[in] point Reference point
+			@param[in] points Neighborhood of the point
+			@param[in] normal Normal of the reference point
+			@param[in] var Variance of the distances from the points of the neighborhood to the reference point
+		*/
+		MovingPoint(utils::Matrix<ElementType> point,
+			utils::Matrix<ElementType> points,
+			utils::Matrix<ElementType> normal
+			ElementType var)
+		{
+			point_ = point;
+
+			points_ = points;
+
+			normal_ = normal;
+
+			var_ = var;
 		}
 
 		/**
@@ -55,32 +128,32 @@ namespace pointcloud
 		/**
 			Copy constructor
 
-			@param[in] class An instance of class  MovingPoint
+			@param[in] moving_point An instance of class MovingPoint
 		*/
-		MovingPoint(const  MovingPoint<ElementType>& class) = delete;
+		MovingPoint(const  MovingPoint<ElementType>& moving_point) = delete;
 
 		/**
 			Copy constructor
 	
-			@param[in] class An instance of class  MovingPoint
+			@param[in] moving_point An instance of class MovingPoint
 		*/
-		MovingPoint(const  MovingPoint<ElementType>&& class) = delete;
+		MovingPoint(const  MovingPoint<ElementType>&& moving_point) = delete;
 	
 		/**
 			Operator =
 	
-			@param[in] class An instance of class  MovingPoint
+			@param[in] moving_point An instance of class MovingPoint
 			@return Returns reference to the current instance
 		*/
-		MovingPoint& operator=(const  MovingPoint<ElementType>& class) = delete;
+		MovingPoint& operator=(const  MovingPoint<ElementType>& moving_point) = delete;
 	
 		/**
 			Operator =
 		
-			@param[in] class An instance of class  MovingPoint
+			@param[in] moving_point An instance of class MovingPoint
 			@return Returns reference to the current instance
 		*/
-		MovingPoint& operator=(const  MovingPoint<ElementType>&& class) = delete;
+		MovingPoint& operator=(const  MovingPoint<ElementType>&& moving_point) = delete;
 		
 		/**
 			Set MovingPoint
@@ -91,7 +164,25 @@ namespace pointcloud
 		}
 
 	private:
+		/**
+			Point
+		*/
+		utils::Matrix<ElementType> point_;
 
+		/**
+			Neighborhood
+		*/
+		utils::Matrix<ElementType> points_;
+
+		/**
+			Normal
+		*/
+		utils::Matrix<ElementType> normal_;
+
+		/**
+			Variance
+		*/
+		ElementType var_;
 	};
 }
 

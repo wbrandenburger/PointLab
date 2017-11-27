@@ -86,7 +86,7 @@ namespace utils
 			@param[in] rows_ Rows of the matrix
 			@param[in] cols_ Columns of the matrix
 		*/
-		Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols)
+		Matrix(std::initializer_list<ElementType> data, size_t rows, size_t cols) : Matrix()
 		{
 			rows_ = rows;
 			cols_ = cols;

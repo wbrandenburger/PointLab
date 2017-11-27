@@ -152,25 +152,27 @@ namespace math
 	/**
 		Computation of the mean of an array of data points
 
-		@param[in,out] mean The container whilch holds the mean
 		@param[in] data The data points
+		@return Mean
 	*/
-	template<typename ElementType> inline void computeMean(utils::Matrix<ElementType>& mean, const utils::Matrix<ElementType>& data)
+	template<typename ElementType> inline utils::Matrix<ElementType> computeMean(const utils::Matrix<ElementType>& data)
 	{
-		mean = utils::Matrix<ElementType>(computeMean<ElementType>(data), 1, data.getCols());
+		ElementType* mean = new ElementType[data.getCols()];
+		std::memset(mean, (ElementType)0, sizeof(ElementType) * data.getCols());
+
+		computeMean<ElementType>(mean, data);
+
+		return utils::Matrix<ElementType>(mean, data.getCols(), 1);
 	}
 
 	/**
 		Computation of the mean of an array of data points
 
+		@param[in] mean Vector with the respective mean
 		@param[in] data The data points
-		@return Vector with the respective mean
 	*/
-	template<typename ElementType> inline ElementType* computeMean(const utils::Matrix<ElementType>& data)
+	template<typename ElementType> inline void computeMean(ElementType* mean, const utils::Matrix<ElementType>& data)
 	{
-		ElementType* mean = new ElementType[data.getCols()];
-		std::memset(mean, (ElementType)0, sizeof(ElementType) * data.getCols());
-
 		/**
 			Iterate through the data array and sum the values of a specific dimension
 		*/
@@ -184,8 +186,6 @@ namespace math
 		for (size_t i = 0; i < data.getCols(); i++) {
 			mean[i] /= data.getRows();
 		}
-
-		return mean;
 	}
 
 	/**
@@ -208,7 +208,7 @@ namespace math
 			mean += *data;
 			data++;
 		}
-		mean /= number_of_elements
+		mean /= number_of_elements;
 
 		return mean;
 	}
@@ -217,35 +217,28 @@ namespace math
 		Computation of the variances and covariances of data points
 
 		@param[in] mean Mean
-		@param[in,out] var Container which holds the variances and covariances
 		@param[in] data The data points
+		@return Variances and covariances
 	*/
-	template<typename ElementType> inline void computeVar(const utils::Matrix<ElementType>& mean, utils::Matrix<ElementType>& var, const utils::Matrix<ElementType>& data)
+	template<typename ElementType> inline utils::Matrix<ElementType> computeVar(const utils::Matrix<ElementType>& mean, const utils::Matrix<ElementType>& data)
 	{
 		/**
 			Computation of the variances and covariances
 		*/
-		var = (data - mean).transpose()*(data - mean) / (data.getRows()-1);
+		return (data - mean.transpose()).transpose()*(data - mean.transpose()) / (data.getRows()-1);
 	}
 
 	/**	
 		Computation of the variances and covariances of data points
 
-		@param[in,out] var Container which holds the variances and covariances
 		@param[in] data The data points
 	*/
-	template<typename ElementType> inline void computeVar(utils::Matrix<ElementType>& var, const utils::Matrix<ElementType>& data)
+	template<typename ElementType> inline utils::Matrix<ElementType> computeVar(const utils::Matrix<ElementType>& data)
 	{
-		/**
-			Compute mean
-		*/
-		utils::Matrix<ElementType> mean;
-		computeMean<ElementType>(mean, data);
-
 		/**
 			Computation of the variances and covariances
 		*/
-		computeVar<ElementType>(mean, var, data);
+		return computeVar<ElementType>(computeMean<ElementType>(data), data);
 	}
 
 	/**	
@@ -266,6 +259,7 @@ namespace math
 		*/
 		while (data != end) {
 			var += (*data - mean)*(*data - mean);
+			data++;
 		}
 		var /= (number_of_elements - 1);
 
@@ -275,7 +269,6 @@ namespace math
 	/**	
 		Computation of the variances and covariances of data points
 
-		
 		@param[in] data The data points
 		@param[in] number_of_elements Number of elements
 		@return Variance
@@ -283,14 +276,9 @@ namespace math
 	template<typename ElementType> inline ElementType computeVar(ElementType* data, size_t number_of_elements)
 	{
 		/**
-			Compute mean
-		*/
-		ElementType mean = computeMean<ElementType>(data, number_of_elements);
-
-		/**
 			Computation of the variances and covariances
 		*/	
-		return computeVar<ElementType>(mean, data, number_of_elements);
+		return computeVar<ElementType>(computeMean<ElementType>(data, number_of_elements), data, number_of_elements);
 	}
 }
 
