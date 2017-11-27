@@ -110,10 +110,10 @@ namespace pointcloud
 		*/
 		ElementType h = std::sqrt(var) / 2;
 		size_t number_of_elements = eps;
-		ElementType size_of_steps = 2 * h / number_of_elements;
+		ElementType size_of_steps =  2*h / number_of_elements;
 
-		ElementType* x = new ElementType[number_of_elements];
-		ElementType* x_end = x + number_of_elements;
+		ElementType* y = new ElementType[number_of_elements];
+		ElementType* y_end = y + number_of_elements;
 
 		/**
 			Structure which holds the computation for the parameter t which shall be minimized
@@ -124,14 +124,14 @@ namespace pointcloud
 			Computation the error for every t in -h/2 and h/2
 		*/
 		ElementType step = 0;
-		for (ElementType* x_ptr = x; x_ptr != x_end; x_ptr++)
+		for (ElementType* y_ptr = y; y_ptr != y_end; y_ptr++)
 		{
-			*x_ptr = minimization(-h + step);
-			std::cout << *x_ptr << std::endl;
+			*y_ptr = minimization(-h + step);
+			std::cout << -h + step << " " << *y_ptr << " " << size_of_steps <<  std::endl;
 			step += size_of_steps;
 		}
 
-		return x;
+		return y;
 	}
 
 	template<typename ElementType> struct NonLinearPlaneMLSMinimization
