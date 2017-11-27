@@ -334,6 +334,17 @@ namespace gl
 		}
 
 		/**
+			Set pointlcoud
+
+			@param[in] points Points
+		*/
+		void setPointcloud(const utils::Matrix<ElementType>& points)
+		{
+			gl::GLContainer<ElementType> gl_container(points);
+			viewer_instances_.getCurrentViewerInstance().setPointcloud(gl_container);
+		}
+
+		/**
 			Set pointcloud
 
 			@param[in] points_ Pointcloud

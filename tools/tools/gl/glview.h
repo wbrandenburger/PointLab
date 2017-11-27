@@ -323,6 +323,20 @@ namespace gl
 		/**
 			Set pointcloud
 
+			@param[in] pointcloud_ Pointcloud
+		*/
+		void setPointcloud(const utils::Matrix<ElementType>& points)
+		{
+			if (current_instance_ != GLInstance::GLVIEWER) {
+				exitFailure(__FILE__, __LINE__);
+			}
+
+			glviewer_.setPointcloud(points);
+		}
+
+		/**
+			Set pointcloud
+
 			@param[in] points_ Pointcloud
 			@param[in] number_of_elements_ Number of elements
 		*/
@@ -349,7 +363,21 @@ namespace gl
 
 			glplot3d_.setPointcloud(mode, pointcloud);
 		}
+		
+		/**
+			Set pointcloud
+			
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points Points
+		*/
+		void setPointcloud(GLParams mode, const utils::Matrix<ElementType>& points)
+		{
+			if (current_instance_ != GLInstance::GLPLOT3D) {
+				exitFailure(__FILE__, __LINE__);
+			}
 
+			glplot3d_.setPointcloud(mode, points);
+		}
 		/**
 			Set pointcloud
 

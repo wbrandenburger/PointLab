@@ -401,8 +401,8 @@ namespace gl
 		/**
 			Set pointlcoud
 			
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] pointcloud_ Pointcloud
+			@param[in] mode Specifies what kind of primitives to render
+			@param[in] pointcloud Pointcloud
 		*/
 		void setPointcloud(GLParams mode, const pointcloud::Pointcloud<ElementType>& pointcloud)
 		{
@@ -413,9 +413,21 @@ namespace gl
 		/**
 			Set pointcloud
 
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-			@param[in] number_of_vertices_ Number of elements
+			@param[in] mode Specifies what kind of primitivie to render
+			@param[in] points Points
+		*/
+		void setPointcloud(GLParams mode, const utils::Matrix<ElementType>& points)
+		{
+			glGLContainer<ElementType> glContainer(mode, points);
+			plot3d_instances_.getCurrentPlot3DInstance().setPointcloud(gl_container);
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode Specifies what kind of primitives to render
+			@param[in] points Points
+			@param[in] number_of_vertices Number of elements
 		*/
 		void setPointcloud(GLParams mode, ElementType* points, size_t number_of_vertices)
 		{
