@@ -208,7 +208,7 @@ int main(int argc, char* argv[]) {
 			array_y[i] = moving_surface(array_x[i]);
 		}
 
-		//pointcloud::planeMLS<float>(point, points);
+		pointcloud::planeMLS<float>(point, points);
 	/**
 		Show results
 	*/
