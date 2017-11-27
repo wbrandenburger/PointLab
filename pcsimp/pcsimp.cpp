@@ -44,77 +44,6 @@
 
 #include "trees/trees.hpp"
 
-	/**
-		Determination of t while computing a moving surface in a pointcloud
-	*/
-	template<typename ElementType> struct MovingSurface
-	{
-		/**
-			Constructor
-		*/
-		MovingSurface(utils::Matrix<ElementType> points, 
-			utils::Matrix<ElementType> normal)
-		{
-			/**
-				The first point in points is the reference point
-			*/
-			r_ =utils::Matrix<ElementType>(points.getAllocatedRowPtr(0), 3, 1);
-			/**
-				Set the normal and the vectors of the neighborhood
-			*/
-			points_ = points - r_.transpose();
-			n_ = normal;
-			/**
-				Compute the variance
-			*/
-			h_ = math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points_)).getPtr(), points_.getRows());
-		}
-
-		ElementType operator()(ElementType t)
-		{
-			ElementType result = ElementType();
-
-			for (size_t i = 0; i < points_.getRows(); i++)
-			{
-				/**
-					Vector between searched point and data point
-				*/
-				utils::Matrix<ElementType> p(points_.getAllocatedRowPtr(i), 3, 1);
-				utils::Matrix<ElementType> q = p - n_*t;
-
-				/**
-					Distance of vector between searched point and data point
-				*/
-				ElementType qq = std::pow((q.transpose()*q).getValue(),2);
-				ElementType nq = (n_.transpose()* q).getValue();
-
-				result += nq * (1 + std::pow(nq, 2) / (2*h_)) * std::exp(-qq/(2*h_));
-			}
-			result *= 2;
-
-			return result;
-		}
-		/**
-			Point
-		*/
-		utils::Matrix<ElementType> r_;
-
-		/**
-			Neighborhood
-		*/
-		utils::Matrix<ElementType> points_;
-
-		/**
-			Normal
-		*/
-		utils::Matrix<ElementType> n_;
-
-		/**
-			Variance
-		*/
-		ElementType h_;
-	};
-
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
@@ -196,13 +125,17 @@ int main(int argc, char* argv[]) {
 		*/
 		size_t number_of_elements = 100;
 		utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points-point.transpose())));
-		std::cout << var << std::endl;
 		float* x = new float[number_of_elements];
 		for (size_t i = 0; i < number_of_elements; i++) 
 		{
 			x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
 		}
-		float* y = pointcloud::planeMLS<float>(points, number_of_elements);
+		
+		
+		pointcloud::SurfaceParams surface_params;
+		surface_params.setAccuracy(1.0f / (float)number_of_elements);
+
+		float* y = pointcloud::planeMLS<float>(point, points, normal, surface_params);
 
 
 	/**

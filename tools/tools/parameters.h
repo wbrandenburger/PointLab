@@ -204,4 +204,31 @@
 		LINEAR = 1
 	};
 
+	/**
+		Approximation of the root
+	*/
+	enum struct RootsApproximation
+	{
+		/**
+			Newton-Raphson method
+		*/
+		NEWTON = 0,
+		
+		/**
+			Quadratic inverse Interpolation
+		*/
+		QUAD = 1,
+	};
+
+	/**
+		Computation of a surface in a neighborhood
+	*/
+	enum struct SurfaceComputation
+	{
+		/**
+			Computation of the moving least squares plane in the neighborhood 
+		*/
+		PLANEMLS = 0,
+	};
+
 #endif /* PARAMETERS_H_ */

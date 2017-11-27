@@ -244,17 +244,44 @@ namespace pointcloud
 		utils::Matrix<ElementType> points;
 		pointcloud.getSubset(indices, neighbors, points);
 		
+		utils::Matrix<ElementType> point = points.getRowMatrix(0);
+
 		/**
 			Compute the normal
 		*/
 		ElementType normal[3];
 		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
-		computeNormal<ElementType>(normal, points, normal_params);
+		computeNormal<ElementType>(normal, point, points, normal_params);
 
 		/**
 			Set the normal
 		*/
 		pointcloud.setNormalPtr(normal, index);
+	}
+
+	/**
+		Normal computation switch which depends on the chosen method for computing normals
+		
+		@param[in] points Matrix with the points
+		@param[in] normal_params Parameter for computing normals
+		@return Normal
+	*/
+	template<typename ElementType> utils::Matrix<ElementType> computeNormal(
+		const utils::Matrix<ElementType>& point,
+		const utils::Matrix<ElementType>& points,
+		NormalParams normal_params = NormalParams())
+	{
+		ElementType* normal = new ElementType[3];
+		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
+
+		switch (normal_params.getNormalComputation()) {
+		case NormalComputation::PLANESVD: normalPlaneSVD(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::PLANEPCA: normalPlanePCA(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::VECTORSVD: normalVectorSVD(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::QUADSVD: normalQuadSVD(normal, point, points, normal_params.getWeightFunction()); break;
+		}
+
+		return utils::Matrix<ElementType>(normal, 3, 1);
 	}
 
 	/**
@@ -266,39 +293,16 @@ namespace pointcloud
 	*/
 	template<typename ElementType> void computeNormal(
 		ElementType* normal,
+		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		NormalParams normal_params = NormalParams())
 	{
 		switch (normal_params.getNormalComputation()) {
-		case NormalComputation::PLANESVD: normalPlaneSVD(normal, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::PLANEPCA: normalPlanePCA(normal, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::VECTORSVD: normalVectorSVD(normal, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::QUADSVD: normalQuadSVD(normal, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::PLANESVD: normalPlaneSVD(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::PLANEPCA: normalPlanePCA(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::VECTORSVD: normalVectorSVD(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::QUADSVD: normalQuadSVD(normal, point, points, normal_params.getWeightFunction()); break;
 		}
-	}
-
-	/**
-		Normal computation switch which depends on the chosen method for computing normals
-		
-		@param[in] points Matrix with the points
-		@param[in] normal_params Parameter for computing normals
-		@return Normal
-	*/
-	template<typename ElementType> utils::Matrix<ElementType> computeNormal(
-		const utils::Matrix<ElementType>& points,
-		NormalParams normal_params = NormalParams())
-	{
-		ElementType* normal = new ElementType[3];
-		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
-
-		switch (normal_params.getNormalComputation()) {
-		case NormalComputation::PLANESVD: normalPlaneSVD(normal, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::PLANEPCA: normalPlanePCA(normal, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::VECTORSVD: normalVectorSVD(normal, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::QUADSVD: normalQuadSVD(normal, points, normal_params.getWeightFunction()); break;
-		}
-
-		return utils::Matrix<ElementType>(normal, 3, 1);
 	}
 
 	/**
@@ -310,15 +314,11 @@ namespace pointcloud
 		 @param[in] weight_function Defines the weight function
 	*/
 	template<typename ElementType> void normalPlaneSVD(
-		ElementType* normal, 
+		ElementType* normal,
+		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
-		/**
-			Define the reference point. This is the first point in points
-		*/
-		utils::Matrix<ElementType> point = points.getRowMatrix(0);;
-		
 		/**
 			Computation of the distances to the reference point and define the weigths
 		*/
@@ -383,6 +383,7 @@ namespace pointcloud
 
 	template<typename ElementType> void normalPlanePCA(
 		ElementType* normal,
+		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points, 
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
@@ -399,6 +400,7 @@ namespace pointcloud
 	*/
 	template<typename ElementType> void normalVectorSVD(
 		ElementType* normal,
+		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points, 
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{
@@ -414,6 +416,7 @@ namespace pointcloud
 	*/
 	template<typename ElementType> void normalQuadSVD(
 		ElementType* normal,
+		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points, 
 		WeightFunction weight_function = WeightFunction::LINEAR)
 	{

@@ -34,114 +34,142 @@
 
 #include "tools/parameters.h"
 
+#define REPETITION 1000
+
 namespace math
 {
-
-	template<typename ElementType> struct NewtonMethod
+	
+	/**
+		Operator () Computes a zero point bewteen  a given interval
+	
+		@param[in] function Structure with overloaded operator ()
+		@param[in] a Left or right interval bound
+		@param[in] b Left or rigth interval bound
+		@param[in] eps Value which determines the acurracy
+	*/
+	template<typename ElementType, typename FunctionHandle> ElementType NewtonMethod(
+		FunctionHandle function, 
+		ElementType a, 
+		ElementType b, 
+		ElementType eps)
 	{
-		/**
-			Operator () Computes a zero point bewteen  a given interval
-
-			@param[in] function_ Structure with overloaded operator ()
-			@param[in] a_ Left or right interval bound
-			@param[in] b_ Left or rigth interval bound
-			@param[in] eps_ Value which determines the acurracy
-		*/
-		template<typename FunctionHandle>
-		ElementType operator() (FunctionHandle function_, ElementType a_, ElementType b_, ElementType eps_)
-		{
-			if (std::abs(a_) < std::abs(b_)) {
-				swap(a_, b_);
-			}
-			
-			while (std::abs(function_(b_)) > eps_ && std::abs(function_(a_)) > eps_) 
-			{
-				/**
-					Newton method x_n+1 = x_n - f(x_n)/f'(x_n) with f'(x_n) = (f(x_2) - f(x_1)/(x_2 - x_1)
-				*/
-				ElementType s = b_ - function_(b_)*(b_ - a_) / (function_(b_) - function_(a_));
-				a_ = b_;
-				b_ = s;
-			}
-
-			return b_;
+		if (std::abs(a) < std::abs(b)) {
+			swap(a, b);
 		}
-	};
+			
+		ElementType right_border = a, left_border = b;
 
-	template<typename ElementType> struct QuadraticInverseInterpolation
-	{	
-		/**
-			Operator () Computes a zero point bewteen  a given interval
-
-			@param[in] function_ Structure with overloaded operator ()
-			@param[in] a_ Left or right interval bound
-			@param[in] b_ Left or rigth interval bound
-			@param[in] eps_ Value which determines the acurracy
-		*/
-		template<typename FunctionHandle> 
-		ElementType operator()(FunctionHandle function_, ElementType a_, ElementType b_, ElementType eps_)
+		size_t repetition = 0;
+		while (std::abs(function(b)) > eps && std::abs(function(a)) > eps) 
 		{
-			if (std::abs(a_) < std::abs(b_)) {
-				swapElement(a_, b_);
+			/**
+				Newton method x_n+1 = x_n - f(x_n)/f'(x_n) with f'(x_n) = (f(x_2) - f(x_1)/(x_2 - x_1)
+			*/
+			ElementType s = b - function(b)*(a - b) / (function(a) - function(b));
+			a = b;
+			b = s;
+
+			/**
+				Abort if the computed function value is out of the bounds
+			*/
+			if (b > right_border || b < left_border) {
+				exitFailure(__FILE__, __LINE__);
 			}
 
 			/**
-				Newton method x_n+1 = x_n - f(x_n)/f'(x_n) to determine a third supporting point 
+				Abort if the computation of zero tooks too much repetitions
 			*/
-			ElementType s = b_ - function_(b_)*(b_ - a_) / (function_(b_) - function_(a_));
-			ElementType c = b_;
-			
+			repetition++;
+			if (repetition > REPETITION) {
+				exitFailure(__FILE__, __LINE__);
+			}
+		}
+		return b;
+	}
+
+
+	/**
+		Operator () Computes a zero point bewteen  a given interval
+	
+		@param[in] function Structure with overloaded operator ()
+		@param[in] a Left or right interval bound
+		@param[in] b Left or rigth interval bound
+		@param[in] eps Value which determines the acurracy
+	*/
+	template<typename ElementType, typename FunctionHandle> ElementType QuadraticInverseInterpolation(
+		FunctionHandle function, 
+		ElementType a, 
+		ElementType b, 
+		ElementType eps)
+	{
+		if (std::abs(a) < std::abs(b)) {
+			swap(a, b);
+		}
+
+		/**
+			Newton method x_n+1 = x_n - f(x_n)/f'(x_n) with f'(x_n) = (f(x_2) - f(x_1)/(x_2 - x_1) to determine a third supporting point 
+		*/
+		ElementType s = b - function(b)*(a - b) / (function(a) - function(b));
+		ElementType c = b;
+		
+		/**
+			If a and s are on different sides the inverse interpolationpolynom are used and
+			if they are on the same side newton method are used. This is because the newton method
+			creates a fictive line with a zero point whereas the inverse interpolationspolynom interpolates only
+			through the three supporting points
+		*/
+		if (function(a)*function(s) < 0) {
+			b = s;
+		}
+		else {
+			a = s;
+		}
+
+		if (std::abs(a) < std::abs(b)) {
+			swap(a, b);
+		}
+
+		size_t repetition = 0;
+		while (std::abs(function(b)) > eps && std::abs(function(a)) > eps) {
+			if (function(a) != function(c) && function(b) != function(c)) {
+				/**
+					Inverse interpolationpolynom with y = 0 and a, b and c as supporting points
+				*/
+				s = a*function(b)*function(c) / ((function(a) - function(b))*(function(a) - function(c))) +
+					b*function(a)*function(c) / ((function(b) - function(a))*(function(b) - function(c))) +
+					c*function(a)*function(b) / ((function(c) - function(a))*(function(c) - function(b)));
+			}
+			else { 
+				s = b - function(b)*(b - a) / (function(b) - function(a));
+			}
+			c = b;
 			/**
 				If a and s are on different sides the inverse interpolationpolynom are used and
-				if they are on the same side newton method are used. This is because the newton method
+				if they are on the same side newton method are used. This is because the newton method 
 				creates a fictive line with a zero point whereas the inverse interpolationspolynom interpolates only
 				through the three supporting points
 			*/
-			if (function_(a_)*function_(s) < 0) {
-				b_ = s;
+			if (function(a)*function(s) < 0) {
+				b = s;
 			}
 			else {
-				a_ = s;
+				a = s;
 			}
-
-			if (std::abs(a_) < std::abs(b_)) {
-				swap(a_, b_);
+	
+			if (std::abs(a) < std::abs(b)) {
+				swap(a, b);
 			}
-
-			while (std::abs(function_(b_)) > eps_ && std::abs(function_(a_)) > eps_) {
-				if (function_(a_) != function_(c) && function_(b_) != function_(c)) {
-					/**
-						Inverse interpolationpolynom with y = 0 and a, b and c as supporting points
-					*/
-					s = a_*function_(b_)*function_(c) / ((function_(a_) - function_(b_))*(function_(a_) - function_(c))) +
-						b_*function_(a_)*function_(c) / ((function_(b_) - function_(a_))*(function_(b_) - function_(c))) +
-						c*function_(a_)*function_(b_) / ((function_(c) - function_(a_))*(function_(c) - function_(b_)));
-				}
-				else { 
-					s = b_ - function_(b_)*(b_ - a_) / (function_(b_) - function_(a_));
-				}
-				c = b_;
-				/**
-					If a and s are on different sides the inverse interpolationpolynom are used and
-					if they are on the same side newton method are used. This is because the newton method 
-					creates a fictive line with a zero point whereas the inverse interpolationspolynom interpolates only
-					through the three supporting points
-				*/
-				if (function_(a_)*function_(s) < 0) {
-					b_ = s;
-				}
-				else {
-					a_ = s;
-				}
-
-				if (std::abs(a_) < std::abs(b_)) {
-					swap(a_, b_);
-				}
+	
+			/**
+				Abort if the computation of zero tooks too much repetitions
+			*/
+			repetition++;
+			if (repetition > REPETITION) {
+				exitFailure(__FILE__, __LINE__);
 			}
-
-			return std::abs(function_(b_)) < eps_ ? b_ : a_;
 		}
-	};
+		return std::abs(function(b)) < eps ? b : a;
+	}
 }
 
 #endif /* MATH_ZERO_H_ */

@@ -42,35 +42,156 @@
 namespace pointcloud
 {	
 	/**
-		Computes the supporting plane of a neighborhood of points
-
-		@param[in] points Neighborhood of a point
-		@param[in] eps Accuracy of the computation of t
+		Structure which holds tree parameters
 	*/
-	template<typename ElementType> ElementType* planeMLS(
-		const utils::Matrix<ElementType>& points,
-		ElementType eps)
+	struct SurfaceParams 
 	{
-		pointcloud::NormalParams normal_params;
+	public:
+		/**
+			Constructor
+		*/
+		SurfaceParams() :
+			surface_computation_(SurfaceComputation::PLANEMLS),
+			roots_approximation_(RootsApproximation::NEWTON),
+			weight_function_(WeightFunction::GAUSSIAN),
+			eps_(0.001),
+			cores_(1)
+		{
+		}
 
-		return planeMLS<ElementType>(points.getRowMatrix(0), points, eps);
-	}
-	/**
-		Computes the supporting plane of a neighborhood of points
+		/**
+			Constructor
 
-		@param[in] point Reference point
-		@param[in] points Neighborhood of the point
-		@param[in] eps Accuracy of the computation of t
-	*/
-	template<typename ElementType> ElementType* planeMLS(
-		const utils::Matrix<ElementType>& point,
-		const utils::Matrix<ElementType>& points,
-		ElementType eps)
-	{
-		pointcloud::NormalParams normal_params;
+			@param[in] normal_computation Method which will be used for computing normals
+			@param[in] weight_function Defines the weight function
+			@param[in] cores Number of cores
+		*/
+		SurfaceParams(SurfaceComputation surface_computation,
+			RootsApproximation roots_approximation,
+			WeightFunction weight_function,
+			float eps,
+			size_t cores)  : SurfaceParams()
+		{
+			surface_computation_ = surface_computation;
+			roots_approximation_ = roots_approximation;
+			weight_function_ = weight_function;
+			eps_ = eps;
+			cores_ = cores;
+		}
 
-		return planeMLS<ElementType>(point, points, pointcloud::computeNormal<ElementType>(points, normal_params), eps);
-	}
+		/**
+			Set method which will be used for computing surface
+		*/
+		void setSurfaceComputation(SurfaceComputation surface_computation)
+		{
+			surface_computation_ = surface_computation;
+		}
+
+		/**
+			Set the method which will be used for approximating the root
+		*/
+		void setRootsApproximation(RootsApproximation roots_approximation)
+		{
+			roots_approximation_ = roots_approximation;
+		}
+
+		/**
+			Set the weight function
+		*/
+		void setWeightFunction(WeightFunction weight_function)
+		{
+			weight_function_ = weight_function;
+		}
+
+		/**
+			Set accuracy
+		*/
+		void setAccuracy(float eps) 
+		{
+			eps_ = eps;
+		}
+
+		/**
+			Set number of cores
+		*/
+		void setCores(size_t cores)
+		{
+			cores_ = cores;
+		}
+
+		/**
+			Get method which will be used for computing surface
+
+			@return Method which will be used for computing surface
+		*/
+		SurfaceComputation getSurfaceComputation()
+		{
+			return surface_computation_;
+		}
+
+		/**
+			Get method which will be used for approximating the root
+
+			@return Method which will be used for approximating roots
+		*/
+		RootsApproximation getRootsApproximation()
+		{
+			return roots_approximation_;
+		}
+		/**
+			Get the weight function
+
+			@return Weight function
+		*/
+		WeightFunction getWeightFunction()
+		{
+			return weight_function_;
+		}
+		
+		/**
+			Get accuracy
+		*/
+		float getAccuracy() 
+		{
+			return eps_;
+		}
+
+		/**
+			Get number of cores
+			
+			@return Number of cores
+		*/
+		size_t getCores()
+		{
+			return cores_;
+		}
+
+	private:
+		/**
+			Method for computing surface
+		*/
+		SurfaceComputation surface_computation_;
+
+		/**
+			Method for approximating roots
+		*/
+		RootsApproximation roots_approximation_;
+
+		/**
+			WeightFunction weight_function
+		*/
+		WeightFunction weight_function_;
+
+		/**
+			Accuracy of computation of the root
+		*/
+		float eps_;
+
+		/**
+			Cores
+		*/
+		size_t cores_;
+	};
 
 	/**
 		Computes the supporting plane of a neighborhood of points
@@ -84,10 +205,10 @@ namespace pointcloud
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
-		ElementType eps)
+		SurfaceParams surface_params)
 	{	
 
-		return planeMLS <ElementType>(point, points, normal, math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points - point.transpose())).getPtr(), points.getRows()), eps);
+		return planeMLS <ElementType>(point, points, normal, math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points - point.transpose())).getPtr(), points.getRows()),surface_params);
 	}
 
 	/**
@@ -104,13 +225,13 @@ namespace pointcloud
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
 		ElementType var,
-		ElementType eps )
+		SurfaceParams surface_params)
 	{
 		/**
 			Intervall in which zero is assumed
 		*/
 		ElementType h = std::sqrt(var) / 2;
-		size_t number_of_elements = eps;
+		size_t number_of_elements = std::floor(1/surface_params.getAccuracy());
 		ElementType size_of_steps =  2*h / number_of_elements;
 
 		ElementType* y = new ElementType[number_of_elements];
@@ -131,8 +252,24 @@ namespace pointcloud
 			step += size_of_steps;
 		}
 
-		math::NewtonMethod<ElementType> zero_function;
-		std::cout << zero_function(minimization, h, -h, h / 1000) << std::endl;
+		ElementType t;
+		switch (surface_params.getRootsApproximation()) {
+		case RootsApproximation::NEWTON: {
+			t = math::NewtonMethod<ElementType, NonLinearPlaneMLSMinimization<ElementType>>(
+				minimization, h, -h, h * surface_params.getAccuracy());
+			break;
+			}
+		case RootsApproximation::QUAD: {
+			t = math::QuadraticInverseInterpolation<ElementType, NonLinearPlaneMLSMinimization<ElementType>>(
+				minimization, h, -h, h * surface_params.getAccuracy());
+			break;
+			}
+		}
+
+		std::cout << math::NewtonMethod<ElementType, NonLinearPlaneMLSMinimization<ElementType>>(
+			minimization, h, -h, h * surface_params.getAccuracy()) << std::endl;
+		std::cout << math::QuadraticInverseInterpolation<ElementType, NonLinearPlaneMLSMinimization<ElementType>>(
+			minimization, h, -h, h * surface_params.getAccuracy()) << std::endl;
 
 		return y;
 	}
