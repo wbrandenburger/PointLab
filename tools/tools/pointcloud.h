@@ -32,6 +32,7 @@
 
 #include "pointcloud/features.h"
 #include "pointcloud/normals.h"
+#include "pointcloud/plane.h"
 #include "pointcloud/pointcloud.h"
 #include "pointcloud/pointcloudaos.h"
 #include "pointcloud/pointcloudsoa.h"

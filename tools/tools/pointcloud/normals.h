@@ -288,7 +288,7 @@ namespace pointcloud
 		const utils::Matrix<ElementType>& points,
 		NormalParams normal_params = NormalParams())
 	{
-		ElementType normal = new ElementType[3];
+		ElementType* normal = new ElementType[3];
 		std::memset(normal, (ElementType)0, sizeof(ElementType) * 3);
 
 		switch (normal_params.getNormalComputation()) {
@@ -298,7 +298,7 @@ namespace pointcloud
 		case NormalComputation::QUADSVD: normalQuadSVD(normal, points, normal_params.getWeightFunction()); break;
 		}
 
-		return utils::Matrix<ElementType>(normal, 3, 1)
+		return utils::Matrix<ElementType>(normal, 3, 1);
 	}
 
 	/**

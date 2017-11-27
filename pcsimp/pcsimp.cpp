@@ -58,14 +58,13 @@
 			/**
 				The first point in points is the reference point
 			*/
-			r_.setMatrix(points.getAllocatedRowPtr(0), 3, 1);
+			r_ =utils::Matrix<ElementType>(points.getAllocatedRowPtr(0), 3, 1);
 			
 			/**
 				Set the normal and the vectors of the neighborhood
 			*/
 			points_ = points - r_.transpose();
-			n_ = normal.transpose();
-			std::cout << points_ << std::endl;
+			n_ = normal;
 			/**
 				Compute the variance
 			*/
@@ -174,8 +173,8 @@ int main(int argc, char* argv[]) {
 			Search for the neighbors of a specific point
 		*/
 		size_t random_point = 15000;
-		utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 1, 3);
-		utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 1, 3);
+		utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
+		utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
 
 		trees::TreeParams tree_params;
 		tree_params.setCores(normal_params.getCores());
@@ -183,7 +182,7 @@ int main(int argc, char* argv[]) {
 		utils::Matrix<size_t> indices(1, neighbors);
 		utils::Matrix<float> dists(1, neighbors);
 
-		kdtree_index.knnSearch(point, indices, dists, neighbors, tree_params);
+		kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
 		
 		/**
 			Get the neighbors of the point
@@ -196,11 +195,8 @@ int main(int argc, char* argv[]) {
 		/**
 			Compute the distances and the variance of these distances
 		*/
-		
-		utils::Matrix<float> var= math::computeVar<float>(std::sqrt(math::euclideanDistance(points - point)));
-
+		utils::Matrix<float> var= math::computeVar<float>(std::sqrt(math::euclideanDistance(points - point.transpose())));
 		MovingSurface<float> moving_surface(points, normal);
-
 		size_t number_of_elements = 1000;
 		std::vector<float> array_x(number_of_elements);
 		std::vector<float> array_y(number_of_elements);
@@ -210,9 +206,9 @@ int main(int argc, char* argv[]) {
 		for (size_t i = 1; i < number_of_elements; i++) {
 			array_x[i] = array_x[i-1] + quant;
 			array_y[i] = moving_surface(array_x[i]);
-
 		}
 
+		//pointcloud::planeMLS<float>(point, points);
 	/**
 		Show results
 	*/
