@@ -59,7 +59,6 @@
 				The first point in points is the reference point
 			*/
 			r_ =utils::Matrix<ElementType>(points.getAllocatedRowPtr(0), 3, 1);
-			
 			/**
 				Set the normal and the vectors of the neighborhood
 			*/
@@ -197,19 +196,21 @@ int main(int argc, char* argv[]) {
 		*/
 		utils::Matrix<float> var= math::computeVar<float>(std::sqrt(math::euclideanDistance(points - point.transpose())));
 		MovingSurface<float> moving_surface(points, normal);
-		size_t number_of_elements = 1000;
+		size_t number_of_elements = 10;
 		std::vector<float> array_x(number_of_elements);
 		std::vector<float> array_y(number_of_elements);
-		float quant = std::sqrt(var.getValue())/ (1000/2);
-		array_x[0] = -std::sqrt(var.getValue());
-		array_y[0] = moving_surface(array_x[0]);
+		float quant = std::sqrt(var.getValue())/ (number_of_elements);
+		array_x[0] = -std::sqrt(var.getValue())/2;
+		array_y[0] = moving_surface(array_x[0]); 
+		std::cout << array_y[0] << " " << quant << std::endl;
 		for (size_t i = 1; i < number_of_elements; i++) {
 			array_x[i] = array_x[i-1] + quant;
 			array_y[i] = moving_surface(array_x[i]);
+			std::cout << array_y[i] << std::endl;
 		}
 
 
-		float* y2 = pointcloud::planeMLS<float>(points);
+		float* y2 = pointcloud::planeMLS<float>(points, 10);
 
 
 
@@ -231,7 +232,7 @@ int main(int argc, char* argv[]) {
 		glview.setY(array_y);
 		glview.subPlot(2, 2, 2);
 
-		glview.setPlot(1 / 0.001);
+		glview.setPlot(number_of_elements);
 		glview.setX(array_x);
 		glview.setY(y2);
 		glview.subPlot(2, 2, 3);

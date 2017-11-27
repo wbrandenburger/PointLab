@@ -44,27 +44,31 @@ namespace pointcloud
 		Computes the supporting plane of a neighborhood of points
 
 		@param[in] points Neighborhood of a point
+		@param[in] eps Accuracy of the computation of t
 	*/
 	template<typename ElementType> ElementType* planeMLS(
-		const utils::Matrix<ElementType>& points)
+		const utils::Matrix<ElementType>& points,
+		ElementType eps)
 	{
 		pointcloud::NormalParams normal_params;
 
-		return planeMLS<ElementType>(points.getRowMatrix(0), points);
+		return planeMLS<ElementType>(points.getRowMatrix(0), points, eps);
 	}
 	/**
 		Computes the supporting plane of a neighborhood of points
 
 		@param[in] point Reference point
 		@param[in] points Neighborhood of the point
+		@param[in] eps Accuracy of the computation of t
 	*/
 	template<typename ElementType> ElementType* planeMLS(
 		const utils::Matrix<ElementType>& point,
-		const utils::Matrix<ElementType>& points)
+		const utils::Matrix<ElementType>& points,
+		ElementType eps)
 	{
 		pointcloud::NormalParams normal_params;
 
-		return planeMLS<ElementType>(point, points, pointcloud::computeNormal<ElementType>(points, normal_params));
+		return planeMLS<ElementType>(point, points, pointcloud::computeNormal<ElementType>(points, normal_params), eps);
 	}
 
 	/**
@@ -73,14 +77,16 @@ namespace pointcloud
 		@param[in] point Reference point
 		@param[in] points Neighborhood of the point
 		@param[in] normal Normal of the reference point
+		@param[in] eps Accuracy of the computation of t
 	*/
 	template<typename ElementType> ElementType* planeMLS(
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
-		const utils::Matrix<ElementType>& normal)
+		const utils::Matrix<ElementType>& normal,
+		ElementType eps)
 	{	
 
-		return planeMLS <ElementType>(point, points, normal, math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points - point.transpose())).getPtr(), points.getRows()));
+		return planeMLS <ElementType>(point, points, normal, math::computeVar<ElementType>(std::sqrt(math::euclideanDistance(points - point.transpose())).getPtr(), points.getRows()), eps);
 	}
 
 	/**
@@ -90,19 +96,20 @@ namespace pointcloud
 		@param[in] points Neighborhood of the point
 		@param[in] normal Normal of the reference point
 		@param[in] var Variance of the distances from the points of the neighborhood to the reference point
+		@param[in] eps Accuracy of the computation of t
 	*/
 	template<typename ElementType> ElementType* planeMLS(
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
 		ElementType var,
-		ElementType eps = 0.001)
+		ElementType eps )
 	{
 		/**
 			Intervall in which the zero is assumed
 		*/
 		ElementType h = std::sqrt(var) / 2;
-		size_t number_of_elements = std::round(1 / eps);
+		size_t number_of_elements = eps;
 		ElementType size_of_steps = 2 * h / number_of_elements;
 
 		ElementType* x = new ElementType[number_of_elements];
@@ -120,6 +127,7 @@ namespace pointcloud
 		for (ElementType* x_ptr = x; x_ptr != x_end; x_ptr++)
 		{
 			*x_ptr = minimization(-h + step);
+			std::cout << *x_ptr << std::endl;
 			step += size_of_steps;
 		}
 
@@ -155,18 +163,18 @@ namespace pointcloud
 			for (size_t i = 0; i < points_.getRows(); i++)
 			{
 				/**
-				Vector between searched point and data point
+					Vector between searched point and data point
 				*/
 				utils::Matrix<ElementType> q = (points_.getRowMatrix(i) - point_) - normal_ * t;
 
 				/**
-				Distance of vector between searched point and data point
+					Distance of vector between searched point and data point
 				*/
-				ElementType qq = std::pow((q.transpose()*q).getValue(), 2);
-				ElementType nq = (normal_.transpose()* q).getValue();
+				ElementType qq = std::pow((q.transpose() * q).getValue(), 2);
+				ElementType nq = (normal_.transpose() * q).getValue();
 
 				/**
-				Computing and Rendering Point Set Surfaces, equation (6)
+					Computing and Rendering Point Set Surfaces, equation (6)
 				*/
 				result += nq * (1 + std::pow(nq, 2) / (2 * var_)) * std::exp(-qq / (2 * var_));
 			}
