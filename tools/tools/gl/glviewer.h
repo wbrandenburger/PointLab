@@ -120,7 +120,7 @@ namespace gl
 		*/
 		void increasePointSize()
 		{
-			if (gl_pointsize_ < 10) {
+			if (gl_pointsize_ < 20) {
 				gl_pointsize_++;
 			}
 		}

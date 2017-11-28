@@ -139,10 +139,8 @@ int main(int argc, char* argv[]) {
 			surface_params.setRootsApproximation(RootsApproximation::QUAD);
 
 			utils::Matrix<float> new_point = pointcloud::planeMLS<float>(point, points, normal, surface_params);
-			pointcloud_points.setPointPtr(new_point.getAllocatedPtr(), 0);
-			uint8_t color[3];
-			color[0] = 255; color[1] = 0; color[2] = 0;
-			pointcloud_points.setColorPtr(color, 0);
+			pointcloud_points.setPointPtr(new_point.getPtr(), 0);
+			pointcloud_points.setColorPtr({ 255,0,0 }, 0);
 
 
 			/**

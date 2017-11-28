@@ -67,7 +67,7 @@ namespace gl
 		Plot3DInstance()
 		{
 			number_of_clouds_ = 0;
-			gl_pointsize_ = 1;
+			gl_pointsize_ = 10;
 			gl_normalsize_ = 0.5f;
 
 			gl_change_size_ = 0;
@@ -141,7 +141,7 @@ namespace gl
 		void increaseSize()
 		{
 			switch (gl_change_size_) {
-			case 0: if (gl_pointsize_ < 10) { gl_pointsize_++; } break;
+			case 0: if (gl_pointsize_ < 20) { gl_pointsize_++; } break;
 			case 1: gl_normalsize_ *= 1.1f; break;
 			}
 		}

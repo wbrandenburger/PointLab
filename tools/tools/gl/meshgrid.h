@@ -43,13 +43,13 @@ namespace gl
 	/**
 		Computes a 2D-meshgrid of a specific range
 
-		@param[in] data Matrix with the neighborhood
+		@param[in] points_neighborhood Matrix with the neighborhood
 		@return Meshgrid
 	*/
 	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
-		utils::Matrix<ElementType> data)
+		utils::Matrix<ElementType> points_neighborhood)
 	{
-		BoundingBox<ElementType> bounding_box(data.getPtr(), dat.getRows(), 3);
+		BoundingBox<ElementType> bounding_box(points_neighborhood.getPtr(), points_neighborhood.getRows(), 3);
 
 		return meshGrid<ElementType>(bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
 			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
@@ -95,12 +95,12 @@ namespace gl
 		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
 		number_of_vertices = number_x * number_y;
 
-		utils::Matrix<ElementType> data (new ElementType[number_of_vertices * 3], number_of_vertices, 3);
+		utils::Matrix<ElementType> points (new ElementType[number_of_vertices * 3], number_of_vertices, 3);
 
 		/**
 			Set the mehsgrid
 		*/
-		ElementType* data_ptr = data.getPtr();
+		ElementType* points_ptr = points.getPtr();
 		ElementType x = x_left;
 		for (size_t index_x = 0; index_x < number_x; index_x++) {
 			ElementType y = y_left;
@@ -108,59 +108,59 @@ namespace gl
 				/**
 					Assign the x- and y-values
 				*/
-				*data_ptr = x; data_ptr++;
-				*data_ptr = y; data_ptr++;
+				*points_ptr = x; points_ptr++;
+				*points_ptr = y; points_ptr++;
 				/**
 					Skip z-value
 				*/
-				*data_ptr = 0; data_ptr++;
+				*points_ptr = 0; points_ptr++;
 				y = y + quant;
 			}
 			x = x + quant;
 		}
 
-		return data;
+		return points;
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range and builds a mesh
 		
-		@param[in] data_in Matrix with the neighborhood
-		@param[in,out] data_out Meshgrid
+		@param[in] points_neighborhood  Matrix with the neighborhood
+		@param[in,out] points Meshgrid
 		@param[in,out] lines Lines
 
 	*/
 	template<typename ElementType> void glMeshGrid(
-		const utils::Matrix<ElementType>& data_in, 
-		utils::Matrix<ElementType>& data_out,
+		const utils::Matrix<ElementType>& points_neighborhood,
+		utils::Matrix<ElementType>& points,
 		utils::Matrix<unsigned int>& lines)
 	{
-		BoundingBox<ElementType> bounding_box(data_in.getPtr(), data_in.getRows(), 3);
+		BoundingBox<ElementType> bounding_box(points_neighborhood.getPtr(), points_neighborhood.getRows(), 3);
 
-		glMeshGrid<ElementType>(data_out, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+		glMeshGrid<ElementType>(points, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
 			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range builds a mesh
 
-		@param[in,out] data_out Meshgrid
+		@param[in,out] points Meshgrid
 		@param[in,out] lines Lines
 		@param[in] bounding_box Bounding box
 	*/
 	template<typename ElementType> void glMeshGrid(
-		utils::Matrix<ElementType>& data_out,
+		utils::Matrix<ElementType>& points,
 		utils::Matrix<unsigned int>& lines, 
 		utils::BoundingBox<ElementType> bounding_box)
 	{
-		glMeshGrid<ElementType>(data_out, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+		glMeshGrid<ElementType>(points, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
 			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range  builds a mesh
 
-		@param[in,out] data_out Meshgrid
+		@param[in,out] points Meshgrid
 		@param[in,out] lines Lines
 		@param[in] x_left Left border in x-direction
 		@param[in] x_right Right border in x-direction
@@ -168,12 +168,12 @@ namespace gl
 		@param[in] y_right Right borger in y-direction
 	*/
 	template<typename ElementType> void glMeshGrid(
-		utils::Matrix<ElementType>& data_out,
+		utils::Matrix<ElementType>& points,
 		utils::Matrix<unsigned int>& lines,
 		ElementType x_left, 
 		ElementType x_right,
 		ElementType y_left, 
-		ElementType y_right,)
+		ElementType y_right)
 	{
 		
 		/** 
@@ -190,7 +190,7 @@ namespace gl
 		/**
 			compute the meshgrid
 		*/
-		data_out = meshGrid<ElementType>(x_left, x_right, y_left, y_right);
+		points = meshGrid<ElementType>(x_left, x_right, y_left, y_right);
 
 		number_of_lines =  (number_x - 1) * (number_y - 1) * 2 + number_x + number_y - 2;
 
