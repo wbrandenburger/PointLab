@@ -201,7 +201,7 @@ namespace pointcloud
 		@param[in] normal Normal of the reference point
 		@param[in] eps Accuracy of the computation of t
 	*/
-	template<typename ElementType> ElementType* planeMLS(
+	template<typename ElementType> utils::Matrix<ElementType> planeMLS(
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
@@ -220,7 +220,7 @@ namespace pointcloud
 		@param[in] var Variance of the distances from the points of the neighborhood to the reference point
 		@param[in] eps Accuracy of the computation of t
 	*/
-	template<typename ElementType> ElementType* planeMLS(
+	template<typename ElementType> utils::Matrix<ElementType> planeMLS(
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
@@ -243,15 +243,8 @@ namespace pointcloud
 		NonLinearPlaneMLSMinimization<ElementType> minimization(point, points, normal, var);
 
 		/**
-			Computation the error for every t in -h/2 and h/2
+			Computation the zero in the intervall in -h/2 and h/2
 		*/
-		ElementType step = 0;
-		for (ElementType* y_ptr = y; y_ptr != y_end; y_ptr++)
-		{
-			*y_ptr = minimization(-h + step);
-			step += size_of_steps;
-		}
-
 		ElementType t;
 		switch (surface_params.getRootsApproximation()) {
 		case RootsApproximation::NEWTON: {
@@ -266,12 +259,7 @@ namespace pointcloud
 			}
 		}
 
-		std::cout << math::NewtonMethod<ElementType, NonLinearPlaneMLSMinimization<ElementType>>(
-			minimization, h, -h, h * surface_params.getAccuracy()) << std::endl;
-		std::cout << math::QuadraticInverseInterpolation<ElementType, NonLinearPlaneMLSMinimization<ElementType>>(
-			minimization, h, -h, h * surface_params.getAccuracy()) << std::endl;
-
-		return y;
+		return point + normal*t;
 	}
 
 	template<typename ElementType> struct NonLinearPlaneMLSMinimization

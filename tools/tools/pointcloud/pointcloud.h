@@ -34,6 +34,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <initializer_list>
 
 #include "tools/parameters.h"
 
@@ -444,6 +445,14 @@ namespace pointcloud
 			@param[in] row_ Row
 		*/
 		virtual void setPointPtr(ElementType* point_, size_t row_) = 0;
+		
+		/**
+			Set point
+
+			@param[in] point_ Point
+			@param[in] row_ Row
+		*/
+		virtual void setPointPtr(std::initializer_list<ElementType> point_, size_t row_) = 0;
 
 		/**
 			Set normal
@@ -454,12 +463,28 @@ namespace pointcloud
 		virtual void setNormalPtr(ElementType* normal_,size_t row_) = 0;
 
 		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@param[in] row_ Row
+		*/
+		virtual void setNormalPtr(std::initializer_list<ElementType> normal_,size_t row_) = 0;
+
+		/**
 			Set color information
 
 			@param[in] color_ Color information
 			@param[in] row_ Row
 		*/
 		virtual void setColorPtr(uint8_t* color_, size_t row_) = 0;
+	
+		/**
+			Set color information
+
+			@param[in] color_ Color information
+			@param[in] row_ Row
+		*/
+		virtual void setColorPtr(std::initializer_list<uint8_t> color_, size_t row_) = 0;
 
 		/**
 			Set triangle

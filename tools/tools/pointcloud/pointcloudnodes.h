@@ -33,6 +33,7 @@
 #define POINTCLOUD_POINTCLOUDNODE_H_
 
 #include <stdint.h>
+#include <initializer_list>
 
 #include "tools/utils/matrix.h"
 
@@ -412,9 +413,19 @@ namespace pointcloud
 		*/
 		void setPointPtr(ElementType* point_)
 		{
-			std::memcpy(&point[0], point_, sizeof(ElementType) * 3);
+			std::memcpy(point, point_, sizeof(ElementType) * 3);
 		}
-		
+			
+		/**
+			Set point
+			
+			@param[in] point_ Point
+		*/
+		void setPointPtr(std::initializer_list<ElementType> point_)
+		{
+			std::memcpy(point, point_.begin(), sizeof(ElementType) * 3);
+		}
+
 		/**
 			Set color
 
@@ -422,7 +433,17 @@ namespace pointcloud
 		*/
 		void setColorPtr(uint8_t* color_)
 		{
-			std::memcpy(&color[0], color_, sizeof(uint8_t) * 3);
+			std::memcpy(color, color_, sizeof(uint8_t) * 3);
+		}
+
+		/**
+			Set color
+
+			@param[in] color_ Color
+		*/
+		void setColorPtr(std::initializer_list<uint8_t> color_)
+		{
+			std::memcpy(color, color_.begin(), sizeof(uint8_t) * 3);
 		}
 
 		/**
@@ -432,7 +453,17 @@ namespace pointcloud
 		*/
 		void setNormalPtr(ElementType* normal_)
 		{
-			std::memcpy(&normal[0], normal_, sizeof(ElementType) * 3);
+			std::memcpy(normal, normal_, sizeof(ElementType) * 3);
+		}
+
+		/**
+			Set normal
+
+			@param[in] normal_ Normal
+		*/
+		void setNormalPtr(std::initializer_list<ElementType> normal_)
+		{
+			std::memcpy(normal, normal_.begin(), sizeof(ElementType) * 3);
 		}
 
 		/**

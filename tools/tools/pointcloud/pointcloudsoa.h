@@ -33,6 +33,7 @@
 #define POINTCLOUD_POINTCLOUDSOA_H_
 
 #include <stdint.h>
+#include <initializer_list>
 
 #include "tools/pointcloud/pointcloud.h"
 
@@ -312,6 +313,17 @@ namespace pointcloud
 		}
 
 		/**
+			Set point
+
+			@param[in] point_ Point
+			@param[in] row_ Row
+		*/
+		void setPointPtr(std::initializer_list<ElementType> point_, size_t row_)
+		{
+			std::memcpy(&points[row_ * 3], point_.begin(), sizeof(ElementType) * 3);
+		}
+
+		/**
 			Set normal
 
 			@param[in] normal_ Normal
@@ -323,6 +335,17 @@ namespace pointcloud
 		}
 
 		/**
+			Set normal
+
+			@param[in] normal_ Normal
+			@param[in] row_ Row
+		*/
+		void setNormalPtr(std::initializer_list<ElementType> normal_, size_t row_)
+		{
+			std::memcpy(&normals[row_ * 3], normal_.begin(), sizeof(ElementType) * 3);
+		}
+
+		/**
 			Set color information
 
 			@param[in] color_ Color information
@@ -331,6 +354,17 @@ namespace pointcloud
 		void setColorPtr(uint8_t* color_, size_t row_)
 		{
 			std::memcpy(&colors[row_ * 3], color_, sizeof(uint8_t) * 3);
+		}
+	
+		/**
+			Set color information
+
+			@param[in] color_ Color information
+			@param[in] row_ Row
+		*/
+		void setColorPtr(std::initializer_list<uint8_t> color_, size_t row_)
+		{
+			std::memcpy(&colors[row_ * 3], color_.begin(), sizeof(uint8_t) * 3);
 		}
 
 		/**

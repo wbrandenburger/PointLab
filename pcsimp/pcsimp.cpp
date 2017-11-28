@@ -58,10 +58,10 @@ int main(int argc, char* argv[]) {
 	/**
 		Read pointcloud
 	*/
-	pointcloud::PointcloudAoS<float> pointcloud;
+	pointcloud::PointcloudSoA<float> pointcloud;
 
-	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/mesh.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
@@ -97,66 +97,74 @@ int main(int argc, char* argv[]) {
 		trees::Index<float> kdtree_index(pointcloud_matrix, trees::KDTreeIndexParams(neighbors));
 		kdtree_index.buildIndex();
 
-		/**
-			Search for the neighbors of a specific point
-		*/
-		size_t random_point = 15000;
-		utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
-		utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
+		utils::randSeed();
+		do{
+			/**
+				Search for the neighbors of a specific point
+			*/
+			size_t random_point = utils::randInt(pointcloud.getNumberOfVertices(),0);
+			utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
+			utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
 
-		trees::TreeParams tree_params;
-		tree_params.setCores(normal_params.getCores());
+			trees::TreeParams tree_params;
+			tree_params.setCores(normal_params.getCores());
 
-		utils::Matrix<size_t> indices(1, neighbors);
-		utils::Matrix<float> dists(1, neighbors);
+			utils::Matrix<size_t> indices(1, neighbors);
+			utils::Matrix<float> dists(1, neighbors);
 
-		kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
-		
-		/**
-			Get the neighbors of the point
-		*/
-		pointcloud::PointcloudAoS<float> pointcloud_points;
-		pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
-		utils::Matrix<float> points;
-		pointcloud_points.getMatrix(points);
+			kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
 
-		/**
-			Compute the distances and the variance of these distances
-		*/
-		size_t number_of_elements = 100;
-		utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points-point.transpose())));
-		float* x = new float[number_of_elements];
-		for (size_t i = 0; i < number_of_elements; i++) 
-		{
-			x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
-		}
-		
-		
-		pointcloud::SurfaceParams surface_params;
-		surface_params.setAccuracy(1.0f / (float)number_of_elements);
+			/**
+				Get the neighbors of the point
+			*/
+			pointcloud::PointcloudAoS<float> pointcloud_points;
+			pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
+			utils::Matrix<float> points;
+			pointcloud_points.getMatrix(points);
 
-		float* y = pointcloud::planeMLS<float>(point, points, normal, surface_params);
+			/**
+				Compute the distances and the variance of these distances
+			*/
+			size_t number_of_elements = 100;
+			utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points - point.transpose())));
+			float* x = new float[number_of_elements];
+			for (size_t i = 0; i < number_of_elements; i++)
+			{
+				x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
+			}
 
 
-	/**
-		Show results
-	*/
-	gl::GLView<float> glview;
+			pointcloud::SurfaceParams surface_params;
+			surface_params.setAccuracy(1.0f / (float)number_of_elements);
+			surface_params.setRootsApproximation(RootsApproximation::QUAD);
 
-		glview.setPlot3D();
-		glview.setPointcloud(GLParams::POINTS, pointcloud);
-		glview.subPlot(2, 2, 0);
+			utils::Matrix<float> new_point = pointcloud::planeMLS<float>(point, points, normal, surface_params);
+			pointcloud_points.setPointPtr(new_point.getAllocatedPtr(), 0);
+			uint8_t color[3];
+			color[0] = 255; color[1] = 0; color[2] = 0;
+			pointcloud_points.setColorPtr(color, 0);
 
-		glview.setPlot3D();
-		glview.setPointcloud(GLParams::POINTS, pointcloud_points);
-		glview.subPlot(2, 2, 1);
 
-		glview.setPlot(number_of_elements);
-		glview.setX(x);
-		glview.setY(y);
-		glview.subPlot(2, 2, 2);
+			/**
+				Show results
+			*/
+			gl::GLView<float> glview;
 
-	glview.mainLoop();
+			glview.setPlot3D();
+			glview.setPointcloud(GLParams::POINTS, pointcloud);
+			glview.subPlot(2, 2, 0);
+
+			glview.setPlot3D();
+			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
+			glview.subPlot(2, 2, 1);
+
+			//glview.setPlot(number_of_elements);
+			//glview.setX(x);
+			//glview.setY(y);
+			//glview.subPlot(2, 2, 2);
+
+			glview.mainLoop();
+		} while (true);
 
 	/**
 		Write results
