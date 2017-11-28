@@ -62,6 +62,8 @@ namespace gl
 			- utils::Matrix<ElementType>
 			- ElementType*
 		
+		The viewer copy the data from the specific container.
+
 		The pointcloud can be an instance of:
 			- pointcloud::Pointcloud<ElementType>
 			- ElementType*
@@ -323,7 +325,7 @@ namespace gl
 		/**
 			Set pointcloud
 
-			@param[in] pointcloud_ Pointcloud
+			@param[in] pointcloud_ Points
 		*/
 		void setPointcloud(const utils::Matrix<ElementType>& points)
 		{
@@ -331,13 +333,13 @@ namespace gl
 				exitFailure(__FILE__, __LINE__);
 			}
 
-			glviewer_.setPointcloud(points);
+			glviewer_.setPointcloud(points.getPtr(), points.getRows());
 		}
 
 		/**
 			Set pointcloud
 
-			@param[in] points_ Pointcloud
+			@param[in] points_ Points
 			@param[in] number_of_elements_ Number of elements
 		*/
 		void setPointcloud(ElementType* points, size_t number_of_elements) 
@@ -376,13 +378,13 @@ namespace gl
 				exitFailure(__FILE__, __LINE__);
 			}
 
-			glplot3d_.setPointcloud(mode, points);
+			glplot3d_.setPointcloud(mode, points.getPtr(), points.getRows());
 		}
 		/**
 			Set pointcloud
 
 			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Pointcloud
+			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of vertices
 		*/
 		void setPointcloud(GLParams mode, ElementType* points, size_t number_of_vertices)
@@ -398,7 +400,24 @@ namespace gl
 			Set pointcloud
 
 			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Pointcloud
+			@param[in] points_ Points
+			@param[in] lines_ Lines
+		*/
+		void setPointcloud(GLParams mode, utils::Matrix<ElementType> points, 
+			utils::Matrix<unsigned int> lines)
+		{
+			if (current_instance_ != GLInstance::GLPLOT3D) {
+				exitFailure(__FILE__, __LINE__);
+			}
+
+			glplot3d_.setPointcloud(mode, points.getPtr(), lines.getPtr(), points.getRows(), lines.getRows());
+		}
+
+		/**
+			Set pointcloud
+
+			@param[in] mode_ Specifies what kind of primitives to render
+			@param[in] points_ Points
 			@param[in] lines_ Lines
 			@param[in] number_of_vertices_ Number of vertices
 			@param[in] number_of_lines_ Number of indices

@@ -199,7 +199,7 @@ namespace pointcloud
 		@param[in] point Reference point
 		@param[in] points Neighborhood of the point
 		@param[in] normal Normal of the reference point
-		@param[in] eps Accuracy of the computation of t
+		@param[in] surface_params Parameter for computing the surface
 	*/
 	template<typename ElementType> utils::Matrix<ElementType> planeMLS(
 		const utils::Matrix<ElementType>& point,
@@ -218,7 +218,7 @@ namespace pointcloud
 		@param[in] points Neighborhood of the point
 		@param[in] normal Normal of the reference point
 		@param[in] var Variance of the distances from the points of the neighborhood to the reference point
-		@param[in] eps Accuracy of the computation of t
+		@param[in] surface_params Parameter for computing the surface
 	*/
 	template<typename ElementType> utils::Matrix<ElementType> planeMLS(
 		const utils::Matrix<ElementType>& point,

@@ -106,35 +106,6 @@ namespace gl
 			Constructor
 
 			@param[in] points_ Points
-		*/
-		GLContainer(const utils::Matrix<ElementType>& points) : GLContainer() 
-		{
-			mode = GL_POINTS;
-
-			number_of_vertices_ = points.getRows();
-
-			points_ = points.getAllocatedPtr(); 
-		}
-
-		/**
-			Constructor
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-		*/
-		GLContainer(GLParams mode, const utils::Matrix<ElementType>& points) : GLContainer()
-		{
-			setMode(mode);
-
-			number_of_vertices_ = points.getRows();
-
-			points_ = points.getAllocatedPtr(); 
-		}
-
-		/**
-			Constructor
-
-			@param[in] points_ Points
 			@param[in] number_of_vertices_ Number of elements
 		*/
 		GLContainer(ElementType* points, size_t number_of_vertices) : GLContainer() 
@@ -351,35 +322,6 @@ namespace gl
 				number_of_indices_ = pointcloud.getNumberOfTriangles() * 3;
 				indices_ = pointcloud.getTrianglesPtr<unsigned int>();
 			}
-		}
-
-		/**
-			Set plot container
-
-			@param[in] points_ Points
-		*/
-		void setGLContainer(const utils::Matrix<ElementType>& points) 
-		{
-			mode = GL_POINTS;
-
-			number_of_vertices_ = points.getRows();
-
-			points_ = points.getAllocatedPtr(); 
-		}
-
-		/**
-			Set plot container
-
-			@param[in] mode_ Specifies what kind of primitives to render
-			@param[in] points_ Points
-		*/
-		void setGLContainer(GLParams mode, const utils::Matrix<ElementType>& points)
-		{
-			setMode(mode);
-
-			number_of_vertices_ = points.getRows();
-
-			points_ = points.getAllocatedPtr(); 
 		}
 
 		/**
