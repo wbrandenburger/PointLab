@@ -42,48 +42,46 @@ namespace gl
 {
 	/**
 		Computes a 2D-meshgrid of a specific range
-		
-		@param[in] dataset_in Pointer to a dataset with the reference to a neighborhood
-		@param[in,out] dataset_new Pointer in which the mehsgrid will be saved
-		@param[in] number_of_vertices_in 
-		@param[in,out] number_of_vertices_out Number of points in one direction
-	*/
-	template<typename ElementType> void meshGrid(ElementType* dataset_in , ElementType** dataset_out,
-		size_t number_of_vertices_in, size_t& number_of_vertices_out)
-	{
-		BoundingBox<ElementType> bounding_box(dataset_in, number_of_vertices_in, 3);
 
-		meshGrid<ElementType>(dataset_out, bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices_out);
+		@param[in] data Matrix with the neighborhood
+		@return Meshgrid
+	*/
+	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
+		utils::Matrix<ElementType> data)
+	{
+		BoundingBox<ElementType> bounding_box(data.getPtr(), dat.getRows(), 3);
+
+		return meshGrid<ElementType>(bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range
 
-		@param[in,out] dataset Pointer in which the mehsgrid will be saved
 		@param[in] bounding_box Bounding box
-		@param[in,out] number_of_vertices Number of points in one direction
+		@return Meshgrid
 	*/
-	template<typename ElementType> void meshGrid(ElementType** dataset,
-		utils::BoundingBox<ElementType> bounding_box, size_t& number_of_vertices)
+	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
+		utils::BoundingBox<ElementType> bounding_box)
 	{
-		meshGrid<ElementType>(pointcloud, bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices);
+		return meshGrid<ElementType>(bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range
 
-		@param[in,out] dataset Pointer in which the mehsgrid will be saved
 		@param[in] x_left Left border in x-direction
 		@param[in] x_right Right border in x-direction
 		@param[in] y_left Left border in y-direction
 		@param[in] y_right Right borger in y-direction
-		@param[in,out] number_of_vertices Number of points in one direction
+		@return Meshgrid
 	*/
-	template<typename ElementType> void meshGrid(ElementType** dataset,
-		ElementType x_left,ElementType x_right, ElementType y_left, ElementType y_right, 
-		size_t& number_of_vertices)
+	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
+		ElementType x_left,
+		ElementType x_right, 
+		ElementType y_left, 
+		ElementType y_right)
 	{
 		/** 
 			Computation of the number of resulting elements and set the pointcloud
@@ -97,12 +95,12 @@ namespace gl
 		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
 		number_of_vertices = number_x * number_y;
 
-		*dataset = new ElementType[number_of_vertices * 3];
+		utils::Matrix<ElementType> data (new ElementType[number_of_vertices * 3], number_of_vertices, 3);
 
 		/**
 			Set the mehsgrid
 		*/
-		ElementType* dataset_ptr = *dataset;
+		ElementType* data_ptr = data.getPtr();
 		ElementType x = x_left;
 		for (size_t index_x = 0; index_x < number_x; index_x++) {
 			ElementType y = y_left;
@@ -110,68 +108,72 @@ namespace gl
 				/**
 					Assign the x- and y-values
 				*/
-				*dataset_ptr = x; dataset_ptr++;
-				*dataset_ptr = y; dataset_ptr++;
+				*data_ptr = x; data_ptr++;
+				*data_ptr = y; data_ptr++;
 				/**
 					Skip z-value
 				*/
-				*dataset_ptr = 0; dataset_ptr++;
+				*data_ptr = 0; data_ptr++;
 				y = y + quant;
 			}
 			x = x + quant;
 		}
+
+		return data;
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range and builds a mesh
 		
-		@param[in] dataset_in Pointer to a dataset with the reference to a neighborhood
-		@param[in,out] dataset_new Pointer in which the mehsgrid will be saved
-		@param[in] number_of_vertices_in 
-		@param[in,out] number_of_vertices_out Number of points in one direction
-		@param[in,out] lines Pointer to the lines
-		@param[in,out] number_of_lines Number of lines
-	*/
-	template<typename ElementType> void glMeshGrid(ElementType* dataset_in , ElementType** dataset_out,
-		size_t number_of_vertices_in, size_t& number_of_vertices_out, unsigned int** lines, size_t& number_of_lines)
-	{
-		BoundingBox<ElementType> bounding_box(dataset_in, number_of_vertices_in, 3);
+		@param[in] data_in Matrix with the neighborhood
+		@param[in,out] data_out Meshgrid
+		@param[in,out] lines Lines
 
-		glMeshGrid<ElementType>(dataset_out, bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices_out, lines, number_of_lines);
+	*/
+	template<typename ElementType> void glMeshGrid(
+		const utils::Matrix<ElementType>& data_in, 
+		utils::Matrix<ElementType>& data_out,
+		utils::Matrix<unsigned int>& lines)
+	{
+		BoundingBox<ElementType> bounding_box(data_in.getPtr(), data_in.getRows(), 3);
+
+		glMeshGrid<ElementType>(data_out, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range builds a mesh
 
-		@param[in,out] dataset Pointer in which the mehsgrid will be saved
+		@param[in,out] data_out Meshgrid
+		@param[in,out] lines Lines
 		@param[in] bounding_box Bounding box
-		@param[in,out] number_of_vertices Number of points in one direction
-		@param[in,out] lines Pointer to the lines
-		@param[in,out] number_of_lines Number of lines
 	*/
-	template<typename ElementType> void glMeshGrid(ElementType** dataset, utils::BoundingBox<ElementType> bounding_box,
-		size_t& number_of_vertices, unsigned int** lines, size_t& number_of_lines)
+	template<typename ElementType> void glMeshGrid(
+		utils::Matrix<ElementType>& data_out,
+		utils::Matrix<unsigned int>& lines, 
+		utils::BoundingBox<ElementType> bounding_box)
 	{
-		glMeshGrid<ElementType>(pointcloud, bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices, lines, number_of_lines);
+		glMeshGrid<ElementType>(data_out, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range  builds a mesh
 
-		@param[in,out] dataset Pointer in which the mehsgrid will be saved
+		@param[in,out] data_out Meshgrid
+		@param[in,out] lines Lines
 		@param[in] x_left Left border in x-direction
 		@param[in] x_right Right border in x-direction
 		@param[in] y_left Left border in y-direction
 		@param[in] y_right Right borger in y-direction
-		@param[in,out] number_of_vertices Number of points in one direction
-		@param[in,out] lines Pointer to the lines
-		@param[in,out] number_of_lines Number of lines
 	*/
-	template<typename ElementType> void glMeshGrid(ElementType** dataset,
-		ElementType x_left, ElementType x_right, ElementType y_left, ElementType y_right,
-		size_t& number_of_vertices, unsigned int** lines, size_t& number_of_lines)
+	template<typename ElementType> void glMeshGrid(
+		utils::Matrix<ElementType>& data_out,
+		utils::Matrix<unsigned int>& lines,
+		ElementType x_left, 
+		ElementType x_right,
+		ElementType y_left, 
+		ElementType y_right,)
 	{
 		
 		/** 
@@ -188,16 +190,16 @@ namespace gl
 		/**
 			compute the meshgrid
 		*/
-		meshGrid<ElementType>(dataset, x_left, x_right, y_left, y_right, number_of_vertices);
+		data_out = meshGrid<ElementType>(x_left, x_right, y_left, y_right);
 
 		number_of_lines =  (number_x - 1) * (number_y - 1) * 2 + number_x + number_y - 2;
 
-		*lines = new unsigned int[number_of_lines * 2];
+		lines.setMatrix(new unsigned int[number_of_lines * 2], number_of_lines, 2);
 
 		/**
 			Set the indices
 		*/
-		unsigned int* lines_ptr = *lines;
+		unsigned int* lines_ptr = lines.getPtr();
 		size_t index = 0;
 		for (size_t x = 0; x < number_x; x++) {
 			for (size_t y = 0; y < number_y; y++) {
