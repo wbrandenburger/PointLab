@@ -170,6 +170,15 @@ int main(int argc, char* argv[]) {
 		//	glview.mainLoop();
 		//} while (true);
 
+		utils::Matrix<float> matrix({ 1,6,3,8,3,5,1,7,9,2,6,3 }, 3, 4);
+		utils::Matrix<float> solution = matrix.gaussJordanElimination();
+		std::cout << solution << std::endl;
+		utils::Matrix<float> matrix1({ 1,6,3,3,5,1,9,2,6 }, 3, 3);
+		std::cout << matrix1 * solution << std::endl;
+		
+		utils::Matrix<float> matrix2({ 8,6,4,3,5,6,9,9,6 }, 3, 3);
+
+		std::cout << matrix1.conctatenateCol(matrix2) << std::endl;
 
 
 	/**
