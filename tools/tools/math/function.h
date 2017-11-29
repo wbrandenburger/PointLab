@@ -34,8 +34,6 @@
 
 #include "tools/utils/matrix.h"
 
-#include "eigen3/Eigen/Dense"
-
 namespace math
 {
 	/**
@@ -151,8 +149,8 @@ namespace math
 		/**
 			Constructor
 
-			@param[in] parameter_ The coefficients of the polynomial
-			@param[in] degree_ Degree of the polynomial
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
 		*/
 		Polynomial2D(utils::Matrix<ElementType> parameter, size_t degree) :
 			parameter_(parameter), degree_(degree) {}
@@ -190,7 +188,8 @@ namespace math
 		*/
 		size_t degree_;
 	};
-		
+
+
 	/**
 		Creates a three dimensional polynom of abitrary degree
 	*/
@@ -200,8 +199,8 @@ namespace math
 		/**
 			Constructor
 
-			@param[in] parameter_ The coefficients of the polynomial
-			@param[in] degree_ Degree of the polynomial
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
 		*/
 		Polynomial3D(utils::Matrix<ElementType> parameter, size_t degree) :
 			parameter_(parameter), degree_(degree) {}
@@ -215,8 +214,8 @@ namespace math
 		/**
 			Operator() Computation of a value corresponding to a function value
 
-			@param[in] x_ Function value
-			@param[in] y_ Function value
+			@param[in] x Function value
+			@param[in] y Function value
 			@result Corresponding value
 		*/
 		ElementType operator()(const ElementType& x, const ElementType& y) const
@@ -259,9 +258,9 @@ namespace math
 		/**
 			Constructor
 
-			@param[in] polynomial3D_ The basical polynom
-			@param[in] function_x_ The function for x
-			@param[in] function_y_ The function for y
+			@param[in] polynomial3D The basical polynom
+			@param[in] function_x The function for x
+			@param[in] function_y The function for y
 		*/
 		Polynomial3DExpand(Polynomial3D polynomial3D,
 			Polynomial2D<ElementType> function_x, Polynomial2D<ElementType> function_y) :
@@ -271,10 +270,10 @@ namespace math
 		/**
 			Constructor
 
-			@param[in] parameter_ The coefficients of the polynomial
-			@param[in] degree_ Degree of the polynomial
-			@param[in] function_x_ The function for x
-			@param[in] function_y_ The function for y
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
+			@param[in] function_x The function for x
+			@param[in] function_y The function for y
 		*/
 		Polynomial3DExpand(utils::Matrix<ElementType> parameter, size_t degree,
 			Polynomial2D<ElementType> function_x, Polynomial2D<ElementType> function_y) :
@@ -289,7 +288,7 @@ namespace math
 		/**
 			Operator()
 			
-			@param[in] value_ Function value
+			@param[in] value Function value
 			@return Corresponding value 
 		*/
 		ElementType operator()(const ElementType& value) const
@@ -321,11 +320,11 @@ namespace math
 		/**
 			Constructor
 
-			@param[in] parameter_ The coefficients of the polynomial
-			@param[in] degree_ Degree of the polynomial
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
 		*/
 		Polynomial4D(utils::Matrix<ElementType> parameter, size_t degree) :
-			parameter_(parameter), degree_(degree) {}
+			parameter(parameter), degree(degree) {}
 
 		/**
 			Destructor
@@ -336,9 +335,9 @@ namespace math
 		/**
 			Operator() Computation of a value corresponding to a function value
 
-			@param[in] x_ Function value
-			@param[in] y_ Function value
-			@param[in] z_ Function value
+			@param[in] x Function value
+			@param[in] y Function value
+			@param[in] z Function value
 			@result Corresponding value
 		*/
 		ElementType operator()(const ElementType& x, const ElementType& y, const ElementType& z) const

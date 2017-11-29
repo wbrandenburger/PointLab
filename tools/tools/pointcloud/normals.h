@@ -60,7 +60,7 @@ namespace pointcloud
 		*/
 		NormalParams() :
 			normal_computation_(NormalComputation::PLANESVD), 
-			weight_function_(WeightFunction::GAUSSIAN), 
+			weight_function_(WeightFunction::LINEAR), 
 			cores_(1)
 		{
 		}
@@ -262,6 +262,7 @@ namespace pointcloud
 	/**
 		Normal computation switch which depends on the chosen method for computing normals
 		
+		@param[in] point Reference point
 		@param[in] points Matrix with the points
 		@param[in] normal_params Parameter for computing normals
 		@return Normal
@@ -288,6 +289,7 @@ namespace pointcloud
 		Normal computation switch which depends on the chosen method for computing normals
 		
 		@param[in,out] normal Normal
+		@param[in] point Reference point
 		@param[in] points Matrix with the points
 		@param[in] normal_params Parameter for computing normals
 	*/
@@ -310,6 +312,7 @@ namespace pointcloud
 		 to the points in the neighborhood
 
 		 @param[in,out] normal Normal
+		 @param[in] point Reference point
 		 @param[in] points Matrix with the points
 		 @param[in] weight_function Defines the weight function
 	*/
@@ -377,6 +380,7 @@ namespace pointcloud
 		mean from the data matrix Q and then performing a SVD on the modified data matrix
 
 		 @param[in,out] normal Normal
+		 @param[in] point Reference point
 		 @param[in] points Matrix with the points
 		 @param[in] weight_function Defines the weight function
 	*/
@@ -395,6 +399,7 @@ namespace pointcloud
 		p to q and the normal vector n
 
 		@param[in,out] normal Normal
+		@param[in] point Reference point
 		@param[in] points Matrix with the points
 		@param[in] weight_function Defines the weight function
 	*/
@@ -411,6 +416,7 @@ namespace pointcloud
 		by fitting a quadric surface
 
 		@param[in,out] normal Normal
+		@param[in] point Reference point
 		@param[in] points Matrix with the points
 		@param[in] weight_function Defines the weight function
 	*/
