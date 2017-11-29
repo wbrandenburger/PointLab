@@ -32,6 +32,8 @@
 #ifndef MATH_FUNCTION_H_
 #define MATH_FUNCTION_H_
 
+#include "tools/utils/matrix.h"
+
 #include "eigen3/Eigen/Dense"
 
 namespace math
@@ -140,22 +142,20 @@ namespace math
 		return result;
 	}
 
-
-	struct Polynomial2D 
+	/**
+		Creates a two dimensional polynom of abitrary degree
+	*/
+	template<typename ElementType> class Polynomial2D 
 	{
-		/** 
-			Constructor
-		*/
-		Polynomial2D() {}
-
+	public:
 		/**
 			Constructor
 
-			@param[in] degree_ Degree of the polynomial
 			@param[in] parameter_ The coefficients of the polynomial
+			@param[in] degree_ Degree of the polynomial
 		*/
-		Polynomial2D(Eigen::Matrix<double, Eigen::Dynamic, 1> parameter_, size_t degree_) :
-			parameter(parameter_), degree(degree_) {}
+		Polynomial2D(utils::Matrix<ElementType> parameter, size_t degree) :
+			parameter_(parameter), degree_(degree) {}
 
 		/**
 			Destructor
@@ -165,33 +165,15 @@ namespace math
 		/**
 			Operator() Computation of a value corresponding to a function value
 
-			@param[in] x_ Function value
+			@param[in] x Function value
 			@result Corresponding value
 		*/
-		double operator()(const double& x_) const
+		ElementType operator()(const ElementType& x) const
 		{
-			double result = double();
-			for (size_t i = 0; i <= degree; i++) {
-				result += parameter(i)*std::pow(x_, i);
+			ElementType result = ElementType();
+			for (size_t i = 0; i <= degree_; i++) {
+				result += parameter_[i]*std::pow(x, i);
 			}
-
-			return result;
-		}
-
-		/**
-			Operator() Computation of a value corresponding to a function value
-
-			@param[in] x_ Function value
-			@param[in] y_ Function value
-			@result Corresponding value
-		*/
-		double operator()(const double& x_, const double& y_) const
-		{
-			double result = double();
-			for (size_t i = 0; i <= degree; i++) {
-				result += parameter(i)*std::pow(x_, i);
-			}
-			result -= y_;
 
 			return result;
 		}
@@ -201,92 +183,28 @@ namespace math
 		/**
 			The coefficients of the polynomial
 		*/
-		Eigen::Matrix<double, Eigen::Dynamic, 1> parameter;
+		utils::Matrix<ElementType> parameter_;
 
 		/**
 			Degree of the polynomial	
 		*/
-		size_t degree;
+		size_t degree_;
 	};
-	
-	template<typename FunctionX, typename FunctionY> struct Polynomial2DExpand 
-	{
 		
-		/**
-			Constructor
-		*/
-		Polynomial2DExpand() {}
-
-		/**
-			Constructor
-
-			@param[in] polynomial2D_ The basical polynom
-			@param[in] function_x_ The function for x
-			@param[in] function_y_ The function for y
-		*/
-		Polynomial2DExpand(Polynomial2D polynomial2D_, FunctionX function_x_, FunctionY function_y_) :
-			polynomial2D(polynomial2D_), function_x(function_x_), function_y(function_y_) {}
-
-		/**
-			Constructor
-
-			@param[in] degree_ Degree of the polynomial
-			@param[in] parameter_ The coefficients of the polynomial
-			@param[in] function_x_ The function for x
-			@param[in] function_y_ The function for y
-		*/
-		Polynomial2DExpand(Eigen::Matrix<double, Eigen::Dynamic, 1> parameter_, size_t degree_,
-			FunctionX function_x_, FunctionY function_y_) :
-			polynomial2D(Polynomial2D(parameter_, degree_)),
-			function_x(function_x_), function_y(function_y_) {}
-
-		/**
-			Deconstructor
-		*/
-		~Polynomial2DExpand() {}
-		
-		/**
-			Operator()
-			
-			@param[in] value_ Function value
-			@return Corresponding value 
-		*/
-		double operator()(const double value_) const
-		{
-			return polynomial2D(function_x(value_), function_y(value_));
-		}
-
-		/**
-			Polynom
-		*/
-		Polynomial2D polynomial2D;
-
-		/**
-			Function in x
-		*/
-		FunctionX function_x;
-
-		/**
-			Function in y
-		*/
-		FunctionY function_y;
-	};
-
-	struct Polynomial3D
+	/**
+		Creates a three dimensional polynom of abitrary degree
+	*/
+	template<typename ElementType> class Polynomial3D
 	{
-		/**
-			Constructor
-		*/
-		Polynomial3D() {}
-
+	public:
 		/**
 			Constructor
 
-			@param[in] degree_ Degree of the polynomial
 			@param[in] parameter_ The coefficients of the polynomial
+			@param[in] degree_ Degree of the polynomial
 		*/
-		Polynomial3D(Eigen::Matrix<double, Eigen::Dynamic, 1> parameter_, size_t degree_) :
-			parameter(parameter_), degree(degree_) {}
+		Polynomial3D(utils::Matrix<ElementType> parameter, size_t degree) :
+			parameter_(parameter), degree_(degree) {}
 
 		/**
 			Destructor
@@ -301,48 +219,20 @@ namespace math
 			@param[in] y_ Function value
 			@result Corresponding value
 		*/
-		double operator()(const double& x_, const double& y_) const
+		ElementType operator()(const ElementType& x, const ElementType& y) const
 		{
-			double result = double();
+			ElementType result = ElementType();
 			size_t index = 0;
-			for (size_t i = 0; i <= degree; i++) {
+			for (size_t i = 0; i <= degree_; i++) {
 				for (size_t j = 0; j <= i; j++) {
 					for (size_t k = 0; k <= i; k++) {
 						if (j + k == i) {
-							result += parameter(index)*std::pow(x_, j)*std::pow(y_, k);
+							result += parameter_[index]*std::pow(x, j)*std::pow(y, k);
 							index++;
 						}
 					}
 				}
 			}
-
-			return result;
-		}
-
-
-		/**
-			Operator() Computation of a value corresponding to a function value
-
-			@param[in] x_ Function value
-			@param[in] y_ Function value
-			@param[in] z_ Function value
-			@result Corresponding value
-		*/
-		double operator()(const double& x_, const double& y_, const double& z_) const
-		{
-			double result = double();
-			size_t index = 0;
-			for (size_t i = 0; i <= degree; i++) {
-				for (size_t j = 0; j <= i; j++) {
-					for (size_t k = 0; k <= i; k++) {
-						if (j + k == i) {
-							result += parameter(index)*std::pow(x_, j)*std::pow(y_, k);
-							index++;
-						}
-					}
-				}
-			}
-			result -= z_;
 
 			return result;
 		}
@@ -352,51 +242,47 @@ namespace math
 		/**
 			The coefficients of the polynomial
 		*/
-		Eigen::Matrix<double, Eigen::Dynamic, 1> parameter;
+		utils::Matrix<ElementType> parameter_;
 
 		/**
 			Degree of the polynomial
 		*/
-		size_t degree;
+		size_t degree_;
 	};
 
-	template<typename FunctionX, typename FunctionY, typename FunctionZ> struct Polynomial3DExpand 
+	/**
+		Creates a three dimensional polynom of abitrary degree, 
+		which depends on two dimensional functions
+	*/
+	template<typename ElementType> class Polynomial3DExpand 
 	{
-		
-		/**
-			Constructor
-		*/
-		Polynomial3DExpand() {}
-
 		/**
 			Constructor
 
 			@param[in] polynomial3D_ The basical polynom
 			@param[in] function_x_ The function for x
 			@param[in] function_y_ The function for y
-			@param[in] function_z_ The function for z
 		*/
-		Polynomial3DExpand(Polynomial3D polynomial3D_,
-			FunctionX function_x_, FunctionY function_y_, FunctionZ function_z_) :
-			polynomial3D(polynomial3D_),
-			function_x(function_x_), function_y(function_y_), function_z(function_z_) {}
+		Polynomial3DExpand(Polynomial3D polynomial3D,
+			Polynomial2D<ElementType> function_x, Polynomial2D<ElementType> function_y) :
+			polynomial3D_(polynomial3D),
+			function_x_(function_x), function_y_(function_y) {}
 
 		/**
 			Constructor
 
-			@param[in] degree_ Degree of the polynomial
 			@param[in] parameter_ The coefficients of the polynomial
+			@param[in] degree_ Degree of the polynomial
 			@param[in] function_x_ The function for x
 			@param[in] function_y_ The function for y
-			@param[in] function_z_ The function for z
 		*/
-		Polynomial3DExpand(Eigen::Matrix<double, Eigen::Dynamic, 1> parameter_, size_t degree_,
-			FunctionX function_x_, FunctionY function_y_, FunctionZ function_z_) :
-			polynomial3D(Polynomial3D(parameter_, degree_)),
-			function_x(function_x_), function_y(function_y_), function_z(function_z_) {}
+		Polynomial3DExpand(utils::Matrix<ElementType> parameter, size_t degree,
+			Polynomial2D<ElementType> function_x, Polynomial2D<ElementType> function_y) :
+			polynomial3D_(Polynomial3D<ElementType>(parameter, degree)),
+			function_x_(function_x), function_y_(function_y){}
 		
 		/**
-			Deconstructor
+			Destructor
 		*/
 		~Polynomial3DExpand() {}
 		
@@ -406,47 +292,40 @@ namespace math
 			@param[in] value_ Function value
 			@return Corresponding value 
 		*/
-		double operator()(const double value_) const
+		ElementType operator()(const ElementType& value) const
 		{
-			return polynomial3D(function_x(value_),function_y(value_), function_z(value_));
+			return polynomial3D_(function_x_(value),function_y_(value));
 		}
 
 		/**
 			Polynom
 		*/
-		Polynomial3D polynomial3D;
+		Polynomial3D<ElementType> polynomial3D_;
 
 		/**
 			Function in x
 		*/
-		FunctionX function_x;
+		Polynomial2D<ElementType> function_x_;
 
 		/**
 			Function in y
 		*/
-		FunctionY function_y;
-
-		/**
-			Function in z
-		*/
-		FunctionZ function_z;
+		Polynomial2D<ElementType> function_y_;
 	};
-
-	struct Polynomial4D
+		
+	/**
+		Creates a four dimensional polynom of abitrary degree
+	*/
+	template<typename ElementType> class Polynomial4D
 	{
 		/**
 			Constructor
-		*/
-		Polynomial4D() {}
 
-		/**
-			Constructor
-
-			@param[in] degree_ Degree of the polynomial
 			@param[in] parameter_ The coefficients of the polynomial
+			@param[in] degree_ Degree of the polynomial
 		*/
-		Polynomial4D(Eigen::Matrix<double, Eigen::Dynamic, 1> parameter_, size_t degree_) :
-			parameter(parameter_), degree(degree_) {}
+		Polynomial4D(utils::Matrix<ElementType> parameter, size_t degree) :
+			parameter_(parameter), degree_(degree) {}
 
 		/**
 			Destructor
@@ -462,52 +341,22 @@ namespace math
 			@param[in] z_ Function value
 			@result Corresponding value
 		*/
-		double operator()(const double& x_, const double& y_, const double& z_) const
+		ElementType operator()(const ElementType& x, const ElementType& y, const ElementType& z) const
 		{
-			double result = double();
+			ElementType result = ElementType();
 			size_t index = 0;
-			for (size_t i = 0; i <= degree; i++) {
+			for (size_t i = 0; i <= degree_; i++) {
 				for (size_t j = 0; j <= i; j++) {
 					for (size_t k = 0; k <= i; k++) {
 						for (size_t l = 0; l <= i; l++) {
 							if (j + k + l == i) {
-								result += parameter(index)*std::pow(x_, i)*std::pow(y_, j)*std::pow(z_, k);
+								result += parameter_[index]*std::pow(x, i)*std::pow(y, j)*std::pow(z, k);
 								index++;
 							}
 						}
 					}
 				}
 			}
-
-			return result;
-		}
-
-		/**
-			Operator() Computation of a value corresponding to a function value
-
-			@param[in] x_ Function value
-			@param[in] y_ Function value
-			@param[in] z_ Function value
-			@param[in] value_ Function value
-			@result Corresponding value
-		*/
-		double operator()(const double& x_, const double& y_, const double& z_, const double& value_) const
-		{
-			double result = double();
-			size_t index = 0;
-			for (size_t i = 0; i <= degree; i++) {
-				for (size_t j = 0; j <= i; j++) {
-					for (size_t k = 0; k <= i; k++) {
-						for (size_t l = 0; l <= i; l++) {
-							if (j + k + l == i) {
-								result += parameter(index)*std::pow(x_, i)*std::pow(y_, j)*std::pow(z_, k);
-								index++;
-							}
-						}
-					}
-				}
-			}
-			result -= value_;
 
 			return result;
 		}
@@ -517,91 +366,12 @@ namespace math
 		/**
 			The coefficients of the polynomial
 		*/
-		Eigen::Matrix<double, Eigen::Dynamic, 1> parameter;
+		utils::Matrix<ElementType> parameter_;
 		
 		/**
 			Degree of the polynomial
 		*/
-		size_t degree;
-	};
-
-	template<typename FunctionX, typename FunctionY, typename FunctionZ, typename FunctionValue> struct Polynomial4DExpand 
-	{
-		
-		/**
-			Constructor
-		*/
-		Polynomial4DExpand() {}
-
-		/**
-			Constructor
-
-			@param[in] polynomial4D_ The basical polynom
-			@param[in] function_x_ The function for x
-			@param[in] function_y_ The function for y
-			@param[in] function_z_ The function for z
-			@param[in] function_value_ The function for value
-		*/
-		Polynomial4DExpand(Polynomial4D polynomial4D_,
-			FunctionX function_x_, FunctionY function_y_, FunctionZ function_z_, FunctionValue function_value_) :
-			polynomial4D(polynomial4D_),
-			function_x(function_x_), function_y(function_y_), function_z(function_z_), function_value(function_value_) {}
-
-		/**
-			Constructor
-
-			@param[in] degree_ Degree of the polynomial
-			@param[in] parameter_ The coefficients of the polynomial
-			@param[in] function_x_ The function for x
-			@param[in] function_y_ The function for y
-			@param[in] function_z_ The function for z
-			@param[in] function_value_ The function for value
-		*/
-		Polynomial4DExpand(Eigen::Matrix<double, Eigen::Dynamic, 1> parameter_, size_t degree_,
-			FunctionX function_x_, FunctionY function_y_, FunctionZ function_z_, FunctionValue function_value_) :
-			polynomial4D(Polynomial3D(parameter_, degree_)),
-			function_x(function_x_), function_y(function_y_), function_z(function_z_), function_value(function_value_) {}
-		
-		/**
-			Deconstructor
-		*/
-		~Polynomial4DExpand() {}
-		
-		/**
-			Operator()
-			
-			@param[in] value_ Function value
-			@return Corresponding value 
-		*/
-		double operator()(const double value_) const
-		{
-			return polynomial4D(function_x(value_),function_y(value_), function_z(value_), function_value(value_));
-		}
-
-		/**
-			Polynom
-		*/
-		Polynomial4D polynomial4D;
-
-		/**
-			Function in x
-		*/
-		FunctionX function_x;
-
-		/**
-			Function in y
-		*/
-		FunctionY function_y;
-
-		/**
-			Function in z
-		*/
-		FunctionZ function_z;
-
-		/**
-			Function in value
-		*/
-		FunctionValue function_value;
+		size_t degree_;
 	};
 }
 

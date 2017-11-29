@@ -98,88 +98,77 @@ int main(int argc, char* argv[]) {
 		kdtree_index.buildIndex();
 
 		utils::randSeed();
-		//do{
-		//	/**
-		//		Search for the neighbors of a specific point
-		//	*/
-		//	size_t random_point = utils::randInt(pointcloud.getNumberOfVertices(),0);
-		//	utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
-		//	utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
+		do{
+			/**
+				Search for the neighbors of a specific point
+			*/
+			size_t random_point = utils::randInt(pointcloud.getNumberOfVertices(),0);
+			utils::Matrix<float> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
+			utils::Matrix<float> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
 
-		//	trees::TreeParams tree_params;
-		//	tree_params.setCores(normal_params.getCores());
+			trees::TreeParams tree_params;
+			tree_params.setCores(normal_params.getCores());
 
-		//	utils::Matrix<size_t> indices(1, neighbors);
-		//	utils::Matrix<float> dists(1, neighbors);
+			utils::Matrix<size_t> indices(1, neighbors);
+			utils::Matrix<float> dists(1, neighbors);
 
-		//	kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
+			kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
 
-		//	/**
-		//		Get the neighbors of the point
-		//	*/
-		//	pointcloud::PointcloudAoS<float> pointcloud_points;
-		//	pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
-		//	utils::Matrix<float> points;
-		//	pointcloud_points.getMatrix(points);
+			/**
+				Get the neighbors of the point
+			*/
+			pointcloud::PointcloudAoS<float> pointcloud_points;
+			pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
+			utils::Matrix<float> points;
+			pointcloud_points.getMatrix(points);
 
-		//	/**
-		//		Compute the distances and the variance of these distances
-		//	*/
-		//	size_t number_of_elements = 100;
-		//	utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points - point.transpose())));
-		//	float* x = new float[number_of_elements];
-		//	for (size_t i = 0; i < number_of_elements; i++)
-		//	{
-		//		x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
-		//	}
+			/**
+				Compute the distances and the variance of these distances
+			*/
+			size_t number_of_elements = 100;
+			utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points - point.transpose())));
+			float* x = new float[number_of_elements];
+			for (size_t i = 0; i < number_of_elements; i++)
+			{
+				x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
+			}
 
 
-		//	pointcloud::SurfaceParams surface_params;
-		//	surface_params.setAccuracy(1.0f / (float)number_of_elements);
-		//	surface_params.setRootsApproximation(RootsApproximation::QUAD);
+			pointcloud::SurfaceParams surface_params;
+			surface_params.setAccuracy(1.0f / (float)number_of_elements);
+			surface_params.setRootsApproximation(RootsApproximation::QUAD);
 
-		//	utils::Matrix<float> new_point = pointcloud::planeMLS<float>(point, points, normal, surface_params);
-		//	pointcloud_points.setPointPtr(new_point.getPtr(), 0);
-		//	pointcloud_points.setColorPtr({ 255,0,0 }, 0);
+			utils::Matrix<float> new_point = pointcloud::planeMLS<float>(point, points, normal, surface_params);
+			pointcloud_points.setPointPtr(new_point.getPtr(), 0);
+			pointcloud_points.setColorPtr({ 255,0,0 }, 0);
 
-		//	utils::Matrix<float> points_mesh;
-		//	utils::Matrix<unsigned int> lines_mesh;
-		//	gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 5);
+			utils::Matrix<float> points_mesh;
+			utils::Matrix<unsigned int> lines_mesh;
+			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 5);
 
-		//	/**
-		//		Show results
-		//	*/
-		//	gl::GLView<float> glview(argc,argv);
+			/**
+				Show results
+			*/
+			gl::GLView<float> glview(argc,argv);
 
-		//	glview.setViewer();
-		//	glview.setPointcloud(pointcloud);
-		//	glview.subPlot(2, 2, 0);
+			glview.setViewer();
+			glview.setPointcloud(pointcloud);
+			glview.subPlot(2, 2, 0);
 
-		//	glview.setPlot3D();
-		//	glview.setPointcloud(GLParams::POINTS, pointcloud_points);
-		//	glview.subPlot(2, 2, 1);
+			glview.setPlot3D();
+			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
+			glview.subPlot(2, 2, 1);
 
-		//	//glview.setPlot(number_of_elements);
-		//	//glview.setX(x);
-		//	//glview.setY(y);
+			//glview.setPlot(number_of_elements);
+			//glview.setX(x);
+			//glview.setY(y);
 
-		//	glview.setPlot3D();
-		//	glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
-		//	glview.subPlot(2, 2, 2); 
+			glview.setPlot3D();
+			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
+			glview.subPlot(2, 2, 2); 
 
-		//	glview.mainLoop();
-		//} while (true);
-
-		utils::Matrix<float> matrix({ 1,6,3,8,3,5,1,7,9,2,6,3 }, 3, 4);
-		utils::Matrix<float> solution = matrix.gaussJordanElimination();
-		std::cout << solution << std::endl;
-		utils::Matrix<float> matrix1({ 1,6,3,3,5,1,9,2,6 }, 3, 3);
-		std::cout << matrix1 * solution << std::endl;
-		
-		utils::Matrix<float> matrix2({ 8,6,4,3,5,6,9,9,6 }, 3, 3);
-
-		std::cout << matrix1.conctatenateCol(matrix2) << std::endl;
-
+			glview.mainLoop();
+		} while (true);
 
 	/**
 		Write results

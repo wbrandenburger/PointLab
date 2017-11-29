@@ -262,7 +262,7 @@ namespace utils
 			@param[in] ptr Pointer to the row
 			@param[in] row Row
 		*/
-		void setRow(ElementType* ptr, size_t row)
+		void setRowPtr(ElementType* ptr, size_t row)
 		{
 			std::memcpy(data_ + row * cols_, ptr, sizeof(ElementType) * cols_);
 		}
@@ -273,9 +273,9 @@ namespace utils
 			@param[in] ptr Pointer to the column
 			@param[in] col Column
 		*/
-		void setCol(ElementType* ptr, size_t col)
+		void setColPtr(ElementType* ptr, size_t col)
 		{
-			for(size_t i = 0; i < rows; i++)
+			for(size_t i = 0; i < rows_; i++)
 			{
 				(*this)[i][col] = ptr[i];
 			}
@@ -287,9 +287,9 @@ namespace utils
 			@param[in] matrix Matrix with the row
 			@param[in] row Row
 		*/
-		void setRow(const Matrix<ElementType> matrix, size_t row)
+		void setRowMatrix(const Matrix<ElementType> matrix, size_t row)
 		{
-			setRow(matrix.getPtr(), row);
+			setRowPtr(matrix.getPtr(), row);
 		}
 
 		/**
@@ -298,9 +298,9 @@ namespace utils
 			@param[in] matrix An instance of class Matrix
 			@param[in] col Column
 		*/
-		void setCol(const Matrix<ElementType> matrix, size_t col)
+		void setColMatrix(const Matrix<ElementType> matrix, size_t col)
 		{
-			setCol(matrix.getPtr(), col);
+			setColPtr(matrix.getPtr(), col);
 		}
 
 		/**
@@ -967,9 +967,9 @@ namespace utils
 		}
 
 		/**
-			Transpose matrix
+			Transpose the matrix
 
-			@return
+			@return Transpose of the matrix
 		*/
 		Matrix<ElementType> transpose() const
 		{
@@ -981,6 +981,31 @@ namespace utils
 			}
 			
 			return matrix_new;
+		}
+
+		/**
+			Invert the matrix
+
+			@return Inverse of the matrix
+		*/
+		Matrix<ElementType> inverse() const
+		{
+			if (rows_ != cols_) {
+				exitFailure(__FILE__, __LINE__);
+			}
+
+			Matrix<ElementType> inv(rows_, cols_);
+			Matrix<ElementType> equation_left = (*this);
+			for (size_t i = 0; i < cols_; i++) {
+				Matrix<ElementType> equation_right(rows_, 1);
+				equation_right[i][0] = (ElementType) 1.0;
+
+				Matrix<ElementType> equation = equation_left.conctatenateCol(equation_right);
+
+				inv.setColMatrix(equation.gaussJordanElimination(), i);
+			}
+
+			return inv;
 		}
 
 		/**
@@ -996,16 +1021,22 @@ namespace utils
 			
 			Matrix<ElementType> matrix = (*this);
 
+			/**
+				Eliminiate the coefficents under the diagonal
+			*/
 			for (size_t i = 0; i < rows_; i++)
 			{
 				Matrix<ElementType> row = matrix.getRowMatrix(i) / matrix[i][i];
-				matrix.setRow(row, i);
+				matrix.setRowMatrix(row, i);
 				for (size_t j = i + 1; j < rows_; j++)
 				{
 					matrix.subtractRow(row * matrix[j][i], j);
 				}
 			}
 
+			/**
+				Eliminate the coefficents above the diagonal
+			*/
 			for (size_t i = rows_ - 1; i > 0; i--)
 			{
 				Matrix<ElementType> row = matrix.getRowMatrix(i);
