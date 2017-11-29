@@ -170,7 +170,7 @@ namespace math
 		{
 			ElementType result = ElementType();
 			for (size_t i = 0; i <= degree_; i++) {
-				result += parameter_[i]*std::pow(x, i);
+				result += parameter_[i][0] * std::pow(x, i);
 			}
 
 			return result;
@@ -226,7 +226,7 @@ namespace math
 				for (size_t j = 0; j <= i; j++) {
 					for (size_t k = 0; k <= i; k++) {
 						if (j + k == i) {
-							result += parameter_[index]*std::pow(x, j)*std::pow(y, k);
+							result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
 							index++;
 						}
 					}
@@ -349,7 +349,7 @@ namespace math
 					for (size_t k = 0; k <= i; k++) {
 						for (size_t l = 0; l <= i; l++) {
 							if (j + k + l == i) {
-								result += parameter_[index]*std::pow(x, i)*std::pow(y, j)*std::pow(z, k);
+								result += parameter_[index][0] * std::pow(x, i) * std::pow(y, j) * std::pow(z, k);
 								index++;
 							}
 						}

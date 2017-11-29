@@ -199,7 +199,6 @@ namespace gl
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
-
 			for (size_t i = 0; i < number_of_clouds_; i++) {
 				/**
 					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
@@ -261,21 +260,23 @@ namespace gl
 					glDrawElements(gl_container_[i].getMode(), gl_container_[i].getNumberOfIndices(),
 						GL_UNSIGNED_INT, gl_container_[i].getIndices());
 				}
+				
+				if (gl_container_[i].isNormal()) {
+					if (gl_change_size_ == 1) {
+						ElementType* points = gl_container_[i].getPoints();
+						ElementType* normals = gl_container_[i].getNormals();
+						for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
+							glBegin(GL_LINES);
+							glColor4f(0.5f, 0.5, 0.5, 0.0);
+							glVertex3f(points[0], points[1], points[2]);
+							glVertex3f(points[0] + normals[0] * gl_normalsize_,
+								points[1] + normals[1] * gl_normalsize_,
+								points[2] + normals[2] * gl_normalsize_);
+							glEnd();
 
-				if (gl_change_size_ == 1) {
-					ElementType* points = gl_container_[i].getPoints();
-					ElementType* normals = gl_container_[i].getNormals();
-					for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
-						glBegin(GL_LINES);
-						glColor4f(0.5f, 0.5, 0.5, 0.0);
-						glVertex3f(points[0], points[1], points[2]);
-						glVertex3f(points[0] + normals[0] * gl_normalsize_, 
-							points[1] + normals[1] * gl_normalsize_, 
-							points[2] + normals[2] * gl_normalsize_);
-						glEnd();
-
-						points += 3;
-						normals += 3;
+							points += 3;
+							normals += 3;
+						}
 					}
 				}
 

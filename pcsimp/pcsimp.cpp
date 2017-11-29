@@ -138,13 +138,20 @@ int main(int argc, char* argv[]) {
 			surface_params.setAccuracy(1.0f / (float)number_of_elements);
 			surface_params.setRootsApproximation(RootsApproximation::QUAD);
 
-			utils::Matrix<float> new_point = pointcloud::planeMLS<float>(point, points, normal, surface_params);
-			pointcloud_points.setPointPtr(new_point.getPtr(), 0);
-			pointcloud_points.setColorPtr({ 255,0,0 }, 0);
+			utils::Matrix<float> parameter = pointcloud::planeMLS<float>(point, points, normal, surface_params);
+			std::cout << parameter << std::endl;
+			//pointcloud_points.setPointPtr(new_point.getPtr(), 0);
+			//pointcloud_points.setColorPtr({ 255,0,0 }, 0);
 
 			utils::Matrix<float> points_mesh;
 			utils::Matrix<unsigned int> lines_mesh;
-			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 5);
+			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 50);
+
+			//for (size_t i = 0 ; i < points.getRows(); i++)
+			//{
+			//	points_mesh[i][2] = parameter[0][0] * points_mesh[i][0] +
+			//		parameter[1][0] * points_mesh[i][1] + parameter[2][0];
+			//}
 
 			/**
 				Show results
@@ -157,15 +164,16 @@ int main(int argc, char* argv[]) {
 
 			glview.setPlot3D();
 			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
+			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
 			glview.subPlot(2, 2, 1);
 
 			//glview.setPlot(number_of_elements);
 			//glview.setX(x);
 			//glview.setY(y);
 
-			glview.setPlot3D();
-			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
-			glview.subPlot(2, 2, 2); 
+			//glview.setPlot3D();
+			//glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
+			//glview.subPlot(2, 2, 2); 
 
 			glview.mainLoop();
 		} while (true);
