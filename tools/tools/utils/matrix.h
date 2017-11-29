@@ -257,6 +257,53 @@ namespace utils
 		}
 
 		/**
+			Set row
+
+			@param[in] row_ptr Pointer to the row
+			@param[in] row Row
+		*/
+		void setRow(ElementType* row_ptr, size_t row)
+		{
+			std::memcpy(data_ + row * cols_, row_ptr, sizeof(ElementType) * cols_);
+		}
+
+		/**
+			Set column
+
+			@param[in] col_ptr Pointer to the column
+			@param[in] col Column
+		*/
+		void setCol(ElementType* col_ptr, size_t col)
+		{
+			for(size_t i = 0; i < rows; i++)
+			{
+				(*this)[i][col] = col_ptr[i];
+			}
+		}
+
+		/**
+			Set row
+
+			@param[in] row_matrix Matrix with the row
+			@param[in] row Row
+		*/
+		void setRow(const Matrix<ElementType> row_matrix, size_t row)
+		{
+			setRow(row_matrix.getPtr(), row);
+		}
+
+		/**
+			Set column
+
+			@param[in] col_matrix Matrix with the column
+			@param[in] col Column
+		*/
+		void setCol(const Matrix<ElementType> col_matrix, size_t col)
+		{
+			setCol(col_matrix.getPtr(), col);
+		}
+
+		/**
 			Returns the pointer to the data array
 			
 			@return Return pointer of data array
@@ -343,7 +390,7 @@ namespace utils
 			@param[in] matrix Matrix which contains the row
 			@param[in] row Number of the row
 		*/
-		utils::Matrix<ElementType> getRowMatrix(size_t row) const
+		Matrix<ElementType> getRowMatrix(size_t row) const
 		{
 			return Matrix<ElementType>(getAllocatedRowPtr(row), cols_, 1);
 		}
@@ -354,7 +401,7 @@ namespace utils
 			@param[in] matrix Matrix which contains the col
 			@param[in] col Number of the col
 		*/
-		utils::Matrix<ElementType> getColMatrix(size_t col) const
+		Matrix<ElementType> getColMatrix(size_t col) const
 		{
 			return Matrix<ElementType>(getAllocatedColPtr(col), rows_, 1);
 		}
@@ -674,6 +721,60 @@ namespace utils
 			return (*this) + matrix*(-1);
 		}
 
+	private:
+
+		/**
+			Add a row to the matrix
+
+			@param[in] matrix An instance of class matrix
+			@param[in] row Row
+		*/
+		void addRow(const Matrix<ElementType>& matrix, size_t row)
+		{
+			for (size_t i = 0; i < cols_; i++)
+			{
+				(*this)[row][i] = matrix[0][i];
+			}
+		}
+
+		/**
+			Subtract a row from the matrix
+
+			@param[in] matrix An instance of class matrix
+			@param[in] row Row
+		*/
+		void subtractRow(const Matrix<ElementType>& matrix, size_t row)
+		{
+			addRow(matrix * (-1), row);
+		}
+
+		/**
+			Add a column to the matrix
+
+			@param[in] matrix An instance of class matrix
+			@param[in] col Column
+		*/
+		void addCol(const Matrix<ElementType>& matrix, size_t col)
+		{
+			for (size_t i = 0; i < rows_; i++)
+			{
+				(*this)[i][col] = matrix[i][col];
+			}
+		}
+
+		/**
+			Subtract a column from the matrix
+
+			@param[in] matrix An instance of class matrix
+			@param[in] col Column
+		*/
+		void subtractCol(const Matrix<ElementType>& matrix, size_t col)
+		{
+			addRow(matrix * (-1), col);
+		}
+
+	public:
+
 		/**
 			Operator- Subtract a matrix from the matrix
 
@@ -823,6 +924,32 @@ namespace utils
 			}
 			
 			return matrix_new;
+		}
+
+		/**
+			Inverse matrix
+		*/
+		Matrix<ElementType> gaussJordanElimination() const
+		{
+			if (rows_ != cols_ - 1) {
+				exitFailure(__FILE__, __LINE__);
+			}
+			
+			Matrix<ElementType> matrix = (*this);
+
+			for (size_t i = 0; i < rows - 1; i++)
+			{
+				Matrix<ElementType> row = matrix.getRowMatrix(i) / matrix[i][i];
+				matrix.setRow(row, i);
+				for (size_t j = i + 1; j < rows; j++)
+				{
+					matrix.subtractRow(row * matrix[j][i]);
+				}
+			}
+
+			std::cout << matrix << std::endl;
+
+			return matrix;
 		}
 
 		/**
