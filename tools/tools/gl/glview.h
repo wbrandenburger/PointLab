@@ -69,7 +69,7 @@ namespace gl
 			- ElementType*
 
 		An instance of a plotting object can be called with
-			- utils::GLView<ElementType> glview
+			- utils::GLView<ElementType> glview(argc,argv)
 
 		This instance hold several plots which can be separate visualized.
 		To set a viewer call
@@ -147,11 +147,9 @@ namespace gl
 		/**
 			Constructor
 		*/
-		GLView()
+		GLView(int argc, char* argv[])
 		{
-			int argc = 0;
-			char** argv = nullptr;
-			
+
 			glutInit(&argc, argv);
 
 			glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);

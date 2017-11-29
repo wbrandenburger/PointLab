@@ -60,8 +60,8 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud::PointcloudSoA<float> pointcloud;
 
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/mesh.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 		kdtree_index.buildIndex();
 
 		utils::randSeed();
-		do{
+		//do{
 			/**
 				Search for the neighbors of a specific point
 			*/
@@ -142,14 +142,18 @@ int main(int argc, char* argv[]) {
 			pointcloud_points.setPointPtr(new_point.getPtr(), 0);
 			pointcloud_points.setColorPtr({ 255,0,0 }, 0);
 
-
+			utils::Matrix<float> points_mesh;
+			utils::Matrix<unsigned int> lines_mesh;
+			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 5);
+			std::cout << points_mesh << std::endl;
+			std::cout << lines_mesh << std::endl;
 			/**
 				Show results
 			*/
-			gl::GLView<float> glview;
+			gl::GLView<float> glview(argc,argv);
 
-			glview.setPlot3D();
-			glview.setPointcloud(GLParams::POINTS, pointcloud);
+			glview.setViewer();
+			glview.setPointcloud(pointcloud);
 			glview.subPlot(2, 2, 0);
 
 			glview.setPlot3D();
@@ -159,10 +163,13 @@ int main(int argc, char* argv[]) {
 			//glview.setPlot(number_of_elements);
 			//glview.setX(x);
 			//glview.setY(y);
-			//glview.subPlot(2, 2, 2);
+
+			glview.setPlot3D();
+			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
+			glview.subPlot(2, 2, 2); 
 
 			glview.mainLoop();
-		} while (true);
+		//} while (true);
 
 	/**
 		Write results

@@ -35,6 +35,7 @@
 #include "tools/parameters.h"
 
 #include "tools/utils/boundingbox.h"
+#include "tools/utils/matrix.h"
 
 #include "tools/pointcloud/pointcloud.h"
 
@@ -44,28 +45,32 @@ namespace gl
 		Computes a 2D-meshgrid of a specific range
 
 		@param[in] points_neighborhood Matrix with the neighborhood
+		@param[in] number_of_vertices Number of vertices
 		@return Meshgrid
 	*/
 	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
-		utils::Matrix<ElementType> points_neighborhood)
+		utils::Matrix<ElementType> points_neighborhood,
+		size_t number_of_vertices)
 	{
-		BoundingBox<ElementType> bounding_box(points_neighborhood.getPtr(), points_neighborhood.getRows(), 3);
+		utils::BoundingBox<ElementType> bounding_box(points_neighborhood.getPtr(), points_neighborhood.getRows(), 3);
 
 		return meshGrid<ElementType>(bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices);
 	}
 
 	/**
 		Computes a 2D-meshgrid of a specific range
 
 		@param[in] bounding_box Bounding box
+		@param[in] number_of_vertices Number of vertices
 		@return Meshgrid
 	*/
 	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
-		utils::BoundingBox<ElementType> bounding_box)
+		utils::BoundingBox<ElementType> bounding_box,
+		size_t number_of_vertices)
 	{
 		return meshGrid<ElementType>(bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices);
 	}
 
 	/**
@@ -75,32 +80,33 @@ namespace gl
 		@param[in] x_right Right border in x-direction
 		@param[in] y_left Left border in y-direction
 		@param[in] y_right Right borger in y-direction
+		@param[in] number_of_vertices Number of vertices
 		@return Meshgrid
 	*/
 	template<typename ElementType> utils::Matrix<ElementType> meshGrid(
 		ElementType x_left,
 		ElementType x_right, 
 		ElementType y_left, 
-		ElementType y_right)
+		ElementType y_right,
+		size_t number_of_vertices)
 	{
 		/** 
 			Computation of the number of resulting elements and set the pointcloud
 		*/
+		ElementType quant_x = (x_right - x_left) / (ElementType)(number_of_vertices - 1);
+		ElementType quant_y = (y_right - y_left) / (ElementType)(number_of_vertices - 1);
 
-		ElementType quant = std::floor(x_right - x_left) > std::floor(y_right - y_left) ? 
-				std::floor(x_right - x_left) / (ElementType)( number_of_vertices - 1) :
-				std::floor(y_right - y_left) / (ElementType)( number_of_vertices - 1);
-		
-		size_t number_x = std::floor((x_right - x_left) / quant) + 1;
-		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
+		size_t number_x = std::floor((x_right - x_left) / quant_x) + 1;
+		size_t number_y = std::floor((y_right - y_left) / quant_y) + 1;
+
 		number_of_vertices = number_x * number_y;
 
-		utils::Matrix<ElementType> points (new ElementType[number_of_vertices * 3], number_of_vertices, 3);
+		ElementType* points = new ElementType[number_of_vertices * 3];
 
 		/**
 			Set the mehsgrid
 		*/
-		ElementType* points_ptr = points.getPtr();
+		ElementType* points_ptr = points;
 		ElementType x = x_left;
 		for (size_t index_x = 0; index_x < number_x; index_x++) {
 			ElementType y = y_left;
@@ -114,12 +120,12 @@ namespace gl
 					Skip z-value
 				*/
 				*points_ptr = 0; points_ptr++;
-				y = y + quant;
+				y = y + quant_y;
 			}
-			x = x + quant;
+			x = x + quant_x;
 		}
 
-		return points;
+		return utils::Matrix<ElementType>(points, number_of_vertices, 3);
 	}
 
 	/**
@@ -128,17 +134,19 @@ namespace gl
 		@param[in] points_neighborhood  Matrix with the neighborhood
 		@param[in,out] points Meshgrid
 		@param[in,out] lines Lines
+		@param[in] number_of_vertices Number of vertices
 
 	*/
 	template<typename ElementType> void glMeshGrid(
 		const utils::Matrix<ElementType>& points_neighborhood,
 		utils::Matrix<ElementType>& points,
-		utils::Matrix<unsigned int>& lines)
+		utils::Matrix<unsigned int>& lines,
+		size_t number_of_vertices)
 	{
-		BoundingBox<ElementType> bounding_box(points_neighborhood.getPtr(), points_neighborhood.getRows(), 3);
+		utils::BoundingBox<ElementType> bounding_box(points_neighborhood.getPtr(), points_neighborhood.getRows(), 3);
 
-		glMeshGrid<ElementType>(points, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
+		glMeshGrid<ElementType>(points, lines, bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices);
 	}
 
 	/**
@@ -147,14 +155,16 @@ namespace gl
 		@param[in,out] points Meshgrid
 		@param[in,out] lines Lines
 		@param[in] bounding_box Bounding box
+		@param[in] number_of_vertices Number of vertices
 	*/
 	template<typename ElementType> void glMeshGrid(
 		utils::Matrix<ElementType>& points,
 		utils::Matrix<unsigned int>& lines, 
-		utils::BoundingBox<ElementType> bounding_box)
+		utils::BoundingBox<ElementType> bounding_box,
+		size_t number_of_vertices)
 	{
-		glMeshGrid<ElementType>(points, lines bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
-			bounding_box.getMinDim(1), bounding_box.getMaxDim(1));
+		glMeshGrid<ElementType>(points, lines, bounding_box.getMinDim(0), bounding_box.getMaxDim(0),
+			bounding_box.getMinDim(1), bounding_box.getMaxDim(1), number_of_vertices);
 	}
 
 	/**
@@ -166,50 +176,50 @@ namespace gl
 		@param[in] x_right Right border in x-direction
 		@param[in] y_left Left border in y-direction
 		@param[in] y_right Right borger in y-direction
+		@param[in] number_of_vertices Number of vertices
 	*/
 	template<typename ElementType> void glMeshGrid(
 		utils::Matrix<ElementType>& points,
 		utils::Matrix<unsigned int>& lines,
-		ElementType x_left, 
+		ElementType x_left,
 		ElementType x_right,
-		ElementType y_left, 
-		ElementType y_right)
+		ElementType y_left,
+		ElementType y_right,
+		size_t number_of_vertices)
 	{
-		
-		/** 
+
+		/**
 			Computation of the number of resulting elements and set the pointcloud
 		*/
+		ElementType quant_x = (x_right - x_left) / (ElementType)(number_of_vertices - 1);
+		ElementType quant_y = (y_right - y_left) / (ElementType)(number_of_vertices - 1);
 
-		ElementType quant = std::floor(x_right - x_left) > std::floor(y_right - y_left) ? 
-				std::floor(x_right - x_left) / (ElementType)(number_of_vertices - 1) :
-				std::floor(y_right - y_left) / (ElementType)(number_of_vertices - 1);
-		
-		size_t number_x = std::floor((x_right - x_left) / quant) + 1;
-		size_t number_y = std::floor((y_right - y_left) / quant) + 1;
+		size_t number_x = std::floor((x_right - x_left) / quant_x) + 1;
+		size_t number_y = std::floor((y_right - y_left) / quant_y) + 1;
 
 		/**
 			compute the meshgrid
 		*/
-		points = meshGrid<ElementType>(x_left, x_right, y_left, y_right);
+		points = meshGrid<ElementType>(x_left, x_right, y_left, y_right, number_of_vertices);
 
-		number_of_lines =  (number_x - 1) * (number_y - 1) * 2 + number_x + number_y - 2;
-
-		lines.setMatrix(new unsigned int[number_of_lines * 2], number_of_lines, 2);
+		size_t number_of_lines =  (number_x - 1) * (number_y - 1) * 2 + number_x + number_y - 2;
+		
+		unsigned int* lines_ptr = new unsigned int[number_of_lines * 2];
+		lines.setMatrix(lines_ptr, number_of_lines, 2);
 
 		/**
 			Set the indices
 		*/
-		unsigned int* lines_ptr = lines.getPtr();
 		size_t index = 0;
 		for (size_t x = 0; x < number_x; x++) {
 			for (size_t y = 0; y < number_y; y++) {
-				if (y != number_x - 1) {
+				if (y != number_y - 1) {
 					*lines_ptr = index; lines_ptr++;
 					*lines_ptr = index + 1; lines_ptr++;
 				}
-				if (x != number_y - 1) {
+				if (x != number_x - 1) {
 					*lines_ptr = index; lines_ptr++;
-					*lines_ptr = index + number_x; lines_ptr++;
+					*lines_ptr = index + number_y; lines_ptr++;
 				}
 				index++;
 			}
