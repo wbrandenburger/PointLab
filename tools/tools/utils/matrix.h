@@ -619,6 +619,7 @@ namespace utils
 			Operator+ Adds a scalar to the matrix
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType> operator+(ElementType a) const
 		{
@@ -640,6 +641,7 @@ namespace utils
 			Operator+= Add a scalar to the matrix
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType>& operator+=(ElementType a)
 		{
@@ -657,6 +659,7 @@ namespace utils
 			Operator- Subtract a scalar from the matrix
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType> operator-(ElementType a) const
 		{
@@ -667,6 +670,7 @@ namespace utils
 			Operator- Subtract a scalar from th matrix
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType>& operator-=(ElementType a)
 		{
@@ -679,6 +683,7 @@ namespace utils
 			Operator+ Add a matrix to the matrix
 
 			@param[in] matrix An instance of class Matrix
+			@return Solution
 		*/
 		Matrix<ElementType> operator+(const Matrix<ElementType>& matrix) const
 		{
@@ -720,6 +725,7 @@ namespace utils
 			Operator+= Add a matrix to the matrix
 
 			@param[in] matrix An instance of class Matrix
+			@return Solution
 		*/
 		Matrix<ElementType>& operator+=(const Matrix<ElementType>& matrix)
 		{
@@ -756,6 +762,7 @@ namespace utils
 			Operator- Subtract a matrix from the matrix
 
 			@param[in] matrix An instance of class Matrix
+			@return Solution
 		*/
 		Matrix<ElementType> operator-(const Matrix<ElementType>& matrix) const
 		{
@@ -820,6 +827,7 @@ namespace utils
 			Operator- Subtract a matrix from the matrix
 
 			@param[in] matrix An instance of class Matrix
+			@return Solution
 		*/
 		Matrix<ElementType>& operator-=(const Matrix<ElementType>& matrix)
 		{
@@ -832,6 +840,7 @@ namespace utils
 			Operator* Multiply two matrices
 
 			@param[in] matrix An instance of class Matrix
+			@return Solution
 		*/
 		Matrix<ElementType> operator*(const Matrix<ElementType>& matrix) const
 		{
@@ -887,6 +896,7 @@ namespace utils
 			Operator*= Multiply two matrices
 
 			@param[in] matrix An instance of class Matrix
+			@return Solution
 		*/
 		Matrix<ElementType>& operator*=(const Matrix<ElementType>& matrix)
 		{
@@ -899,6 +909,7 @@ namespace utils
 			Operator* Multiply a matrix with a scalar
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType> operator*(ElementType a) const
 		{
@@ -919,6 +930,7 @@ namespace utils
 			Operator*= Multiply a matrix with a scalar
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType>& operator*=(ElementType a)
 		{
@@ -934,6 +946,7 @@ namespace utils
 			Operator/ Divide the matrix with a scalar
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType> operator/(ElementType a) const
 		{
@@ -944,6 +957,7 @@ namespace utils
 			Operator/= Divide the matrix with a scalar
 
 			@param[in] a Scalar
+			@return Solution
 		*/
 		Matrix<ElementType>& operator/=(ElementType a)
 		{
@@ -954,6 +968,8 @@ namespace utils
 
 		/**
 			Transpose matrix
+
+			@return
 		*/
 		Matrix<ElementType> transpose() const
 		{
@@ -968,7 +984,9 @@ namespace utils
 		}
 
 		/**
-			Inverse matrix
+			Solves a system of linear equations 
+
+			@return Solution of the system of linear equations
 		*/
 		Matrix<ElementType> gaussJordanElimination() const
 		{
