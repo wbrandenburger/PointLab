@@ -126,22 +126,24 @@ int main(int argc, char* argv[]) {
 				Compute the distances and the variance of these distances
 			*/
 			pointcloud::SurfaceParams surface_params;
+			size_t polynomial_degree = 3;
 			surface_params.setAccuracy(1.0f / 1000.0f);
 			surface_params.setRootsApproximation(RootsApproximation::QUAD);
-			utils::Matrix<float> parameter = pointcloud::planeMLS<float>(point, points, normal, surface_params);
+			surface_params.setSurfaceComputation(SurfaceComputation::SURFPOLYMLS);
+			surface_params.setPolynomialDegree(polynomial_degree);
+
+			utils::Matrix<double> parameter = pointcloud::computeSurface<double>(
+												point.getType<double>(), 
+												points.getType<double>(),
+												normal.getType<double>(),
+												surface_params);
 
 			utils::Matrix<float> points_mesh;
 			utils::Matrix<unsigned int> lines_mesh;
 			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 10);
 
-			for (size_t i = 0 ; i < points_mesh.getRows(); i++)
-			{
-				points_mesh[i][2] = parameter[0][0] * points_mesh[i][0] +
-					parameter[1][0] * points_mesh[i][1] + parameter[2][0];
-				//points_mesh[i][2] = point[2][0];
-				//std::cout << points_mesh[i][0] << "  " << points_mesh[i][1] <<" " << points_mesh[i][2] << std::endl;
-			}
-
+			math::Polynomial3D<float> polynomial(parameter.getType<float>(), polynomial_degree);
+			polynomial(points_mesh);
 
 			/**
 				Show results

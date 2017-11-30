@@ -36,12 +36,56 @@
 
 namespace math
 {
+	/**
+		Build the desgin matrix for a two dimensional polynom
+		x^n + x^n-1 + ... x^3 + x^2 + x + 1
 
+		@param[in] data A matrix with the data array
+		@param[in,out] design_matrix The resulting design matrix
+		@param[in] degree The polynomial degree
+	*/
+	template<typename ElementType> void buildDesignMatrixPolynomial2D(
+		const utils::Matrix<ElementType>& data,
+		utils::Matrix<ElementType>& design_matrix,
+		size_t degree)
+	{
+		design_matrix.setMatrix(data.getRows(), degree + 1);
+		for (size_t i = 0; i < data.getRows(), i++) {
+			for (size_t j = 0; j <= degree_; j++) {
+				design_matrix[i][degree-j] = std::pow(data[i][0], j);
+			}
+		}
+	}
 
+	/**
+		Build the desgin matrix for a three dimensional polynom
+		 x^n +x^n-1y + ... + xy^n-1+ y^n + ... + x^2 + xy + y^2 + x + y + 1
 
-
-
-
+		@param[in] data A matrix with the data array
+		@param[in,out] design_matrix The resulting design matrix
+		@param[in] degree The polynomial degree
+	*/
+	template<typename ElementType> void buildDesignMatrixPolynomial3D(
+		const utils::Matrix<ElementType>& data,
+		utils::Matrix<ElementType>& design_matrix,
+		size_t degree)
+	{
+		size_t index = ((degree + 2) * (degree + 1)) / 2 - 1;
+		design_matrix.setMatrix(data.getRows(), index + 1);
+		for (size_t i = 0; i < data.getRows(); i++) {
+			index = ((degree + 2) * (degree + 1)) / 2 - 1;
+			for (size_t j = 0; j <= degree; j++) {
+				for (size_t k = 0; k <= j; k++) {
+					for (size_t l = 0; l <= j; l++) {
+						if (k + l == j) {
+							design_matrix[i][index] = std::pow(data[i][0], k) * std::pow(data[i][1], l);
+							index--;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
-#endif /* MATH_ADJUSMENT_H_ */
+#endif /* MATH_ADJUSTMENT_H_ */

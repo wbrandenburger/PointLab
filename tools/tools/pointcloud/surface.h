@@ -34,6 +34,7 @@
 
 #include "tools/utils/matrix.h"
 
+#include "tools/math/adjustment.h"
 #include "tools/math/standard.h"
 #include "tools/math/zero.h"
 
@@ -51,9 +52,9 @@ namespace pointcloud
 			Constructor
 		*/
 		SurfaceParams() :
-			surface_computation_(SurfaceComputation::PLANEMLS),
+			surface_computation_(SurfaceComputation::PLANE),
 			roots_approximation_(RootsApproximation::QUAD),
-			weight_function_(WeightFunction::GAUSSIAN),
+			weight_function_(WeightFunction::LINEAR),
 			polynomial_degree_(4),
 			eps_(0.001),
 			cores_(1)
@@ -237,10 +238,10 @@ namespace pointcloud
 		utils::Matrix<ElementType> parameter;
 
 		switch (surface_params.getSurfaceComputation()) {
-		case SurfaceComputation:PLANE: parameter = plane(point, points, normal, surface_params); break;
+		case SurfaceComputation::PLANE: parameter = plane(point, points, normal, surface_params); break;
 		case SurfaceComputation::PLANEMLS: parameter = planeMLS(point, points, normal, surface_params); break;
-		case SurfaceComputation::SURF: parameter = surf(point, points, normal, surface_params); break;
-		case SurfaceComputation::SRUFMLS: parameter = surfMLS(point, points, normal, surface_params); break;
+		case SurfaceComputation::SURFPOLY: parameter = surfPoly(point, points, normal, surface_params); break;
+		case SurfaceComputation::SURFPOLYMLS: parameter = surfPolyMLS(point, points, normal, surface_params); break;
 		}
 
 		return parameter;
@@ -359,13 +360,38 @@ namespace pointcloud
 		@param[in] surface_params Parameter for computing the surface
 		@return Parameters of the plane
 	*/
-	template<typename ElementType> utils::Matrix<ElementType> surf(
+	template<typename ElementType> utils::Matrix<ElementType> surfPoly(
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
 		SurfaceParams surface_params)
 	{
-		return utils::Matrix<ElementType>();
+		/**
+			Build the design matrix
+		*/
+		utils::Matrix<ElementType> design_matrix;
+		math::buildDesignMatrixPolynomial3D<ElementType>(
+			points,
+			design_matrix,
+			surface_params.getPolynomialDegree());
+
+		/**
+			Build the observation vector
+		*/
+		utils::Matrix<ElementType> observation = points.getColMatrix(2);
+
+		/**
+			Build the weight matrix
+		*/
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point.transpose()));
+
+		utils::Matrix<ElementType> weights;
+		math::getWeightsDistances(distances, weights, surface_params.getWeightFunction());
+
+		/**
+			Compute the adjustment x = (A'PA)^(-1)A'Pl and return the parameter
+		*/
+		return (design_matrix.transpose()*(weights*design_matrix)).inverse()*design_matrix.transpose()*(weights*observation);
 	}
 
 	/**
@@ -377,7 +403,7 @@ namespace pointcloud
 		@param[in] surface_params Parameter for computing the surface
 		@return Parameters of the plane
 	*/
-	template<typename ElementType> utils::Matrix<ElementType> surfMLS(
+	template<typename ElementType> utils::Matrix<ElementType> surfPolyMLS(
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
 		const utils::Matrix<ElementType>& normal,
@@ -389,7 +415,32 @@ namespace pointcloud
 			normal,
 			surface_params);
 
-		return utils::Matrix<ElementType>();
+		/**
+			Build the design matrix
+		*/
+		utils::Matrix<ElementType> design_matrix;
+		math::buildDesignMatrixPolynomial3D<ElementType>(
+			points,
+			design_matrix,
+			surface_params.getPolynomialDegree());
+
+		/**
+			Build the observation vector
+		*/
+		utils::Matrix<ElementType> observation = points.getColMatrix(2);
+
+		/**
+			Build the weight matrix
+		*/
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - reference_point.transpose()));
+
+		utils::Matrix<ElementType> weights;
+		math::getWeightsDistances(distances, weights, surface_params.getWeightFunction());
+
+		/**
+			Compute the adjustment x = (A'PA)^(-1)A'Pl and return the parameter
+		*/
+		return (design_matrix.transpose()*(weights*design_matrix)).inverse()*design_matrix.transpose()*(weights*observation);
 	}
 
 	template<typename ElementType> struct NonLinearPlaneMLSMinimization

@@ -170,11 +170,44 @@ namespace math
 		{
 			ElementType result = ElementType();
 			for (size_t i = 0; i <= degree_; i++) {
-				result += parameter_[i][0] * std::pow(x, i);
+				result += parameter_[degree-i][0] * std::pow(x, i);
 			}
 
 			return result;
 		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+
+			@param[in] x Function values
+			@param[in] number_of_elements Number of elements
+			@result Corresponding values
+		*/
+		ElementType operator()(ElementType* x, size_t number_of_elements) const
+		{
+			ElementType* result = new ElementType[number_of_elements];
+			ElementType* result_ptr = result;
+			ElementType* end = x + number_of_elements;
+
+			while (x != end) {
+				*result_ptr = (*this)(*x);
+				result_ptr++;
+				x++;
+			}
+
+			return result;
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+
+			@param[in,out] data Function values
+		*/
+		void operator()(utils::Matrix<ElementType>& data) const
+		{
+			 data.setColPtr((*this)(x.getPtr(), x.getRows()), 1);
+		}
+
 
 	private:
 
@@ -221,19 +254,57 @@ namespace math
 		ElementType operator()(const ElementType& x, const ElementType& y) const
 		{
 			ElementType result = ElementType();
-			size_t index = 0;
+			size_t index = ((degree_ + 2) * (degree_ + 1)) / 2 - 1;
 			for (size_t i = 0; i <= degree_; i++) {
 				for (size_t j = 0; j <= i; j++) {
 					for (size_t k = 0; k <= i; k++) {
 						if (j + k == i) {
 							result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
-							index++;
+							index--;
 						}
 					}
 				}
 			}
 
 			return result;
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+
+			@param[in] x Function values
+			@param[in] y Function values
+			@param[in] number_of_elements Number of elements
+			@result Corresponding values
+		*/
+		ElementType* operator()(ElementType* x, ElementType* y, size_t number_of_elements) const
+		{
+			ElementType* result = new ElementType[number_of_elements];
+			ElementType* result_ptr = result;
+			ElementType* end = x + number_of_elements;
+
+			while (x != end) {
+				*result_ptr = (*this)(*x,*y);
+				result_ptr++;
+				x++;
+				y++;
+			}
+
+			return result;
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+
+			@param[in,out] data Function values
+		*/
+		void operator()(utils::Matrix<ElementType>& data) const
+		{
+			utils::Matrix<ElementType> data_transpose = data.transpose();
+			ElementType* result = (*this)(data_transpose[0], data_transpose[1], data.getRows());
+
+			data.setColPtr(result,2);
+			delete[] result;
 		}
 
 	private:
@@ -286,7 +357,7 @@ namespace math
 		~Polynomial3DExpand() {}
 		
 		/**
-			Operator()
+			Operator() Computation of a value corresponding to a function value
 			
 			@param[in] value Function value
 			@return Corresponding value 
@@ -294,6 +365,33 @@ namespace math
 		ElementType operator()(const ElementType& value) const
 		{
 			return polynomial3D_(function_x_(value),function_y_(value));
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+			
+			@param[in] values Function values
+			@param[in] number_of_elements Number of elements
+			@return Corresponding values
+		*/
+		ElementType* operator()(ElementType* values, size_t number_of_elements) const
+		{
+			return polynomial3D_(function_x_(values),function_y_(values), number_of_elements);
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+			
+			@param[in,out] data Function values
+		*/
+		void operator()(utils::Matrix<ElementType>& data) const
+		{
+			utils::Matrix<ElementType> data_transpose = data.transpose();
+			ElementType* result = polynomial3D_(function_x_(data_transpose[0], data.getRows()),
+				function_y_(data_transpose[0], data.getRows()), number_of_elements);
+
+			data.setColPtr(result,2);
+			delete[] result;
 		}
 
 		/**
@@ -310,67 +408,6 @@ namespace math
 			Function in y
 		*/
 		Polynomial2D<ElementType> function_y_;
-	};
-		
-	/**
-		Creates a four dimensional polynom of abitrary degree
-	*/
-	template<typename ElementType> class Polynomial4D
-	{
-		/**
-			Constructor
-
-			@param[in] parameter The coefficients of the polynomial
-			@param[in] degree Degree of the polynomial
-		*/
-		Polynomial4D(utils::Matrix<ElementType> parameter, size_t degree) :
-			parameter(parameter), degree(degree) {}
-
-		/**
-			Destructor
-		*/
-		~Polynomial4D() {}
-
-
-		/**
-			Operator() Computation of a value corresponding to a function value
-
-			@param[in] x Function value
-			@param[in] y Function value
-			@param[in] z Function value
-			@result Corresponding value
-		*/
-		ElementType operator()(const ElementType& x, const ElementType& y, const ElementType& z) const
-		{
-			ElementType result = ElementType();
-			size_t index = 0;
-			for (size_t i = 0; i <= degree_; i++) {
-				for (size_t j = 0; j <= i; j++) {
-					for (size_t k = 0; k <= i; k++) {
-						for (size_t l = 0; l <= i; l++) {
-							if (j + k + l == i) {
-								result += parameter_[index][0] * std::pow(x, i) * std::pow(y, j) * std::pow(z, k);
-								index++;
-							}
-						}
-					}
-				}
-			}
-
-			return result;
-		}
-
-	private:
-
-		/**
-			The coefficients of the polynomial
-		*/
-		utils::Matrix<ElementType> parameter_;
-		
-		/**
-			Degree of the polynomial
-		*/
-		size_t degree_;
 	};
 }
 

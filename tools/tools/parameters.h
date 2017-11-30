@@ -194,14 +194,19 @@
 	enum struct WeightFunction
 	{
 		/**
-			Gaussian weight function
+			Equal weights
 		*/
-		GAUSSIAN = 0,
+		BOX = 0,
 
 		/**
 			Linear weight function
 		*/
-		LINEAR = 1
+		LINEAR = 1,
+
+		/**
+			Gaussian weight function
+		*/
+		GAUSSIAN = 2,
 	};
 
 	/**
@@ -238,12 +243,12 @@
 		/**
 			Computation of a polynom of abitrary degree to approximate the surface
 		*/
-		SURF = 2,
+		SURFPOLY = 2,
 
 		/**
 			Computation of a polynom of abitrary degree to approximate the surface using moving least squares
 		*/
-		SURFMLS = 3,
+		SURFPOLYMLS = 3,
 
 	};
 

@@ -300,10 +300,10 @@ namespace pointcloud
 		NormalParams normal_params = NormalParams())
 	{
 		switch (normal_params.getNormalComputation()) {
-		case NormalComputation::PLANESVD: normalPlaneSVD(normal, point, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::PLANEPCA: normalPlanePCA(normal, point, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::VECTORSVD: normalVectorSVD(normal, point, points, normal_params.getWeightFunction()); break;
-		case NormalComputation::QUADSVD: normalQuadSVD(normal, point, points, normal_params.getWeightFunction()); break;
+		case NormalComputation::PLANESVD: normalPlaneSVD(normal, point, points, normal_params); break;
+		case NormalComputation::PLANEPCA: normalPlanePCA(normal, point, points, normal_params); break;
+		case NormalComputation::VECTORSVD: normalVectorSVD(normal, point, points, normal_params); break;
+		case NormalComputation::QUADSVD: normalQuadSVD(normal, point, points, normal_params); break;
 		}
 	}
 
@@ -314,13 +314,13 @@ namespace pointcloud
 		 @param[in,out] normal Normal
 		 @param[in] point Reference point
 		 @param[in] points Matrix with the points
-		 @param[in] weight_function Defines the weight function
+		 @param[in] normal_params Parameter for computing normals
 	*/
 	template<typename ElementType> void normalPlaneSVD(
 		ElementType* normal,
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points,
-		WeightFunction weight_function = WeightFunction::LINEAR)
+		const NormalParams&  normal_params)
 	{
 		/**
 			Computation of the distances to the reference point and define the weigths
@@ -328,18 +328,7 @@ namespace pointcloud
 		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point.transpose()));
 		
 		utils::Matrix<ElementType> weights;
-		switch (weight_function) {
-		case WeightFunction::GAUSSIAN: {
-			math::WeightFunctionGaussian<ElementType> weight_function_gaussian(utils::Matrix<ElementType>({ 0 }, 1, 1), distances);
-			weights = weight_function_gaussian(distances);
-			break;
-			}
-		case WeightFunction::LINEAR: {
-			math::WeightFunctionLinear<ElementType> weight_function_linear(distances, true);
-			weights = weight_function_linear(distances);
-			break;
-			}
-		}
+		math::getWeightsDistances(distances, weights, normal_params.getWeightFunction());
 		
 		/**
 			Build a nx4 design matrix = [x y z 1] with n = number of points
@@ -382,14 +371,14 @@ namespace pointcloud
 		 @param[in,out] normal Normal
 		 @param[in] point Reference point
 		 @param[in] points Matrix with the points
-		 @param[in] weight_function Defines the weight function
+		 @param[in] normal_params Parameter for computing normals
 	*/
 
 	template<typename ElementType> void normalPlanePCA(
 		ElementType* normal,
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points, 
-		WeightFunction weight_function = WeightFunction::LINEAR)
+		const NormalParams&  normal_params)
 	{
 	}
 
@@ -401,13 +390,13 @@ namespace pointcloud
 		@param[in,out] normal Normal
 		@param[in] point Reference point
 		@param[in] points Matrix with the points
-		@param[in] weight_function Defines the weight function
+		@param[in] normal_params Parameter for computing normals
 	*/
 	template<typename ElementType> void normalVectorSVD(
 		ElementType* normal,
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points, 
-		WeightFunction weight_function = WeightFunction::LINEAR)
+		const NormalParams&  normal_params)
 	{
 	}
 	
@@ -418,13 +407,13 @@ namespace pointcloud
 		@param[in,out] normal Normal
 		@param[in] point Reference point
 		@param[in] points Matrix with the points
-		@param[in] weight_function Defines the weight function
+		@param[in] normal_params Parameter for computing normals
 	*/
 	template<typename ElementType> void normalQuadSVD(
 		ElementType* normal,
 		const utils::Matrix<ElementType>& point,
 		const utils::Matrix<ElementType>& points, 
-		WeightFunction weight_function = WeightFunction::LINEAR)
+		const NormalParams&  normal_params)
 	{
 	}
 }

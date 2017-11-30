@@ -38,6 +38,121 @@
 
 namespace math
 {
+	/**
+		Computes the weights from distances
+		
+		@param[in] data Data points
+		@param[in] weights Matrix with the weigths
+		@param[in,out] weight_function Defines the weight function
+	*/
+	template<typename ElementType> void getWeightsDistances(
+		const utils::Matrix<ElementType>& distances, 
+		utils::Matrix<ElementType>& weights, 
+		WeightFunction weight_function)
+	{
+		switch (weight_function) {
+		case WeightFunction::BOX: {
+			math::WeightFunctionBox<ElementType> weight_function_box;
+			weights = weight_function_box(distances);
+			break;
+			}
+		case WeightFunction::LINEAR: {
+			math::WeightFunctionLinear<ElementType> weight_function_linear(distances, true);
+			weights = weight_function_linear(distances);
+			break;
+			}
+		case WeightFunction::GAUSSIAN: {
+			math::WeightFunctionGaussian<ElementType> weight_function_gaussian(utils::Matrix<ElementType>({ 0 }, 1, 1), distances);
+			weights = weight_function_gaussian(distances);
+			break;
+			}
+		}
+	}
+
+	template<typename ElementType> class WeightFunctionBox
+	{
+	public:
+		/**
+			Constructor
+		*/
+		WeightFunctionBox()
+		{
+		}
+
+		/**
+			Destructor
+		*/
+		~WeightFunctionBox()
+		{
+		}
+		
+		/**
+			Copy constructor
+
+			@param[in] weight_function_box An instance of class WeightFunctionBox
+		*/
+		WeightFunctionBox(const WeightFunctionBox<ElementType>&  weight_function_box) = delete;
+
+		/**
+			Copy constructor
+	
+			@param[in] weight_function_box An instance of class WeightFunctionBox
+		*/
+		WeightFunctionBox(const WeightFunctionBox<ElementType>&& weight_function_box) = delete;
+	
+		/**
+			Operator =
+	
+			@param[in] weight_function_box An instance of class WeightFunctionBox
+			@return Returns reference to the current instance
+		*/
+		WeightFunctionBox& operator=(const WeightFunctionBox<ElementType>& weight_function_box) = delete;
+	
+		/**
+			Operator =
+		
+			@param[in] weight_function_box An instance of class WeightFunctionBox
+			@return Returns reference to the current instance
+		*/
+		WeightFunctionBox& operator=(const WeightFunctionBox<ElementType>&& weight_function_box) = delete;
+
+		/**
+			Operator()
+
+			@param[in] x Data point
+			@return Weight
+		*/
+		ElementType operator()(ElementType x) const
+		{
+			return (ElementType)1.0;
+		}
+
+		/**
+			Operator()
+
+			@param[in] data Data points
+			@param[in] number_of_elements
+			@return Weights
+		*/
+		ElementType* operator()(ElementType* data, size_t number_of_elements) const
+		{
+			ElementType* weights = new ElementType[number_of_elements];
+			std::memset(weights, (ElementType)1.0, sizeof(ElementType) * number_of_elements);
+
+			return weights;
+		}
+
+		/**
+			Operator()
+
+			@param[in] matrix Matrix
+			@return Weights
+		*/
+		utils::Matrix<ElementType> operator()(const utils::Matrix<ElementType>& matrix) const
+		{
+			return utils::Matrix<ElementType>((*this)(matrix.getPtr(), matrix.getRows()), matrix.getRows(), 1);
+		}
+	};
 
 	template<typename ElementType> class WeightFunctionLinear
 	{
@@ -131,7 +246,7 @@ namespace math
 
 			@param[in] data Data points
 			@param[in] number_of_elements
-			@return Weight
+			@return Weights
 		*/
 		ElementType* operator()(ElementType* data, size_t number_of_elements) const
 		{
@@ -152,13 +267,11 @@ namespace math
 			Operator()
 
 			@param[in] matrix Matrix
-			@return Weight
+			@return Weights
 		*/
 		utils::Matrix<ElementType> operator()(const utils::Matrix<ElementType>& matrix) const
 		{
-			utils::Matrix<ElementType> weights((*this)(matrix.getPtr(), matrix.getRows()), matrix.getRows(), 1);
-
-			return weights;
+			 return utils::Matrix<ElementType>((*this)(matrix.getPtr(), matrix.getRows()), matrix.getRows(), 1);
 		}
 
 		/**

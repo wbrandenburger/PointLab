@@ -407,6 +407,25 @@ namespace utils
 		}
 
 		/**
+			Get matrix of another type
+		*/
+		template<typename ResultType> Matrix<ResultType> getType() const
+		{
+			Matrix<ResultType> matrix(rows_, cols_);
+			Matrix<ResultType>::Iterator it_matrix = matrix.begin();
+			Matrix<ElementType>::Iterator it = begin();
+
+			while (it != end())
+			{
+				*it_matrix = (ResultType)*it;
+				it_matrix++;
+				it++;
+			}
+
+			return matrix;
+		}
+
+		/**
 			Concatenate two matrices rowwise
 
 			@param[in] matrix An instance of class Matrix
