@@ -226,9 +226,25 @@
 	enum struct SurfaceComputation
 	{
 		/**
-			Computation of the moving least squares plane in the neighborhood 
+			Computation of a plane
 		*/
-		PLANEMLS = 0,
+		PLANE = 0,
+
+		/**
+			Computation of a plane using moving least squares
+		*/
+		PLANEMLS = 1,
+
+		/**
+			Computation of a polynom of abitrary degree to approximate the surface
+		*/
+		SURF = 2,
+
+		/**
+			Computation of a polynom of abitrary degree to approximate the surface using moving least squares
+		*/
+		SURFMLS = 3,
+
 	};
 
 #endif /* PARAMETERS_H_ */

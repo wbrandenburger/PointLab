@@ -125,33 +125,23 @@ int main(int argc, char* argv[]) {
 			/**
 				Compute the distances and the variance of these distances
 			*/
-			size_t number_of_elements = 100;
-			utils::Matrix<float> var = math::computeVar<float>(std::sqrt(math::euclideanDistance<float>(points - point.transpose())));
-			float* x = new float[number_of_elements];
-			for (size_t i = 0; i < number_of_elements; i++)
-			{
-				x[i] = -std::sqrt(var.getValue()) / 2 + i * std::sqrt(var.getValue()) / number_of_elements;
-			}
-
-
 			pointcloud::SurfaceParams surface_params;
-			surface_params.setAccuracy(1.0f / (float)number_of_elements);
+			surface_params.setAccuracy(1.0f / 1000.0f);
 			surface_params.setRootsApproximation(RootsApproximation::QUAD);
-
 			utils::Matrix<float> parameter = pointcloud::planeMLS<float>(point, points, normal, surface_params);
-			std::cout << parameter << std::endl;
-			//pointcloud_points.setPointPtr(new_point.getPtr(), 0);
-			//pointcloud_points.setColorPtr({ 255,0,0 }, 0);
 
 			utils::Matrix<float> points_mesh;
 			utils::Matrix<unsigned int> lines_mesh;
-			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 50);
+			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 10);
 
-			//for (size_t i = 0 ; i < points.getRows(); i++)
-			//{
-			//	points_mesh[i][2] = parameter[0][0] * points_mesh[i][0] +
-			//		parameter[1][0] * points_mesh[i][1] + parameter[2][0];
-			//}
+			for (size_t i = 0 ; i < points_mesh.getRows(); i++)
+			{
+				points_mesh[i][2] = parameter[0][0] * points_mesh[i][0] +
+					parameter[1][0] * points_mesh[i][1] + parameter[2][0];
+				//points_mesh[i][2] = point[2][0];
+				//std::cout << points_mesh[i][0] << "  " << points_mesh[i][1] <<" " << points_mesh[i][2] << std::endl;
+			}
+
 
 			/**
 				Show results

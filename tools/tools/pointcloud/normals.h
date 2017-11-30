@@ -110,7 +110,7 @@ namespace pointcloud
 
 			@return Method which will be used for computing normals
 		*/
-		NormalComputation getNormalComputation()
+		NormalComputation getNormalComputation() const
 		{
 			return normal_computation_;
 		}
@@ -120,7 +120,7 @@ namespace pointcloud
 
 			@return Weight function
 		*/
-		WeightFunction getWeightFunction()
+		WeightFunction getWeightFunction() const
 		{
 			return weight_function_;
 		}
@@ -130,7 +130,7 @@ namespace pointcloud
 			
 			@return Number of cores
 		*/
-		size_t getCores()
+		size_t getCores() const
 		{
 			return cores_;
 		}
