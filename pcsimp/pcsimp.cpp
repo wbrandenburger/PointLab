@@ -60,8 +60,8 @@ int main(int argc, char* argv[]) {
 	*/
 	pointcloud::PointcloudSoA<float> pointcloud;
 
-	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/mesh.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
@@ -137,6 +137,15 @@ int main(int argc, char* argv[]) {
 												points.getType<double>(),
 												normal.getType<double>(),
 												surface_params);
+			
+			utils::Matrix<double> point_ref = pointcloud::pointMLS<double>(
+				point.getType<double>(),
+				points.getType<double>(),
+				normal.getType<double>(),
+				surface_params);
+
+			pointcloud_points.setPointPtr( point_ref.getTypePtr<float>(), 0);
+			pointcloud_points.setColorPtr({ 255,0,0 }, 0);
 
 			/**
 				Create a grid which shall be fitted to the pointcloud
@@ -150,13 +159,34 @@ int main(int argc, char* argv[]) {
 
 			math::Polynomial3D<float> polynom(parameter.getType<float>(), 3);
 			math::Polynomial3DIntersection<float> polynom_intersection(polynom, normal, point);
-			std::cout << polynom_intersection(0) << std::endl;
 
 			utils::BoundingBox<float> bounding_box(points);
-			std::cout << bounding_box << std::endl;
 
+			float min = /*std::sqrt(*/((point - bounding_box.getMinMatrix()).transpose() * normal).getValue();
+			float max = /*std::sqrt(*/((point - bounding_box.getMaxMatrix()).transpose() * normal).getValue();
 
+			if (min > max) {
+				swap(min, max);
+			}
 
+			size_t number_of_elements = 1000;
+			utils::Matrix<float> intersection = math::getFunctionMatrix<float, math::Polynomial3DIntersection<float>>(
+				polynom_intersection,
+				min,
+				max,
+				number_of_elements);
+
+			float t = math::NewtonMethod<float, math::Polynomial3DIntersection<float>>(
+				polynom_intersection, 
+				min, 
+				max, 
+				std::abs(max - min) / 1000);
+
+			std::cout << t << std::endl;
+			if (t != NULL) {
+				pointcloud_points.setPointPtr((normal*t+point).getPtr(), 1);
+				pointcloud_points.setColorPtr({ 0,255,0 }, 1);
+			}
 			/**
 				Show results
 			*/
@@ -170,6 +200,11 @@ int main(int argc, char* argv[]) {
 			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
 			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
 			glview.subPlot(2, 2, 1);
+
+			glview.setPlot(number_of_elements);
+			glview.setX(intersection.getAllocatedColPtr(0));
+			glview.setY(intersection.getAllocatedColPtr(1));
+			glview.subPlot(2, 2, 2);
 
 			glview.mainLoop();
 		} while (true);

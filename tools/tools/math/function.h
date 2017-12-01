@@ -140,6 +140,30 @@ namespace math
 		return result;
 	}
 
+	template<typename ElementType, typename FunctionType> 
+	utils::Matrix<ElementType> getFunctionMatrix(
+		FunctionType function, 
+		ElementType min,
+		ElementType max,
+		size_t number_of_elements)
+	{
+		utils::Matrix<ElementType> matrix(number_of_elements, 2);
+		utils::Matrix<ElementType>::Iterator it = matrix.begin();
+		
+		ElementType quant = (max - min) / (ElementType) number_of_elements;
+		for (size_t i = 0; i < number_of_elements; i++) 
+		{
+			ElementType x = min + i*quant;
+			
+			*it = x;
+			it++;
+			*it = function(x);
+			it++;
+		}
+
+		return matrix;
+	}
+
 	/**
 		Creates a two dimensional polynom of abitrary degree
 	*/

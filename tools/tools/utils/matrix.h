@@ -426,6 +426,24 @@ namespace utils
 		}
 
 		/**
+			Get pointer of another type
+		*/
+		template<typename ResultType> ResultType* getTypePtr() const
+		{
+			ResultType matrix = new ResultType[rows_ * cols_];
+			ResultType* matrix_ptr = data_;
+			Matrix<ElementType>::Iterator it = begin();
+
+			while (it != end())
+			{
+				*matrix_ptr = (ResultType)*it;
+				matrix_ptr++;
+				it++;
+			}
+
+			return matrix;
+		}
+		/**
 			Concatenate two matrices rowwise
 
 			@param[in] matrix An instance of class Matrix

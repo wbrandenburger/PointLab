@@ -47,44 +47,36 @@ namespace math
 		@param[in] b Left or rigth interval bound
 		@param[in] eps Value which determines the acurracy
 	*/
-	template<typename ElementType, typename FunctionHandle> ElementType NewtonMethod(
-		FunctionHandle function, 
-		ElementType a, 
-		ElementType b, 
+	template<typename ElementType, typename FunctionType> ElementType NewtonMethod(
+		FunctionType function, 
+		ElementType min, 
+		ElementType max, 
 		ElementType eps)
 	{
-		if (std::abs(a) < std::abs(b)) {
-			swap(a, b);
+		if (min > max) {
+			swap(min, max);
 		}
-			
-		ElementType right_border = a, left_border = b;
 
 		size_t repetition = 0;
-		while (std::abs(function(b)) > eps && std::abs(function(a)) > eps) 
+		while (std::abs(function(max)) > eps && std::abs(function(min)) > eps) 
 		{
 			/**
-				Newton method x_n+1 = x_n - f(x_n)/f'(x_n) with f'(x_n) = (f(x_2) - f(x_1)/(x_2 - x_1)
+				Newton method x_n+1 = x_min + f(x_min)/f'(x_min) with f'(x_min) = (f(x_max) - f(x_min)/(x_max - x_min)
 			*/
-			ElementType s = b - function(b)*(a - b) / (function(a) - function(b));
-			a = b;
-			b = s;
-
-			/**
-				Abort if the computed function value is out of the bounds
-			*/
-			if (b > right_border || b < left_border) {
-				exitFailure(__FILE__, __LINE__);
-			}
+			ElementType s = min - function(min)*(max - min) / (function(max) - function(min));
+			max = min;
+			min = s;
 
 			/**
 				Abort if the computation of zero tooks too much repetitions
 			*/
 			repetition++;
 			if (repetition > REPETITION) {
-				exitFailure(__FILE__, __LINE__);
+				return NULL;
 			}
 		}
-		return b;
+
+		return function(min) < function(max) ? min : max;
 	}
 
 
@@ -96,13 +88,13 @@ namespace math
 		@param[in] b Left or rigth interval bound
 		@param[in] eps Value which determines the acurracy
 	*/
-	template<typename ElementType, typename FunctionHandle> ElementType QuadraticInverseInterpolation(
-		FunctionHandle function, 
+	template<typename ElementType, typename FunctionType> ElementType QuadraticInverseInterpolation(
+		FunctionType function, 
 		ElementType a, 
 		ElementType b, 
 		ElementType eps)
 	{
-		if (std::abs(a) < std::abs(b)) {
+		if (b < a) {
 			swap(a, b);
 		}
 
@@ -156,7 +148,7 @@ namespace math
 				a = s;
 			}
 	
-			if (std::abs(a) < std::abs(b)) {
+			if (b < a) {
 				swap(a, b);
 			}
 	
