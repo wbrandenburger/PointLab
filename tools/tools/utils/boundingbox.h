@@ -402,9 +402,7 @@ namespace utils
 	{
 		for (size_t i = 0; i <  bounding_box_.getDim(); i++) {
 			out_ << bounding_box_.getMinDim(i) << " " 
-				<< bounding_box_.getMaxDim(i) << " " 
-				<< bounding_box_.getDifference(i) << " " 
-				<< bounding_box_.getMiddle(i) << std::endl;
+				<< bounding_box_.getMaxDim(i) << std::endl;
 		}
 		return out_;
 	}

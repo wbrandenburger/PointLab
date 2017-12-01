@@ -155,6 +155,8 @@ int main(int argc, char* argv[]) {
 			utils::BoundingBox<float> bounding_box(points);
 			std::cout << bounding_box << std::endl;
 
+
+
 			/**
 				Show results
 			*/
