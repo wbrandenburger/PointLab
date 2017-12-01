@@ -828,10 +828,11 @@ namespace pointcloud
 		void getMatrix(utils::Matrix<ElementType>& matrix_) const
 		{
 			ElementType* data = new ElementType[number_of_vertices*3];
-			
-			size_t index = 0;
+			ElementType* data_ptr = data;
+
 			for (Iterator<ElementType> it = beginPoint(); it != endPoint(); it++) {
-				data[index++] = *it;
+				*data_ptr= *it;
+				data_ptr++;
 			}
 
 			matrix_.setMatrix(data, number_of_vertices, 3);
@@ -1153,10 +1154,16 @@ namespace pointcloud
 			void setStride(const PointcloudFlag& pointcloud_flag)
 			{
 				if (pointcloud_type_ == PointcloudType::AOS) {
+
+					size_t type_padding = 0;
+					if (std::is_same<ElementType, double>::value) {
+						type_padding = 4;
+					}
+
 					switch (pointcloud_flag) {
-					case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + 4; break;
-					case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + 2; break;
-					case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + 4; break;
+					case PointcloudFlag::POINTS: stride_ = sizeof(ElementType) * 4 + sizeof(uint8_t)*4 + type_padding; break;
+					case PointcloudFlag::RGB: stride_ = sizeof(ElementType) * 6 + sizeof(uint8_t) * 2 + type_padding; break;
+					case PointcloudFlag::NORMALS: stride_ = sizeof(ElementType) * 4 + sizeof(uint8_t) * 4 + type_padding; break;
 					}
 				}
 			}

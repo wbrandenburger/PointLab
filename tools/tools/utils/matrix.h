@@ -430,8 +430,8 @@ namespace utils
 		*/
 		template<typename ResultType> ResultType* getTypePtr() const
 		{
-			ResultType matrix = new ResultType[rows_ * cols_];
-			ResultType* matrix_ptr = data_;
+			ResultType* matrix = new ResultType[rows_ * cols_];
+			ResultType* matrix_ptr = matrix;
 			Matrix<ElementType>::Iterator it = begin();
 
 			while (it != end())

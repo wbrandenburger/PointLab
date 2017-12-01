@@ -191,9 +191,25 @@ namespace gl
 		}
 
 		/**
-			Draw the pointcloud with float accurancy
+			Draw the pointcloud with float or double accurancy
 		*/
 		void draw() 
+		{
+			if (std::is_same<ElementType, float>::value) {
+				drawFloat();
+			}
+			else if (std::is_same<ElementType, double>::value) {
+				drawDouble();
+			}
+			else {
+				exitFailure(__FILE__, __LINE__);
+			}
+		}
+
+		/**
+			Draw the pointcloud with float accurancy
+		*/
+		void drawFloat() 
 		{
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -237,9 +253,9 @@ namespace gl
 				*/
 				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
 				gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
-				glRotatef(-1.0f *math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
-				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
-				glRotatef(1.0f *math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
+				glRotatef(-1.0f * math::toDeg<ElementType>(gl_rot_x), 1.0f, 0.0, 0.0);
+				glRotatef(1.0f * math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0f, 0.0);
+				glRotatef(1.0f * math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0f);
 
 				/**
 					Determine the size of the points
@@ -267,7 +283,6 @@ namespace gl
 						ElementType* normals = gl_container_[i].getNormals();
 						for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
 							glBegin(GL_LINES);
-							glColor4f(0.5f, 0.5, 0.5, 0.0);
 							glVertex3f(points[0], points[1], points[2]);
 							glVertex3f(points[0] + normals[0] * gl_normalsize_,
 								points[1] + normals[1] * gl_normalsize_,
@@ -300,19 +315,150 @@ namespace gl
 			glEnableClientState(GL_COLOR_ARRAY);
 				glLineWidth(2.0f);
 				glBegin(GL_LINES);
-					glColor4f(1.0f, 0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.25f*gl_mouse_movement_.getZoom(), 0.0, 0.0);
+					glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+					glVertex3f(0.0f, 0.0f, 0.0f);
+					glVertex3f(0.25f*gl_mouse_movement_.getZoom(), 0.0f, 0.0f);
 				glEnd();
 				glBegin(GL_LINES);
-					glColor4f(0.0, 1.0f, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.25f*gl_mouse_movement_.getZoom(), 0.0);
+					glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
+					glVertex3f(0.0f, 0.0f, 0.0f);
+					glVertex3f(0.0f, 0.25f*gl_mouse_movement_.getZoom(), 0.0f);
 				glEnd();
 				glBegin(GL_LINES);
-					glColor4f(0.0, 0.0, 1.0f, 0.0);
-					glVertex3f(0.0, 0.0, 0.0);
-					glVertex3f(0.0, 0.0, 0.25f*gl_mouse_movement_.getZoom());
+					glColor4f(0.0f, 0.0f, 1.0f, 0.0f);
+					glVertex3f(0.0f, 0.0f, 0.0f);
+					glVertex3f(0.0f, 0.0f, 0.25f*gl_mouse_movement_.getZoom());
+				glEnd();
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+
+			glPopMatrix();
+
+			glutSwapBuffers();
+		}
+
+		/**
+			Draw the pointcloud with double accurancy
+		*/
+		void drawDouble() 
+		{
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+			for (size_t i = 0; i < number_of_clouds_; i++) {
+				/**
+					Enables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+				*/
+				glEnableClientState(GL_VERTEX_ARRAY);
+				if (gl_container_[i].isColor()) {
+					glEnableClientState(GL_COLOR_ARRAY);
+				}
+				if (gl_container_[i].getMode() != GL_POINTS) {
+					glEnableClientState(GL_INDEX_ARRAY);
+				}
+
+				float r, g, b;
+				utils::colorSchemeRGB(r, g, b, i, number_of_clouds_);
+				glColor4f(r, g, b, 0.0f);
+
+
+				glLoadIdentity();
+
+				/**
+					Increase or decrease the entire pointcloud by the factor gl_zoom
+				*/
+				glScaled(1.0 / gl_mouse_movement_.getZoom(), 
+					1.0 / gl_mouse_movement_.getZoom(), 
+					1.0 / gl_mouse_movement_.getZoom());
+
+				/**
+					Translate the pointcloud by the chosen centerpoint
+				*/
+				glTranslated(gl_mouse_movement_.getCenterX() * gl_mouse_movement_.getZoom(),
+					gl_mouse_movement_.getCenterY() * gl_mouse_movement_.getZoom(),
+					gl_mouse_movement_.getCenterZ() * gl_mouse_movement_.getZoom());
+
+				/**
+					Rotate the entire pointcloud around the x- and y-axis
+				*/
+				ElementType gl_rot_x, gl_rot_y, gl_rot_z;
+				gl_mouse_movement_.getRotation().getEulerAngles(gl_rot_x, gl_rot_y, gl_rot_z);
+				glRotated(-1.0 * math::toDeg<ElementType>(gl_rot_x), 1.0, 0.0, 0.0);
+				glRotated(1.0 * math::toDeg<ElementType>(gl_rot_y), 0.0, 1.0, 0.0);
+				glRotated(1.0 * math::toDeg<ElementType>(gl_rot_z), 0.0, 0.0, 1.0);
+
+				/**
+					Determine the size of the points
+				*/
+				glPointSize((GLfloat)gl_pointsize_);
+
+				/**
+					Link the points, colors and normals for drawing
+				*/
+				glVertexPointer(3, GL_DOUBLE, 0, gl_container_[i].getPoints());
+				if (gl_container_[i].isColor()) {
+					glColorPointer(3, GL_UNSIGNED_BYTE, 0, gl_container_[i].getColor());
+				}
+				if (gl_container_[i].getMode() == GL_POINTS) {
+					glDrawArrays(gl_container_[i].getMode(), 0, gl_container_[i].getNumberOfVertices());
+				}
+				else{
+					glDrawElements(gl_container_[i].getMode(), gl_container_[i].getNumberOfIndices(),
+						GL_UNSIGNED_INT, gl_container_[i].getIndices());
+				}
+				
+				if (gl_container_[i].isNormal()) {
+					if (gl_change_size_ == 1) {
+						ElementType* points = gl_container_[i].getPoints();
+						ElementType* normals = gl_container_[i].getNormals();
+						for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
+							glBegin(GL_LINES);
+							glVertex3d(points[0], points[1], points[2]);
+							glVertex3d(points[0] + normals[0] * gl_normalsize_,
+								points[1] + normals[1] * gl_normalsize_,
+								points[2] + normals[2] * gl_normalsize_);
+							glEnd();
+
+							points += 3;
+							normals += 3;
+						}
+					}
+				}
+
+				/**
+					Disables use of glVertexPointer and glColorPointer when drawing with glDrawArrays/
+				*/
+				glDisableClientState(GL_VERTEX_ARRAY);
+				if (gl_container_[i].isColor()) {
+					glDisableClientState(GL_COLOR_ARRAY);
+				}
+				if (gl_container_[i].getMode() != GL_POINTS) {
+					glDisableClientState(GL_INDEX_ARRAY);
+				}
+			}
+				
+			/**
+				Draw axis
+			*/
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+				glLineWidth(2.0f);
+				glBegin(GL_LINES);
+					glColor4f(1.0f, 0.0f, 0.0f, 0.0f);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.25*gl_mouse_movement_.getZoom(), 0.0, 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.25*gl_mouse_movement_.getZoom(), 0.0);
+				glEnd();
+				glBegin(GL_LINES);
+					glColor4f(0.0f, 0.0f, 1.0f, 0.0f);
+					glVertex3d(0.0, 0.0, 0.0);
+					glVertex3d(0.0, 0.0, 0.25*gl_mouse_movement_.getZoom());
 				glEnd();
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_COLOR_ARRAY);
