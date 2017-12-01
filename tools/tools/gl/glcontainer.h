@@ -94,6 +94,8 @@ namespace gl
 				normals_ = pointcloud.getNormalsPtr();
 			}
 
+			std::cout << normals_[0] << " " << normals_[1] << " " << normals_[2] << std::endl;
+
 			number_of_vertices_ = pointcloud.getNumberOfVertices();
 
 			if (pointcloud.isTriangle()) {

@@ -34,6 +34,8 @@
 
 #include "tools/utils/matrix.h"
 
+#include "eigen3/Eigen/Dense"
+
 namespace math
 {
 	
@@ -152,6 +154,50 @@ namespace math
 		}
 
 		return matrix_indices;
+	}
+
+	/**
+		Converts a matrix to an eigen matrix
+
+		@param[in] matrix Matrix
+		@return Eigen matrix
+	*/
+	template<typename ElementType> 
+	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrixToEigen(
+		utils::Matrix<ElementType> matrix)
+	{
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> eigen(matrix.getRows(), matrix.getCols());
+		for (size_t row = 0; row < matrix.getRows(); row++)
+		{
+			for (size_t col = 0; col < matrix.getCols(); col++)
+			{
+				eigen(row, col) = (double)matrix[row][col];
+			}
+		}
+
+		return eigen;
+	}
+
+	/**
+		Converts an eigen matrix to a matrix
+
+		@param[in] eigen Eigen matrix
+		@return Matrix
+	*/
+	template<typename ElementType> 
+	utils::Matrix<ElementType> eigenToMatrix(
+		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> eigen)
+	{
+		utils::Matrix<ElementType> matrix(eigen.rows(), eigen.cols());
+		for (size_t row = 0; row < matrix.getRows(); row++)
+		{
+			for (size_t col = 0; col < matrix.getCols(); col++)
+			{
+				matrix[row][col] = (ElementType) eigen(row, col);
+			}
+		}
+
+		return matrix;
 	}
 
 	/**

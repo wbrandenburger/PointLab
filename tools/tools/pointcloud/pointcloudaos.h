@@ -540,8 +540,13 @@ namespace pointcloud
 		*/
 		IteratorInitializer<ElementType> beginNormal() const
 		{
+			size_t type_padding = 0;
+			if (std::is_same<ElementType, double>::value) {
+				type_padding = 4;
+			}
+
 			return IteratorInitializer<ElementType>(
-				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + 4),
+				reinterpret_cast<ElementType*>((char*)&pointcloud[0] + sizeof(ElementType) * 3 + sizeof(uint8_t)*4 + type_padding),
 				PointcloudFlag::NORMALS, PointcloudType::AOS);
 		}
 
@@ -570,7 +575,12 @@ namespace pointcloud
 		*/
 		ElementType* endNormal() const
 		{
-			return reinterpret_cast<ElementType*>((char*)(pointcloud + number_of_vertices) + sizeof(ElementType) * 3 + 4);
+			size_t type_padding = 0;
+			if (std::is_same<ElementType, double>::value) {
+				type_padding = 4;
+			}
+
+			return reinterpret_cast<ElementType*>((char*)(pointcloud + number_of_vertices) + sizeof(ElementType) * 3 + sizeof(uint8_t) * 4 + type_padding);
 		}
 
 		private:

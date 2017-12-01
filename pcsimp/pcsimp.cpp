@@ -44,6 +44,8 @@
 
 #include "trees/trees.hpp"
 
+typedef double ElementType;
+
 int main(int argc, char* argv[]) {
 
 	std::cout << "----------------------- Main -----------------------" << std::endl;
@@ -53,25 +55,23 @@ int main(int argc, char* argv[]) {
 	*/
 	utils::Timer time;
 	int cores = (unsigned int)std::thread::hardware_concurrency();
-	size_t neighbors = 30;
+	size_t neighbors = 50;
 	
 	/**
 		Read pointcloud
 	*/
-	pointcloud::PointcloudSoA<double> pointcloud;
+	pointcloud::PointcloudSoA<ElementType> pointcloud;
 
 	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Ettlingen/Ettlingen1.ply";
-	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
-	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/mesh.ply";
+	//char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Sonstiges/buny.ply";
+	char* file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Gebaeude51/Gebaeude511.ply";
 	//char *file = "C:/Users/Wolfgang Brandenburg/OneDrive/Dokumente/3DModelle/Unikirche/UnikircheII.ply";
 
 	time.start();
-	if (io::readPly<double>(file, pointcloud)) {
+	if (io::readPly<ElementType>(file, pointcloud)) {
 		std::cout << "File with " << pointcloud.getNumberOfVertices() << " point has been read in "
 			<< time.stop() << " s into Pointcloud" << std::endl;
 	}
-	std::cout << pointcloud << std::endl;
-
 	/**
 		----------------------- Computation of the normals -----------------------
 	*/
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 			normal_params.setCores(cores);
 			normal_params.setNormalComputation(NormalComputation::PLANESVD);
 			normal_params.setWeightFunction(WeightFunction::LINEAR);
-		pointcloud::computeNormals<double>(pointcloud, neighbors, normal_params);
+		pointcloud::computeNormals<ElementType>(pointcloud, neighbors, normal_params);
 
 	std::cout << "Computation of Normals in " << time.stop() << " s" << std::endl;
 		
@@ -91,9 +91,9 @@ int main(int argc, char* argv[]) {
 		/**
 			Build kdtree
 		*/
-		utils::Matrix<double> pointcloud_matrix;
+		utils::Matrix<ElementType> pointcloud_matrix;
 		pointcloud.getMatrix(pointcloud_matrix);
-		trees::Index<double> kdtree_index(pointcloud_matrix, trees::KDTreeIndexParams(neighbors));
+		trees::Index<ElementType> kdtree_index(pointcloud_matrix, trees::KDTreeIndexParams(neighbors));
 		kdtree_index.buildIndex();
 		utils::randSeed();
 		do{
@@ -101,109 +101,122 @@ int main(int argc, char* argv[]) {
 				Search for the neighbors of a specific point
 			*/
 			size_t random_point = utils::randInt(pointcloud.getNumberOfVertices(),0);
-			utils::Matrix<double> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
-			utils::Matrix<double> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
+			utils::Matrix<ElementType> point(pointcloud.getAllocatedPointPtr(random_point), 3, 1);
+			utils::Matrix<ElementType> normal(pointcloud.getAllocatedNormalPtr(random_point), 3, 1);
 
 			trees::TreeParams tree_params;
 			tree_params.setCores(normal_params.getCores());
 			utils::Matrix<size_t> indices(1, neighbors);
-			utils::Matrix<double> dists(1, neighbors);
+			utils::Matrix<ElementType> dists(1, neighbors);
 
 			kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
 			/**
 				Get the neighbors of the reference point
 			*/
-			pointcloud::PointcloudAoS<double> pointcloud_points;
+			pointcloud::PointcloudAoS<ElementType> pointcloud_points;
 			pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
-			utils::Matrix<double> points;
+			utils::Matrix<ElementType> points;
 			pointcloud_points.getMatrix(points);
 
 			/**
-				Compute the distances and the variance of these distances
+				----------------------- Computation of the surface without MLS -----------------------
 			*/
-			pointcloud::SurfaceParams surface_params_mls;
-			size_t polynomial_degree_mls = 3;
-			surface_params_mls.setAccuracy(1.0f / 1000.0f);
-			surface_params_mls.setRootsApproximation(RootsApproximation::QUAD);
-			surface_params_mls.setSurfaceComputation(SurfaceComputation::SURFPOLYMLS);
-			surface_params_mls.setPolynomialDegree(polynomial_degree_mls);
-			utils::Matrix<double> parameter_mls = pointcloud::computeSurface<double>(
-												point, 
-												points,
-												normal,
-												surface_params_mls);
-			/**
-				Create a grid which shall be fitted to the pointcloud
-			*/
-			utils::Matrix<double> points_mesh_mls;
-			utils::Matrix<unsigned int> lines_mesh_mls;
-			gl::glMeshGrid<double>(points, points_mesh_mls, lines_mesh_mls, 10);
-
-			math::Polynomial3D<double> polynomial_mls(parameter_mls, polynomial_degree_mls);
-			polynomial_mls(points_mesh_mls);
 			
+			size_t polynomial_degree = 2;
+
+				/**
+					Compute the distances and the variance of these distances
+				*/
+				pointcloud::SurfaceParams surface_params;
+				surface_params.setAccuracy(1.0f / 1000.0f);
+				surface_params.setRootsApproximation(RootsApproximation::QUAD);
+				surface_params.setSurfaceComputation(SurfaceComputation::SURFPOLY);
+				surface_params.setPolynomialDegree(polynomial_degree);
+
+				utils::Matrix<ElementType> parameter = pointcloud::computeSurface<ElementType>(
+													point, 
+													points,
+													normal,
+													surface_params);
+				/**
+					Create a grid which shall be fitted to the pointcloud
+				*/
+				utils::Matrix<ElementType> points_mesh;
+				utils::Matrix<unsigned int> lines_mesh;
+				gl::glMeshGrid<ElementType>(points, points_mesh, lines_mesh, 25);
+
+				math::Polynomial3D<ElementType> polynomial(parameter, polynomial_degree);
+				polynomial(points_mesh);
+
 			/**
-				Compute the distances and the variance of these distances
+				----------------------- Computation of the surface without MLS -----------------------
 			*/
-			pointcloud::SurfaceParams surface_params;
-			size_t polynomial_degree = 3;
-			surface_params.setAccuracy(1.0f / 1000.0f);
-			surface_params.setRootsApproximation(RootsApproximation::QUAD);
-			surface_params.setSurfaceComputation(SurfaceComputation::SURFPOLY);
-			surface_params.setPolynomialDegree(polynomial_degree);
 
-			utils::Matrix<double> parameter = pointcloud::computeSurface<double>(
-												point, 
-												points,
-												normal,
-												surface_params);
+				/**
+					Compute the distances and the variance of these distances
+				*/
+				pointcloud::SurfaceParams surface_params_mls;
+				surface_params_mls.setAccuracy(1.0f / 1000.0f);
+				surface_params_mls.setRootsApproximation(RootsApproximation::QUAD);
+				surface_params_mls.setSurfaceComputation(SurfaceComputation::SURFPOLYMLS);
+				surface_params_mls.setPolynomialDegree(polynomial_degree);
+				utils::Matrix<ElementType> parameter_mls = pointcloud::computeSurface<ElementType>(
+													point, 
+													points,
+													normal,
+													surface_params_mls);
+
+				/**
+					Create a grid which shall be fitted to the pointcloud
+				*/
+				utils::Matrix<ElementType> points_mesh_mls;
+				utils::Matrix<unsigned int> lines_mesh_mls;
+				gl::glMeshGrid<ElementType>(points, points_mesh_mls, lines_mesh_mls, 25);
+
+				math::Polynomial3D<ElementType> polynomial_mls(parameter_mls, polynomial_degree);
+				polynomial_mls(points_mesh_mls);
+				
 			/**
-				Create a grid which shall be fitted to the pointcloud
+				----------------------- Computation of the intersection -----------------------
 			*/
-			utils::Matrix<double> points_mesh;
-			utils::Matrix<unsigned int> lines_mesh;
-			gl::glMeshGrid<double>(points, points_mesh, lines_mesh, 10);
+				//math::Polynomial3D<double> polynom(parameter_mls.getType<double>(), 3);
+				//math::Polynomial3DIntersection<double> polynom_intersection(polynom, normal, point);
 
-			math::Polynomial3D<double> polynomial(parameter, polynomial_degree);
-			polynomial(points_mesh);
+				//utils::BoundingBox<double> bounding_box(points);
+	
+				//double min = ((point - bounding_box.getMinMatrix()).transpose() * normal).getValue();
+				//double max = ((point - bounding_box.getMaxMatrix()).transpose() * normal).getValue();
 
-			////////math::Polynomial3D<float> polynom(parameter_mls.getType<float>(), 3);
-			////////math::Polynomial3DIntersection<float> polynom_intersection(polynom, normal, point);
+				//if (min > max) {
+				//swap(min, max);
+				//}
 
-			////////utils::BoundingBox<float> bounding_box(points);
+				//size_t number_of_elements = 1000;
+				//utils::Matrix<double> intersection = math::getFunctionMatrix<double, math::Polynomial3DIntersection<double>>(
+				//	polynom_intersection,
+				//	min,
+				//	max,
+				//	number_of_elements);
 
-			////////float min = /*std::sqrt(*/((point - bounding_box.getMinMatrix()).transpose() * normal).getValue();
-			////////float max = /*std::sqrt(*/((point - bounding_box.getMaxMatrix()).transpose() * normal).getValue();
-
-			////////if (min > max) {
-			////////	swap(min, max);
-			////////}
-
-			////////size_t number_of_elements = 1000;
-			////////utils::Matrix<float> intersection = math::getFunctionMatrix<float, math::Polynomial3DIntersection<float>>(
-			////////	polynom_intersection,
-			////////	min,
-			////////	max,
-			////////	number_of_elements);
-
-			////////float t = math::NewtonMethod<float, math::Polynomial3DIntersection<float>>(
-			////////	polynom_intersection, 
-			////////	min, 
-			////////	max, 
-			////////	std::abs(max - min) / 1000);
-			////////if (t != NULL) {
-			////////	pointcloud_points.setPointPtr((normal*t+point).getPtr(), 1);
-			////////	pointcloud_points.setColorPtr({ 0,255,0 }, 1);
-			////////}
+				//float t = math::NewtonMethod<double, math::Polynomial3DIntersection<double>>(
+				//	polynom_intersection, 
+				//	min, 
+				//	max, 
+				//	std::abs(max - min) / 1000);
+				//if (t != NULL) {
+				//	pointcloud_points.setPointPtr((normal*t+point).getPtr(), 1);
+				//	pointcloud_points.setColorPtr({ 0,255,0 }, 1);
+				//}
 
 			/**
 				Show results
 			*/
-			gl::GLView<double> glview(argc,argv);
+			gl::GLView<ElementType> glview(argc,argv);
 
 			//glview.setViewer();
 			//glview.setPointcloud(pointcloud);
 			//glview.subPlot(2, 2, 0);
+
 			glview.setPlot3D();
 			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
 			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
@@ -213,6 +226,8 @@ int main(int argc, char* argv[]) {
 			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
 			glview.setPointcloud(GLParams::LINES, points_mesh_mls, lines_mesh_mls);
 			glview.subPlot(2, 2, 1);
+
+			std::cout << pointcloud_points << std::endl;
 
 			//glview.setPlot(number_of_elements);
 			//glview.setX(intersection.getAllocatedColPtr(0));

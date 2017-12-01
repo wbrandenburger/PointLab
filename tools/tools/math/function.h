@@ -336,12 +336,9 @@ namespace math
 			size_t index = ((degree_ + 2) * (degree_ + 1)) / 2 - 1;
 			for (size_t i = 0; i <= degree_; i++) {
 				for (size_t j = 0; j <= i; j++) {
-					for (size_t k = 0; k <= i; k++) {
-						if (j + k == i) {
-							result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
-							index--;
-						}
-					}
+					size_t k = i - j;
+					result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
+					index--;
 				}
 			}
 
@@ -362,12 +359,9 @@ namespace math
 			size_t index = ((degree_ + 2) * (degree_ + 1)) / 2 - 1;
 			for (size_t i = 0; i <= degree_; i++) {
 				for (size_t j = 0; j <= i; j++) {
-					for (size_t k = 0; k <= i; k++) {
-						if (j + k == i) {
-							result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
-							index--;
-						}
-					}
+					size_t k = i - j;
+					result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
+					index--;
 				}
 			}
 

@@ -449,7 +449,7 @@ namespace utils
 			@param[in] matrix An instance of class Matrix
 			@return Concatenated matrices
 		*/
-		Matrix<ElementType> conctatenateRow(Matrix<ElementType> matrix)
+		Matrix<ElementType> concatenateRow(Matrix<ElementType> matrix)
 		{
 			if (cols_ != matrix.getCols())
 			{
@@ -471,7 +471,7 @@ namespace utils
 			@param[in] matrix An instance of class Matrix
 			@return Concatenated matrices
 		*/
-		Matrix<ElementType> conctatenateCol(Matrix<ElementType> matrix)
+		Matrix<ElementType> concatenateCol(Matrix<ElementType> matrix)
 		{
 			if (rows_ != matrix.getRows())
 			{
@@ -481,7 +481,7 @@ namespace utils
 			Matrix<ElementType> matrix_left = transpose();
 			Matrix<ElementType> matrix_right = matrix.transpose();
 
-			return matrix_left.conctatenateRow(matrix_right).transpose();
+			return matrix_left.concatenateRow(matrix_right).transpose();
 		}
 
 		/**
@@ -1037,7 +1037,7 @@ namespace utils
 				Matrix<ElementType> equation_right(rows_, 1);
 				equation_right[i][0] = (ElementType) 1.0;
 
-				Matrix<ElementType> equation = equation_left.conctatenateCol(equation_right);
+				Matrix<ElementType> equation = equation_left.concatenateCol(equation_right);
 
 				inv.setColMatrix(equation.gaussJordanElimination(), i);
 			}

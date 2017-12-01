@@ -40,6 +40,8 @@
 
 #include "tools/pointcloud/normals.h"
 
+#include "eigen3/Eigen/Dense"
+
 namespace pointcloud
 {	
 	/**
@@ -389,9 +391,11 @@ namespace pointcloud
 		math::getWeightsDistances(distances, weights, surface_params.getWeightFunction());
 
 		/**
-			Compute the adjustment x = (A'PA)^(-1)A'Pl and return the parameter
+			Solve the linear equationsystem (A'PA)x = A'Pl and return the parameter
 		*/
-		return (design_matrix.transpose()*(weights*design_matrix)).inverse()*design_matrix.transpose()*(weights*observation);
+		utils::Matrix<ElementType> linear_system = (design_matrix.transpose()*(weights*design_matrix)).concatenateCol(design_matrix.transpose()*(weights*observation));
+
+		return linear_system.gaussJordanElimination();
 	}
 
 	/**
@@ -438,9 +442,11 @@ namespace pointcloud
 		math::getWeightsDistances(distances, weights, surface_params.getWeightFunction());
 
 		/**
-			Compute the adjustment x = (A'PA)^(-1)A'Pl and return the parameter
+			Solve the linear equationsystem (A'PA)x = A'Pl and return the parameter
 		*/
-		return (design_matrix.transpose()*(weights*design_matrix)).inverse()*design_matrix.transpose()*(weights*observation);
+		utils::Matrix<ElementType> linear_system = (design_matrix.transpose()*(weights*design_matrix)).concatenateCol(design_matrix.transpose()*(weights*observation));
+		
+		return linear_system.gaussJordanElimination();
 	}
 
 	template<typename ElementType> struct NonLinearPlaneMLSMinimization

@@ -70,18 +70,15 @@ namespace math
 		utils::Matrix<ElementType>& design_matrix,
 		size_t degree)
 	{
-		size_t index = ((degree + 2) * (degree + 1)) / 2 - 1;
-		design_matrix.setMatrix(data.getRows(), index + 1);
+		size_t number_of_parameter = ((degree + 2) * (degree + 1)) / 2;
+		design_matrix.setMatrix(data.getRows(), number_of_parameter);
 		for (size_t i = 0; i < data.getRows(); i++) {
-			index = ((degree + 2) * (degree + 1)) / 2 - 1;
+			size_t index = number_of_parameter - 1;
 			for (size_t j = 0; j <= degree; j++) {
 				for (size_t k = 0; k <= j; k++) {
-					for (size_t l = 0; l <= j; l++) {
-						if (k + l == j) {
-							design_matrix[i][index] = std::pow(data[i][0], k) * std::pow(data[i][1], l);
-							index--;
-						}
-					}
+					size_t l = j - k;
+					design_matrix[i][index] = std::pow(data[i][0], k) * std::pow(data[i][1], l);
+					index--;
 				}
 			}
 		}

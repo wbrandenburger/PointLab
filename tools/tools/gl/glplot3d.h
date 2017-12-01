@@ -407,12 +407,12 @@ namespace gl
 					glDrawElements(gl_container_[i].getMode(), gl_container_[i].getNumberOfIndices(),
 						GL_UNSIGNED_INT, gl_container_[i].getIndices());
 				}
-				
+
 				if (gl_container_[i].isNormal()) {
 					if (gl_change_size_ == 1) {
 						ElementType* points = gl_container_[i].getPoints();
 						ElementType* normals = gl_container_[i].getNormals();
-						for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
+ 						for (size_t j = 0; j < gl_container_[i].getNumberOfVertices(); j++) {
 							glBegin(GL_LINES);
 							glVertex3d(points[0], points[1], points[2]);
 							glVertex3d(points[0] + normals[0] * gl_normalsize_,
@@ -488,7 +488,7 @@ namespace gl
 		/**
 			Normal size
 		*/
-		float gl_normalsize_;
+		ElementType gl_normalsize_;
 
 		/**
 			Flag which defines whether the size of the points or the normals will be changed
