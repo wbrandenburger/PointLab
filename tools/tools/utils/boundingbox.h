@@ -32,6 +32,8 @@
 #ifndef UTILS_BOUNDINGBOX_H_
 #define UTILS_BOUNDINGBOX_H_
 
+#include "tools/utils/matrix.h"
+
 namespace utils
 {
 	template<typename ElementType> struct BoundingBox 
@@ -40,34 +42,42 @@ namespace utils
 
 		/**
 			Constructor
-
-			@param[in] dataset_ Dataset
-			@param[in] number_of_elements_ Number of elements
-			@param[in] dim_ Specific dimension
 		*/
 		BoundingBox() : min(nullptr), max(nullptr), dim(NULL) {}
 
 		/**
 			Constructor
 
-			@param[in] dataset_ Dataset
+			@param[in] data_ Data
 			@param[in] number_of_elements_ Number of elements
 			@param[in] dim_ Specific dimension
 		*/
-		BoundingBox(ElementType* dataset_, size_t number_of_elements, size_t dim_) :
-			min(nullptr), max(nullptr), dim(dim_)
+		BoundingBox(ElementType* data_, size_t number_of_elements, size_t dim_) :
+			BoundingBox()
 		{
+			dim = dim_;
+
 			min = new ElementType[dim];
 			max = new ElementType[dim];
 
-			std::memcpy(min, dataset_, sizeof(ElementType)*dim);
-			std::memcpy(max, dataset_, sizeof(ElementType)*dim);
+			std::memcpy(min, data_, sizeof(ElementType)*dim);
+			std::memcpy(max, data_, sizeof(ElementType)*dim);
 
-			ElementType* dataset_ptr = dataset_;
+			ElementType* data_ptr = data_;
 			for (size_t i = 0; i < number_of_elements * dim; i++){
-				setCompareValue(*dataset_ptr, i % dim);
-				dataset_ptr++;
+				setCompareValue(*data_ptr, i % dim);
+				data_ptr++;
 			}
+		}
+
+		/**
+			Constructor
+
+			@param[in] data_ Data
+		*/
+		BoundingBox(utils::Matrix<ElementType> data_) :
+			BoundingBox(data_.getPtr(), data_.getRows(), data_.getCols())
+		{
 		}
 
 		/**
@@ -83,7 +93,7 @@ namespace utils
 
 			@param[in] bounding_box_ Bounding Box
 		*/
-		BoundingBox(const BoundingBox<ElementType>& bounding_box_) : min(nullptr), max(nullptr), dim(NULL)
+		BoundingBox(const BoundingBox<ElementType>& bounding_box_) : BoundingBox()
 		{
 			dim = bounding_box_.getDim();
 
@@ -99,7 +109,7 @@ namespace utils
 
 			@param[in] bounding_box_ Bounding Box
 		*/
-		BoundingBox(const BoundingBox<ElementType>&& bounding_box_) : min(nullptr), max(nullptr), dim(NULL)
+		BoundingBox(const BoundingBox<ElementType>&& bounding_box_) : BoundingBox()
 		{
 			dim = bounding_box_.getDim();
 
@@ -199,6 +209,16 @@ namespace utils
 		}
 
 		/**
+			Set the bounding box
+
+			@param[in] data_ Data
+		*/
+		void setBoundingBox(utils::Matrix<ElementType> data_)
+		{
+			setBoundingBox(data_.getPtr(), data_.getRows(), data_.getCols());
+		}
+
+		/**
 			Get minimum value for specific dimension
 
 			@param[in] dim_ Specific dimension
@@ -235,12 +255,34 @@ namespace utils
 		}
 
 		/**
+			Get minimum values
+		*/
+		utils::Matrix<ElementType> getMinMatrix () const
+		{
+			ElementType* min_ptr = new ElementType[dim];
+			std::memcpy(min_ptr, min, sizeof(ElementType) * dim);
+			
+			return utils::Matrix<ElementType>(min_ptr, dim, 1);
+		}
+
+		/**
 			Get maximum values
 		*/
 		ElementType* getMax() const
 		{
 			return max;
 		}	
+
+		/**
+			Get minimum values
+		*/
+		utils::Matrix<ElementType> getMaxMatrix () const
+		{
+			ElementType* max_ptr = new ElementType[dim];
+			std::memcpy(max_ptr, max, sizeof(ElementType) * dim);
+			
+			return utils::Matrix<ElementType>(max_ptr, dim, 1);
+		}
 
 		/**
 			Get difference for a specific dimension
@@ -253,9 +295,53 @@ namespace utils
 		/**
 			Get difference for a specific dimension
 		*/
+		ElementType* getDifference() const
+		{
+			ElementType* diff = new ElementType[dim];
+			for (size_t i = 0; i < dim; i++)
+			{
+				diff[i] = max[i] - min[i];
+			}
+
+			return diff;
+		}
+
+		/**
+			Get difference for a specific dimension
+		*/
+		utils::Matrix<ElementType> getDifferenceMatrix() const
+		{
+			return utils::Matrix<ElementType>(getDifference(), dim, 1);
+		}
+
+		/**
+			Get difference for a specific dimension
+		*/
 		ElementType getMiddle(size_t dim_) const
 		{
 			return (max[dim_] + min[dim_]) / (ElementType)2.0;
+		}
+
+		/**
+			Get difference for a specific dimension
+		*/
+		ElementType* getMiddle() const
+		{
+			ElementType* middle = new ElementType[dim];
+			for (size_t i = 0; i < dim; i++)
+			{
+				middle[i] = (max[i] + min[i]) / (ElementType)2.0;
+			}
+
+			return middle;
+		}
+
+		/**
+			Get difference for a specific dimension
+		*/
+		utils::Matrix<ElementType> getMiddleMatrix() const
+		{
+			return utils::Matrix<ElementType>(getMiddle(), dim, 1);
 		}
 
 		/**

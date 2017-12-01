@@ -148,17 +148,45 @@ namespace math
 	public:
 		/**
 			Constructor
+		*/
+		Polynomial2D() 
+		{
+		}
+
+		/**
+			Constructor
 
 			@param[in] parameter The coefficients of the polynomial
 			@param[in] degree Degree of the polynomial
 		*/
-		Polynomial2D(utils::Matrix<ElementType> parameter, size_t degree) :
-			parameter_(parameter), degree_(degree) {}
+		Polynomial2D(
+			utils::Matrix<ElementType> parameter,
+			size_t degree) :
+			parameter_(parameter), 
+			degree_(degree) 
+		{
+		}
 
 		/**
 			Destructor
 		*/
-		~Polynomial2D() {}
+		~Polynomial2D() 
+		{
+		}
+
+		/**
+			Set Polynomial2D
+
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
+		*/
+		void setPolynomial2D(
+			utils::Matrix<ElementType> parameter,
+			size_t degree) 
+		{
+			parameter_ = parameter;
+			degree_ = degree;
+		}
 
 		/**
 			Operator() Computation of a value corresponding to a function value
@@ -170,7 +198,7 @@ namespace math
 		{
 			ElementType result = ElementType();
 			for (size_t i = 0; i <= degree_; i++) {
-				result += parameter_[degree-i][0] * std::pow(x, i);
+				result += parameter_[degree_-i][0] * std::pow(x, i);
 			}
 
 			return result;
@@ -208,7 +236,6 @@ namespace math
 			 data.setColPtr((*this)(x.getPtr(), x.getRows()), 1);
 		}
 
-
 	private:
 
 		/**
@@ -229,20 +256,48 @@ namespace math
 	template<typename ElementType> class Polynomial3D
 	{
 	public:
+
+		/**
+			Constructor
+		*/
+		Polynomial3D()
+		{
+		}
+
 		/**
 			Constructor
 
 			@param[in] parameter The coefficients of the polynomial
 			@param[in] degree Degree of the polynomial
 		*/
-		Polynomial3D(utils::Matrix<ElementType> parameter, size_t degree) :
-			parameter_(parameter), degree_(degree) {}
+		Polynomial3D(
+			utils::Matrix<ElementType> parameter, 
+			size_t degree) :
+			parameter_(parameter), 
+			degree_(degree) 
+		{
+		}
 
 		/**
 			Destructor
 		*/
-		~Polynomial3D() {}
+		~Polynomial3D()
+		{
+		}
 
+		/**
+			Set Polynomial3D
+
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
+		*/
+		void setPolynomial3D(
+			utils::Matrix<ElementType> parameter, 
+			size_t degree)
+		{
+			parameter_ = parameter,
+			degree_ = degree;
+		}
 
 		/**
 			Operator() Computation of a value corresponding to a function value
@@ -272,6 +327,32 @@ namespace math
 		/**
 			Operator() Computation of a value corresponding to a function value
 
+			@param[in] x Function value
+			@param[in] y Function value
+			@param[in] z Function value
+			@result Corresponding value
+		*/
+		ElementType operator()(const ElementType& x, const ElementType& y, const ElementType& z) const
+		{
+			ElementType result = ElementType();
+			size_t index = ((degree_ + 2) * (degree_ + 1)) / 2 - 1;
+			for (size_t i = 0; i <= degree_; i++) {
+				for (size_t j = 0; j <= i; j++) {
+					for (size_t k = 0; k <= i; k++) {
+						if (j + k == i) {
+							result += parameter_[index][0] * std::pow(x, j) * std::pow(y, k);
+							index--;
+						}
+					}
+				}
+			}
+
+			return result - z;
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+
 			@param[in] x Function values
 			@param[in] y Function values
 			@param[in] number_of_elements Number of elements
@@ -288,6 +369,32 @@ namespace math
 				result_ptr++;
 				x++;
 				y++;
+			}
+
+			return result;
+		}
+
+		/**
+			Operator() Computation of a value corresponding to a function value
+
+			@param[in] x Function values
+			@param[in] y Function values
+			@param[in] z Function values
+			@param[in] number_of_elements Number of elements
+			@result Corresponding values
+		*/
+		ElementType* operator()(ElementType* x, ElementType* y, ElementType* z, size_t number_of_elements) const
+		{
+			ElementType* result = new ElementType[number_of_elements];
+			ElementType* result_ptr = result;
+			ElementType* end = x + number_of_elements;
+
+			while (x != end) {
+				*result_ptr = (*this)(*x,*y,*z);
+				result_ptr++;
+				x++;
+				y++;
+				z++;
 			}
 
 			return result;
@@ -324,38 +431,103 @@ namespace math
 		Creates a three dimensional polynom of abitrary degree, 
 		which depends on two dimensional functions
 	*/
-	template<typename ElementType> class Polynomial3DExpand 
+	template<typename ElementType> class Polynomial3DIntersection
 	{
+	public:
+
+		/**
+			Constructor
+		*/
+		Polynomial3DIntersection() 
+		{
+		}
+
 		/**
 			Constructor
 
 			@param[in] polynomial3D The basical polynom
-			@param[in] function_x The function for x
-			@param[in] function_y The function for y
+			@param[in] line Line
+			@param[in] point Point
 		*/
-		Polynomial3DExpand(Polynomial3D polynomial3D,
-			Polynomial2D<ElementType> function_x, Polynomial2D<ElementType> function_y) :
-			polynomial3D_(polynomial3D),
-			function_x_(function_x), function_y_(function_y) {}
+		Polynomial3DIntersection(
+			Polynomial3D<ElementType> polynomial3D,
+			utils::Matrix<ElementType> line,
+			utils::Matrix<ElementType> point) : 
+			polynomial3D_(polynomial3D)
+		{
+			function_x_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[0][0], point[0][0] }, 2, 1), 1);
+			function_y_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[1][0], point[1][0] }, 2, 1), 1);
+			function_z_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[2][0], point[2][0] }, 2, 1), 1);
+		}
 
 		/**
 			Constructor
 
 			@param[in] parameter The coefficients of the polynomial
 			@param[in] degree Degree of the polynomial
-			@param[in] function_x The function for x
-			@param[in] function_y The function for y
+			@param[in] line Line
+			@param[in] point Point
 		*/
-		Polynomial3DExpand(utils::Matrix<ElementType> parameter, size_t degree,
-			Polynomial2D<ElementType> function_x, Polynomial2D<ElementType> function_y) :
-			polynomial3D_(Polynomial3D<ElementType>(parameter, degree)),
-			function_x_(function_x), function_y_(function_y){}
+		Polynomial3DIntersection(
+			utils::Matrix<ElementType> parameter, 
+			size_t degree,
+			utils::Matrix<ElementType> line,
+			utils::Matrix<ElementType> point) :
+			polynomial3D_(Polynomial3D<ElementType>(parameter, degree))
+		{
+			function_x_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[0][0], point[0][0] }, 2, 1), 1);
+			function_y_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[1][0], point[1][0] }, 2, 1), 1);
+			function_z_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[2][0], point[2][0] }, 2, 1), 1);
+		}
 		
 		/**
 			Destructor
 		*/
-		~Polynomial3DExpand() {}
-		
+		~Polynomial3DIntersection() 
+		{
+		}
+				
+		/**
+			Set Polynomial3DIntersection
+
+			@param[in] polynomial3D The basical polynom
+			@param[in] line Line
+			@param[in] point Point
+		*/
+		void setPolynomial3DIntersection(
+			Polynomial3D<ElementType> polynomial3D,
+			utils::Matrix<ElementType> line,
+			utils::Matrix<ElementType> point) 
+			
+		{
+			polynomial3D_ = polynomial3D;
+
+			function_x_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[0][0], point[0][0] }, 2, 1), 1);
+			function_y_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[1][0], point[1][0] }, 2, 1), 1);
+			function_z_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[2][0], point[2][0] }, 2, 1), 1);
+		}
+
+		/**
+			Set Polynomial3DIntersection
+
+			@param[in] parameter The coefficients of the polynomial
+			@param[in] degree Degree of the polynomial
+			@param[in] line Line
+			@param[in] point Point
+		*/
+		void setPolynomial3DIntersection(
+			utils::Matrix<ElementType> parameter, 
+			size_t degree,
+			utils::Matrix<ElementType> line,
+			utils::Matrix<ElementType> point)
+		{
+			polynomial3D_ = Polynomial3D<ElementType>(parameter, degree);
+
+			function_x_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[0][0], point[0][0] }, 2, 1), 1);
+			function_y_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[1][0], point[1][0] }, 2, 1), 1);
+			function_z_ = Polynomial2D<ElementType>(utils::Matrix<ElementType>({ line[2][0], point[2][0] }, 2, 1), 1);
+		}
+
 		/**
 			Operator() Computation of a value corresponding to a function value
 			
@@ -364,7 +536,7 @@ namespace math
 		*/
 		ElementType operator()(const ElementType& value) const
 		{
-			return polynomial3D_(function_x_(value),function_y_(value));
+			return polynomial3D_(function_x_(value),function_y_(value),function_z_(value));
 		}
 
 		/**
@@ -376,23 +548,10 @@ namespace math
 		*/
 		ElementType* operator()(ElementType* values, size_t number_of_elements) const
 		{
-			return polynomial3D_(function_x_(values),function_y_(values), number_of_elements);
+			return polynomial3D_(function_x_(values), function_y_(values), function_z_(values),  number_of_elements);
 		}
 
-		/**
-			Operator() Computation of a value corresponding to a function value
-			
-			@param[in,out] data Function values
-		*/
-		void operator()(utils::Matrix<ElementType>& data) const
-		{
-			utils::Matrix<ElementType> data_transpose = data.transpose();
-			ElementType* result = polynomial3D_(function_x_(data_transpose[0], data.getRows()),
-				function_y_(data_transpose[0], data.getRows()), number_of_elements);
-
-			data.setColPtr(result,2);
-			delete[] result;
-		}
+	private:
 
 		/**
 			Polynom
@@ -400,14 +559,19 @@ namespace math
 		Polynomial3D<ElementType> polynomial3D_;
 
 		/**
-			Function in x
+			Function for x
 		*/
 		Polynomial2D<ElementType> function_x_;
 
 		/**
-			Function in y
+			Function for y
 		*/
 		Polynomial2D<ElementType> function_y_;
+
+		/**
+			Function for z
+		*/
+		Polynomial2D<ElementType> function_z_;
 	};
 }
 

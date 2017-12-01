@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 	std::cout << pointcloud << std::endl;
 
 	/**
-		Computation of normals
+		----------------------- Computation of the normals -----------------------
 	*/
 	time.start();
 	
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Computation of Normals in " << time.stop() << " s" << std::endl;
 		
 	/**
-		----------------------- Computation of the moving point -----------------------
+		----------------------- Computation of the surfaces -----------------------
 	*/
 
 		/**
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
 			kdtree_index.knnSearch(point.transpose(), indices, dists, neighbors, tree_params);
 
 			/**
-				Get the neighbors of the point
+				Get the neighbors of the reference point
 			*/
 			pointcloud::PointcloudAoS<float> pointcloud_points;
 			pointcloud.getSubset(indices.getPtr(), neighbors, pointcloud_points);
@@ -138,12 +138,22 @@ int main(int argc, char* argv[]) {
 												normal.getType<double>(),
 												surface_params);
 
+			/**
+				Create a grid which shall be fitted to the pointcloud
+			*/
 			utils::Matrix<float> points_mesh;
 			utils::Matrix<unsigned int> lines_mesh;
 			gl::glMeshGrid<float>(points, points_mesh, lines_mesh, 10);
 
 			math::Polynomial3D<float> polynomial(parameter.getType<float>(), polynomial_degree);
 			polynomial(points_mesh);
+
+			math::Polynomial3D<float> polynom(parameter.getType<float>(), 3);
+			math::Polynomial3DIntersection<float> polynom_intersection(polynom, normal, point);
+			std::cout << polynom_intersection(0) << std::endl;
+
+			utils::BoundingBox<float> bounding_box(points);
+			std::cout << bounding_box << std::endl;
 
 			/**
 				Show results
@@ -158,14 +168,6 @@ int main(int argc, char* argv[]) {
 			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
 			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
 			glview.subPlot(2, 2, 1);
-
-			//glview.setPlot(number_of_elements);
-			//glview.setX(x);
-			//glview.setY(y);
-
-			//glview.setPlot3D();
-			//glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
-			//glview.subPlot(2, 2, 2); 
 
 			glview.mainLoop();
 		} while (true);
