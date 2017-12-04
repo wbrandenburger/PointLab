@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
 				----------------------- Computation of the surface without MLS -----------------------
 			*/
 			
-			size_t polynomial_degree = 2;
+			size_t polynomial_degree = 4;
 
 				/**
 					Compute the distances and the variance of these distances
@@ -179,24 +179,30 @@ int main(int argc, char* argv[]) {
 			/**
 				----------------------- Computation of the intersection -----------------------
 			*/
-				//math::Polynomial3D<double> polynom(parameter_mls.getType<double>(), 3);
-				//math::Polynomial3DIntersection<double> polynom_intersection(polynom, normal, point);
+				/**
+					Create a structure which holds the polynom and the line information
+				*/
+				math::Polynomial3D<ElementType> polynom(parameter_mls, polynomial_degree);
+				math::Polynomial3DIntersection<ElementType> polynom_intersection(polynom, normal, point);
 
-				//utils::BoundingBox<double> bounding_box(points);
+				/**
+					Compute the distance to the furthest planes
+				*/
+				utils::BoundingBox<double> bounding_box(points);
 	
-				//double min = ((point - bounding_box.getMinMatrix()).transpose() * normal).getValue();
-				//double max = ((point - bounding_box.getMaxMatrix()).transpose() * normal).getValue();
+				double min = ((point - bounding_box.getMinMatrix()).transpose() * normal).getValue();
+				double max = ((point - bounding_box.getMaxMatrix()).transpose() * normal).getValue();
 
-				//if (min > max) {
-				//swap(min, max);
-				//}
+				if (min > max) {
+				swap(min, max);
+				}
 
-				//size_t number_of_elements = 1000;
-				//utils::Matrix<double> intersection = math::getFunctionMatrix<double, math::Polynomial3DIntersection<double>>(
-				//	polynom_intersection,
-				//	min,
-				//	max,
-				//	number_of_elements);
+				size_t number_of_elements = 1000;
+				utils::Matrix<ElementType> intersection = math::getFunctionMatrix<ElementType, math::Polynomial3DIntersection<ElementType>>(
+					polynom_intersection,
+					min,
+					max,
+					number_of_elements);
 
 				//float t = math::NewtonMethod<double, math::Polynomial3DIntersection<double>>(
 				//	polynom_intersection, 
@@ -213,10 +219,6 @@ int main(int argc, char* argv[]) {
 			*/
 			gl::GLView<ElementType> glview(argc,argv);
 
-			//glview.setViewer();
-			//glview.setPointcloud(pointcloud);
-			//glview.subPlot(2, 2, 0);
-
 			glview.setPlot3D();
 			glview.setPointcloud(GLParams::POINTS, pointcloud_points);
 			glview.setPointcloud(GLParams::LINES, points_mesh, lines_mesh);
@@ -227,12 +229,14 @@ int main(int argc, char* argv[]) {
 			glview.setPointcloud(GLParams::LINES, points_mesh_mls, lines_mesh_mls);
 			glview.subPlot(2, 2, 1);
 
-			std::cout << pointcloud_points << std::endl;
+			glview.setPlot(number_of_elements);
+			glview.setX(intersection.getAllocatedColPtr(0));
+			glview.setY(intersection.getAllocatedColPtr(1));
+			glview.subPlot(2, 2, 2);
 
-			//glview.setPlot(number_of_elements);
-			//glview.setX(intersection.getAllocatedColPtr(0));
-			//glview.setY(intersection.getAllocatedColPtr(1));
-			//glview.subPlot(2, 2, 2);
+			//glview.setViewer();
+			//glview.setPointcloud(pointcloud);
+			//glview.subPlot(2, 2, 3);
 
 			glview.mainLoop();
 		} while (true);

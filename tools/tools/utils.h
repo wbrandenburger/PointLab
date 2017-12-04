@@ -42,7 +42,6 @@
 #include "utils/matrix.h"
 #include "utils/mouseposition.h"
 #include "utils/queue.h"
-#include "utils/plot.h"
 #include "utils/randomize.h"
 #include "utils/threadpool.h"
 #include "utils/timer.h"

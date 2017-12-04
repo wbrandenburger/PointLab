@@ -27,7 +27,7 @@ find_package(FreeGlut REQUIRED)
 find_package(GLEW REQUIRED)
 
 #------------------------------ OpenCV ------------------------------
-find_package(OPENCV)
+#find_package(OPENCV)
 
 #------------------------------ OpenMP ------------------------------
 find_package(OpenMP)
@@ -47,7 +47,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 file(GLOB_RECURSE TOOL_SOURCES "tools/*.cpp" "tools/*.c" "tools/*.cu")
 file(GLOB_RECURSE TOOL_HEADERS "tools/*.hpp" "tools/*.h")
 
-set(STANDARD_TARGETS epivis gcptoheight gcpimgto3d gcptoimg pcsimp)
+set(STANDARD_TARGETS pcsimp) #epivis gcptoheight gcpimgto3d gcptoimg
 
 set(LIBRARY_TARGETS trees)
 
@@ -79,10 +79,10 @@ endforeach()
 #	cuda_add_executable(${FORTARGETS} ${SOURCES} ${TOOL_SOURCES})
 #endforeach()
 
-set(GCPTARGETS epivis gcptoheight gcpimgto3d gcptoimg)
-foreach (FORTARGETS ${GCPTARGETS})
-	set_target_properties(${FORTARGETS} PROPERTIES FOLDER "gcp")
-endforeach()
+#set(GCPTARGETS epivis gcptoheight gcpimgto3d gcptoimg)
+#foreach (FORTARGETS ${GCPTARGETS})
+#	set_target_properties(${FORTARGETS} PROPERTIES FOLDER "gcp")
+#endforeach()
 
 set(TARGETS ${STANDARD_TARGETS} ${LIBRARY_TARGETS} )
 
@@ -121,9 +121,9 @@ foreach(FORTARGETS ${TARGETS})
 	target_link_libraries(${FORTARGETS} ${GLEW_LIBRARY_32S})
 	
 	# ---------------------------- OpenCV ----------------------------
-	foreach (FOR_RELEASE ${OPENCV_RELEASE_DIR})
-		target_link_libraries(${FORTARGETS} optimized ${FOR_RELEASE})
-	endforeach()
+	#foreach (FOR_RELEASE ${OPENCV_RELEASE_DIR})
+	#	target_link_libraries(${FORTARGETS} optimized ${FOR_RELEASE})
+	#endforeach()
 	
 	# ---------------------------- RPly ----------------------------
 	target_link_libraries(${FORTARGETS} ${RPLY_LIBRARY})
