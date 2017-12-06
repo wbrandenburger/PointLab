@@ -380,6 +380,49 @@ namespace pointcloud
 		const utils::Matrix<ElementType>& points, 
 		const NormalParams&  normal_params)
 	{
+		/**
+		Computation of the distances to the reference point and define the weigths
+		*/
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point.transpose()));
+
+		utils::Matrix<ElementType> weights;
+		math::getWeightsDistances(distances, weights, normal_params.getWeightFunction());
+
+		/**
+		Get the average of all points
+		*/
+		utils::Matrix<ElementType> ones(1, points.getRows());
+		ones += 1;
+		utils::Matrix<ElementType> average_point(1, 3);
+		average_point = (ones * points) / points.getRows();
+
+		/**
+		Build a nx3 design matrix = [x y z] with n = number of points
+		*/
+		utils::Matrix<ElementType> design_matrix(points.getRows(), 3);
+		design_matrix = points - average_point;
+
+		/**
+		Add the weights to the design matrix
+		*/
+		design_matrix = weights*design_matrix;
+
+		/**
+		Compute the singular value decomposition of A
+		*/
+		Eigen::Map<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> design_eigen(
+			design_matrix.getPtr(), design_matrix.getRows(), design_matrix.getCols());
+		Eigen::JacobiSVD<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd_eigen(
+			design_eigen, Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+		/**
+		The last vector of matrix v computed by the singular value decomposition corresponds to the
+		smallest singular value
+		*/
+		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> v_eigen = svd_eigen.matrixV();
+		normal[0] = v_eigen(0, 2);
+		normal[1] = v_eigen(1, 2);
+		normal[2] = v_eigen(2, 2);
 	}
 
 	/**
