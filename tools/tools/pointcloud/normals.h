@@ -352,7 +352,7 @@ namespace pointcloud
 		Eigen::Map<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic,Eigen::RowMajor>> design_eigen(
 			design_matrix.getPtr(), design_matrix.getRows(), design_matrix.getCols());
 		Eigen::JacobiSVD<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd_eigen(
-			design_eigen, Eigen::ComputeThinU | Eigen::ComputeThinV);
+			design_eigen, Eigen::ComputeThinV);
 
 		/**
 			The last vector of matrix v computed by the singular value decomposition corresponds to the
@@ -413,7 +413,7 @@ namespace pointcloud
 		Eigen::Map<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> design_eigen(
 			design_matrix.getPtr(), design_matrix.getRows(), design_matrix.getCols());
 		Eigen::JacobiSVD<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd_eigen(
-			design_eigen, Eigen::ComputeThinU | Eigen::ComputeThinV);
+			design_eigen, Eigen::ComputeThinV);
 
 		/**
 		The last vector of matrix v computed by the singular value decomposition corresponds to the
@@ -441,6 +441,41 @@ namespace pointcloud
 		const utils::Matrix<ElementType>& points, 
 		const NormalParams&  normal_params)
 	{
+		/**
+		Computation of the distances to the reference point and define the weigths
+		*/
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point.transpose()));
+
+		utils::Matrix<ElementType> weights;
+		math::getWeightsDistances(distances, weights, normal_params.getWeightFunction());
+
+		/**
+		Build a nx3 design matrix = [x y z] with n = number of points
+		*/
+		utils::Matrix<ElementType> design_matrix(points.getRows(), 3);
+		design_matrix = points - point.transpose();
+
+		/**
+		Add the weights to the design matrix
+		*/
+		design_matrix = weights*design_matrix;
+
+		/**
+		Compute the singular value decomposition of A
+		*/
+		Eigen::Map<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> design_eigen(
+			design_matrix.getPtr(), design_matrix.getRows(), design_matrix.getCols());
+		Eigen::JacobiSVD<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd_eigen(
+			design_eigen, Eigen::ComputeThinV);
+
+		/**
+		The last vector of matrix v computed by the singular value decomposition corresponds to the
+		smallest singular value
+		*/
+		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> v_eigen = svd_eigen.matrixV();
+		normal[0] = v_eigen(0, 2);
+		normal[1] = v_eigen(1, 2);
+		normal[2] = v_eigen(2, 2);
 	}
 	
 	/**
@@ -455,9 +490,66 @@ namespace pointcloud
 	template<typename ElementType> void normalQuadSVD(
 		ElementType* normal,
 		const utils::Matrix<ElementType>& point,
-		const utils::Matrix<ElementType>& points, 
+		const utils::Matrix<ElementType>& points,
 		const NormalParams&  normal_params)
 	{
+		/**
+			Computation of the distances to the reference point and define the weigths
+		*/
+		utils::Matrix<ElementType> distances = std::sqrt(math::euclideanDistance<ElementType>(points - point.transpose()));
+
+		utils::Matrix<ElementType> weights;
+		math::getWeightsDistances(distances, weights, normal_params.getWeightFunction());
+
+		/**
+		Build a nx10 design matrix = [x^2 y^2 z^2 xy xz yz x y z 1] with n = number of points
+		*/
+		utils::Matrix<ElementType> design_matrix(points.getRows(), 10);
+		for (size_t i = 0; i < points.getRows(); i++) {
+			design_matrix[i][0] = points[i][0] * points[i][0];
+			design_matrix[i][1] = points[i][1] * points[i][1];
+			design_matrix[i][2] = points[i][2] * points[i][2];
+			design_matrix[i][3] = points[i][0] * points[i][1];
+			design_matrix[i][4] = points[i][0] * points[i][2];
+			design_matrix[i][5] = points[i][1] * points[i][2];
+			design_matrix[i][6] = points[i][0];
+			design_matrix[i][7] = points[i][1];
+			design_matrix[i][8] = points[i][2];
+			design_matrix[i][9] = (ElementType)1;
+		}
+
+		/**
+		Add the weights to the point matrix
+		*/
+		design_matrix = weights * design_matrix;
+
+		/**
+		Compute the singular value decomposition of A
+		*/
+		Eigen::Map<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> design_eigen(
+			design_matrix.getPtr(), design_matrix.getRows(), design_matrix.getCols());
+		Eigen::JacobiSVD<Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic>> svd_eigen(
+			design_eigen, Eigen::ComputeThinV);
+
+		/**
+		The last vector of matrix v computed by the singular value decomposition corresponds to the
+		smallest singular value. That vector is then used as coefficient of the partial derivatives 
+		of the surface.
+		*/
+		Eigen::Matrix<ElementType, Eigen::Dynamic, Eigen::Dynamic> v_eigen = svd_eigen.matrixV();
+		size_t column = 9;
+		normal[2] = 2 * v_eigen(2, column) * point[2][0] + v_eigen(4, column) * point[0][0] + v_eigen(5, column) * point[1][0] + v_eigen(8, column);
+		normal[0] = (2 * v_eigen(0, column) * point[0][0] + v_eigen(3, column) * point[1][0] + v_eigen(4, column) * point[2][0] + v_eigen(6, column)) / normal[2];
+		normal[1] = (2 * v_eigen(1, column) * point[1][0] + v_eigen(3, column) * point[0][0] + v_eigen(5, column) * point[2][0] + v_eigen(7, column)) / normal[2];
+		normal[2] = 1;
+
+		/**
+		Normalize the vector
+		*/
+		ElementType normal_length = std::sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+		normal[0] /= normal_length;
+		normal[1] /= normal_length;
+		normal[2] /= normal_length;
 	}
 }
 
